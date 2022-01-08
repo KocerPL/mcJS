@@ -33,7 +33,29 @@ export class Shader
     }
     use(gl)
     {
+        gl.linkProgram(this.program);
         gl.useProgram(this.program);
+    }
+    loadUniforms(transformationMatrix,projectionMatrix,viewMatrix)
+    {
+        let transf = this.getUniform('transformation');
+        this.loadMatrix(transf,transformationMatrix);
+        let proj = this.getUniform('projection');
+        this.loadMatrix(proj,projectionMatrix);
+        let vm = this.getUniform('view');
+        this.loadMatrix(vm,viewMatrix);
+    }
+    getUniform(name)
+    {
+        return gl.getUniformLocation(this.program,name);
+    }
+    loadFloat(location,float)
+    {
+        gl.uniform1f(location,float);
+    }
+    loadMatrix(location,matrix)
+    {
+        gl.uniformMatrix4fv(location,false,new Float32Array(matrix));
     }
     static readFile(filePath)
     {

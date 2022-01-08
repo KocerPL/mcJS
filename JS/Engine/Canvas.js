@@ -22,4 +22,12 @@ export class Canvas
         let gl = this.gl;
       gl.viewport(0,0,this.canva.width,this.canva.height);
     }
+    getWidth()
+    {
+        return this.canva.width;
+    }
+    getHeight()
+    {
+        return this.canva.height;
+    }
 }
