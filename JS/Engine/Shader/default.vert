@@ -10,9 +10,9 @@ mat4 ready;
 vec4 posDiv;
 void main() {
 
-ready =transformation*projection;
+ready =transformation*view*projection;
 
 //The graphics card has +10 iq with opengl and does division for us
-gl_Position = ready*vec4(a_Position,1.0);
+gl_Position = vec4(a_Position,1.0)*ready;
 color = vec4(a_color,1.0);
 }

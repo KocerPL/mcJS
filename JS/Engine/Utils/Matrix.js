@@ -2,6 +2,7 @@ export class Matrix extends Float32Array
 {
 constructor(...[args])
 {
+   // console.log(args);
     super(args==undefined|| (args.length<=1&&args[0]==1) ?[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]:args);
     this.rows = new Array();
 }
@@ -21,10 +22,10 @@ static projection(fov,nearPlane,farPlane,aspectRatio)
     // 0                    0            zf/(zf-zn) (zf/(zf-zn))*zn
     // 0                    0            1          0
 let fovRel = 1/Math.tan((fov/2)*(Math.PI/180));
-console.log(fovRel);
-console.log(aspectRatio);
+//console.log(fovRel);
+//console.log(aspectRatio);
 this.clearMat(mat);
-console.log(aspectRatio*fovRel);
+//console.log(aspectRatio*fovRel);
 mat[0] = aspectRatio*fovRel;
 mat[5] = fovRel;
 mat[10] = (farPlane/(farPlane-nearPlane));
@@ -186,10 +187,10 @@ static view(x,y,z,pitch,yaw)
         -cosPitch*cosYaw,-cosPitch*sinYaw,-sinPitch,(cosPitch*((x*cosYaw)+(y*sinYaw)))+(z*sinPitch),
         0,0,0,1
      ]);
-console.log(mat);
+//console.log(mat);
 return Matrix.invert(mat);
 }
-static viewFPS(x,y,z,pitch,yaw)
+static viewFPS(x,y,z,yaw,pitch)
 {
    let rPitch = pitch*(Math.PI/180);
     let rYaw = yaw*(Math.PI/180);
@@ -220,6 +221,16 @@ static viewFPS(x,y,z,pitch,yaw)
         }
     )
 
+}
+scale(x,y,z)
+{
+let scale=    new Matrix();
+scale = new Float32Array([x,0,0,0,
+    0,y,0,0
+    ,0,0,z,0,
+    0,0,0,1]);
+    console.log(scale);
+return Matrix.mult(this,scale);
 }
 static hackyInverse(mat) // works only for rotation and translation!!
 {
