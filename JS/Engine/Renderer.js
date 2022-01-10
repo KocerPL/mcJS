@@ -1,5 +1,3 @@
-import { Matrix } from "./Utils/Matrix.js";
-
 export class Renderer
 {
     static prepare(gl,shader)
@@ -13,11 +11,17 @@ shader.use(gl);
         
       //model.transformation = Matrix.rotateY(model.transformation,0.5);
     //  model.transformation = Matrix.rotateX(model.transformation,0.5);
-     
-     
         shader.loadUniforms(model.transformation,projectionMatrix,viewMatrix);
-            model.vao.bind(gl);
-        gl.drawElements(gl.TRIANGLES,model.vertexCount,  gl.UNSIGNED_INT,0);
-        model.vao.unbind(gl);
+            model.raw.vao.bind(gl);
+        gl.drawElements(gl.TRIANGLES,model.raw.vertexCount,  gl.UNSIGNED_INT,0);
+        model.raw.vao.unbind(gl);
+    }
+    static renderTexture(gl,model,shader,projectionMatrix,viewMatrix)
+    {
+       
+        shader.loadUniforms(model.transformation,projectionMatrix,viewMatrix);
+        model.raw.vao.bind(gl);
+    gl.drawElements(gl.TRIANGLES,model.raw.vertexCount,  gl.UNSIGNED_INT,0);
+    model.raw.vao.unbind(gl);
     }
 }

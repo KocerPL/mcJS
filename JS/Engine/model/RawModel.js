@@ -1,4 +1,4 @@
-import { Matrix } from "./Utils/Matrix.js";
+import { Matrix } from "../Utils/Matrix.js";
 
 export class RawModel
 {
@@ -6,6 +6,5 @@ export class RawModel
     {
 this.vao = vao;
 this.vertexCount = vertexCount;
-this.transformation = new Matrix();
     }
 }

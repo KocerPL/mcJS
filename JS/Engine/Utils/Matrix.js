@@ -190,30 +190,13 @@ static view(x,y,z,pitch,yaw)
 //console.log(mat);
 return Matrix.invert(mat);
 }
-static viewFPS(x,y,z,yaw,pitch)
+static viewFPS(eye,yaw,pitch)
 {
-   let rPitch = pitch*(Math.PI/180);
-    let rYaw = yaw*(Math.PI/180);
-    let cosYaw = Math.cos(rYaw);
-    let sinYaw = Math.sin(rYaw);
-    let cosPitch = Math.cos(rPitch);
-    let sinPitch = Math.sin(rPitch);
-    let xAxis = {x:cosYaw,y:0,z:-sinYaw};
-    let yAxis = {x:sinYaw*sinPitch,y:cosPitch,z:cosYaw*sinPitch};
-    let zAxis = {x:sinYaw*cosPitch,y:-sinPitch,z:cosYaw*cosPitch};
-    //create view matrix
-   let view =new Float32Array( [
-    xAxis.x,yAxis.x,zAxis.x, 0,
-    xAxis.y,yAxis.y,zAxis.y,0,
-    xAxis.z,yAxis.z,zAxis.z,0,
-    //dot products
-    -((xAxis.x*x)+(xAxis.y*y)+(xAxis.z*z)),-((yAxis.x*x)+(yAxis.y*y)+(yAxis.z*z)),-((zAxis.x*x)+(zAxis.y*y)+(zAxis.z*z)),1 
-    ]);
     //view2
     let view2 = new Matrix();
    view2= view2.rotateX(pitch);
     view2 =view2.rotateY(yaw);
-    view2 =view2.translate(-x,-y,-z);
+    view2 =view2.translate(-eye.x,-eye.y,-eye.z);
     return view2;
     let view3 = new Matrix(
         {

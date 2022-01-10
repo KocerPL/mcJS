@@ -1,8 +1,11 @@
 import {Canvas} from "./Engine/Canvas.js";
 import { Loader } from "./Engine/Loader.js";
+import { Model } from "./Engine/model/Model.js";
 import { Pencil } from "./Engine/Pencil.js";
 import { Renderer } from "./Engine/Renderer.js";
 import { Matrix } from "./Engine/Utils/Matrix.js";
+import { Vector } from "./Engine/Utils/Vector.js";
+import { Block } from "./Game/Block.js";
 export class Main 
 {
     static canva = new Canvas(document.body);
@@ -88,12 +91,11 @@ export class Main
         this.mat = Matrix.transpose(this.mat);
         console.log(this.mat);
         console.log(Matrix.getDeterminant(new Float32Array([1,3,0,0,0,1,0,10,0,12,1,0,0,0,0,1])));
-        this.model = Loader.loadToVao(gl,vertices,colors,indices);
-        this.model.transformation[11]=2;
-       
-        this.model2 = Loader.loadToVao(gl,vert2,colors2,indices2);
-       this.model2.transformation= this.model2.transformation.scale(100,1,100);
-        this.model2.transformation[11]=0; 
+        this.model = new Model(gl,vertices,colors,indices);
+       this.block = new Block(gl,new Vector(0,0,3));
+      //  this.model2 = Loader.loadToVao(gl,vert2,colors2,indices2);
+     //  this.model2.transformation= this.model2.transformation.scale(100,1,100);
+     //   this.model2.transformation[11]=0; 
         window.addEventListener('keydown',this.keyDown.bind(this),false);
         window.addEventListener('keyup',this.keyUp.bind(this),false);
         window.addEventListener('mousemove',this.mm.bind(this),false);
@@ -118,31 +120,20 @@ export class Main
     }
     static mm(ev)
     {
-        console.log(ev);
+      //  console.log(ev);
+        
         this.yRot-= ev.movementX/20;
         this.xRot+= ev.movementY/20;
+        if(this.xRot>90) this.xRot=90;
+        if(this.xRot<-90) this.xRot=-90;
+        while(this.yRot>360) this.yRot-=360;
+        while(this.yRot<-360) this.yRot+=360;
 ev.preventDefault();
     }
     static loop()
     {
         this.output.value ="Pos: x:"+this.xPos+" y:"+this.yPos+" z:"+this.zPos+" Rot: x:"+this.xRot+" Rot: y:"+this.yRot; 
         //console.log(this.projectMatrix);
-        if(this.keys[37])
-        {
-            this.yRot+=2;
-        }
-        else if(this.keys[39])
-        {
-            this.yRot-=2;
-        }
-        if(this.keys[38])
-        {
-            this.xRot-=2;
-        }
-        else if(this.keys[40])
-        {
-            this.xRot+=2;
-        }
         if(this.keys[87])
         {
             this.zPos+=Math.cos((-this.yRot)*(Math.PI/180))*0.1;
@@ -173,25 +164,14 @@ ev.preventDefault();
         {
             this.yPos-=0.1;
         }
-        this.view = Matrix.viewFPS(this.xPos,this.yPos,this.zPos,-this.yRot,-this.xRot);
+        this.view = Matrix.viewFPS(new Vector(this.xPos,this.yPos,this.zPos),-this.yRot,-this.xRot);
         Renderer.prepare(gl,this.canva.shader);
-        this.model.transformation= this.model.transformation.rotateX(1);
-        for(let i=0;i<16;i++)
-        {
-            this.model.transformation[11]=i;
-            for(let a=0;a<16;a++)
-            {
-
-                this.model.transformation[3]=a;
-                for(let x=0;x<16;x++)
-            {
-                this.model.transformation[7]=x;
+     //   this.model.transformation= this.model.transformation.rotateX(1);
+    
+          
                 Renderer.render(gl,this.model,this.canva.shader,this.projectMatrix,this.view);
-            }
-            }
-      
-        }
-        Renderer.render(gl,this.model2,this.canva.shader,this.projectMatrix,this.view);
+                this.block.render(gl,this.canva.shader,this.projectMatrix,this.view);
+      //  Renderer.render(gl,this.model2,this.canva.shader,this.projectMatrix,this.view);
         requestAnimationFrame(this.loop.bind(this));
     }
 }
