@@ -12,7 +12,7 @@ export class Canvas
             throw new Error("Your browser doesn't support webgl, or you have no graphics driver updated!");
         location.appendChild(this.canva);
         this.resize();
-        this.shader = new Shader("JS/Engine/Shader/default.vert","JS/Engine/Shader/default.frag",gl);
+       // this.shader = new Shader("JS/Engine/Shader/default.vert","JS/Engine/Shader/default.frag",gl);
         window.addEventListener('resize',this.resize.bind(this),false);
     }
     resize()

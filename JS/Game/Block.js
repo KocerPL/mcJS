@@ -5,6 +5,7 @@ import { TextureShader } from "../Engine/Shader/textureShader.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { VBO } from "../Engine/VBO.js";
 import { TexturedModel } from "../Engine/model/TexturedModel.js";
+import { Matrix } from "../Engine/Utils/Matrix.js";
 export class Block
 {
     static vertices =[
@@ -101,23 +102,50 @@ export class Block
         1, 0,
         0, 0
   ];
+  static type = Object.freeze({
+     AIR:0,
+     DIRT:1 
+  });
+  static ready=false;
+static onReady= function(){};
+static model = null;
+  static init()
+  {
+    this.shader = new TextureShader(gl);
+    Block.texture.src = "/JS/Game/textures/dirt.png";
+    Block.texture.addEventListener("load",()=>
+    {
+        Block.model = new TexturedModel(gl,Block.vertices,Block.indices,Block.texturec,Block.texture);
+        this.ready=true;
+        this.onReady();
+    })
+    
+  }
     static texture = new Image(16,16); 
     constructor(gl,pos)
     {
-        this.shader = new TextureShader(gl);
-        Block.texture.src = "/JS/Game/textures/dirt.png";
-        this.model = new TexturedModel(gl,Block.vertices,Block.indices,Block.texturec,Block.texture);
-        this.model.transformation[3] = pos.x;
-        this.model.transformation[7] = pos.y;
-        this.model.transformation[11] = pos.z;
+     
+   //    this.model =  new TexturedModel(gl,Block.vertices,Block.indices,Block.texturec,Block.texture);
+        this.transformation = new Matrix();
+        this.transformation[3] = pos.x;
+        this.transformation[7] = pos.y;
+        this.transformation[11] = pos.z;
        
     }
-    
-    render(gl,shader,projection,view)
+    static prepareRenderer()
     {
-        Renderer.prepare(gl,this.shader);
-     //    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, Block.texture);
-        Renderer.renderTexture(gl,this.model,this.shader,projection,view);
+        Renderer.prepare(gl,Block.shader);
     }
-
+    render(projection,view)
+    {
+        
+     //    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, Block.texture);
+        Renderer.renderTexture(gl,Block.model,Block.shader,this.transformation,projection,view);
+    }
+    static render(pos,type,projection,view)
+    {
+        let transformation = new Matrix();
+       transformation =  transformation.translate(pos.x,pos.y,pos.z);
+        Renderer.renderTexture(gl,Block.model,Block.shader,transformation,projection,view);
+    }
 }

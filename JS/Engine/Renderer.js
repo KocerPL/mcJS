@@ -16,10 +16,10 @@ shader.use(gl);
         gl.drawElements(gl.TRIANGLES,model.raw.vertexCount,  gl.UNSIGNED_INT,0);
         model.raw.vao.unbind(gl);
     }
-    static renderTexture(gl,model,shader,projectionMatrix,viewMatrix)
+    static renderTexture(gl,model,shader,transformationMatrix,projectionMatrix,viewMatrix)
     {
        
-        shader.loadUniforms(model.transformation,projectionMatrix,viewMatrix);
+        shader.loadUniforms(transformationMatrix,projectionMatrix,viewMatrix);
         model.raw.vao.bind(gl);
     gl.drawElements(gl.TRIANGLES,model.raw.vertexCount,  gl.UNSIGNED_INT,0);
     model.raw.vao.unbind(gl);
