@@ -1,20 +1,23 @@
-export class Matrix extends Float32Array
+export class Matrix
 {
-
-constructor(args?:ArrayBuffer)
+private _data: number[] = [];
+private constructor()
 {
-    let mat:ArrayBuffer = args?? [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1];
-
+    this._data = [
+        1.0, 0, 0, 0,
+        0, 1.0, 0, 0,
+        0, 0, 1.0, 0,
+        0, 0, 0, 1.0
+    ];
    // console.log(args);
-    super(mat);
 }
-static toTransformation(mat)
+static toTransformation(m)
 {
-    return mat;
+    return
 }
 static projection(fov,nearPlane,farPlane,aspectRatio)
 {
-    let mat = new Matrix(1);
+    let mat = new Matrix();
     // (h/w)*1/tan(fov/2)   0            0          0
     // 0                    1/tan(fov/2) 0          0
     // 0                    0            zf/(zf-zn) (zf/(zf-zn))*zn
@@ -170,7 +173,7 @@ let invOut = new Array();
 
 }
 //TODO: vectors
-static view(x,y,z,pitch,yaw)
+public static view(x,y,z,pitch,yaw)
 {
     let rPitch = pitch*(Math.PI/180);
     let rYaw = yaw*(Math.PI/180);
@@ -178,7 +181,7 @@ static view(x,y,z,pitch,yaw)
     let sinYaw = Math.sin(rYaw);
     let cosPitch = Math.cos(rPitch);
     let sinPitch = Math.sin(rPitch);
-    let mat = new Matrix(
+    mat._data = new Matrix(
      [
         -sinYaw,cosYaw,0,(x*sinYaw)-(y*cosYaw),
         -sinPitch,-sinPitch*sinYaw,cosPitch,(sinPitch*((x*cosYaw)+(y*sinYaw)))-(z*cosPitch),
@@ -238,7 +241,7 @@ translate(x,y,z)
 rotateX(degrees)
 {
     let radians = degrees*(Math.PI/180);
-    let rotMatrix = new Matrix(1);
+    let rotMatrix = new Matrix();
     rotMatrix[5]= Math.cos(radians);
     rotMatrix[6]=-Math.sin(radians);
     rotMatrix[9]= Math.sin(radians);
@@ -258,7 +261,7 @@ rotateY(degrees)
 static rotateX(mat,degrees)
 {
     let radians = degrees*(Math.PI/180);
-    let rotMatrix = new Matrix(1);
+    let rotMatrix = new Matrix();
     rotMatrix[5]= Math.cos(radians);
     rotMatrix[6]=-Math.sin(radians);
     rotMatrix[9]= Math.sin(radians);
@@ -268,7 +271,7 @@ static rotateX(mat,degrees)
 static rotateY(mat:Matrix,degrees)
 {
     let radians = degrees*(Math.PI/180);
-    let rotMatrix = new Matrix(1);
+    let rotMatrix = new Matrix();
     rotMatrix[0]= Math.cos(radians);
     rotMatrix[2]=-Math.sin(radians);
     rotMatrix[8]= Math.sin(radians);
@@ -278,7 +281,7 @@ static rotateY(mat:Matrix,degrees)
 static rotateZ(mat:Matrix,degrees)
 {
     let radians = degrees*(Math.PI/180);
-    let rotMatrix = new Matrix(1);
+    let rotMatrix = new Matrix();
     rotMatrix[0]= Math.cos(radians);
     rotMatrix[1]=-Math.sin(radians);
     rotMatrix[4]= Math.sin(radians);
@@ -287,7 +290,7 @@ static rotateZ(mat:Matrix,degrees)
 }
 static mult(mat1:Matrix,mat2:Matrix)
 {
-    let multiplied = new Matrix(1);
+    let multiplied = new Matrix();
     for(var i=0;i<4;i++)
     {
     multiplied[i] = (mat1[0]*mat2[i])+(mat1[1]*mat2[4+i])+(mat1[2]*mat2[8+i])+(mat1[3]*mat2[12+i]);
@@ -317,5 +320,8 @@ static transpose(mat)
     transp[14] = mat[11];
     transp[15] = mat[15];
     return transp;
+}
+public toFloat32Array(): Float32Array {
+    return new Float32Array( this._data );
 }
 }
