@@ -1,0 +1,10 @@
+
+{
+"compilerOptions": {
+    "outDir":"../JS",
+    "lib": [
+        "esnext",
+        "dom"
+      ]
+}
+}
