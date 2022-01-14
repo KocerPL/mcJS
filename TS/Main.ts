@@ -1,4 +1,4 @@
-import { Vector } from "./Utils/Vector.js";
+import { Vector } from "./Engine/Utils/Vector.js";
 
  class Main
 {
