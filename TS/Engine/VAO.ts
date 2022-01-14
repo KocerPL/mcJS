@@ -13,11 +13,11 @@ export class VAO
         gl.vertexAttribPointer(location,length,gl.FLOAT,false,stride,offset);
         gl.enableVertexAttribArray(location);
     }
-    public bind()
+    public bind():void
     {
         gl.bindVertexArray(this.ID);
     }
-    public static unbind()
+    public static unbind():void
     {
         gl.bindVertexArray(0);
     }
