@@ -8,7 +8,7 @@ export class VBO {
     }
     bufferData(data) {
         let gl = CanvaManager.gl;
-        gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
     }
     bind() {
         let gl = CanvaManager.gl;
