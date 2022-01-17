@@ -30,7 +30,6 @@ export class CanvaManager
     }
     static onMouseMove(ev: MouseEvent) 
     {
-        console.log(ev);
         this.mouseMovement.x = ev.movementX;
         this.mouseMovement.y = ev.movementY;
     }
@@ -44,7 +43,6 @@ export class CanvaManager
     }
     public static getKey(keycode:number)
     {
-        console.log(this.keys[keycode])
         return this.keys[keycode] ?? false;
     }
     private static onResize():void

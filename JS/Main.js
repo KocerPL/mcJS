@@ -5,6 +5,7 @@ import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Matrix } from "./Engine/Utils/Matrix.js";
 import { VAO } from "./Engine/VAO.js";
 import { VBO } from "./Engine/VBO.js";
+import { SubChunk } from "./Game/SubChunk.js";
 let gl = CanvaManager.gl;
 class Main {
     static FPS = 61;
@@ -22,6 +23,8 @@ class Main {
     static TESTtransf = Matrix.identity();
     static delta = 0;
     static camera = new Camera();
+    static test = new SubChunk();
+    static count = 3;
     static run() {
         CanvaManager.setupCanva(document.body);
         let vertices = [
@@ -90,21 +93,21 @@ class Main {
             1.0, 1.0, 1.0,
             1.0, 1.0, 1.0
         ];
+        let test = this.test;
         let vao = new VAO();
         vao.bind();
         let vbo = new VBO();
-        vbo.bufferData(vertices);
+        vbo.bufferData(test.vertices);
         vao.addPtr(0, 3, 0, 0);
-        let vco = new VBO();
-        vco.bufferData(colors);
-        vao.addPtr(1, 3, 0, 0);
+        //let vco = new VBO();
+        //vco.bufferData(colors);
+        //  vao.addPtr(1,3,0,0);
         let ebo = new EBO();
-        ebo.bufferData(indices);
+        ebo.bufferData(test.indices);
         // EBO.unbind();
         // VBO.unbind();
         gl.enable(gl.DEPTH_TEST);
         this.shader = new DefaultShader();
-        this.TESTtransf = this.TESTtransf.translate(0, 0, 3);
         //   this.TESTtransf = this.TESTtransf.scale(2,1,1);
         requestAnimationFrame(this.loop.bind(this));
     }
@@ -135,8 +138,11 @@ class Main {
     }
     static update() {
         this.Measure.ticks++;
-        this.TESTtransf = this.TESTtransf.rotateZ(1);
-        this.TESTtransf = this.TESTtransf.rotateY(1);
+        this.count++;
+        if (this.count > this.test.indices.length)
+            this.count = 3;
+        //  this.TESTtransf =  this.TESTtransf.rotateZ(1);
+        //this.TESTtransf =  this.TESTtransf.rotateY(1);
     }
     static render() {
         this.Measure.frames++;
@@ -145,7 +151,7 @@ class Main {
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         this.shader.loadUniforms(this.camera.getProjection(), this.TESTtransf, this.camera.getView());
-        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_INT, 0);
+        gl.drawElements(gl.TRIANGLES, this.test.indices.length, gl.UNSIGNED_INT, 0);
     }
 }
 Main.run();
