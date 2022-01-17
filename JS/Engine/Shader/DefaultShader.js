@@ -5,6 +5,9 @@ export class DefaultShader extends Shader {
     constructor() {
         super("/JS/Engine/Shader/default.vert", "/JS/Engine/Shader/default.frag");
     }
-    loadUniforms() {
+    loadUniforms(proj, transf, view) {
+        this.loadMatrix("projection", proj);
+        this.loadMatrix("transformation", transf);
+        this.loadMatrix("view", view);
     }
 }

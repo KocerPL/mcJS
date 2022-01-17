@@ -212,7 +212,6 @@ scale._data =[x,0,0,0,
     0,y,0,0
     ,0,0,z,0,
     0,0,0,1];
-    console.log(scale);
 return Matrix.mult(this,scale);
 }
 static hackyInverse(mat) // works only for rotation and translation!!
@@ -237,60 +236,70 @@ return leftdown-rightdown ;
 translate(x,y,z)
 {
     let transl = new Matrix();
-    transl[3] = x;
-    transl[7]=y;
-    transl[11] = z;
+    transl._data[3] = x;
+    transl._data[7]=y;
+    transl._data[11] = z;
     return Matrix.mult(this,transl);
-
 }
 rotateX(degrees)
 {
     let radians = degrees*(Math.PI/180);
     let rotMatrix = new Matrix();
-    rotMatrix[5]= Math.cos(radians);
-    rotMatrix[6]=-Math.sin(radians);
-    rotMatrix[9]= Math.sin(radians);
-    rotMatrix[10]=Math.cos(radians);
+    rotMatrix._data[5]= Math.cos(radians);
+    rotMatrix._data[6]=-Math.sin(radians);
+    rotMatrix._data[9]= Math.sin(radians);
+    rotMatrix._data[10]=Math.cos(radians);
     return Matrix.mult(this,rotMatrix);
 }
 rotateY(degrees)
 {
     let radians = degrees*(Math.PI/180);
     let rotMatrix = new Matrix();
-    rotMatrix[0]= Math.cos(radians);
-    rotMatrix[2]=-Math.sin(radians);
-    rotMatrix[8]= Math.sin(radians);
-    rotMatrix[10]=Math.cos(radians);
+    rotMatrix._data[0]= Math.cos(radians);
+    rotMatrix._data[2]=-Math.sin(radians);
+    rotMatrix._data[8]= Math.sin(radians);
+    rotMatrix._data[10]=Math.cos(radians);
+  
     return Matrix.mult(this,rotMatrix);
 }
-static rotateX(mat,degrees)
+rotateZ(degrees)
 {
     let radians = degrees*(Math.PI/180);
     let rotMatrix = new Matrix();
-    rotMatrix[5]= Math.cos(radians);
-    rotMatrix[6]=-Math.sin(radians);
-    rotMatrix[9]= Math.sin(radians);
-    rotMatrix[10]=Math.cos(radians);
+    rotMatrix._data[0]= Math.cos(radians);
+    rotMatrix._data[1]=-Math.sin(radians);
+    rotMatrix._data[4]= Math.sin(radians);
+    rotMatrix._data[5]=Math.cos(radians);
+    return Matrix.mult(this,rotMatrix);
+}
+static rotateX(mat:Matrix,degrees:number)
+{
+    let radians = degrees*(Math.PI/180);
+    let rotMatrix = new Matrix();
+    rotMatrix._data[5]= Math.cos(radians);
+    rotMatrix._data[6]=-Math.sin(radians);
+    rotMatrix._data[9]= Math.sin(radians);
+    rotMatrix._data[10]=Math.cos(radians);
     return Matrix.mult(mat,rotMatrix);
 }
 static rotateY(mat:Matrix,degrees)
 {
     let radians = degrees*(Math.PI/180);
     let rotMatrix = new Matrix();
-    rotMatrix[0]= Math.cos(radians);
-    rotMatrix[2]=-Math.sin(radians);
-    rotMatrix[8]= Math.sin(radians);
-    rotMatrix[10]=Math.cos(radians);
+    rotMatrix._data[0]= Math.cos(radians);
+    rotMatrix._data[2]=-Math.sin(radians);
+    rotMatrix._data[8]= Math.sin(radians);
+    rotMatrix._data[10]=Math.cos(radians);
     return this.mult(mat,rotMatrix);
 }
 static rotateZ(mat:Matrix,degrees)
 {
     let radians = degrees*(Math.PI/180);
     let rotMatrix = new Matrix();
-    rotMatrix[0]= Math.cos(radians);
-    rotMatrix[1]=-Math.sin(radians);
-    rotMatrix[4]= Math.sin(radians);
-    rotMatrix[5]=Math.cos(radians);
+    rotMatrix[0]._data= Math.cos(radians);
+    rotMatrix[1]._data=-Math.sin(radians);
+    rotMatrix[4]._data= Math.sin(radians);
+    rotMatrix[5]._data=Math.cos(radians);
     return this.mult(mat,rotMatrix);
 }
 static mult(mat1:Matrix,mat2:Matrix)

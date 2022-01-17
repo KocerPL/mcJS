@@ -10,6 +10,5 @@ export class Vector
         this.y=y;
         this.z=z;
         this.w=w??1;
-        
     }
 }

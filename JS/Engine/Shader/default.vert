@@ -1,7 +1,15 @@
 #version 300 es
 precision highp float;
+uniform mat4 projection;
+uniform mat4 transformation;
+layout (location=1) in vec3 color;
+out vec4 pass_color;
+mat4 prepared ;
+uniform mat4 view;
 layout(location = 0) in vec3 pos;
 void main()
 {
-gl_Position = vec4(pos,1.0);
+   prepared = transformation*view*projection;
+gl_Position = vec4(pos,1.0)*prepared;
+pass_color=vec4(color,1.0);
 }

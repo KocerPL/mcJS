@@ -1,5 +1,7 @@
 import { CanvaManager } from "../CanvaManager.js";
 import { Loader } from "../Loader.js";
+import { Matrix } from "../Utils/Matrix.js";
+import { Vector } from "../Utils/Vector.js";
 let gl = CanvaManager.gl;
 export abstract class Shader
 {
@@ -28,6 +30,15 @@ export abstract class Shader
     {
         gl.useProgram(this.ID);
     }
-    abstract loadUniforms();
-
+    abstract loadUniforms(...args:any);
+    loadMatrix(name:string,matrix:Matrix)
+    {
+        let loc = gl.getUniformLocation(this.ID,name);
+        gl.uniformMatrix4fv(loc,false,matrix.toFloat32Array());
+    }
+    loadVec4(name:string,vec:Vector)
+    {
+        let loc = gl.getUniformLocation(this.ID,name);
+        gl.uniform4f(loc,vec.x,vec.y,vec.z,vec.w);
+    }
 }
