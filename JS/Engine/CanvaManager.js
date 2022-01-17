@@ -1,3 +1,4 @@
+import { Vector } from "./Utils/Vector.js";
 export class CanvaManager {
     static canva = document.createElement("canvas");
     static HEIGHT = window.innerHeight;
@@ -6,6 +7,7 @@ export class CanvaManager {
     static debug = document.createElement("output");
     static proportion = 1024 / 1920;
     static keys = new Array(100);
+    static mouseMovement = new Vector(0, 0, 0);
     static setupCanva(location, proportion) {
         this.proportion = proportion ?? this.proportion;
         location.appendChild(this.canva);
@@ -16,8 +18,15 @@ export class CanvaManager {
         window.addEventListener("resize", this.onResize.bind(this), false);
         window.addEventListener("keydown", this.onKeyDown.bind(this), false);
         window.addEventListener("keyup", this.onKeyUp.bind(this), false);
+        window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
+        this.canva.addEventListener("click", () => { this.canva.requestPointerLock(); }, false);
         this.onResize();
         return this.canva;
+    }
+    static onMouseMove(ev) {
+        console.log(ev);
+        this.mouseMovement.x = ev.movementX;
+        this.mouseMovement.y = ev.movementY;
     }
     static onKeyDown(ev) {
         this.keys[ev.keyCode] = true;
@@ -40,6 +49,10 @@ export class CanvaManager {
         }
         this.gl.viewport(0, 0, this.WIDTH, this.HEIGHT);
         this.applyResize();
+    }
+    static preRender() {
+        CanvaManager.mouseMovement.x = 0;
+        CanvaManager.mouseMovement.y = 0;
     }
     static applyResize() {
         this.canva.width = this.WIDTH;

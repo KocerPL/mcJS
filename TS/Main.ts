@@ -1,3 +1,4 @@
+import { Camera } from "./Engine/Camera.js";
 import { CanvaManager } from "./Engine/CanvaManager.js";
 import { EBO } from "./Engine/EBO.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
@@ -22,9 +23,7 @@ let gl = CanvaManager.gl;
    private static shader:DefaultShader;
    private static TESTtransf = Matrix.identity();
    private static delta = 0;
-   private static camPos = new Vector(0,0,0);
-   private static proj = Matrix.projection(70,1,100,CanvaManager.getHeight/CanvaManager.getWidth)
-   private static view = Matrix.viewFPS(new Vector(0,0,0),0,0);
+   private static camera = new Camera();
    public static run():void
    {
       CanvaManager.setupCanva(document.body);
@@ -77,23 +76,23 @@ let   colors =[
    1.0,1.0,0.0,
    1.0,1.0,0.0,
    1.0,1.0,0.0,
+   1.0,1.0,0.0,
    1.0,0.0,0.0,
    1.0,0.0,0.0,
    1.0,0.0,0.0,
    1.0,0.0,0.0,
-   1.0,0.0,0.0,
    0.0,1.0,1.0,
    0.0,1.0,1.0,
    0.0,1.0,1.0,
    0.0,1.0,1.0,
-   0.0,1.0,1.0,
-   0.0,1.0,1.0,
-   0.0,1.0,1.0,
-   0.0,1.0,1.0,
+   0.0,0.1,1.0,
+   0.0,0.1,1.0,
+   0.0,0.1,1.0,
+   0.0,0.1,1.0,
    1.0,1.0,1.0,
    1.0,1.0,1.0,
    1.0,1.0,1.0,
-   1.0,1.0,1.0,
+   1.0,1.0,1.0
 ]
      let vao = new VAO();
      vao.bind();
@@ -153,14 +152,13 @@ let   colors =[
    public static render()
    {
       this.Measure.frames++;
-      this.proj = Matrix.projection(70,1,100,CanvaManager.getHeight/CanvaManager.getWidth);
-      gl.clearColor(0,0.5,0,1);
+      this.camera.preRender();
+      CanvaManager.preRender();
+      gl.clearColor(0.0,0.0,0.0,1.0);
       gl.clear(gl.COLOR_BUFFER_BIT);
-      this.shader.loadUniforms(this.proj,this.TESTtransf,this.view);
+      this.shader.loadUniforms(this.camera.getProjection(),this.TESTtransf,this.camera.getView());
        gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,0);
-       if(CanvaManager.getKey(87))
-       this.camPos.z+=1;
-       this.view = Matrix.viewFPS(this.camPos,0,0);
+      
    }
 }
 Main.run();

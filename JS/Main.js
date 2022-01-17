@@ -1,8 +1,8 @@
+import { Camera } from "./Engine/Camera.js";
 import { CanvaManager } from "./Engine/CanvaManager.js";
 import { EBO } from "./Engine/EBO.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Matrix } from "./Engine/Utils/Matrix.js";
-import { Vector } from "./Engine/Utils/Vector.js";
 import { VAO } from "./Engine/VAO.js";
 import { VBO } from "./Engine/VBO.js";
 let gl = CanvaManager.gl;
@@ -21,9 +21,7 @@ class Main {
     static shader;
     static TESTtransf = Matrix.identity();
     static delta = 0;
-    static camPos = new Vector(0, 0, 0);
-    static proj = Matrix.projection(70, 1, 100, CanvaManager.getHeight / CanvaManager.getWidth);
-    static view = Matrix.viewFPS(new Vector(0, 0, 0), 0, 0);
+    static camera = new Camera();
     static run() {
         CanvaManager.setupCanva(document.body);
         let vertices = [
@@ -74,23 +72,23 @@ class Main {
             1.0, 1.0, 0.0,
             1.0, 1.0, 0.0,
             1.0, 1.0, 0.0,
+            1.0, 1.0, 0.0,
             1.0, 0.0, 0.0,
             1.0, 0.0, 0.0,
             1.0, 0.0, 0.0,
             1.0, 0.0, 0.0,
-            1.0, 0.0, 0.0,
             0.0, 1.0, 1.0,
             0.0, 1.0, 1.0,
             0.0, 1.0, 1.0,
             0.0, 1.0, 1.0,
-            0.0, 1.0, 1.0,
-            0.0, 1.0, 1.0,
-            0.0, 1.0, 1.0,
-            0.0, 1.0, 1.0,
+            0.0, 0.1, 1.0,
+            0.0, 0.1, 1.0,
+            0.0, 0.1, 1.0,
+            0.0, 0.1, 1.0,
             1.0, 1.0, 1.0,
             1.0, 1.0, 1.0,
             1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0
         ];
         let vao = new VAO();
         vao.bind();
@@ -142,14 +140,12 @@ class Main {
     }
     static render() {
         this.Measure.frames++;
-        this.proj = Matrix.projection(70, 1, 100, CanvaManager.getHeight / CanvaManager.getWidth);
-        gl.clearColor(0, 0.5, 0, 1);
+        this.camera.preRender();
+        CanvaManager.preRender();
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
-        this.shader.loadUniforms(this.proj, this.TESTtransf, this.view);
+        this.shader.loadUniforms(this.camera.getProjection(), this.TESTtransf, this.camera.getView());
         gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_INT, 0);
-        if (CanvaManager.getKey(87))
-            this.camPos.z += 1;
-        this.view = Matrix.viewFPS(this.camPos, 0, 0);
     }
 }
 Main.run();
