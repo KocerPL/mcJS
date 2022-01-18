@@ -12,6 +12,7 @@ export class CanvaManager {
         this.proportion = proportion ?? this.proportion;
         location.appendChild(this.canva);
         this.debug.style.position = "absolute";
+        this.debug.style.color = "white";
         this.debug.style.top = "0";
         this.debug.style.left = "0";
         location.appendChild(this.debug);

@@ -5,4 +5,9 @@ export class Loader {
         req.send(null);
         return req.responseText;
     }
+    static image(path) {
+        let img = new Image();
+        img.src = path;
+        return img;
+    }
 }

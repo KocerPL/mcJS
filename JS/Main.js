@@ -2,6 +2,7 @@ import { Camera } from "./Engine/Camera.js";
 import { CanvaManager } from "./Engine/CanvaManager.js";
 import { EBO } from "./Engine/EBO.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
+import { Texture } from "./Engine/Texture.js";
 import { Matrix } from "./Engine/Utils/Matrix.js";
 import { VAO } from "./Engine/VAO.js";
 import { VBO } from "./Engine/VBO.js";
@@ -25,6 +26,10 @@ class Main {
     static camera = new Camera();
     static test = new SubChunk();
     static count = 3;
+    static vao;
+    static vbo;
+    static vco;
+    static ebo;
     static run() {
         CanvaManager.setupCanva(document.body);
         let vertices = [
@@ -94,20 +99,29 @@ class Main {
             1.0, 1.0, 1.0
         ];
         let test = this.test;
-        let vao = new VAO();
-        vao.bind();
-        let vbo = new VBO();
-        vbo.bufferData(test.vertices);
-        vao.addPtr(0, 3, 0, 0);
-        //let vco = new VBO();
-        //vco.bufferData(colors);
-        //  vao.addPtr(1,3,0,0);
-        let ebo = new EBO();
-        ebo.bufferData(test.indices);
+        this.vao = new VAO();
+        this.vao.bind();
+        this.vbo = new VBO();
+        this.vbo.bufferData(test.vertices);
+        this.vao.addPtr(0, 3, 0, 0);
+        this.vco = new VBO();
+        this.vco.bufferData(test.colors);
+        this.vao.addPtr(1, 3, 0, 0);
+        this.ebo = new EBO();
+        this.ebo.bufferData(test.indices);
         // EBO.unbind();
         // VBO.unbind();
         gl.enable(gl.DEPTH_TEST);
         this.shader = new DefaultShader();
+        let texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D_ARRAY, texture);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, gl.RGBA, 16, 16, 10, 0, gl.RGBA, gl.UNSIGNED_BYTE, Texture.blocksGrid);
+        Texture.blocksGrid.onload = () => { gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, gl.RGBA, 16, 16, 10, 0, gl.RGBA, gl.UNSIGNED_BYTE, Texture.blocksGrid); };
+        gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
         //   this.TESTtransf = this.TESTtransf.scale(2,1,1);
         requestAnimationFrame(this.loop.bind(this));
     }
@@ -141,6 +155,16 @@ class Main {
         this.count++;
         if (this.count > this.test.indices.length)
             this.count = 3;
+        if (Math.floor(Math.random() * 50) == 1) {
+            this.test.blocks[Math.floor(Math.random() * 16)][Math.floor(Math.random() * 16)][Math.floor(Math.random() * 16)] = 1;
+            this.test.updateVerticesIndices();
+            this.ebo.bind();
+            this.ebo.bufferData(this.test.indices);
+            this.vco.bind();
+            this.vco.bufferData(this.test.colors);
+            this.vbo.bind();
+            this.vbo.bufferData(this.test.vertices);
+        }
         //  this.TESTtransf =  this.TESTtransf.rotateZ(1);
         //this.TESTtransf =  this.TESTtransf.rotateY(1);
     }
@@ -148,7 +172,7 @@ class Main {
         this.Measure.frames++;
         this.camera.preRender();
         CanvaManager.preRender();
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.clearColor(0.0, 0.0, 0.3, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         this.shader.loadUniforms(this.camera.getProjection(), this.TESTtransf, this.camera.getView());
         gl.drawElements(gl.TRIANGLES, this.test.indices.length, gl.UNSIGNED_INT, 0);

@@ -5,7 +5,7 @@ import { Vector } from "./Utils/Vector.js";
 export class Camera
 {
    private projection:Matrix=Matrix.projection(70,1,100,CanvaManager.getHeight/CanvaManager.getWidth);;
-   private pos:Vector = new Vector(0,0,0);
+   private pos:Vector = new Vector(0,10,-20);
    private view:Matrix=Matrix.viewFPS(this.pos,0,0);
    private yaw = 0;
    private pitch =0;
