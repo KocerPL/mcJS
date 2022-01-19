@@ -104,6 +104,7 @@ class Main {
         this.vao.bind();
         this.vbo = new VBO();
         this.vbo.bufferData(test.vertices);
+        //TODO:Move this code to subchunk
         this.vao.addPtr(0, 3, 0, 0);
         this.tco = new VBO();
         this.tco.bufferData(test.colors);
