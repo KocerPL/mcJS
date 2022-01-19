@@ -4,6 +4,7 @@ import { EBO } from "./Engine/EBO.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Texture } from "./Engine/Texture.js";
 import { Matrix } from "./Engine/Utils/Matrix.js";
+import { Vector } from "./Engine/Utils/Vector.js";
 import { VAO } from "./Engine/VAO.js";
 import { VBO } from "./Engine/VBO.js";
 import { SubChunk } from "./Game/SubChunk.js";
@@ -24,7 +25,7 @@ class Main {
     static TESTtransf = Matrix.identity();
     static delta = 0;
     static camera = new Camera();
-    static test = new SubChunk();
+    static test = new SubChunk(new Vector(1, 0, 0));
     static count = 3;
     static vao;
     static vbo;
@@ -146,6 +147,10 @@ class Main {
         // console.log(this.delta);
         if (this.delta >= 1)
             this.lastTick = time;
+        if (this.delta > 100) {
+            console.log("Is game overloaded? Skipping " + delta + "ms");
+            this.delta = 0;
+        }
         while (this.delta >= 1) {
             this.delta--;
             this.update();
@@ -181,7 +186,7 @@ class Main {
         CanvaManager.preRender();
         gl.clearColor(0.0, 0.0, 0.3, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
-        this.shader.loadUniforms(this.camera.getProjection(), this.TESTtransf, this.camera.getView());
+        this.shader.loadUniforms(this.camera.getProjection(), this.test.transformation, this.camera.getView());
         gl.drawElements(gl.TRIANGLES, this.test.indices.length, gl.UNSIGNED_INT, 0);
     }
 }

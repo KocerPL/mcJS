@@ -26,7 +26,7 @@ let gl = CanvaManager.gl;
    private static TESTtransf = Matrix.identity();
    private static delta = 0;
    private static camera = new Camera();
-   private static test = new SubChunk();
+   private static test = new SubChunk(new Vector(1,0,0));
    private static count = 3;
    private static vao:VAO;
    private static vbo:VBO;
@@ -107,7 +107,7 @@ let test = this.test;
      this.vao.bind();
      this.vbo = new VBO();
      this.vbo.bufferData(test.vertices);
-    
+    //TODO:Move this code to subchunk
      this.vao.addPtr(0,3,0,0);
      this.tco = new VBO();
       this.tco.bufferData(test.colors);
@@ -156,6 +156,11 @@ let test = this.test;
       this.delta += delta/(2000/this.TPS);
      // console.log(this.delta);
       if(this.delta>=1) this.lastTick=time;
+      if(this.delta>100) {
+         console.log("Is game overloaded? Skipping "+delta+"ms")
+         this.delta = 0;
+       
+      }
       while(this.delta>=1)
       {
       this.delta--;
@@ -196,7 +201,7 @@ let test = this.test;
       CanvaManager.preRender();
       gl.clearColor(0.0,0.0,0.3,1.0);
       gl.clear(gl.COLOR_BUFFER_BIT);
-      this.shader.loadUniforms(this.camera.getProjection(),this.TESTtransf,this.camera.getView());
+      this.shader.loadUniforms(this.camera.getProjection(),this.test.transformation,this.camera.getView());
        gl.drawElements(gl.TRIANGLES,this.test.indices.length,gl.UNSIGNED_INT,0);
       
    }

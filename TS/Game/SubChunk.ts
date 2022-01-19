@@ -1,5 +1,7 @@
 import { CanvaManager } from "../Engine/CanvaManager.js";
 import { Texture } from "../Engine/Texture.js";
+import { Matrix } from "../Engine/Utils/Matrix.js";
+import { Vector } from "../Engine/Utils/Vector.js";
 
 let gl = CanvaManager.gl;
 export class SubChunk
@@ -43,8 +45,10 @@ export class SubChunk
     vertices = new Array();
     indices = new Array();
     colors = new Array();
-    constructor()
+    transformation = Matrix.identity();
+    constructor(pos:Vector)
     {
+        this.transformation.translate(pos.x*16,pos.y*16,pos.z*16);
         for(let x=0;x<16;x++)
         {
             SubChunk.rand[x] = Math.random();
