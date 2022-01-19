@@ -93,42 +93,42 @@ export class SubChunk
                     {
                     this.vertices = this.vertices.concat(temp.slice(24,36));
                     this.indices = this.indices.concat(index+2,index+1,index,index+3,index,index+2);
-                    this.colors = this.colors.concat(SubChunk.getRandColor(x,y,z));
+                    this.colors = this.colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                     index+=4;
                     }
                     if(x+1 > 15 ||this.blocks[x+1][y][z]!=1)
                     {
                     this.vertices = this.vertices.concat(temp.slice(36,48));
                     this.indices = this.indices.concat(index+2,index+1,index,index+3,index,index+2);
-                    this.colors = this.colors.concat(SubChunk.getRandColor(x,y,z));
+                    this.colors = this.colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                     index+=4;
                     }
                     if(y+1 > 15 ||this.blocks[x][y+1][z]!=1)
                     {
                     this.vertices = this.vertices.concat(temp.slice(60,72));
                     this.indices = this.indices.concat(index+2,index+1,index,index+3,index,index+2);
-                    this.colors = this.colors.concat(SubChunk.getRandColor(x,y,z));
+                    this.colors = this.colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                     index+=4;
                     }
                     if(y-1 < 0 ||this.blocks[x][y-1][z]!=1)
                     {
                     this.vertices = this.vertices.concat(temp.slice(48,60));
                     this.indices = this.indices.concat(index+2,index+1,index,index+3,index,index+2);
-                    this.colors = this.colors.concat(SubChunk.getRandColor(x,y,z));
+                    this.colors = this.colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                     index+=4;
                     }
                     if(z>15||this.blocks[x][y][z+1]!=1)
                     {
                     this.vertices = this.vertices.concat(temp.slice(12,24));
                     this.indices = this.indices.concat(index+2,index+1,index,index+3,index,index+2);
-                    this.colors = this.colors.concat(SubChunk.getRandColor(x,y,z));
+                    this.colors = this.colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                     index+=4;
                     }
                     if(z<0||this.blocks[x][y][z-1]!=1)
                     {
                     this.vertices = this.vertices.concat(temp.slice(0,12));
                     this.indices = this.indices.concat(index+2,index+1,index,index+3,index,index+2);
-                    this.colors = this.colors.concat(SubChunk.getRandColor(x,y,z));
+                    this.colors = this.colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                     index+=4;
                     }
                 }
@@ -151,12 +151,29 @@ export class SubChunk
             }
         }
     }
+    static blockTextureCoords = Object.freeze({
+        1:[
+            0.0, 1.0,
+            1.0, 1.0,
+            1.0, 0.0,
+            0.0, 0.0,
+        ],
+        2:[
+            1.0, 1.0,
+            2.0, 1.0,
+            2.0, 0.0,
+            1.0, 0.0,
+        ]
+    });
+    static getTextureCords(type) {
+        return this.blockTextureCoords[type];
+    }
   static  getRandColor(x,y,z)
     {
-      return[ this.rand[x],this.rand[y+16],this.rand[z+32],
-       this.rand[x],this.rand[y+16],this.rand[z+32],
-       this.rand[x],this.rand[y+16],this.rand[z+32],
-       this.rand[x],this.rand[y+16],this.rand[z+32],
+      return[ 0.0,0.0,
+        0.0,1.0,
+        1.0,1.0,
+        1.0,0.0,
     ] ;
     }
 }

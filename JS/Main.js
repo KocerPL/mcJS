@@ -28,7 +28,7 @@ class Main {
     static count = 3;
     static vao;
     static vbo;
-    static vco;
+    static tco;
     static ebo;
     static run() {
         CanvaManager.setupCanva(document.body);
@@ -104,9 +104,9 @@ class Main {
         this.vbo = new VBO();
         this.vbo.bufferData(test.vertices);
         this.vao.addPtr(0, 3, 0, 0);
-        this.vco = new VBO();
-        this.vco.bufferData(test.colors);
-        this.vao.addPtr(1, 3, 0, 0);
+        this.tco = new VBO();
+        this.tco.bufferData(test.colors);
+        this.vao.addPtr(1, 2, 0, 0);
         this.ebo = new EBO();
         this.ebo.bufferData(test.indices);
         // EBO.unbind();
@@ -114,14 +114,21 @@ class Main {
         gl.enable(gl.DEPTH_TEST);
         this.shader = new DefaultShader();
         let texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D_ARRAY, texture);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.activeTexture(gl.TEXTURE0);
-        gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, gl.RGBA, 16, 16, 10, 0, gl.RGBA, gl.UNSIGNED_BYTE, Texture.blocksGrid);
-        Texture.blocksGrid.onload = () => { gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, gl.RGBA, 16, 16, 10, 0, gl.RGBA, gl.UNSIGNED_BYTE, Texture.blocksGrid); };
-        gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));
+        Texture.blocksGrid.onload = () => {
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, Texture.blocksGrid);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.generateMipmap(gl.TEXTURE_2D);
+            console.log("okok");
+        };
+        if (Texture.blocksGrid.complete) {
+            Texture.blocksGrid.onload(new Event("loaded"));
+        }
         //   this.TESTtransf = this.TESTtransf.scale(2,1,1);
         requestAnimationFrame(this.loop.bind(this));
     }
@@ -156,12 +163,12 @@ class Main {
         if (this.count > this.test.indices.length)
             this.count = 3;
         if (Math.floor(Math.random() * 50) == 1) {
-            this.test.blocks[Math.floor(Math.random() * 16)][Math.floor(Math.random() * 16)][Math.floor(Math.random() * 16)] = 1;
+            this.test.blocks[Math.floor(Math.random() * 16)][Math.floor(Math.random() * 16)][Math.floor(Math.random() * 16)] = Math.ceil(Math.random() * 2);
             this.test.updateVerticesIndices();
             this.ebo.bind();
             this.ebo.bufferData(this.test.indices);
-            this.vco.bind();
-            this.vco.bufferData(this.test.colors);
+            this.tco.bind();
+            this.tco.bufferData(this.test.colors);
             this.vbo.bind();
             this.vbo.bufferData(this.test.vertices);
         }

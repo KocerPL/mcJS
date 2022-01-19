@@ -7,10 +7,11 @@ export class Loader
         req.send(null);
      return req.responseText;
     }
-    public static image(path:string)
+    public static image(path:string) :HTMLImageElement
     {
-        let img = new Image();
+        let img =  new Image();
         img.src = path;
+       img.decode();
         return img;
     }
 }

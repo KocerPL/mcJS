@@ -1,10 +1,10 @@
 #version 300 es
 precision highp float;
 precision mediump sampler2DArray;
-in vec4 pass_color;
+in vec2 pass_tc;
 out vec4 color;
-uniform sampler2DArray tex;
+uniform sampler2D tex;
 void main()
 {
-    color=pass_color;
+    color=texture(tex,pass_tc);
 }

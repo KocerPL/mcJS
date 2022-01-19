@@ -8,6 +8,7 @@ export class Loader {
     static image(path) {
         let img = new Image();
         img.src = path;
+        img.decode();
         return img;
     }
 }
