@@ -1,15 +1,11 @@
 import { Camera } from "./Engine/Camera.js";
 import { CanvaManager } from "./Engine/CanvaManager.js";
-import { EBO } from "./Engine/EBO.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Texture } from "./Engine/Texture.js";
-import { Matrix } from "./Engine/Utils/Matrix.js";
-import { Vector } from "./Engine/Utils/Vector.js";
-import { VAO } from "./Engine/VAO.js";
-import { VBO } from "./Engine/VBO.js";
+import { Chunk } from "./Game/Chunk.js";
 import { SubChunk } from "./Game/SubChunk.js";
 let gl = CanvaManager.gl;
-class Main {
+export class Main {
     static FPS = 61;
     static TPS = 20;
     static Measure = {
@@ -22,95 +18,12 @@ class Main {
     static lastTick = 0;
     static lastFrame = 0;
     static shader;
-    static TESTtransf = Matrix.identity();
     static delta = 0;
     static camera = new Camera();
-    static test = new SubChunk(new Vector(1, 0, 0));
-    static count = 3;
-    static vao;
-    static vbo;
-    static tco;
-    static ebo;
+    static test;
     static run() {
         CanvaManager.setupCanva(document.body);
-        let vertices = [
-            //przód
-            -0.5, -0.5, -0.5,
-            0.5, -0.5, -0.5,
-            0.5, 0.5, -0.5,
-            -0.5, 0.5, -0.5,
-            //tył
-            -0.5, -0.5, 0.5,
-            0.5, -0.5, 0.5,
-            0.5, 0.5, 0.5,
-            -0.5, 0.5, 0.5,
-            //lewo
-            -0.5, -0.5, -0.5,
-            -0.5, -0.5, 0.5,
-            -0.5, 0.5, 0.5,
-            -0.5, 0.5, -0.5,
-            //prawo
-            0.5, -0.5, -0.5,
-            0.5, -0.5, 0.5,
-            0.5, 0.5, 0.5,
-            0.5, 0.5, -0.5,
-            //dół
-            -0.5, -0.5, -0.5,
-            -0.5, -0.5, 0.5,
-            0.5, -0.5, 0.5,
-            0.5, -0.5, -0.5,
-            //góra
-            -0.5, 0.5, -0.5,
-            -0.5, 0.5, 0.5,
-            0.5, 0.5, 0.5,
-            0.5, 0.5, -0.5
-        ];
-        let indices = [
-            2, 1, 0, 3, 0, 2,
-            6, 5, 4, 7, 4, 6,
-            10, 9, 8, 11, 8, 10,
-            14, 13, 12, 15, 12, 14,
-            18, 17, 16, 19, 16, 18,
-            22, 21, 20, 23, 20, 22
-        ];
-        let colors = [
-            0.0, 1.0, 0.0,
-            0.0, 1.0, 0.0,
-            0.0, 1.0, 0.0,
-            0.0, 1.0, 0.0,
-            1.0, 1.0, 0.0,
-            1.0, 1.0, 0.0,
-            1.0, 1.0, 0.0,
-            1.0, 1.0, 0.0,
-            1.0, 0.0, 0.0,
-            1.0, 0.0, 0.0,
-            1.0, 0.0, 0.0,
-            1.0, 0.0, 0.0,
-            0.0, 1.0, 1.0,
-            0.0, 1.0, 1.0,
-            0.0, 1.0, 1.0,
-            0.0, 1.0, 1.0,
-            0.0, 0.1, 1.0,
-            0.0, 0.1, 1.0,
-            0.0, 0.1, 1.0,
-            0.0, 0.1, 1.0,
-            1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0
-        ];
-        let test = this.test;
-        this.vao = new VAO();
-        this.vao.bind();
-        this.vbo = new VBO();
-        this.vbo.bufferData(test.vertices);
         //TODO:Move this code to subchunk
-        this.vao.addPtr(0, 3, 0, 0);
-        this.tco = new VBO();
-        this.tco.bufferData(test.colors);
-        this.vao.addPtr(1, 2, 0, 0);
-        this.ebo = new EBO();
-        this.ebo.bufferData(test.indices);
         // EBO.unbind();
         // VBO.unbind();
         gl.enable(gl.DEPTH_TEST);
@@ -128,9 +41,11 @@ class Main {
             gl.generateMipmap(gl.TEXTURE_2D);
             console.log("okok");
         };
+        SubChunk.init();
         if (Texture.blocksGrid.complete) {
             Texture.blocksGrid.onload(new Event("loaded"));
         }
+        this.test = new Chunk(0, 0);
         //   this.TESTtransf = this.TESTtransf.scale(2,1,1);
         requestAnimationFrame(this.loop.bind(this));
     }
@@ -165,18 +80,12 @@ class Main {
     }
     static update() {
         this.Measure.ticks++;
-        this.count++;
-        if (this.count > this.test.indices.length)
-            this.count = 3;
-        if (Math.floor(Math.random() * 50) == 1) {
-            this.test.blocks[Math.floor(Math.random() * 16)][Math.floor(Math.random() * 16)][Math.floor(Math.random() * 16)] = Math.ceil(Math.random() * 2);
-            this.test.updateVerticesIndices();
-            this.ebo.bind();
-            this.ebo.bufferData(this.test.indices);
-            this.tco.bind();
-            this.tco.bufferData(this.test.colors);
-            this.vbo.bind();
-            this.vbo.bufferData(this.test.vertices);
+        // this.count++;
+        // if(this.count>this.test.indices.length)
+        //this.count=3;
+        if (false && Math.floor(Math.random() * 50) == 1) {
+            //  this.test.blocks[Math.floor(Math.random()*16)][Math.floor(Math.random()*16)][Math.floor(Math.random()*16)] =Math.ceil(Math.random()*2);
+            //this.test.updateVerticesIndices();
         }
         //  this.TESTtransf =  this.TESTtransf.rotateZ(1);
         //this.TESTtransf =  this.TESTtransf.rotateY(1);
@@ -187,8 +96,7 @@ class Main {
         CanvaManager.preRender();
         gl.clearColor(0.0, 0.0, 0.3, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
-        this.shader.loadUniforms(this.camera.getProjection(), this.test.transformation, this.camera.getView());
-        gl.drawElements(gl.TRIANGLES, this.test.indices.length, gl.UNSIGNED_INT, 0);
+        this.test.render();
     }
 }
 Main.run();

@@ -1,12 +1,36 @@
 import { CanvaManager } from "../Engine/CanvaManager.js";
+import { EBO } from "../Engine/EBO.js";
 import { Texture } from "../Engine/Texture.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Vector } from "../Engine/Utils/Vector.js";
+import { VAO } from "../Engine/VAO.js";
+import { VBO } from "../Engine/VBO.js";
 
 let gl = CanvaManager.gl;
 export class SubChunk
 {
+    ebo:EBO;
+    vbo:VBO;
+    vtc:VBO;
+    vao:VAO;
     blocks:Array<Array<Array<number>>>= new Array(16);
+    static defBlocks :Array<Array<Array<number>>>= new Array(16);
+
+    static init()
+    {
+        for(let x=0;x<16;x++)
+        {
+            this.defBlocks[x] = new Array(16);
+            for(let y=0;y<16;y++)
+            {
+                this.defBlocks[x][y] = new Array(16);
+                for(let z=0;z<16;z++)
+                {
+                    this.defBlocks[x][y][z] = 1;
+                }   
+            }
+        }
+    }
     static rand:Array<number> = new Array(64);
     static dirtTexture = new Texture(0,0);
    static defVertices =[
@@ -48,27 +72,25 @@ export class SubChunk
     transformation = Matrix.identity();
     constructor(pos:Vector)
     {
-        this.transformation.translate(pos.x*16,pos.y*16,pos.z*16);
-        for(let x=0;x<16;x++)
-        {
-            SubChunk.rand[x] = Math.random();
-            SubChunk.rand[x+16] = Math.random();
-            SubChunk.rand[x+32] = Math.random();
-            this.blocks[x] = new Array(16);
-            for(let y=0;y<16;y++)
-            {
-                this.blocks[x][y] = new Array(16);
-                for(let z=0;z<16;z++)
-                {
-                    this.blocks[x][y][z] =0;
-                }   
-            }
-        }
+     this.transformation =  this.transformation.translate(pos.x*16,pos.y*16,pos.z*16);
+       this.blocks = SubChunk.defBlocks;
      
         this.blocks[15][15][10]=1;
         this.blocks[15][15][9]=1;
+        this.vao = new VAO();
+        this.vbo = new VBO();
+        this.vao.addPtr(0,3,0,0);
+        this.vtc = new VBO();
+        this.vao.addPtr(1,2,0,0);
+        this.ebo = new EBO();
+        VAO.unbind();
+        VBO.unbind();
+        EBO.unbind();
       //  console.log(this.blocks);
+      let start = new Date();
         this.updateVerticesIndices();
+        let stop = new Date();
+        console.log( stop.getTime() - start.getTime());
     }
  
     updateVerticesIndices() 
@@ -139,6 +161,11 @@ export class SubChunk
                 }   
             }
         }
+        this.vao.bind();
+        this.vbo.bufferData(this.vertices);
+        this.vtc.bufferData(this.colors);
+        this.ebo.bufferData(this.indices);
+       // console.log(this.vertices);
      //   console.log(this.indices);
        // console.log(this.vertices);
     }

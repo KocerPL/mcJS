@@ -12,7 +12,7 @@ export class EBO
     }
     public bufferData(data):void
     {
-      
+      this.bind();
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(data),gl.STATIC_DRAW);
     }
     public bind():void

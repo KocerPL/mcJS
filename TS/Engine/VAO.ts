@@ -19,6 +19,6 @@ export class VAO
     }
     public static unbind():void
     {
-        gl.bindVertexArray(0);
+        gl.bindVertexArray(null);
     }
 }

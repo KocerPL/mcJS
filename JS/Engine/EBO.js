@@ -7,6 +7,7 @@ export class EBO {
         this.bind();
     }
     bufferData(data) {
+        this.bind();
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(data), gl.STATIC_DRAW);
     }
     bind() {

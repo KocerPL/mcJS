@@ -14,6 +14,6 @@ export class VAO {
         gl.bindVertexArray(this.ID);
     }
     static unbind() {
-        gl.bindVertexArray(0);
+        gl.bindVertexArray(null);
     }
 }
