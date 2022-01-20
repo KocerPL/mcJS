@@ -11,5 +11,5 @@ void main()
 {
    prepared = transformation*view*projection;
 gl_Position = vec4(pos,1.0)*prepared;
-pass_tc=vec2(tcoord.x/64.0,tcoord.y/64.0);
+pass_tc=vec2(tcoord.x/64.5,tcoord.y/64.5);
 }

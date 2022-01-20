@@ -26,7 +26,7 @@ export class SubChunk
                 this.defBlocks[x][y] = new Array(16);
                 for(let z=0;z<16;z++)
                 {
-                    this.defBlocks[x][y][z] = 1;
+                    this.defBlocks[x][y][z] = 2;
                 }   
             }
         }
@@ -106,6 +106,8 @@ export class SubChunk
                
                 for(let z=0;z<16;z++)
                 {
+                    if(this.blocks[x][y][z]!=0)
+                    {
                     let temp = new Array();
                     for(let i=0;i<SubChunk.defVertices.length;i+=3)
                     {
@@ -113,44 +115,43 @@ export class SubChunk
                         temp.push(SubChunk.defVertices[i+1]+y);
                         temp.push(SubChunk.defVertices[i+2]+z);
                     }
-                    if(this.blocks[x][y][z]!=0)
-                    {
-                   if(x-1 <0 || this.blocks[x-1][y][z]!=1)
+                    
+                   if(x-1 <0 || this.blocks[x-1][y][z]<1)
                     {
                     this.vertices = this.vertices.concat(temp.slice(24,36));
                     this.indices = this.indices.concat(index+2,index+1,index,index+3,index,index+2);
                     this.colors = this.colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                     index+=4;
                     }
-                    if(x+1 > 15 ||this.blocks[x+1][y][z]!=1)
+                    if(x+1 > 15 ||this.blocks[x+1][y][z]<1)
                     {
                     this.vertices = this.vertices.concat(temp.slice(36,48));
                     this.indices = this.indices.concat(index+2,index+1,index,index+3,index,index+2);
                     this.colors = this.colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                     index+=4;
                     }
-                    if(y+1 > 15 ||this.blocks[x][y+1][z]!=1)
+                    if(y+1 > 15 ||this.blocks[x][y+1][z]<1)
                     {
                     this.vertices = this.vertices.concat(temp.slice(60,72));
                     this.indices = this.indices.concat(index+2,index+1,index,index+3,index,index+2);
                     this.colors = this.colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                     index+=4;
                     }
-                    if(y-1 < 0 ||this.blocks[x][y-1][z]!=1)
+                    if(y-1 < 0 ||this.blocks[x][y-1][z]<1)
                     {
                     this.vertices = this.vertices.concat(temp.slice(48,60));
                     this.indices = this.indices.concat(index+2,index+1,index,index+3,index,index+2);
                     this.colors = this.colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                     index+=4;
                     }
-                    if(z>15||this.blocks[x][y][z+1]!=1)
+                    if(z>15||this.blocks[x][y][z+1]<1)
                     {
                     this.vertices = this.vertices.concat(temp.slice(12,24));
                     this.indices = this.indices.concat(index+2,index+1,index,index+3,index,index+2);
                     this.colors = this.colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                     index+=4;
                     }
-                    if(z<0||this.blocks[x][y][z-1]!=1)
+                    if(z<0||this.blocks[x][y][z-1]<1)
                     {
                     this.vertices = this.vertices.concat(temp.slice(0,12));
                     this.indices = this.indices.concat(index+2,index+1,index,index+3,index,index+2);
