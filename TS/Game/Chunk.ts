@@ -6,7 +6,7 @@ let gl = CanvaManager.gl;
 export class Chunk
 {
     subchunks:Array<SubChunk> = new Array(16);
-    constructor(x,z)
+  constructor(x,z)
     {
         console.log("Constructing chunk");
         for(let i =0; i<this.subchunks.length;i++)

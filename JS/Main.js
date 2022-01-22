@@ -21,9 +21,9 @@ export class Main {
     static delta = 0;
     static camera = new Camera();
     static test;
+    static thread = new Worker("/JS/test.js", { type: "module" });
     static run() {
         CanvaManager.setupCanva(document.body);
-        //TODO:Move this code to subchunk
         // EBO.unbind();
         // VBO.unbind();
         gl.enable(gl.DEPTH_TEST);
@@ -41,6 +41,9 @@ export class Main {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             gl.generateMipmap(gl.TEXTURE_2D);
             console.log("okok");
+        };
+        this.thread.onmessage = (ev) => {
+            console.log(ev.data);
         };
         SubChunk.init();
         if (Texture.blocksGrid.complete) {
@@ -84,7 +87,12 @@ export class Main {
         // this.count++;
         // if(this.count>this.test.indices.length)
         //this.count=3;
-        if (false && Math.floor(Math.random() * 50) == 1) {
+        if (Math.floor(Math.random() * 50) == 1) {
+            let rand = 0;
+            this.thread.postMessage({ task: "Subchunk" });
+            console.log("jes");
+            //   this.test.subchunks[rand].blocks[Math.floor(Math.random()*16)][Math.floor(Math.random()*16)][Math.floor(Math.random()*16)] =Math.ceil(Math.random()*2);
+            // this.test.subchunks[rand].updateVerticesIndices();
             //  this.test.blocks[Math.floor(Math.random()*16)][Math.floor(Math.random()*16)][Math.floor(Math.random()*16)] =Math.ceil(Math.random()*2);
             //this.test.updateVerticesIndices();
         }
