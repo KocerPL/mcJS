@@ -14,6 +14,7 @@ export class Main
 {
    public static FPS:number=61;
    public static TPS:number=20;
+   private static TPU:number = 60000/this.TPS;
    public static Measure = {
       tps:0,
       fps:0,
@@ -27,7 +28,7 @@ export class Main
    private static delta = 0;
    public static camera = new Camera();
    public static test:Chunk;
- private static thread = new Worker("/JS/test.js",{type:"module"});
+   public static test2:Chunk;
    public static run():void
    {
       CanvaManager.setupCanva(document.body);
@@ -49,15 +50,12 @@ export class Main
          gl.generateMipmap(gl.TEXTURE_2D);
          console.log("okok");
       };
-      this.thread.onmessage = (ev)=>{
-         console.log(ev.data);
-      }
-      SubChunk.init();
      if(Texture.blocksGrid.complete)
      {
       Texture.blocksGrid.onload(new Event("loaded"));
      }
      this.test = new Chunk(0,0);
+     this.test2 = new Chunk(1,0);
  //   this.TESTtransf = this.TESTtransf.scale(2,1,1);
      requestAnimationFrame(this.loop.bind(this));
     
@@ -78,16 +76,23 @@ export class Main
       this.delta += delta/(2000/this.TPS);
      // console.log(this.delta);
       if(this.delta>=1) this.lastTick=time;
-      if(this.delta>100) {
-         console.log("Is game overloaded? Skipping "+delta+"ms")
-         this.delta = 0;
-       
-      }
+     
       while(this.delta>=1)
       {
+         if(this.delta>100) {
+            console.log("Is game overloaded? Skipping "+delta+"ms")
+            this.delta = 0;
+          
+         }
       this.delta--;
       this.update();
       };
+      let testTime = Date.now();
+      if(this.Measure.fps>30)
+      while(Date.now()-testTime <20 )
+      {
+         this.chunksUpdate();
+      }
      if(this.lastFrame < time-(1000/this.FPS))
      {
       this.render();
@@ -96,17 +101,23 @@ export class Main
   
       requestAnimationFrame(this.loop.bind(this));
    }
+   public static chunksUpdate()
+   {
+      let time = Date.now();
+      this.test.update(time);
+      this.test2.update(time);
+   }
    public static update()
    {
+      
       this.Measure.ticks++;
      // this.count++;
      // if(this.count>this.test.indices.length)
       //this.count=3;
+      
       if(Math.floor(Math.random()*50) == 1)
       {
          let rand = 0;
-         this.thread.postMessage({task:"Subchunk"})
-         console.log("jes");
       //   this.test.subchunks[rand].blocks[Math.floor(Math.random()*16)][Math.floor(Math.random()*16)][Math.floor(Math.random()*16)] =Math.ceil(Math.random()*2);
         // this.test.subchunks[rand].updateVerticesIndices();
     //  this.test.blocks[Math.floor(Math.random()*16)][Math.floor(Math.random()*16)][Math.floor(Math.random()*16)] =Math.ceil(Math.random()*2);
@@ -124,7 +135,7 @@ export class Main
       gl.clearColor(0.0,0.0,0.3,1.0);
       gl.clear(gl.COLOR_BUFFER_BIT);
     this.test.render();
-      
+   this.test2.render();
    }
 }
 Main.run();

@@ -23,6 +23,12 @@ export class Camera {
         this.view = Matrix.viewFPS(this.pos, this.yaw, this.pitch);
         this.updateProjection();
     }
+    getYaw() {
+        return this.yaw;
+    }
+    getPitch() {
+        return this.pitch;
+    }
     setYaw(yaw) {
         this.yaw = yaw;
     }
@@ -31,6 +37,9 @@ export class Camera {
     }
     setPosition(pos) {
         this.pos = pos;
+    }
+    getPosition() {
+        return this.pos;
     }
     getView() {
         return this.view;

@@ -14,23 +14,9 @@ export class SubChunk
     vtc:VBO;
     vao:VAO;
     blocks:Array<Array<Array<number>>>= new Array(16);
+    tasks:Array<Function> = new Array();
+    generated:boolean=false;
     static defBlocks :Array<Array<Array<number>>>= new Array(16);
-
-    static init()
-    {
-        for(let x=0;x<16;x++)
-        {
-            this.defBlocks[x] = new Array(16);
-            for(let y=0;y<16;y++)
-            {
-                this.defBlocks[x][y] = new Array(16);
-                for(let z=0;z<16;z++)
-                {
-                    this.defBlocks[x][y][z] = 0;
-                }   
-            }
-        }
-    }
     static rand:Array<number> = new Array(64);
     static dirtTexture = new Texture(0,0);
    static defVertices =[
@@ -102,7 +88,17 @@ export class SubChunk
         
 
     }
-    async updateVerticesOneLevel(x,y,index)
+    update(startTime:number)
+    {
+        let   actualTime =Date.now();
+        while(this.tasks.length> 0 && actualTime-20 < startTime)
+        {
+          actualTime =Date.now();
+         let work = this.tasks.shift();
+         work();
+        }
+    }
+  updateVerticesOneLevel(x,y,index)
     {
         let indices = new Array();
         let vertices = new Array();
@@ -165,7 +161,7 @@ export class SubChunk
         }   
         return {v:vertices,i:indices,c:colors,ind:index};
     }
-     async updateVerticesIndices() 
+   updateVerticesIndices() 
     {
         this.vertices= new Array();
         this.indices = new Array();
@@ -176,7 +172,8 @@ export class SubChunk
         {
             for(let y=0;y<16;y++)
             {
-              let vic = await this.updateVerticesOneLevel(x,y,index);
+                this.tasks.push(()=>{
+              let vic = this.updateVerticesOneLevel(x,y,index);
          //    console.log(x,y,vic);
                 
               this.vertices =   this.vertices.concat(vic.v);
@@ -241,11 +238,15 @@ export class SubChunk
                   //  console.log("z");
                     index+=4;
                     }
-                } */  
+                } */ 
+            });
             }
         }
-      
+      this.tasks.push(()=>
+      {
         this.bufferVIC();
+        this.generated=true;
+      });
       //  console.log(this.vertices);
        // console.log(this.indices);
         //console.log(this.colors);

@@ -3,11 +3,11 @@ import { CanvaManager } from "./Engine/CanvaManager.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Texture } from "./Engine/Texture.js";
 import { Chunk } from "./Game/Chunk.js";
-import { SubChunk } from "./Game/SubChunk.js";
 let gl = CanvaManager.gl;
 export class Main {
     static FPS = 61;
     static TPS = 20;
+    static TPU = 60000 / this.TPS;
     static Measure = {
         tps: 0,
         fps: 0,
@@ -21,7 +21,7 @@ export class Main {
     static delta = 0;
     static camera = new Camera();
     static test;
-    static thread = new Worker("/JS/test.js", { type: "module" });
+    static test2;
     static run() {
         CanvaManager.setupCanva(document.body);
         // EBO.unbind();
@@ -42,14 +42,11 @@ export class Main {
             gl.generateMipmap(gl.TEXTURE_2D);
             console.log("okok");
         };
-        this.thread.onmessage = (ev) => {
-            console.log(ev.data);
-        };
-        SubChunk.init();
         if (Texture.blocksGrid.complete) {
             Texture.blocksGrid.onload(new Event("loaded"));
         }
         this.test = new Chunk(0, 0);
+        this.test2 = new Chunk(1, 0);
         //   this.TESTtransf = this.TESTtransf.scale(2,1,1);
         requestAnimationFrame(this.loop.bind(this));
     }
@@ -67,20 +64,30 @@ export class Main {
         // console.log(this.delta);
         if (this.delta >= 1)
             this.lastTick = time;
-        if (this.delta > 100) {
-            console.log("Is game overloaded? Skipping " + delta + "ms");
-            this.delta = 0;
-        }
         while (this.delta >= 1) {
+            if (this.delta > 100) {
+                console.log("Is game overloaded? Skipping " + delta + "ms");
+                this.delta = 0;
+            }
             this.delta--;
             this.update();
         }
         ;
+        let testTime = Date.now();
+        if (this.Measure.fps > 30)
+            while (Date.now() - testTime < 20) {
+                this.chunksUpdate();
+            }
         if (this.lastFrame < time - (1000 / this.FPS)) {
             this.render();
             this.lastFrame = time;
         }
         requestAnimationFrame(this.loop.bind(this));
+    }
+    static chunksUpdate() {
+        let time = Date.now();
+        this.test.update(time);
+        this.test2.update(time);
     }
     static update() {
         this.Measure.ticks++;
@@ -89,8 +96,6 @@ export class Main {
         //this.count=3;
         if (Math.floor(Math.random() * 50) == 1) {
             let rand = 0;
-            this.thread.postMessage({ task: "Subchunk" });
-            console.log("jes");
             //   this.test.subchunks[rand].blocks[Math.floor(Math.random()*16)][Math.floor(Math.random()*16)][Math.floor(Math.random()*16)] =Math.ceil(Math.random()*2);
             // this.test.subchunks[rand].updateVerticesIndices();
             //  this.test.blocks[Math.floor(Math.random()*16)][Math.floor(Math.random()*16)][Math.floor(Math.random()*16)] =Math.ceil(Math.random()*2);
@@ -106,6 +111,7 @@ export class Main {
         gl.clearColor(0.0, 0.0, 0.3, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         this.test.render();
+        this.test2.render();
     }
 }
 Main.run();
