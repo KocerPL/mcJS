@@ -8,13 +8,13 @@ import { Vector } from "./Engine/Utils/Vector.js";
 import { VAO } from "./Engine/VAO.js";
 import { VBO } from "./Engine/VBO.js";
 import { Chunk } from "./Game/Chunk.js";
+import { Player } from "./Game/Player.js";
 import { SubChunk } from "./Game/SubChunk.js";
 let gl = CanvaManager.gl;
 export class Main
 {
    public static FPS:number=61;
    public static TPS:number=20;
-   private static TPU:number = 60000/this.TPS;
    public static Measure = {
       tps:0,
       fps:0,
@@ -26,7 +26,8 @@ export class Main
    private static lastFrame=0;
    public static shader:DefaultShader;
    private static delta = 0;
-   public static camera = new Camera();
+   public static player = new Player(new Vector(0,250,0));
+   public static chunks:Array<Array<Chunk>>=new Array(8)
    public static test:Chunk;
    public static test2:Chunk;
    public static run():void
@@ -35,6 +36,9 @@ export class Main
     // EBO.unbind();
     // VBO.unbind();
     gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LEQUAL);
+    gl.enable(gl.CULL_FACE);
+    gl.cullFace(gl.BACK);
      this.shader = new DefaultShader();
      let texture =gl.createTexture();
      gl.bindTexture(gl.TEXTURE_2D,texture);
@@ -54,6 +58,14 @@ export class Main
      {
       Texture.blocksGrid.onload(new Event("loaded"));
      }
+     for(let x=0; x<8;x++)
+     {
+      this.chunks[x] = new Array(16);
+      for(let z=0; z<8;z++)
+       {
+         this.chunks[x][z] =  new Chunk(x,z);
+       }
+      }
      this.test = new Chunk(0,0);
      this.test2 = new Chunk(1,0);
  //   this.TESTtransf = this.TESTtransf.scale(2,1,1);
@@ -70,7 +82,7 @@ export class Main
          this.Measure.fps = this.Measure.frames;
          this.Measure.frames = 0;
          CanvaManager.debug.value = "Fps: "+this.Measure.fps+ " Tps:"+this.Measure.tps;
-       
+         CanvaManager.debug.value+="Pos: x:"+this.player.pos.x+" y:"+this.player.pos.y+" z:"+this.player.pos.z;
       }
       let delta = time-this.lastTick;
       this.delta += delta/(2000/this.TPS);
@@ -104,8 +116,11 @@ export class Main
    public static chunksUpdate()
    {
       let time = Date.now();
-      this.test.update(time);
-      this.test2.update(time);
+      for(let x=0; x<8;x++)     
+       for(let z=0; z<8;z++)
+        {
+          this.chunks[x][z].update(time);
+        }
    }
    public static update()
    {
@@ -129,13 +144,17 @@ export class Main
    public static render()
    {
       this.Measure.frames++;
-      this.camera.preRender();
+      this.player.camera.preRender();
+      this.player.updatePos();
       CanvaManager.preRender();
      
       gl.clearColor(0.0,0.0,0.3,1.0);
       gl.clear(gl.COLOR_BUFFER_BIT);
-    this.test.render();
-   this.test2.render();
+      for(let x=0; x<8;x++)     
+      for(let z=0; z<8;z++)
+       {
+         this.chunks[x][z].render();
+       }
    }
 }
 Main.run();

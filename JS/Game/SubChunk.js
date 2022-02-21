@@ -101,37 +101,37 @@ export class SubChunk {
             }
             if (x - 1 < 0 || this.blocks[x - 1][y][z] < 1) {
                 vertices = vertices.concat(temp.slice(24, 36));
-                indices = indices.concat(index + 2, index + 1, index, index + 3, index, index + 2);
+                indices = indices.concat(index + 2, index + 1, index, index + 2, index, index + 3);
                 colors = colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                 index += 4;
             }
             if (x + 1 > 15 || this.blocks[x + 1][y][z] < 1) {
                 vertices = vertices.concat(temp.slice(36, 48));
-                indices = indices.concat(index + 2, index + 1, index, index + 3, index, index + 2);
+                indices = indices.concat(index + 1, index + 2, index, index + 3, index, index + 2);
                 colors = colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                 index += 4;
             }
             if (y + 1 > 15 || this.blocks[x][y + 1][z] < 1) {
                 vertices = vertices.concat(temp.slice(60, 72));
-                indices = indices.concat(index + 2, index + 1, index, index + 3, index, index + 2);
+                indices = indices.concat(index + 2, index + 1, index, index + 2, index, index + 3);
                 colors = colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                 index += 4;
             }
             if (y - 1 < 0 || this.blocks[x][y - 1][z] < 1) {
                 vertices = vertices.concat(temp.slice(48, 60));
-                indices = indices.concat(index + 2, index + 1, index, index + 3, index, index + 2);
+                indices = indices.concat(index + 1, index + 2, index, index + 3, index, index + 2);
                 colors = colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                 index += 4;
             }
             if (z + 1 > 15 || this.blocks[x][y][z + 1] < 1) {
                 vertices = vertices.concat(temp.slice(12, 24));
-                indices = indices.concat(index + 2, index + 1, index, index + 3, index, index + 2);
+                indices = indices.concat(index + 2, index + 1, index, index + 2, index, index + 3);
                 colors = colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                 index += 4;
             }
             if (z - 1 < 0 || this.blocks[x][y][z - 1] < 1) {
                 vertices = vertices.concat(temp.slice(0, 12));
-                indices = indices.concat(index + 2, index + 1, index, index + 3, index, index + 2);
+                indices = indices.concat(index + 1, index + 2, index, index + 3, index, index + 2);
                 colors = colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
                 //  console.log("z");
                 index += 4;

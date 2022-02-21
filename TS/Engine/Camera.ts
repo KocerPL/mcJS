@@ -62,33 +62,6 @@ export class Camera
     }
     private updatePos()
     {
-        if(CanvaManager.getKey(87))
-        {
-            this.pos.x+=Math.sin(this.yaw*Math.PI/180)*0.1;
-            this.pos.z+=Math.cos(this.yaw*Math.PI/180)*0.1;
-        }
-        else if(CanvaManager.getKey(83))
-        {
-            this.pos.x-=Math.sin(this.yaw*Math.PI/180)*0.1;
-            this.pos.z-=Math.cos(this.yaw*Math.PI/180)*0.1;
-        }
-        if(CanvaManager.getKey(68))
-        {
-            this.pos.x+=Math.sin((this.yaw+90)*Math.PI/180)*0.1;
-            this.pos.z+=Math.cos((this.yaw+90)*Math.PI/180)*0.1;
-        }
-        else if(CanvaManager.getKey(65))
-        {
-            this.pos.x-=Math.sin((this.yaw+90)*Math.PI/180)*0.1;
-            this.pos.z-=Math.cos((this.yaw+90)*Math.PI/180)*0.1;
-        }
-        if(CanvaManager.getKey(32))
-        this.pos.y+=0.1;
-        else if(CanvaManager.getKey(16))
-        this.pos.y-=0.1;
-        this.pitch -= CanvaManager.mouseMovement.y/10;
-        this.yaw += CanvaManager.mouseMovement.x/10;
-        if(this.pitch>90) this.pitch =90;
-        if(this.pitch<-90) this.pitch=-90;
+       
     }
 }

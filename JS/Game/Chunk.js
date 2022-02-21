@@ -31,7 +31,7 @@ export class Chunk {
         for (let i = 0; i < this.subchunks.length; i++) {
             if (this.subchunks[i] != undefined && this.subchunks[i].generated) {
                 this.subchunks[i].vao.bind();
-                Main.shader.loadUniforms(Main.camera.getProjection(), this.subchunks[i].transformation, Main.camera.getView());
+                Main.shader.loadUniforms(Main.player.camera.getProjection(), this.subchunks[i].transformation, Main.player.camera.getView());
                 gl.drawElements(gl.TRIANGLES, this.subchunks[i].indices.length, gl.UNSIGNED_INT, 0);
             }
         }
@@ -40,12 +40,21 @@ export class Chunk {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 256) {
             throw new Error("Incorrect cordinates");
         }
-        let y = pos.y;
-        let yPos = 0;
-        while (y < 16) {
-            y -= 16;
-            yPos++;
+        let y = pos.y % 16;
+        let yPos = Math.round(pos.y / 16);
+        if (this.subchunks[yPos] != undefined) {
+            return this.subchunks[yPos].blocks[pos.x][y][pos.z];
         }
-        return this.subchunks[yPos].blocks[pos.x, y, pos.z];
+    }
+    setBlock(pos, blockID) {
+        if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 256) {
+            throw new Error("Incorrect cordinates");
+        }
+        let y = pos.y % 16;
+        let yPos = Math.round(pos.y / 16);
+        if (this.subchunks[yPos] != undefined) {
+            this.subchunks[yPos].blocks[pos.x][y][pos.z] = blockID;
+            this.subchunks[yPos].updateVerticesIndices();
+        }
     }
 }

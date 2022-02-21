@@ -1,13 +1,13 @@
-import { Camera } from "./Engine/Camera.js";
 import { CanvaManager } from "./Engine/CanvaManager.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Texture } from "./Engine/Texture.js";
+import { Vector } from "./Engine/Utils/Vector.js";
 import { Chunk } from "./Game/Chunk.js";
+import { Player } from "./Game/Player.js";
 let gl = CanvaManager.gl;
 export class Main {
     static FPS = 61;
     static TPS = 20;
-    static TPU = 60000 / this.TPS;
     static Measure = {
         tps: 0,
         fps: 0,
@@ -19,7 +19,8 @@ export class Main {
     static lastFrame = 0;
     static shader;
     static delta = 0;
-    static camera = new Camera();
+    static player = new Player(new Vector(0, 250, 0));
+    static chunks = new Array(8);
     static test;
     static test2;
     static run() {
@@ -27,6 +28,9 @@ export class Main {
         // EBO.unbind();
         // VBO.unbind();
         gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.LEQUAL);
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
         this.shader = new DefaultShader();
         let texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -45,6 +49,12 @@ export class Main {
         if (Texture.blocksGrid.complete) {
             Texture.blocksGrid.onload(new Event("loaded"));
         }
+        for (let x = 0; x < 8; x++) {
+            this.chunks[x] = new Array(16);
+            for (let z = 0; z < 8; z++) {
+                this.chunks[x][z] = new Chunk(x, z);
+            }
+        }
         this.test = new Chunk(0, 0);
         this.test2 = new Chunk(1, 0);
         //   this.TESTtransf = this.TESTtransf.scale(2,1,1);
@@ -58,6 +68,7 @@ export class Main {
             this.Measure.fps = this.Measure.frames;
             this.Measure.frames = 0;
             CanvaManager.debug.value = "Fps: " + this.Measure.fps + " Tps:" + this.Measure.tps;
+            CanvaManager.debug.value += "Pos: x:" + this.player.pos.x + " y:" + this.player.pos.y + " z:" + this.player.pos.z;
         }
         let delta = time - this.lastTick;
         this.delta += delta / (2000 / this.TPS);
@@ -86,8 +97,10 @@ export class Main {
     }
     static chunksUpdate() {
         let time = Date.now();
-        this.test.update(time);
-        this.test2.update(time);
+        for (let x = 0; x < 8; x++)
+            for (let z = 0; z < 8; z++) {
+                this.chunks[x][z].update(time);
+            }
     }
     static update() {
         this.Measure.ticks++;
@@ -106,12 +119,15 @@ export class Main {
     }
     static render() {
         this.Measure.frames++;
-        this.camera.preRender();
+        this.player.camera.preRender();
+        this.player.updatePos();
         CanvaManager.preRender();
         gl.clearColor(0.0, 0.0, 0.3, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
-        this.test.render();
-        this.test2.render();
+        for (let x = 0; x < 8; x++)
+            for (let z = 0; z < 8; z++) {
+                this.chunks[x][z].render();
+            }
     }
 }
 Main.run();
