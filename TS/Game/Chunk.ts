@@ -23,17 +23,15 @@ export class Chunk {
       let work = this.todo.shift();
       work();
     }
-    for (let i = 0; i < this.subchunks.length; i++) {
-      if (this.subchunks[i] != undefined)
-        this.subchunks[i].update(startTime);
-    }
   }
   render() {
+  
     for (let i = 0; i < this.subchunks.length; i++) {
       if (this.subchunks[i] != undefined && this.subchunks[i].generated) {
         this.subchunks[i].vao.bind();
         Main.shader.loadUniforms(Main.player.camera.getProjection(), this.subchunks[i].transformation, Main.player.camera.getView());
-        gl.drawElements(gl.TRIANGLES, this.subchunks[i].indices.length, gl.UNSIGNED_INT, 0);
+       //console.log(this.subchunks[i].count);
+        gl.drawElements(gl.TRIANGLES, this.subchunks[i].count, gl.UNSIGNED_INT, 0);
       }
     }
   }
@@ -42,7 +40,7 @@ export class Chunk {
       throw new Error("Incorrect cordinates");
     }
     let y = pos.y%16;
-    let yPos = Math.round(pos.y/16);
+    let yPos = Math.floor(pos.y/16);
     if(this.subchunks[yPos]!=undefined)
     {
     return this.subchunks[yPos].blocks[pos.x][y][pos.z];
@@ -54,13 +52,14 @@ export class Chunk {
     }
     let y = pos.y%16;
   
-    let yPos = Math.round(pos.y/16);
-    
+    let yPos = Math.floor(Math.round(pos.y)/16);
+    console.log(yPos);
     if(this.subchunks[yPos]!=undefined)
     {
     this.subchunks[yPos].blocks[pos.x][y][pos.z]=blockID;
-    this.subchunks[yPos].updateVerticesIndices();
+    this.subchunks[yPos].updateVerticesIndices(10);
     }
+    else console.log("undefined Chunk!");
   }
 
 }

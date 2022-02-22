@@ -4,6 +4,7 @@ export class Texture
 {
     static SIZE = (1024/16);
     static blocksGrid = Loader.image("/JS/Engine/Textures/Blocks.png");
+    static crossHair = Loader.image("/JS/Engine/Textures/crosshair.png");
     x:number;
     y:number;
     dx:number;

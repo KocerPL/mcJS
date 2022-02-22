@@ -29,6 +29,10 @@ export class Shader {
         let loc = gl.getUniformLocation(this.ID, name);
         gl.uniformMatrix4fv(loc, false, matrix.toFloat32Array());
     }
+    loadFloat(name, float) {
+        let loc = gl.getUniformLocation(this.ID, name);
+        gl.uniform1f(loc, float);
+    }
     loadVec4(name, vec) {
         let loc = gl.getUniformLocation(this.ID, name);
         gl.uniform4f(loc, vec.x, vec.y, vec.z, vec.w);

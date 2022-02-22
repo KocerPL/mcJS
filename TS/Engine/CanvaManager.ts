@@ -10,6 +10,7 @@ export class CanvaManager
     private static proportion:number  = 1024/1920;
     private static keys:Array<Boolean> = new Array(100);
     public static mouseMovement = new Vector(0,0,0);
+    public static mouse = {left:false,right:false};
    public static setupCanva(location:Node,proportion?:number) : HTMLCanvasElement
     {
         this.proportion = proportion ?? this.proportion;
@@ -24,6 +25,8 @@ export class CanvaManager
         window.addEventListener("keydown",this.onKeyDown.bind(this),false);
         window.addEventListener("keyup",this.onKeyUp.bind(this),false);
         window.addEventListener("mousemove",this.onMouseMove.bind(this),false);
+        window.addEventListener("mousedown",this.onMouseDown.bind(this),false);
+        window.addEventListener("mouseup",this.onMouseUp.bind(this),false);
         this.canva.addEventListener("click",()=>{      this.canva.requestPointerLock()},false);
    
     this.onResize();
@@ -41,6 +44,23 @@ export class CanvaManager
     private static onKeyUp(ev)
     {
         this.keys[ev.keyCode] = false;
+    }
+    private static onMouseDown(ev:MouseEvent)
+    {
+        if(ev.button == 0)
+        this.mouse.left =true;
+        else if(ev.button ==2)
+        this.mouse.right = true
+        ev.preventDefault();
+    }
+    private static onMouseUp(ev)
+    {
+        console.log(ev)
+        if(ev.button == 0)
+        this.mouse.left =false;
+        else if(ev.button ==2)
+        this.mouse.right = false
+        ev.preventDefault();
     }
     public static getKey(keycode:number)
     {

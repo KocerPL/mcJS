@@ -5,6 +5,7 @@ import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
+import { Main } from "../Main.js";
 
 let gl = CanvaManager.gl;
 export class SubChunk
@@ -16,6 +17,7 @@ export class SubChunk
     blocks:Array<Array<Array<number>>>= new Array(16);
     tasks:Array<Function> = new Array();
     generated:boolean=false;
+    count:number;
     static defBlocks :Array<Array<Array<number>>>= new Array(16);
     static rand:Array<number> = new Array(64);
     static dirtTexture = new Texture(0,0);
@@ -67,7 +69,7 @@ export class SubChunk
          this.blocks[x][y] = new Array();
      for(let z=0;z<16;z++)
      {
-       this.blocks[x][y][z]=Math.floor( Math.random()*2.5)
+       this.blocks[x][y][z]=2;
      }
     }
     }
@@ -84,19 +86,9 @@ export class SubChunk
         EBO.unbind();
       //  console.log(this.blocks);
 
-        this.updateVerticesIndices();
+        this.updateVerticesIndices(1);
         
 
-    }
-    update(startTime:number)
-    {
-        let   actualTime =Date.now();
-        while(this.tasks.length> 0 && actualTime-20 < startTime)
-        {
-          actualTime =Date.now();
-         let work = this.tasks.shift();
-         work();
-        }
     }
   updateVerticesOneLevel(x,y,index)
     {
@@ -161,7 +153,7 @@ export class SubChunk
         }   
         return {v:vertices,i:indices,c:colors,ind:index};
     }
-   updateVerticesIndices() 
+   updateVerticesIndices(priority:number) 
     {
         this.vertices= new Array();
         this.indices = new Array();
@@ -172,7 +164,7 @@ export class SubChunk
         {
             for(let y=0;y<16;y++)
             {
-                this.tasks.push(()=>{
+                Main.tasks[priority].push(()=>{
               let vic = this.updateVerticesOneLevel(x,y,index);
          //    console.log(x,y,vic);
                 
@@ -242,10 +234,11 @@ export class SubChunk
             });
             }
         }
-      this.tasks.push(()=>
+        Main.tasks[priority].push(()=>
       {
         this.bufferVIC();
-        this.generated=true;
+        this.count = this.indices.length;
+        this.generated = true;
       });
       //  console.log(this.vertices);
        // console.log(this.indices);
@@ -257,6 +250,7 @@ export class SubChunk
         this.vbo.bufferData(this.vertices);
         this.vtc.bufferData(this.colors);
         this.ebo.bufferData(this.indices);
+        VAO.unbind();
     }
     render()
     {
