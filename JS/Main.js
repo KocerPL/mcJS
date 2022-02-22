@@ -8,6 +8,7 @@ import { VAO } from "./Engine/VAO.js";
 import { VBO } from "./Engine/VBO.js";
 import { Chunk } from "./Game/Chunk.js";
 import { Player } from "./Game/Player.js";
+import { World } from "./Game/World.js";
 let gl = CanvaManager.gl;
 export class Main {
     static FPS = 61;
@@ -28,7 +29,7 @@ export class Main {
     static texture;
     static crosshair;
     static crossVAO;
-    static player = new Player(new Vector(0, 250, 0));
+    static player = new Player(new Vector(0, 20, 0));
     static chunks = new Array(8);
     static crosscords = [
         -0.02, -0.02,
@@ -106,6 +107,8 @@ export class Main {
         VAO.unbind();
         VBO.unbind();
         EBO.unbind();
+        //init world
+        World.init();
         //loading chunks
         for (let x = 0; x < 8; x++) {
             this.chunks[x] = new Array(16);

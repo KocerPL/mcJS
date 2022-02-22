@@ -5,6 +5,7 @@ import { Matrix } from "../Engine/Utils/Matrix.js";
 import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
+import { World } from "./World.js";
 let gl = CanvaManager.gl;
 export class SubChunk {
     ebo;
@@ -56,17 +57,24 @@ export class SubChunk {
     transformation = Matrix.identity();
     constructor(pos) {
         this.transformation = this.transformation.translate(pos.x * 16, pos.y * 16, pos.z * 16);
+        let yPos = pos.y * 16;
+        let xPos = pos.x * 16;
+        let zPos = pos.z * 16;
         for (let x = 0; x < 16; x++) {
             this.blocks[x] = new Array();
             for (let y = 0; y < 16; y++) {
                 this.blocks[x][y] = new Array();
                 for (let z = 0; z < 16; z++) {
-                    this.blocks[x][y][z] = 2;
+                    let ah = World.getHeight(x + xPos, z + zPos);
+                    if (ah - 3 >= (y + yPos))
+                        this.blocks[x][y][z] = 2;
+                    else if (ah >= (y + yPos))
+                        this.blocks[x][y][z] = 1;
+                    else
+                        this.blocks[x][y][z] = 0;
                 }
             }
         }
-        this.blocks[15][15][10] = 1;
-        this.blocks[15][15][9] = 1;
         this.vao = new VAO();
         this.vbo = new VBO();
         this.vao.addPtr(0, 3, 0, 0);

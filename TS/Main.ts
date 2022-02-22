@@ -11,6 +11,7 @@ import { VBO } from "./Engine/VBO.js";
 import { Chunk } from "./Game/Chunk.js";
 import { Player } from "./Game/Player.js";
 import { SubChunk } from "./Game/SubChunk.js";
+import { World } from "./Game/World.js";
 let gl = CanvaManager.gl;
 export class Main
 {
@@ -32,7 +33,7 @@ export class Main
    private static texture;
    private static crosshair;
    private static crossVAO:VAO;
-   public static player = new Player(new Vector(0,250,0));
+   public static player = new Player(new Vector(0,20,0));
    public static chunks:Array<Array<Chunk>>=new Array(8);
    private static crosscords = [
       -0.02,-0.02,
@@ -113,6 +114,8 @@ gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     VAO.unbind();
     VBO.unbind();
     EBO.unbind();
+    //init world
+    World.init();
      //loading chunks
      for(let x=0; x<8;x++)
      {
