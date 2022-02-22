@@ -66,8 +66,14 @@ export class SubChunk {
                 this.blocks[x][y] = new Array();
                 for (let z = 0; z < 16; z++) {
                     let ah = World.getHeight(x + xPos, z + zPos);
-                    if (ah - 3 >= (y + yPos))
-                        this.blocks[x][y][z] = 2;
+                    if (ah - 3 >= (y + yPos)) {
+                        if (Math.round(Math.random() * 10) == 1) {
+                            this.blocks[x][y][z] = 3;
+                        }
+                        else {
+                            this.blocks[x][y][z] = 2;
+                        }
+                    }
                     else if (ah >= (y + yPos))
                         this.blocks[x][y][z] = 1;
                     else
@@ -252,6 +258,12 @@ export class SubChunk {
             1.99, 1.0,
             1.99, 0.0,
             1.01, 0.0,
+        ],
+        3: [
+            2.01, 1.0,
+            2.99, 1.0,
+            2.99, 0.0,
+            2.01, 0.0,
         ]
     });
     static getTextureCords(type) {
