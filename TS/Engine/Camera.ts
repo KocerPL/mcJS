@@ -10,7 +10,7 @@ export class Camera
    private yaw = 0;
    private pitch =0;
    private fov =70;
-   private near = 1;
+   private near = 0.1;
    private far =100;
    private aspect =CanvaManager.getHeight/CanvaManager.getWidth;
 

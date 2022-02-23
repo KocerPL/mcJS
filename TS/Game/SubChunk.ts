@@ -6,6 +6,7 @@ import { Vector } from "../Engine/Utils/Vector.js";
 import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
+import { blocks } from "./Block.js";
 import { World } from "./World.js";
 
 let gl = CanvaManager.gl;
@@ -15,6 +16,8 @@ export class SubChunk
     vbo:VBO;
     vtc:VBO;
     vao:VAO;
+    nor:VBO;
+    normals:Array<number>;
     blocks:Array<Array<Array<number>>>= new Array(16);
     tasks:Array<Function> = new Array();
     generated:boolean=false;
@@ -55,6 +58,40 @@ export class SubChunk
         0.5,0.5,-0.5
   
     ];
+    static defNormals =
+    [
+      0,0,-1,
+      0,0,-1,
+      0,0,-1,
+      0,0,-1,
+      //tył
+      0,0,1,
+      0,0,1,
+      0,0,1,
+      0,0,1,
+      //lewo
+      -1,0,0,
+      -1,0,0,
+      -1,0,0,
+      -1,0,0,
+      //prawo
+      1,0,0,
+      1,0,0,
+      1,0,0,
+      1,0,0,
+      //dół
+      0,-1,0,
+      0,-1,0,
+      0,-1,0,
+      0,-1,0,
+      //góra
+      0,1,0,
+      0,1,0,
+      0,1,0,
+      0,1,0
+
+
+    ]
     vertices = new Array();
     indices = new Array();
     colors = new Array();
@@ -78,15 +115,17 @@ export class SubChunk
        {
        if(Math.round(Math.random()*10) ==1)
        {
-       this.blocks[x][y][z]=3;
+       this.blocks[x][y][z]=4;
        }
       else
       {
-      this.blocks[x][y][z]=2;
+      this.blocks[x][y][z]=3;
       }
       }
-       else if(ah>=(y+yPos))
+       else if(ah-1>=(y+yPos))
        this.blocks[x][y][z]=1;
+       else if(ah>=(y+yPos))
+       this.blocks[x][y][z]=2;
        else
        this.blocks[x][y][z]=0;
      }
@@ -97,6 +136,8 @@ export class SubChunk
         this.vao.addPtr(0,3,0,0);
         this.vtc = new VBO();
         this.vao.addPtr(1,2,0,0);
+        this.nor = new VBO();
+        this.vao.addPtr(2,3,0,0);
         this.ebo = new EBO();
         VAO.unbind();
         VBO.unbind();
@@ -111,7 +152,8 @@ export class SubChunk
     {
         let indices = new Array();
         let vertices = new Array();
-        let colors = new Array();
+        let textureCoords = new Array();
+        let normals = new Array();
       //  let index = 0;
         for(let z=0;z<16;z++)
         {
@@ -127,54 +169,61 @@ export class SubChunk
            if(x-1 <0 || this.blocks[x-1][y][z]<1)
             {
             vertices = vertices.concat(temp.slice(24,36));
+            normals = normals.concat(SubChunk.defNormals.slice(24,36));
             indices = indices.concat(index+2,index+1,index,index+2,index,index+3);
-            colors = colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
+            textureCoords = textureCoords.concat(SubChunk.getTextureCords(this.blocks[x][y][z],"left"));
             index+=4;
             }
             if(x+1 > 15 ||this.blocks[x+1][y][z]<1)
             {
             vertices = vertices.concat(temp.slice(36,48));
+            normals = normals.concat(SubChunk.defNormals.slice(36,48));
             indices = indices.concat(index+1,index+2,index,index+3,index,index+2);
-            colors = colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
+            textureCoords = textureCoords.concat(SubChunk.getTextureCords(this.blocks[x][y][z],"right"));
             index+=4;
             }
             if(y+1 > 15 ||this.blocks[x][y+1][z]<1)
             {
             vertices = vertices.concat(temp.slice(60,72));
+            normals = normals.concat(SubChunk.defNormals.slice(60,72));
             indices = indices.concat(index+2,index+1,index,index+2,index,index+3);
-            colors = colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
+            textureCoords = textureCoords.concat(SubChunk.getTextureCords(this.blocks[x][y][z],"top"));
             index+=4;
             }
             if(y-1 < 0 ||this.blocks[x][y-1][z]<1)
             {
             vertices = vertices.concat(temp.slice(48,60));
+            normals = normals.concat(SubChunk.defNormals.slice(48,60));
             indices = indices.concat(index+1,index+2,index,index+3,index,index+2);
-            colors = colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
+            textureCoords = textureCoords.concat(SubChunk.getTextureCords(this.blocks[x][y][z],"bottom"));
             index+=4;
             }
             if(z+1>15||this.blocks[x][y][z+1]<1)
             {
             vertices = vertices.concat(temp.slice(12,24));
+            normals = normals.concat(SubChunk.defNormals.slice(12,24));
             indices = indices.concat(index+2,index+1,index,index+2,index,index+3);
-            colors = colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
+            textureCoords = textureCoords.concat(SubChunk.getTextureCords(this.blocks[x][y][z],"front"));
             index+=4;
             }
             if(z-1 <0||this.blocks[x][y][z-1]<1)
             {
             vertices = vertices.concat(temp.slice(0,12));
+            normals = normals.concat(SubChunk.defNormals.slice(0,12));
             indices = indices.concat(index+1,index+2,index,index+3,index,index+2);
-            colors = colors.concat(SubChunk.getTextureCords(this.blocks[x][y][z]));
+            textureCoords = textureCoords.concat(SubChunk.getTextureCords(this.blocks[x][y][z],"back"));
           //  console.log("z");
             index+=4;
             }
         }   
-        return {v:vertices,i:indices,c:colors,ind:index};
+        return {v:vertices,i:indices,c:textureCoords,ind:index,n:normals};
     }
    updateVerticesIndices(priority:number) 
     {
         this.vertices= new Array();
         this.indices = new Array();
         this.colors = new Array();
+        this.normals = new Array();
         let index= 0;
       // let done = new Array();
         for(let x=0;x<16;x++)
@@ -186,6 +235,7 @@ export class SubChunk
          //    console.log(x,y,vic);
                 
               this.vertices =   this.vertices.concat(vic.v);
+              this.normals =   this.vertices.concat(vic.n);
               this.indices =   this.indices.concat(vic.i)
                 this.colors = this.colors.concat(vic.c);
                 index = vic.ind;
@@ -265,6 +315,7 @@ export class SubChunk
     {
         this.vao.bind();
         this.vbo.bufferData(this.vertices);
+        this.nor.bufferData(this.normals);
         this.vtc.bufferData(this.colors);
         this.ebo.bufferData(this.indices);
         VAO.unbind();
@@ -284,10 +335,10 @@ export class SubChunk
     }
     static blockTextureCoords = Object.freeze({
         1:[
-            0.01, 1.0,
-            0.99, 1.0,
-            0.99, 0.0,
-            0.01, 0.0,
+            0, 1.0,
+            1.0, 1.0,
+            1.0, 0.0,
+            0.0, 0.0,
         ],
         2:[
             1.01, 1.0,
@@ -302,8 +353,18 @@ export class SubChunk
           2.01, 0.0,
       ]
     });
-    static getTextureCords(type) {
-        return this.blockTextureCoords[type];
+    static getTextureCords(type,face) {
+      let index = blocks[type].textureIndex[face];
+      let posInGrid = index*Texture.rowSize;
+      let rowNum = Math.floor(index/ Texture.SIZE);
+      let column = index%Texture.SIZE;
+   let temp =   [
+        column, rowNum+1.0,
+        column+1.0, rowNum+1.0,
+        column+1.0, rowNum+0.0,
+        column+0.0, rowNum+0.0,
+    ];
+        return temp;
     }
   static  getRandColor(x,y,z)
     {

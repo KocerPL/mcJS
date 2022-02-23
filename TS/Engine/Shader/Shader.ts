@@ -41,6 +41,11 @@ export abstract class Shader
         let loc = gl.getUniformLocation(this.ID,name);
         gl.uniform1f(loc,float);
     }
+    loadVec3(name:string,vec:Vector)
+    {
+        let loc = gl.getUniformLocation(this.ID,name);
+        gl.uniform3f(loc,vec.x,vec.y,vec.z);
+    }
     loadVec4(name:string,vec:Vector)
     {
         let loc = gl.getUniformLocation(this.ID,name);

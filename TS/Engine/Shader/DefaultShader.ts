@@ -9,9 +9,10 @@ export class DefaultShader extends Shader
     {
         super("/JS/Engine/Shader/default.vert","/JS/Engine/Shader/default.frag");
     }
-    loadUniforms(proj:Matrix,transf:Matrix,view:Matrix) {
+    loadUniforms(proj:Matrix,transf:Matrix,view:Matrix,lightPos:Vector) {
         this.loadMatrix("projection",proj);
         this.loadMatrix("transformation",transf);  
         this.loadMatrix("view",view);
+        this.loadVec3("lightPos",lightPos);
     }
 }

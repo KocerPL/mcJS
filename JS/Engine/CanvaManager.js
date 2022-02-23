@@ -9,6 +9,7 @@ export class CanvaManager {
     static keys = new Array(100);
     static mouseMovement = new Vector(0, 0, 0);
     static mouse = { left: false, right: false };
+    static scrollAmount = 0;
     static setupCanva(location, proportion) {
         this.proportion = proportion ?? this.proportion;
         location.appendChild(this.canva);
@@ -23,9 +24,14 @@ export class CanvaManager {
         window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
         window.addEventListener("mousedown", this.onMouseDown.bind(this), false);
         window.addEventListener("mouseup", this.onMouseUp.bind(this), false);
+        window.addEventListener("wheel", this.onScroll.bind(this), false);
         this.canva.addEventListener("click", () => { this.canva.requestPointerLock(); }, false);
         this.onResize();
         return this.canva;
+    }
+    static onScroll(ev) {
+        this.scrollAmount += (Math.round(ev.deltaY / 50));
+        //   console.log(ev);
     }
     static onMouseMove(ev) {
         this.mouseMovement.x = ev.movementX;
@@ -45,7 +51,7 @@ export class CanvaManager {
         ev.preventDefault();
     }
     static onMouseUp(ev) {
-        console.log(ev);
+        //console.log(ev)
         if (ev.button == 0)
             this.mouse.left = false;
         else if (ev.button == 2)

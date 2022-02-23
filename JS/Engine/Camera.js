@@ -9,7 +9,7 @@ export class Camera {
     yaw = 0;
     pitch = 0;
     fov = 70;
-    near = 1;
+    near = 0.1;
     far = 100;
     aspect = CanvaManager.getHeight / CanvaManager.getWidth;
     constructor() {

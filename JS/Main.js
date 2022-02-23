@@ -13,6 +13,7 @@ let gl = CanvaManager.gl;
 export class Main {
     static FPS = 61;
     static TPS = 20;
+    static sunPos = new Vector(100, 100, 100);
     static Measure = {
         tps: 0,
         fps: 0,
@@ -66,8 +67,8 @@ export class Main {
             gl.bindTexture(gl.TEXTURE_2D, crossHair);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, Texture.crossHair);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             gl.generateMipmap(gl.TEXTURE_2D);
             console.log("loaded crosshair");
@@ -76,16 +77,18 @@ export class Main {
             Texture.crossHair.onload(new Event("loaded"));
         }
         this.crosshair = crossHair;
+        //Blocks grid
         let texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.activeTexture(gl.TEXTURE0);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));
         Texture.blocksGrid.onload = () => {
             gl.bindTexture(gl.TEXTURE_2D, texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, Texture.blocksGrid);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, Texture.blocksGrid);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            //   gl.texParameteri(gl.TEXTURE_2D , gl.TEXTURE_BASE_LEVEL , 8); 
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             gl.generateMipmap(gl.TEXTURE_2D);
             console.log("okok");
@@ -207,7 +210,7 @@ export class Main {
         this.shader2d.loadUniforms(CanvaManager.getProportion);
         this.crossVAO.bind();
         CanvaManager.debug.value = "Fps: " + this.Measure.fps + " Tps:" + this.Measure.tps;
-        CanvaManager.debug.value += "Pos: x:" + this.player.pos.x + " y:" + this.player.pos.y + " z:" + this.player.pos.z;
+        CanvaManager.debug.value += "Pos: x:" + String(this.player.pos.x).slice(0, 5) + " y:" + String(this.player.pos.y).slice(0, 5) + " z:" + String(this.player.pos.z).slice(0, 5);
         gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, 0);
     }
 }

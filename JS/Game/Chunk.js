@@ -27,7 +27,7 @@ export class Chunk {
         for (let i = 0; i < this.subchunks.length; i++) {
             if (this.subchunks[i] != undefined && this.subchunks[i].generated) {
                 this.subchunks[i].vao.bind();
-                Main.shader.loadUniforms(Main.player.camera.getProjection(), this.subchunks[i].transformation, Main.player.camera.getView());
+                Main.shader.loadUniforms(Main.player.camera.getProjection(), this.subchunks[i].transformation, Main.player.camera.getView(), Main.sunPos);
                 //console.log(this.subchunks[i].count);
                 gl.drawElements(gl.TRIANGLES, this.subchunks[i].count, gl.UNSIGNED_INT, 0);
             }

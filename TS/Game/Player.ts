@@ -7,6 +7,8 @@ export class Player
 {
     camera:Camera = new Camera();
     pos:Vector;
+    itemsBar:Array<number> = [1,1,2,3,4,5,3,3,3];
+    selectedItem = 1;
     constructor(pos:Vector)
     {
         this.pos = pos;
@@ -43,6 +45,19 @@ export class Player
         this.camera.setYaw(this.camera.getYaw()+(CanvaManager.mouseMovement.x/10));
         if(this.camera.getPitch()>90) this.camera.setPitch(90);
         if(this.camera.getPitch()<-90) this.camera.setPitch(-90);
+        if(CanvaManager.scrollAmount!=0)
+        {
+            this.selectedItem += CanvaManager.scrollAmount;
+            CanvaManager.scrollAmount=0;
+            while(this.selectedItem>8)
+            {
+                this.selectedItem-=8;
+            }
+            while(this.selectedItem<0)
+            {
+                this.selectedItem+=8;
+            }
+        }
         if(CanvaManager.mouse.left) this.mine();
         if(CanvaManager.mouse.right) this.place();
         this.camera.setPosition(new Vector(this.pos.x,this.pos.y+1,this.pos.z));
@@ -98,7 +113,7 @@ export class Player
         chunkPos =new Vector(Math.floor(Math.round(lastPos.x)/16),Math.round(lastPos.y),Math.floor(Math.round(lastPos.z)/16));
        if(Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos)==0 && i!=6 && i!=0)
        {
-        Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos,1);
+        Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos,this.itemsBar[this.selectedItem]);
         CanvaManager.mouse.right=false;
         console.log("placed block!! at: ",blockPos);
        }

@@ -11,6 +11,7 @@ export class CanvaManager
     private static keys:Array<Boolean> = new Array(100);
     public static mouseMovement = new Vector(0,0,0);
     public static mouse = {left:false,right:false};
+    public static scrollAmount =0;
    public static setupCanva(location:Node,proportion?:number) : HTMLCanvasElement
     {
         this.proportion = proportion ?? this.proportion;
@@ -27,10 +28,16 @@ export class CanvaManager
         window.addEventListener("mousemove",this.onMouseMove.bind(this),false);
         window.addEventListener("mousedown",this.onMouseDown.bind(this),false);
         window.addEventListener("mouseup",this.onMouseUp.bind(this),false);
+        window.addEventListener("wheel",this.onScroll.bind(this),false)
         this.canva.addEventListener("click",()=>{      this.canva.requestPointerLock()},false);
    
     this.onResize();
         return this.canva;
+    }
+    static onScroll(ev:WheelEvent)
+    {
+this.scrollAmount+=(Math.round(ev.deltaY/50));
+     //   console.log(ev);
     }
     static onMouseMove(ev: MouseEvent) 
     {
@@ -53,9 +60,9 @@ export class CanvaManager
         this.mouse.right = true
         ev.preventDefault();
     }
-    private static onMouseUp(ev)
+    private static onMouseUp(ev:MouseEvent)
     {
-        console.log(ev)
+        //console.log(ev)
         if(ev.button == 0)
         this.mouse.left =false;
         else if(ev.button ==2)

@@ -2,7 +2,9 @@ import { Loader } from "./Loader.js";
 
 export class Texture
 {
-    static SIZE = (1024/16);
+    static SIZE = 64;
+    static imageSize = 1024;
+    static rowSize = 16;
     static blocksGrid = Loader.image("/JS/Engine/Textures/Blocks.png");
     static crossHair = Loader.image("/JS/Engine/Textures/crosshair.png");
     x:number;
