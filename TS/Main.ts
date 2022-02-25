@@ -230,7 +230,7 @@ gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
       this.player.camera.preRender();
       this.player.updatePos();
       CanvaManager.preRender();
-      gl.clearColor(0.0,0.0,0.3,1.0);
+      gl.clearColor(0.0,1.0,1.0,1.0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       for(let x=0; x<8;x++)     
       for(let z=0; z<8;z++)

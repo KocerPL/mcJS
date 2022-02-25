@@ -7,8 +7,8 @@ export class World {
         this.genHeightMap();
     }
     static genHeightMap() {
-        let height = 10;
-        let height2 = 10;
+        let height = 20;
+        let height2 = 20;
         for (let x = 0; x < 256; x++) {
             if (x % 4)
                 height += Math.round(Math.random() * 2) - 1;
