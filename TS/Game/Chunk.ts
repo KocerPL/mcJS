@@ -88,15 +88,16 @@ export class Chunk {
     let y = pos.y%16;
   
     let yPos = Math.floor(Math.round(pos.y)/16);
-    if(this.subchunks[yPos]!=undefined)
+    if(this.subchunks[yPos]!=undefined && this.subchunks[yPos].generated==true)
     {
     this.subchunks[yPos].blocks[pos.x][y][pos.z].id=blockID;
+    this.updateSubchunkAt(pos.y);
     }
     else
     {
       console.log("Subchunk is undefined");
     }
-    this.updateSubchunkAt(pos.y);
+   
   }
   setBlock2(pos:Vector, blockID) {
     if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {

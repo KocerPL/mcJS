@@ -101,7 +101,7 @@ export class Player
         let dist = 0.1;
         try{
             let lastPos =new Vector(0,0,0);
-        while( Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).id==0 && i<5)
+        while( World.getBlock(blockPos).id==0 && i<5)
         {
         //    console.log(Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos));
           //  console.log(blockPos);
@@ -116,9 +116,9 @@ export class Player
         inChunkPos = new Vector(Math.round(Math.round(lastPos.x)%16),Math.round(lastPos.y),Math.round(Math.round(lastPos.z)%16));
         chunkPos =new Vector(Math.floor(Math.round(lastPos.x)/16),Math.floor(lastPos.y),Math.floor(Math.round(lastPos.z)/16));
         console.log(Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos));
-       if(Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).id==0 && i<10)
+       if(  World.getBlock(lastPos).id==0 && i<10)
        {
-        Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos,this.itemsBar[this.selectedItem]);
+       World.setBlock(lastPos,this.itemsBar[this.selectedItem]);
         CanvaManager.mouse.right=false;
         console.log("placed block!! at: ",lastPos);
        }

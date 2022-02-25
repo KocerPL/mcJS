@@ -1,6 +1,6 @@
 export class Block {
     id;
-    lightLevel = 0;
+    lightLevel = 1;
     constructor(id) {
         this.id = id;
     }
