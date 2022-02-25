@@ -11,4 +11,8 @@ export class Vector
         this.z=z;
         this.w=w??1;
     }
+    copy()
+    {
+        return new Vector(this.x,this.y,this.z,this.w);
+    }
 }

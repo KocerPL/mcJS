@@ -1,3 +1,10 @@
+export class Block {
+    id;
+    lightLevel = 0;
+    constructor(id) {
+        this.id = id;
+    }
+}
 export var blocks = [
     {
         name: "Air"

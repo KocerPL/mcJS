@@ -1,3 +1,13 @@
+export class Block
+{
+    id:number;
+    lightLevel:number=0;
+    constructor(id)
+    {
+this.id = id;
+    }
+}
+
 export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}> = [
 {
     name:"Air"

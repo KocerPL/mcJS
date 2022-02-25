@@ -6,10 +6,14 @@ let gl = CanvaManager.gl;
 export class Chunk {
     subchunks = new Array(16);
     todo = new Array();
+    heightmap = new Array(16);
     constructor(x, z) {
         // console.log("Constructing chunk");
+        for (let i = 0; i < 16; i++) {
+            this.heightmap[i] = new Array(16);
+        }
         for (let i = 0; i < this.subchunks.length; i++) {
-            this.todo.push(() => { this.subchunks[i] = new SubChunk(new Vector(x, i, z)); });
+            this.todo.push(() => { this.subchunks[i] = new SubChunk(new Vector(x, i, z), this.heightmap); });
             //console.log("Completed generating subchunk: "+i);
         }
         // console.log("done constructing");
@@ -44,15 +48,54 @@ export class Chunk {
         }
     }
     setBlock(pos, blockID) {
-        if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 256) {
+        if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {
             throw new Error("Incorrect cordinates");
         }
         let y = pos.y % 16;
         let yPos = Math.floor(Math.round(pos.y) / 16);
         console.log(yPos);
         if (this.subchunks[yPos] != undefined) {
-            this.subchunks[yPos].blocks[pos.x][y][pos.z] = blockID;
-            this.subchunks[yPos].updateVerticesIndices(10);
+            this.subchunks[yPos].blocks[pos.x][y][pos.z].id = blockID;
+            try {
+                if (yPos + y >= this.heightmap[pos.x][pos.z]) {
+                    this.heightmap[pos.x][pos.z] = (yPos + y) - 1;
+                    let blockId = this.subchunks[yPos].blocks[pos.x][y - 1][pos.z].id;
+                    this.subchunks[yPos].blocks[pos.x][y - 1][pos.z].lightLevel = 15;
+                    this.subchunks[yPos].blocks[pos.x - 1][y - 1][pos.z].lightLevel = 13;
+                    this.subchunks[yPos].blocks[pos.x + 1][y - 1][pos.z].lightLevel = 13;
+                    this.subchunks[yPos].blocks[pos.x][y - 1][pos.z + 1].lightLevel = 13;
+                    this.subchunks[yPos].blocks[pos.x][y - 1][pos.z - 1].lightLevel = 13;
+                    let tempPos = 0;
+                    while (blockId < 1) {
+                        tempPos += 1;
+                        this.heightmap[pos.x][pos.z] = (yPos + y) - tempPos;
+                        blockID = this.subchunks[yPos].blocks[pos.x][y - tempPos][pos.z].id;
+                        this.subchunks[yPos].blocks[pos.x][y - tempPos][pos.z].lightLevel = 15;
+                        this.subchunks[yPos].blocks[pos.x - 1][y - tempPos][pos.z].lightLevel = 13 - tempPos;
+                        this.subchunks[yPos].blocks[pos.x + 1][y - tempPos][pos.z].lightLevel = 13 - tempPos;
+                        this.subchunks[yPos].blocks[pos.x][y - tempPos][pos.z + 1].lightLevel = 13 - tempPos;
+                        this.subchunks[yPos].blocks[pos.x][y - tempPos][pos.z - 1].lightLevel = 13 - tempPos;
+                    }
+                }
+                else {
+                    let light = this.subchunks[yPos].blocks[pos.x][y][pos.z].lightLevel;
+                    if (this.subchunks[yPos].blocks[pos.x + 1][y][pos.z].lightLevel < light - 1)
+                        this.subchunks[yPos].blocks[pos.x + 1][y][pos.z].lightLevel = light - 1;
+                    if (this.subchunks[yPos].blocks[pos.x - 1][y][pos.z].lightLevel < light - 1)
+                        this.subchunks[yPos].blocks[pos.x - 1][y][pos.z].lightLevel = light - 1;
+                    if (this.subchunks[yPos].blocks[pos.x][y][pos.z - 1].lightLevel < light - 1)
+                        this.subchunks[yPos].blocks[pos.x][y][pos.z - 1].lightLevel = light - 1;
+                    if (this.subchunks[yPos].blocks[pos.x][y][pos.z + 1].lightLevel < light - 1)
+                        this.subchunks[yPos].blocks[pos.x][y][pos.z + 1].lightLevel = light - 1;
+                    if (this.subchunks[yPos].blocks[pos.x][y - 1][pos.z].lightLevel < light - 1)
+                        this.subchunks[yPos].blocks[pos.x][y - 1][pos.z].lightLevel = light - 1;
+                    if (this.subchunks[yPos].blocks[pos.x][y + 1][pos.z].lightLevel < light - 1)
+                        this.subchunks[yPos].blocks[pos.x][y + 1][pos.z].lightLevel = light - 1;
+                }
+            }
+            catch (error) {
+            }
+            this.subchunks[yPos].updateVerticesIndices(10, this.heightmap);
         }
         else
             console.log("undefined Chunk!");

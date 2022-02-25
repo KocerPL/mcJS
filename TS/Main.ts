@@ -8,6 +8,7 @@ import { Matrix } from "./Engine/Utils/Matrix.js";
 import { Vector } from "./Engine/Utils/Vector.js";
 import { VAO } from "./Engine/VAO.js";
 import { VBO } from "./Engine/VBO.js";
+import { blocks } from "./Game/Block.js";
 import { Chunk } from "./Game/Chunk.js";
 import { Player } from "./Game/Player.js";
 import { SubChunk } from "./Game/SubChunk.js";
@@ -242,7 +243,7 @@ gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
       this.shader2d.loadUniforms(CanvaManager.getProportion);
        this.crossVAO.bind();
        CanvaManager.debug.value = "Fps: "+this.Measure.fps+ " Tps:"+this.Measure.tps;
-       CanvaManager.debug.value+="Pos: x:"+String(this.player.pos.x).slice(0,5)+" y:"+String(this.player.pos.y).slice(0,5)+" z:"+String(this.player.pos.z).slice(0,5);
+       CanvaManager.debug.value+="Selected block:"+blocks[this.player.itemsBar[this.player.selectedItem]].name+ " Pos: x:"+String(this.player.pos.x).slice(0,5)+" y:"+String(this.player.pos.y).slice(0,5)+" z:"+String(this.player.pos.z).slice(0,5);
        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, 0);
    }
 }

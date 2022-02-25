@@ -1,3 +1,5 @@
+import { Vector } from "../Engine/Utils/Vector.js";
+import { Main } from "../Main.js";
 import { Chunk } from "./Chunk.js";
 export class World
 {
@@ -40,6 +42,30 @@ export class World
                 this.heightMap[x][z] =height2;
             }
         }
+    }
+   public static setBlock(blockPos:Vector,type:number)
+    {
+       let inChunkPos = new Vector(Math.round(Math.round(blockPos.x)%16),Math.round(blockPos.y),Math.round(Math.round(blockPos.z)%16));
+        let chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
+        try
+       {
+        Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos,type);
+       }catch(error)
+       {
+
+       }
+       return;
+    }
+    public static getBlock(blockPos:Vector)
+    {
+        let inChunkPos = new Vector(Math.round(Math.round(blockPos.x)%16),Math.round(blockPos.y),Math.round(Math.round(blockPos.z)%16));
+        let chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
+       try
+       {
+        return Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos);
+       }catch(error)
+       {}
+       return 0;
     }
     public static getHeight(x,z)
     {
