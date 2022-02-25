@@ -239,7 +239,7 @@ export class SubChunk
     }
    updateVerticesIndices(priority:number,heightmap) 
     {
-      if(this.inReGeneration) {Main.tasks[priority].push( ()=>{this.updateVerticesIndices(priority,heightmap)}); return;};
+      if(this.inReGeneration) {Main.tasks[priority].push( ()=>{this.updateVerticesIndices(priority,heightmap)});   return;};
         this.vertices= new Array();
         this.indices = new Array();
         this.colors = new Array();

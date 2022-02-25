@@ -47,7 +47,42 @@ export class Chunk {
             return this.subchunks[yPos].blocks[pos.x][y][pos.z];
         }
     }
+    setLight(pos, lightLevel) {
+        if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {
+            throw new Error("Incorrect cordinates");
+        }
+        let y = pos.y % 16;
+        let yPos = Math.floor(Math.round(pos.y) / 16);
+        if (this.subchunks[yPos] != undefined) {
+            this.subchunks[yPos].blocks[pos.x][y][pos.z].lightLevel = lightLevel;
+        }
+        else {
+            console.log("Subchunk is undefined");
+        }
+    }
+    getSubchunk(y) {
+        let yPos = Math.floor(Math.round(y) / 16);
+        return this.subchunks[yPos];
+    }
+    updateSubchunkAt(y) {
+        let yPos = Math.floor(Math.round(y) / 16);
+        this.subchunks[yPos].updateVerticesIndices(10, this.heightmap);
+    }
     setBlock(pos, blockID) {
+        if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {
+            throw new Error("Incorrect cordinates");
+        }
+        let y = pos.y % 16;
+        let yPos = Math.floor(Math.round(pos.y) / 16);
+        if (this.subchunks[yPos] != undefined) {
+            this.subchunks[yPos].blocks[pos.x][y][pos.z].id = blockID;
+        }
+        else {
+            console.log("Subchunk is undefined");
+        }
+        this.updateSubchunkAt(pos.y);
+    }
+    setBlock2(pos, blockID) {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {
             throw new Error("Incorrect cordinates");
         }

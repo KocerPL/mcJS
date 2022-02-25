@@ -62,14 +62,14 @@ export class Player {
         let chunkPos = new Vector(Math.round(blockPos.x / 16), Math.round(blockPos.y), Math.round(blockPos.z / 16));
         let i = 0;
         try {
-            while (Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).id == 0 && i < 5) {
+            while (World.getBlock(blockPos).id == 0 && i < 5) {
                 i += dist;
                 blockPos = new Vector(blockPos.x + (Math.sin(this.camera.getYaw() * Math.PI / 180) * Math.cos(this.camera.getPitch() * Math.PI / 180) * dist), blockPos.y + (Math.sin(this.camera.getPitch() * Math.PI / 180) * dist), blockPos.z + (Math.cos(this.camera.getYaw() * Math.PI / 180) * Math.cos(this.camera.getPitch() * Math.PI / 180) * dist));
                 inChunkPos = new Vector(Math.round(Math.round(blockPos.x) % 16), Math.round(blockPos.y), Math.round(Math.round(blockPos.z) % 16));
                 chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.floor(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
             }
             if (Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).id != 0) {
-                Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos, 0);
+                World.setBlock(blockPos, 0);
                 console.log("mined block!!");
             }
         }
@@ -141,7 +141,7 @@ export class Player {
                 let lastPos = firstPos;
                 if (py < 0 && pz < 0) {
                     firstPos = new Vector(firstPos.x + dod.x, firstPos.y, firstPos.z);
-                    if (World.getBlock(firstPos) != 0) {
+                    if (World.getBlock(firstPos).id != 0) {
                         World.setBlock(lastPos, this.itemsBar[this.selectedItem]);
                         CanvaManager.mouse.right = false;
                         return;
@@ -151,7 +151,7 @@ export class Player {
                 }
                 else if (py > 0 && pz < 0) {
                     firstPos = new Vector(firstPos.x, firstPos.y + dod.y, firstPos.z);
-                    if (World.getBlock(firstPos) != 0) {
+                    if (World.getBlock(firstPos).id != 0) {
                         World.setBlock(lastPos, this.itemsBar[this.selectedItem]);
                         CanvaManager.mouse.right = false;
                         return;
@@ -161,7 +161,7 @@ export class Player {
                 }
                 else if (py == 0) {
                     firstPos = new Vector(firstPos.x + dod.x, firstPos.y, firstPos.z + dod.z);
-                    if (World.getBlock(firstPos) != 0) {
+                    if (World.getBlock(firstPos).id != 0) {
                         World.setBlock(lastPos, this.itemsBar[this.selectedItem]);
                         CanvaManager.mouse.right = false;
                         return;
@@ -171,7 +171,7 @@ export class Player {
                 }
                 else {
                     firstPos = new Vector(firstPos.x + dod.x, firstPos.y, firstPos.z + dod.z);
-                    if (World.getBlock(firstPos) != 0) {
+                    if (World.getBlock(firstPos).id != 0) {
                         World.setBlock(lastPos, this.itemsBar[this.selectedItem]);
                         CanvaManager.mouse.right = false;
                         return;
@@ -204,7 +204,7 @@ export class Player {
                     dod.z = -1;
                 if (px < 0 && pz < 0) {
                     firstPos = new Vector(firstPos.x, firstPos.y + dod.y, firstPos.z);
-                    if (World.getBlock(firstPos) != 0) {
+                    if (World.getBlock(firstPos).id != 0) {
                         World.setBlock(lastPos, this.itemsBar[this.selectedItem]);
                         CanvaManager.mouse.right = false;
                         return;
@@ -214,7 +214,7 @@ export class Player {
                 }
                 else if (px > 0 && pz < 0) {
                     firstPos = new Vector(firstPos.x + dod.x, firstPos.y + dod.y, firstPos.z);
-                    if (World.getBlock(firstPos) != 0) {
+                    if (World.getBlock(firstPos).id != 0) {
                         World.setBlock(lastPos, this.itemsBar[this.selectedItem]);
                         CanvaManager.mouse.right = false;
                         return;
@@ -224,7 +224,7 @@ export class Player {
                 }
                 else if (px == 0) {
                     firstPos = new Vector(firstPos.x, firstPos.y + dod.y, firstPos.z + dod.z);
-                    if (World.getBlock(firstPos) != 0) {
+                    if (World.getBlock(firstPos).id != 0) {
                         World.setBlock(lastPos, this.itemsBar[this.selectedItem]);
                         CanvaManager.mouse.right = false;
                         return;
@@ -234,7 +234,7 @@ export class Player {
                 }
                 else {
                     firstPos = new Vector(firstPos.x + dod.x, firstPos.y + dod.y, firstPos.z + dod.z);
-                    if (World.getBlock(firstPos) != 0) {
+                    if (World.getBlock(firstPos).id != 0) {
                         World.setBlock(lastPos, this.itemsBar[this.selectedItem]);
                         CanvaManager.mouse.right = false;
                         return;
@@ -267,7 +267,7 @@ export class Player {
                 let lastPos = firstPos;
                 if (px < 0 && py < 0) {
                     firstPos = new Vector(firstPos.x, firstPos.y, firstPos.z + dod.z);
-                    if (World.getBlock(firstPos) != 0) {
+                    if (World.getBlock(firstPos).id != 0) {
                         World.setBlock(lastPos, this.itemsBar[this.selectedItem]);
                         CanvaManager.mouse.right = false;
                         return;
@@ -277,7 +277,7 @@ export class Player {
                 }
                 else if (px > 0 && py < 0) {
                     firstPos = new Vector(firstPos.x + dod.x, firstPos.y + dod.y, firstPos.z);
-                    if (World.getBlock(firstPos) != 0) {
+                    if (World.getBlock(firstPos).id != 0) {
                         World.setBlock(lastPos, this.itemsBar[this.selectedItem]);
                         CanvaManager.mouse.right = false;
                         return;
@@ -287,7 +287,7 @@ export class Player {
                 }
                 else if (px == 0) {
                     firstPos = new Vector(firstPos.x, firstPos.y + dod.y, firstPos.z + dod.z);
-                    if (World.getBlock(firstPos) != 0) {
+                    if (World.getBlock(firstPos).id != 0) {
                         World.setBlock(lastPos, this.itemsBar[this.selectedItem]);
                         CanvaManager.mouse.right = false;
                         return;
@@ -297,7 +297,7 @@ export class Player {
                 }
                 else {
                     firstPos = new Vector(firstPos.x + dod.x, firstPos.y + dod.y, firstPos.z + dod.z);
-                    if (World.getBlock(firstPos) != 0) {
+                    if (World.getBlock(firstPos).id != 0) {
                         World.setBlock(lastPos, this.itemsBar[this.selectedItem]);
                         CanvaManager.mouse.right = false;
                         return;
@@ -341,7 +341,7 @@ export class Player {
             else if (dVec.z >= dVec.x && dVec.z >= dVec.y) {
                 firstPos.z += dod.z;
             }
-            if (World.getBlock(firstPos) != 0) {
+            if (World.getBlock(firstPos).id != 0) {
                 World.setBlock(lastPos, this.itemsBar[this.selectedItem]);
                 CanvaManager.mouse.right = false;
                 return;
