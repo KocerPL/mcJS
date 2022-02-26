@@ -10,6 +10,7 @@ import { VAO } from "./Engine/VAO.js";
 import { VBO } from "./Engine/VBO.js";
 import { blocks } from "./Game/Block.js";
 import { Chunk } from "./Game/Chunk.js";
+import { GUI } from "./Game/GUI.js";
 import { Player } from "./Game/Player.js";
 import { SubChunk } from "./Game/SubChunk.js";
 import { World } from "./Game/World.js";
@@ -32,8 +33,6 @@ export class Main
    private static lastFrame=0;
    public static shader:DefaultShader;
    private static delta = 0;
-   private static texture;
-   private static crosshair;
    private static crossVAO:VAO;
    public static player = new Player(new Vector(0,20,0));
    public static chunks:Array<Array<Chunk>>=new Array(8);
@@ -45,9 +44,9 @@ export class Main
    ]
    private static crosstcords = [
       0,0,
-      1,1,
-      0,1,
-      1,0
+      9,9,
+      0,9,
+      9,0
    ]
    private static crossindices =[
       0,1,2, 3,1,0
@@ -61,51 +60,15 @@ export class Main
     gl.depthFunc(gl.LEQUAL);
     gl.enable(gl.CULL_FACE);
     gl.cullFace(gl.BACK);
+    //Transparency requires blending 
     gl.enable (gl.BLEND);
-gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+   //Shader for world
      this.shader = new DefaultShader();
+     //shader for GUI(2d)
      this.shader2d = new Shader2d();
-     let crossHair = gl.createTexture();
-     gl.bindTexture(gl.TEXTURE_2D,crossHair);
-     gl.activeTexture(gl.TEXTURE0);
-     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0,gl.RGBA, gl.UNSIGNED_BYTE,new Uint8Array([0, 255, 0, 255]));
-     Texture.crossHair.onload = ()=>{
-      gl.bindTexture(gl.TEXTURE_2D,crossHair);  
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA,gl.UNSIGNED_BYTE,Texture.crossHair);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-         gl.generateMipmap(gl.TEXTURE_2D);
-         console.log("loaded crosshair");
-      };
-      if(Texture.crossHair.complete)
-      {
-       Texture.crossHair.onload(new Event("loaded"));
-      }
-      this.crosshair = crossHair;
-      //Blocks grid
-     let texture =gl.createTexture();
-     gl.bindTexture(gl.TEXTURE_2D,texture);
-     gl.activeTexture(gl.TEXTURE0);
-     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0,gl.RGBA, gl.UNSIGNED_BYTE,new Uint8Array([0, 0, 255, 255]));
-     Texture.blocksGrid.onload = ()=>{
-      gl.bindTexture(gl.TEXTURE_2D,texture);  
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA,gl.UNSIGNED_BYTE,Texture.blocksGrid);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
-         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
-      //   gl.texParameteri(gl.TEXTURE_2D , gl.TEXTURE_BASE_LEVEL , 8); 
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-         gl.generateMipmap(gl.TEXTURE_2D);
-         console.log("okok");
-      };
-     if(Texture.blocksGrid.complete)
-     {
-      Texture.blocksGrid.onload(new Event("loaded"));
-     }
-     this.texture = texture;
      //loading crosshair 
+     GUI.init();
      this.crossVAO = new VAO();
      let vbo = new VBO();
      vbo.bufferData(this.crosscords);
@@ -209,7 +172,7 @@ gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
      // this.count++;
      // if(this.count>this.test.indices.length)
       //this.count=3;
-      
+      GUI.update();
       if(Math.floor(Math.random()*50) == 1)
       {
          let rand = 0;
@@ -225,7 +188,7 @@ gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
    public static render()
    {
       this.Measure.frames++;
-      gl.bindTexture(gl.TEXTURE_2D,this.texture);
+      gl.bindTexture(gl.TEXTURE_2D,Texture.blocksGrid);
       this.shader.use();
       this.player.camera.preRender();
       this.player.updatePos();
@@ -238,13 +201,8 @@ gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
          this.chunks[x][z].render();
        }
       //render crosshair
-      gl.bindTexture(gl.TEXTURE_2D,this.crosshair);
-      this.shader2d.use();
-      this.shader2d.loadUniforms(CanvaManager.getProportion);
-       this.crossVAO.bind();
-       CanvaManager.debug.value = "Fps: "+this.Measure.fps+ " Tps:"+this.Measure.tps;
-       CanvaManager.debug.value+="Selected block:"+blocks[this.player.itemsBar[this.player.selectedItem]].name+ " Pos: x:"+String(this.player.pos.x).slice(0,5)+" y:"+String(this.player.pos.y).slice(0,5)+" z:"+String(this.player.pos.z).slice(0,5);
-       gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_INT, 0);
+    
+      GUI.render(this.shader2d);
    }
 }
 Main.run();

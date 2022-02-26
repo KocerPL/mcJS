@@ -6,6 +6,7 @@ export class Texture
     static imageSize = 1024;
     static rowSize = 16;
     static blocksGrid = Loader.image("/JS/Engine/Textures/Blocks.png");
+    static GUI = Loader.image("/JS/Engine/Textures/GUI.png");
     static crossHair = Loader.image("/JS/Engine/Textures/crosshair.png");
     x:number;
     y:number;

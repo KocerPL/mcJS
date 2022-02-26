@@ -67,5 +67,16 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         right:5
     }
 },
+{
+    name:"log",
+    textureIndex:{
+        top:7,
+        bottom:7,
+        front:6,
+        back:6,
+        left:6,
+        right:6
+    }
+},
 
 ];

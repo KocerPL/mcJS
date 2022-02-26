@@ -8,8 +8,8 @@ export class Player
 {
     camera:Camera = new Camera();
     pos:Vector;
-    itemsBar:Array<number> = [1,1,2,3,4,5,3,3,3];
-    selectedItem = 1;
+    itemsBar:Array<number> = [1,1,2,3,4,5,6,3,3];
+    selectedItem = 0;
     constructor(pos:Vector)
     {
         this.pos = pos;
@@ -52,11 +52,11 @@ export class Player
             CanvaManager.scrollAmount=0;
             while(this.selectedItem>8)
             {
-                this.selectedItem-=8;
+                this.selectedItem-=9;
             }
             while(this.selectedItem<0)
             {
-                this.selectedItem+=8;
+                this.selectedItem+=9;
             }
         }
         if(CanvaManager.mouse.left) this.mine();

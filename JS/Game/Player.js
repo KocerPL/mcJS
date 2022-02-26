@@ -6,8 +6,8 @@ import { World } from "./World.js";
 export class Player {
     camera = new Camera();
     pos;
-    itemsBar = [1, 1, 2, 3, 4, 5, 3, 3, 3];
-    selectedItem = 1;
+    itemsBar = [1, 1, 2, 3, 4, 5, 6, 3, 3];
+    selectedItem = 0;
     constructor(pos) {
         this.pos = pos;
         this.camera.setPosition(new Vector(pos.x, pos.y + 1, pos.z));
@@ -43,10 +43,10 @@ export class Player {
             this.selectedItem += CanvaManager.scrollAmount;
             CanvaManager.scrollAmount = 0;
             while (this.selectedItem > 8) {
-                this.selectedItem -= 8;
+                this.selectedItem -= 9;
             }
             while (this.selectedItem < 0) {
-                this.selectedItem += 8;
+                this.selectedItem += 9;
             }
         }
         if (CanvaManager.mouse.left)
