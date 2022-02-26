@@ -1,7 +1,6 @@
 import { Camera } from "../Engine/Camera.js";
 import { CanvaManager } from "../Engine/CanvaManager.js";
 import { Vector } from "../Engine/Utils/Vector.js";
-import { Main } from "../Main.js";
 import { World } from "./World.js";
 export class Player {
     camera = new Camera();
@@ -58,17 +57,13 @@ export class Player {
     mine() {
         let dist = 0.1;
         let blockPos = new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1), Math.round(this.pos.z));
-        let inChunkPos = new Vector(Math.round(blockPos.x) % 16, Math.round(blockPos.y), Math.round(blockPos.z) % 16);
-        let chunkPos = new Vector(Math.round(blockPos.x / 16), Math.round(blockPos.y), Math.round(blockPos.z / 16));
         let i = 0;
         try {
             while (World.getBlock(blockPos).id == 0 && i < 5) {
                 i += dist;
                 blockPos = new Vector(blockPos.x + (Math.sin(this.camera.getYaw() * Math.PI / 180) * Math.cos(this.camera.getPitch() * Math.PI / 180) * dist), blockPos.y + (Math.sin(this.camera.getPitch() * Math.PI / 180) * dist), blockPos.z + (Math.cos(this.camera.getYaw() * Math.PI / 180) * Math.cos(this.camera.getPitch() * Math.PI / 180) * dist));
-                inChunkPos = new Vector(Math.round(Math.round(blockPos.x) % 16), Math.round(blockPos.y), Math.round(Math.round(blockPos.z) % 16));
-                chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.floor(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
             }
-            if (Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).id != 0) {
+            if (World.getBlock(blockPos).id != 0) {
                 World.setBlock(blockPos, 0);
                 console.log("mined block!!");
             }
@@ -79,8 +74,6 @@ export class Player {
     }
     place() {
         let blockPos = new Vector(this.pos.x, this.pos.y + 1, this.pos.z);
-        let inChunkPos = new Vector(Math.round(blockPos.x) % 16, Math.round(blockPos.y), Math.round(blockPos.z) % 16);
-        let chunkPos = new Vector(Math.round(blockPos.x / 16), Math.round(blockPos.y), Math.round(blockPos.z / 16));
         let i = 0;
         let dist = 0.1;
         try {
@@ -91,15 +84,8 @@ export class Player {
                 lastPos = blockPos.copy();
                 i += dist;
                 blockPos = new Vector(blockPos.x + (Math.sin(this.camera.getYaw() * Math.PI / 180) * Math.cos(this.camera.getPitch() * Math.PI / 180) * dist), blockPos.y + (Math.sin(this.camera.getPitch() * Math.PI / 180) * dist), blockPos.z + (Math.cos(this.camera.getYaw() * Math.PI / 180) * Math.cos(this.camera.getPitch() * Math.PI / 180) * dist));
-                inChunkPos = new Vector(Math.round(blockPos.x % 16), Math.round(blockPos.y), Math.round(blockPos.z % 16));
-                chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.floor(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
             }
-            console.log(Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos));
-            //console.log(blockPos,lastPos);
-            inChunkPos = new Vector(Math.round(Math.round(lastPos.x) % 16), Math.round(lastPos.y), Math.round(Math.round(lastPos.z) % 16));
-            chunkPos = new Vector(Math.floor(Math.round(lastPos.x) / 16), Math.floor(lastPos.y), Math.floor(Math.round(lastPos.z) / 16));
-            console.log(Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos));
-            if (World.getBlock(lastPos).id == 0 && i < 10) {
+            if (World.getBlock(lastPos).id == 0 && i < 5) {
                 World.setBlock(lastPos, this.itemsBar[this.selectedItem]);
                 CanvaManager.mouse.right = false;
                 console.log("placed block!! at: ", lastPos);

@@ -38,8 +38,8 @@ export class Chunk {
         }
     }
     getBlock(pos) {
-        if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 256) {
-            throw new Error("Incorrect cordinates");
+        if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 15 || pos.y > 256 || pos.z > 15) {
+            throw new Error("Incorrect cordinates: x:" + pos.x + " y:" + pos.y + " z:" + pos.z);
         }
         let y = pos.y % 16;
         let yPos = Math.floor(pos.y / 16);

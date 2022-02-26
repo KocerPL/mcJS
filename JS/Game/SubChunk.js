@@ -20,6 +20,7 @@ export class SubChunk {
     tasks = new Array();
     generated = false;
     inReGeneration = false;
+    lightUpdate = false;
     count;
     static defBlocks = new Array(16);
     static rand = new Array(64);
@@ -209,8 +210,7 @@ export class SubChunk {
         return { v: vertices, i: indices, c: textureCoords, ind: index, lL: lightLevels };
     }
     updateVerticesIndices(priority, heightmap) {
-        if (this.inReGeneration) {
-            Main.tasks[priority].push(() => { this.updateVerticesIndices(priority, heightmap); });
+        if (this.inReGeneration) { //Main.tasks[priority].push( ()=>{this.updateVerticesIndices(priority,heightmap); console.log("self lock")});
             return;
         }
         ;
@@ -297,6 +297,7 @@ export class SubChunk {
             this.bufferVIC();
             this.count = this.indices.length;
             this.generated = true;
+            this.lightUpdate = false;
             this.inReGeneration = false;
         });
         //  console.log(this.vertices);

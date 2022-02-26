@@ -23,6 +23,7 @@ export class SubChunk
     tasks:Array<Function> = new Array();
     generated:boolean=false;
     inReGeneration:boolean=false;
+    lightUpdate:boolean = false;
     count:number;
     static defBlocks :Array<Array<Array<number>>>= new Array(16);
     static rand:Array<number> = new Array(64);
@@ -239,7 +240,8 @@ export class SubChunk
     }
    updateVerticesIndices(priority:number,heightmap) 
     {
-      if(this.inReGeneration) {Main.tasks[priority].push( ()=>{this.updateVerticesIndices(priority,heightmap)});   return;};
+      if(this.inReGeneration) {//Main.tasks[priority].push( ()=>{this.updateVerticesIndices(priority,heightmap); console.log("self lock")});
+           return;};
         this.vertices= new Array();
         this.indices = new Array();
         this.colors = new Array();
@@ -330,6 +332,7 @@ export class SubChunk
         this.bufferVIC();
         this.count = this.indices.length;
         this.generated = true;
+        this.lightUpdate =false;
         this.inReGeneration =false;
       });
       //  console.log(this.vertices);

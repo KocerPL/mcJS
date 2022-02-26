@@ -46,10 +46,10 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         }
 },
 {
-    name:"Greenstone",
+    name:"Greenstone ore",
     textureIndex:{
-        top:3,
-        bottom:3,
+        top:4,
+        bottom:4,
         front:4,
         back:4,
         left:4,

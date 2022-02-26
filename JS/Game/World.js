@@ -35,9 +35,15 @@ export class World {
     }
     static setLight(blockPos, lightLevel) {
         try {
-            let inChunkPos = new Vector(Math.round(Math.round(blockPos.x) % 16), Math.round(blockPos.y), Math.round(Math.round(blockPos.z) % 16));
+            let inChunkPos = new Vector(Math.round(blockPos.x) % 16, Math.round(blockPos.y), Math.round(blockPos.z) % 16);
             let chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
             Main.chunks[chunkPos.x][chunkPos.z].setLight(inChunkPos, lightLevel);
+            let sc = Main.chunks[chunkPos.x][chunkPos.z].getSubchunk(blockPos.y);
+            if (!sc.lightUpdate) {
+                sc.lightUpdate = true;
+                console.log("okokokok");
+                sc.updateVerticesIndices(9, Main.chunks[chunkPos.x][chunkPos.z].heightmap);
+            }
             return Main.chunks[chunkPos.x][chunkPos.z];
         }
         catch (error) {
@@ -73,25 +79,25 @@ export class World {
                 else {
                     let lightLevel = Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).lightLevel - 1;
                     if (lightLevel > 1) {
-                        this.lightFunc(new Vector(blockPos.x, blockPos.y - 1, blockPos.z), lightLevel, blockPos);
-                        this.lightFunc(new Vector(blockPos.x, blockPos.y + 1, blockPos.z), lightLevel, blockPos);
-                        this.lightFunc(new Vector(blockPos.x + 1, blockPos.y, blockPos.z), lightLevel, blockPos);
-                        this.lightFunc(new Vector(blockPos.x - 1, blockPos.y, blockPos.z), lightLevel, blockPos);
-                        this.lightFunc(new Vector(blockPos.x, blockPos.y, blockPos.z + 1), lightLevel, blockPos);
-                        this.lightFunc(new Vector(blockPos.x, blockPos.y, blockPos.z - 1), lightLevel, blockPos);
+                        this.lightFunc(new Vector(blockPos.x, blockPos.y - 1, blockPos.z), lightLevel);
+                        this.lightFunc(new Vector(blockPos.x, blockPos.y + 1, blockPos.z), lightLevel);
+                        this.lightFunc(new Vector(blockPos.x + 1, blockPos.y, blockPos.z), lightLevel);
+                        this.lightFunc(new Vector(blockPos.x - 1, blockPos.y, blockPos.z), lightLevel);
+                        this.lightFunc(new Vector(blockPos.x, blockPos.y, blockPos.z + 1), lightLevel);
+                        this.lightFunc(new Vector(blockPos.x, blockPos.y, blockPos.z - 1), lightLevel);
                     }
                 }
             }
             else {
                 console.log("ok");
                 let lightLevel = 15;
-                this.lightFunc(blockPos, lightLevel, blockPos);
-                this.lightFunc(new Vector(blockPos.x, blockPos.y - 1, blockPos.z), lightLevel, blockPos);
-                this.lightFunc(new Vector(blockPos.x, blockPos.y + 1, blockPos.z), lightLevel, blockPos);
-                this.lightFunc(new Vector(blockPos.x + 1, blockPos.y, blockPos.z), lightLevel, blockPos);
-                this.lightFunc(new Vector(blockPos.x - 1, blockPos.y, blockPos.z), lightLevel, blockPos);
-                this.lightFunc(new Vector(blockPos.x, blockPos.y, blockPos.z + 1), lightLevel, blockPos);
-                this.lightFunc(new Vector(blockPos.x, blockPos.y, blockPos.z - 1), lightLevel, blockPos);
+                this.lightFunc(blockPos, lightLevel);
+                this.lightFunc(new Vector(blockPos.x, blockPos.y - 1, blockPos.z), lightLevel);
+                this.lightFunc(new Vector(blockPos.x, blockPos.y + 1, blockPos.z), lightLevel);
+                this.lightFunc(new Vector(blockPos.x + 1, blockPos.y, blockPos.z), lightLevel);
+                this.lightFunc(new Vector(blockPos.x - 1, blockPos.y, blockPos.z), lightLevel);
+                this.lightFunc(new Vector(blockPos.x, blockPos.y, blockPos.z + 1), lightLevel);
+                this.lightFunc(new Vector(blockPos.x, blockPos.y, blockPos.z - 1), lightLevel);
             }
         }
         catch (error) {
@@ -103,27 +109,20 @@ export class World {
         }
         return;
     }
-    static lightFunc(vec, lightLevel, blockPos) {
+    static lightFunc(vec, lightLevel) {
         if (this.getBlock(vec).lightLevel < lightLevel)
             this.setLight(vec, lightLevel);
-        else if (false) {
-            lightLevel = this.getBlock(vec).lightLevel - 1;
-            // this.setLight(new Vector(blockPos.x,blockPos.y,blockPos.z),this.getBlock(vec).lightLevel-1);
-            this.lightFunc(new Vector(blockPos.x, blockPos.y + 1, blockPos.z), lightLevel, blockPos);
-            this.lightFunc(new Vector(blockPos.x, blockPos.y - 1, blockPos.z), lightLevel, blockPos);
-            this.lightFunc(new Vector(blockPos.x + 1, blockPos.y, blockPos.z), lightLevel, blockPos);
-            this.lightFunc(new Vector(blockPos.x - 1, blockPos.y, blockPos.z), lightLevel, blockPos);
-            this.lightFunc(new Vector(blockPos.x, blockPos.y, blockPos.z + 1), lightLevel, blockPos);
-            this.lightFunc(new Vector(blockPos.x, blockPos.y, blockPos.z - 1), lightLevel, blockPos);
-        }
     }
     static getBlock(blockPos) {
-        let inChunkPos = new Vector(Math.round(Math.round(blockPos.x) % 16), Math.round(blockPos.y), Math.round(Math.round(blockPos.z) % 16));
+        let inChunkPos = new Vector(Math.round(blockPos.x) % 16, Math.round(blockPos.y), Math.round(blockPos.z) % 16);
         let chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
         try {
             return Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos);
         }
-        catch (error) { }
+        catch (error) {
+            console.log(inChunkPos);
+            console.error(error);
+        }
     }
     static getHeight(x, z) {
         try {
@@ -131,7 +130,5 @@ export class World {
         }
         catch (error) { }
         return 0;
-    }
-    getBlock() {
     }
 }
