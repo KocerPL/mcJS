@@ -2,6 +2,7 @@ import { Vector } from "../Engine/Utils/Vector.js";
 import { Main } from "../Main.js";
 import { Block } from "./Block.js";
 import { Chunk } from "./Chunk.js";
+declare var perlin: any;
 export class World
 {
     private Chunks:Array<Array<Chunk>> = new Array();
@@ -10,6 +11,7 @@ export class World
     public static init()
     {
         this.genHeightMap();
+        console.log(perlin);
     }
     public static genHeightMap()
     {
@@ -22,7 +24,7 @@ export class World
             this.heightMap[x] = new Array();
             for(let z=0;z<256;z++)
             {
-                try {
+                /*try {
                     if(z!=0)
                     {
                    height2 = Math.round((Math.random()*2)-1) +  this.heightMap[x][z-1];
@@ -39,8 +41,8 @@ export class World
                    height2 =height;
                 } catch (error) {
                     
-                }
-                this.heightMap[x][z] =height2;
+                }*/
+                this.heightMap[x][z] =Math.round((perlin.get(x/128,z/128)+1)*30);
             }
         }
     }

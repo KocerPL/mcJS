@@ -5,6 +5,7 @@ export class World {
     static heightMap = new Array(256);
     static init() {
         this.genHeightMap();
+        console.log(perlin);
     }
     static genHeightMap() {
         let height = 20;
@@ -14,22 +15,25 @@ export class World {
                 height += Math.round(Math.random() * 2) - 1;
             this.heightMap[x] = new Array();
             for (let z = 0; z < 256; z++) {
-                try {
-                    if (z != 0) {
-                        height2 = Math.round((Math.random() * 2) - 1) + this.heightMap[x][z - 1];
-                        while (height2 > this.heightMap[x - 1][z] + 1) {
-                            height2 -= 1;
-                        }
-                        while (height2 < this.heightMap[x - 1][z] - 1) {
-                            height2 += 1;
-                        }
+                /*try {
+                    if(z!=0)
+                    {
+                   height2 = Math.round((Math.random()*2)-1) +  this.heightMap[x][z-1];
+                   while(height2>this.heightMap[x-1][z]+1 )
+                   {
+                       height2 -=1;
+                   }
+                   while( height2<this.heightMap[x-1][z]-1)
+                   {
+                    height2 +=1;
+                   }
                     }
-                    else
-                        height2 = height;
-                }
-                catch (error) {
-                }
-                this.heightMap[x][z] = height2;
+                   else
+                   height2 =height;
+                } catch (error) {
+                    
+                }*/
+                this.heightMap[x][z] = Math.round((perlin.get(x / 128, z / 128) + 1) * 30);
             }
         }
     }
