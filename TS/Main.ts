@@ -188,6 +188,7 @@ export class Main
    public static render()
    {
       this.Measure.frames++;
+      CanvaManager.debug.value = "Selected block: "+ blocks[this.player.itemsBar[this.player.selectedItem]].name;
       gl.bindTexture(gl.TEXTURE_2D,Texture.blocksGrid);
       this.shader.use();
       this.player.camera.preRender();

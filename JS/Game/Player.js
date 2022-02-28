@@ -5,7 +5,7 @@ import { World } from "./World.js";
 export class Player {
     camera = new Camera();
     pos;
-    itemsBar = [1, 1, 2, 3, 4, 5, 6, 3, 3];
+    itemsBar = [1, 1, 2, 3, 4, 5, 6, 7, 8];
     selectedItem = 0;
     constructor(pos) {
         this.pos = pos;

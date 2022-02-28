@@ -6,6 +6,7 @@ import { Texture } from "./Engine/Texture.js";
 import { Vector } from "./Engine/Utils/Vector.js";
 import { VAO } from "./Engine/VAO.js";
 import { VBO } from "./Engine/VBO.js";
+import { blocks } from "./Game/Block.js";
 import { Chunk } from "./Game/Chunk.js";
 import { GUI } from "./Game/GUI.js";
 import { Player } from "./Game/Player.js";
@@ -159,6 +160,7 @@ export class Main {
     }
     static render() {
         this.Measure.frames++;
+        CanvaManager.debug.value = "Selected block: " + blocks[this.player.itemsBar[this.player.selectedItem]].name;
         gl.bindTexture(gl.TEXTURE_2D, Texture.blocksGrid);
         this.shader.use();
         this.player.camera.preRender();

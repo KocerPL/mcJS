@@ -8,7 +8,7 @@ export class Player
 {
     camera:Camera = new Camera();
     pos:Vector;
-    itemsBar:Array<number> = [1,1,2,3,4,5,6,3,3];
+    itemsBar:Array<number> = [1,1,2,3,4,5,6,7,8];
     selectedItem = 0;
     constructor(pos:Vector)
     {

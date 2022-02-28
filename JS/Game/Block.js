@@ -75,4 +75,26 @@ export var blocks = [
             right: 6
         }
     },
+    {
+        name: "*****",
+        textureIndex: {
+            top: 8,
+            bottom: 8,
+            front: 8,
+            back: 8,
+            left: 8,
+            right: 8
+        }
+    },
+    {
+        name: "Put***",
+        textureIndex: {
+            top: 9,
+            bottom: 9,
+            front: 9,
+            back: 9,
+            left: 9,
+            right: 9
+        }
+    },
 ];
