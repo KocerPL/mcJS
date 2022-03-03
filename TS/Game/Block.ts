@@ -79,7 +79,7 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
     }
 },
 {
-    name:"*****",
+    name:"Light blue",
     textureIndex:{
         top:8,
         bottom:8,
@@ -90,7 +90,7 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
     }
 },
 {
-    name:"Put***",
+    name:"Yellow",
     textureIndex:{
         top:9,
         bottom:9,

@@ -176,11 +176,11 @@ export class GUI
         let rowNum = Math.floor(index/ Texture.SIZE);
         let column = index%Texture.SIZE;
      let temp =   [
-        column+1.0, rowNum+1.0,
+        column+1.0, rowNum+0.9,
         column, rowNum, 
        
           column+1.0, rowNum,
-          column, rowNum+1.0,
+          column, rowNum+0.9,
          
          
       ];
