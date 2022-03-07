@@ -1,13 +1,13 @@
 #version 300 es
 precision highp float;
 precision mediump sampler2DArray;
-in vec2 pass_tc;
+in vec3 pass_tc;
 out vec4 color;
 //in vec3 FragPos;
 //in vec3 pass_Normal;
 in float pass_Light;
 //uniform vec3 lightPos;
-uniform sampler2D tex;
+uniform sampler2DArray tex;
 void main()
 {
   //  vec3 norm = normalize(pass_Normal);

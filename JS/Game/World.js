@@ -16,7 +16,8 @@ export class World {
             this.heightMap[x] = new Array();
             for (let z = 0; z < 256; z++) {
                 /*try {
-                    if(z!=0)
+                    if(z!=0) if(inChunkPos.x<0)
+        inChunkPos.x = inChunkPos.x+16;
                     {
                    height2 = Math.round((Math.random()*2)-1) +  this.heightMap[x][z-1];
                    while(height2>this.heightMap[x-1][z]+1 )
@@ -56,6 +57,10 @@ export class World {
     }
     static setBlock(blockPos, type) {
         let inChunkPos = new Vector(Math.round(Math.round(blockPos.x) % 16), Math.round(blockPos.y), Math.round(Math.round(blockPos.z) % 16));
+        if (inChunkPos.x < 0)
+            inChunkPos.x = 16 - Math.abs(inChunkPos.x);
+        if (inChunkPos.z < 0)
+            inChunkPos.z = 16 - Math.abs(inChunkPos.z);
         let chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
         Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos, type);
         try {
@@ -107,11 +112,6 @@ export class World {
         catch (error) {
             return;
         }
-        try {
-        }
-        catch (error) {
-        }
-        return;
     }
     static lightFunc(vec, lightLevel) {
         if (this.getBlock(vec).lightLevel < lightLevel)
@@ -119,6 +119,13 @@ export class World {
     }
     static getBlock(blockPos) {
         let inChunkPos = new Vector(Math.round(blockPos.x) % 16, Math.round(blockPos.y), Math.round(blockPos.z) % 16);
+        if (inChunkPos.x < 0)
+            inChunkPos.x = 16 - Math.abs(inChunkPos.x);
+        if (inChunkPos.z < 0)
+            inChunkPos.z = 16 - Math.abs(inChunkPos.z);
+        if (inChunkPos.x < 0 || inChunkPos.z < 0) {
+            inChunkPos = inChunkPos.abs();
+        }
         let chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
         try {
             return Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos);
@@ -130,6 +137,8 @@ export class World {
     }
     static getHeight(x, z) {
         try {
+            if (x < 0 || z < 0)
+                return 1;
             return this.heightMap[x][z];
         }
         catch (error) { }

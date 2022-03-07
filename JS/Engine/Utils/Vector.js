@@ -12,4 +12,10 @@ export class Vector {
     copy() {
         return new Vector(this.x, this.y, this.z, this.w);
     }
+    abs() {
+        return new Vector(Math.abs(this.x), Math.abs(this.y), Math.abs(this.z));
+    }
+    static add(vecA, vecB) {
+        return new Vector(vecA.x + vecB.x, vecA.y + vecB.y, vecA.z + vecB.z);
+    }
 }

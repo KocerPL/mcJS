@@ -84,10 +84,10 @@ export class Main
     //init world
     World.init();
      //loading chunks
-     for(let x=0; x<8;x++)
+     for(let x=-4; x<4;x++)
      {
       this.chunks[x] = new Array(16);
-      for(let z=0; z<8;z++)
+      for(let z=-4; z<4;z++)
        {
          this.chunks[x][z] =  new Chunk(x,z);
        }
@@ -159,8 +159,8 @@ export class Main
       let time = Date.now();
 
       
-      for(let x=0; x<8;x++)     
-       for(let z=0; z<8;z++)
+      for(let x=-4; x<4;x++)     
+       for(let z=-4; z<4;z++)
         {
           this.chunks[x][z].update(time);
         }
@@ -189,15 +189,15 @@ export class Main
    {
       this.Measure.frames++;
       CanvaManager.debug.value = "Selected block: "+ blocks[this.player.itemsBar[this.player.selectedItem]].name;
-      gl.bindTexture(gl.TEXTURE_2D,Texture.blocksGrid);
+      gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
       this.shader.use();
       this.player.camera.preRender();
       this.player.updatePos();
       CanvaManager.preRender();
       gl.clearColor(0.0,1.0,1.0,1.0);
       gl.clear(gl.COLOR_BUFFER_BIT);
-      for(let x=0; x<8;x++)     
-      for(let z=0; z<8;z++)
+      for(let x=-4; x<4;x++)     
+      for(let z=-4; z<4;z++)
        {
          this.chunks[x][z].render();
        }

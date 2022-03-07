@@ -15,4 +15,12 @@ export class Vector
     {
         return new Vector(this.x,this.y,this.z,this.w);
     }
+    abs():Vector
+    {
+        return new Vector(Math.abs(this.x),Math.abs(this.y),Math.abs(this.z));
+    }
+    static add(vecA:Vector,vecB:Vector):Vector
+    {
+        return new Vector(vecA.x+vecB.x,vecA.y+vecB.y,vecA.z+vecB.z);
+    }
 }

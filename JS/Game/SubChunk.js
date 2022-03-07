@@ -128,7 +128,7 @@ export class SubChunk {
         this.vbo = new VBO();
         this.vao.addPtr(0, 3, 0, 0);
         this.vtc = new VBO();
-        this.vao.addPtr(1, 2, 0, 0);
+        this.vao.addPtr(1, 3, 0, 0);
         this.vlo = new VBO();
         this.vao.addPtr(2, 1, 0, 0);
         this.ebo = new EBO();
@@ -336,14 +336,11 @@ export class SubChunk {
     });
     static getTextureCords(block, face) {
         let index = blocks[block.id].textureIndex[face];
-        let posInGrid = index * Texture.rowSize;
-        let rowNum = Math.floor(index / Texture.SIZE);
-        let column = index % Texture.SIZE;
         let temp = [
-            column, rowNum + 1.0,
-            column + 1.0, rowNum + 1.0,
-            column + 1.0, rowNum + 0.0,
-            column + 0.0, rowNum + 0.0,
+            0.0, 1.0, index,
+            1.0, 1.0, index,
+            1.0, 0.0, index,
+            0.0, 0.0, index
         ];
         return temp;
     }
