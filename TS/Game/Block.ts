@@ -9,10 +9,10 @@ this.id = id;
 }
 
 export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}> = [
-{
+{//0
     name:"Air"
 },
-{
+{//1
     name:"Dirt",
     textureIndex:{
         top:0,
@@ -23,7 +23,7 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         right:0
     }
 },
-{
+{//2
  name:"Grass",
  textureIndex:{
     top:2,
@@ -34,7 +34,7 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
     right:1
 }
 },
-{
+{//3
     name:"Stone",
     textureIndex:{
         top:3,
@@ -45,7 +45,7 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         right:3
         }
 },
-{
+{//4
     name:"Greenstone ore",
     textureIndex:{
         top:4,
@@ -56,7 +56,7 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         right:4
     }
 },
-{
+{//5
     name:"Greenstone block",
     textureIndex:{
         top:5,
@@ -67,7 +67,7 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         right:5
     }
 },
-{
+{//6
     name:"log",
     textureIndex:{
         top:7,
@@ -78,7 +78,7 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         right:6
     }
 },
-{
+{//7
     name:"Light blue",
     textureIndex:{
         top:8,

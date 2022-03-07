@@ -2,6 +2,7 @@ import { CanvaManager } from "../Engine/CanvaManager.js";
 import { EBO } from "../Engine/EBO.js";
 import { Texture } from "../Engine/Texture.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
+import { Vector } from "../Engine/Utils/Vector.js";
 import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
@@ -21,6 +22,7 @@ export class SubChunk {
     generated = false;
     inReGeneration = false;
     lightUpdate = false;
+    empty = false;
     count;
     static defBlocks = new Array(16);
     static rand = new Array(64);
@@ -115,10 +117,14 @@ export class SubChunk {
                     else if (ah - 1 >= (y + yPos))
                         this.blocks[x][y][z] = new Block(1);
                     else if (ah >= (y + yPos)) {
+                        if (Math.round(Math.random() * 100) == 1 && !(World.waterLevel > y + yPos))
+                            World.generateTree(new Vector(xPos + x, y + yPos, zPos + z));
                         heightmap[x][z] = ah;
                         this.blocks[x][y][z] = new Block(2);
                         this.blocks[x][y][z].lightLevel = 15;
                     }
+                    else if (World.waterLevel > y + yPos)
+                        this.blocks[x][y][z] = new Block(7);
                     else
                         this.blocks[x][y][z] = new Block(0);
                 }
@@ -305,14 +311,19 @@ export class SubChunk {
         //console.log(this.colors);
     }
     bufferVIC() {
-        this.vao.bind();
-        this.vbo.bufferData(this.vertices);
-        this.vlo.bufferData(this.lightLevels);
-        //  console.log(this.lightLevels);
-        // this.nor.bufferData(this.normals);
-        this.vtc.bufferData(this.colors);
-        this.ebo.bufferData(this.indices);
-        VAO.unbind();
+        if (this.indices.length <= 1)
+            this.empty = true;
+        else {
+            this.empty = false;
+            this.vao.bind();
+            this.vbo.bufferData(this.vertices);
+            this.vlo.bufferData(this.lightLevels);
+            //  console.log(this.lightLevels);
+            // this.nor.bufferData(this.normals);
+            this.vtc.bufferData(this.colors);
+            this.ebo.bufferData(this.indices);
+            VAO.unbind();
+        }
     }
     static blockTextureCoords = Object.freeze({
         1: [

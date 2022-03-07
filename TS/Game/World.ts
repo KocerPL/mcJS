@@ -7,11 +7,54 @@ export class World
 {
     private Chunks:Array<Array<Chunk>> = new Array();
     public static heightMap:Array<Array<number>> = new Array(256);
-
+public static waterLevel:number = 24;
     public static init()
     {
         this.genHeightMap();
         console.log(perlin);
+    }
+   public static generateTree(vec:Vector)
+    {
+        console.log("shedule Generating tree")
+        Main.tasks[0].push(()=>{
+            let i;
+        for( i=vec.y;i<vec.y+5;i++)
+        {
+            //console.log("Generating tree")
+            this.setBlock(new Vector(vec.x,i,vec.z),6);
+
+        }
+        
+        for(let x=vec.x-2;x<=vec.x+2;x++)
+        for(let z=vec.z-2;z<=vec.z+2;z++)
+        {
+            this.setBlock(new Vector(x,i,z),5); 
+        }
+        this.setBlock(new Vector(vec.x,i,vec.z),6);
+        i++;
+        for(let x=vec.x-2;x<=vec.x+2;x++)
+        for(let z=vec.z-2;z<=vec.z+2;z++)
+        {
+            
+            this.setBlock(new Vector(x,i,z),5); 
+        }
+        this.setBlock(new Vector(vec.x+2,i,vec.z+2),0); 
+        this.setBlock(new Vector(vec.x+2,i,vec.z-2),0); 
+        this.setBlock(new Vector(vec.x-2,i,vec.z+2),0);
+        this.setBlock(new Vector(vec.x-2,i,vec.z-2),0);
+        i++;
+        this.setBlock(new Vector(vec.x+1,i,vec.z),5); 
+        this.setBlock(new Vector(vec.x-1,i,vec.z),5); 
+        this.setBlock(new Vector(vec.x,i,vec.z+1),5);
+        this.setBlock(new Vector(vec.x,i,vec.z-1),5);
+        this.setBlock(new Vector(vec.x,i,vec.z),6);
+        i++;
+        this.setBlock(new Vector(vec.x+1,i,vec.z),5); 
+        this.setBlock(new Vector(vec.x-1,i,vec.z),5); 
+        this.setBlock(new Vector(vec.x,i,vec.z+1),5);
+        this.setBlock(new Vector(vec.x,i,vec.z-1),5);
+        this.setBlock(new Vector(vec.x,i,vec.z),5);
+        });
     }
     public static genHeightMap()
     {
@@ -53,6 +96,10 @@ export class World
         {
     
        let inChunkPos = new Vector(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);
+       if(inChunkPos.x<0)
+       inChunkPos.x = 16-Math.abs(inChunkPos.x);
+       if(inChunkPos.z<0)
+       inChunkPos.z = 16-Math.abs(inChunkPos.z);
         let chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
         Main.chunks[chunkPos.x][chunkPos.z].setLight(inChunkPos,lightLevel);
         let sc = Main.chunks[chunkPos.x][chunkPos.z].getSubchunk(blockPos.y)
@@ -79,10 +126,11 @@ export class World
 
         let chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
         
-        Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos,type);
+      
         
         try
         {
+            Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos,type);
             if(type<1)
             {
          if(inChunkPos.y>=Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] )
@@ -178,9 +226,9 @@ export class World
     {
         try
         {
-            if(x<0||z<0)
-            return 1;
-        return this.heightMap[x][z];
+          //  if(x<0||z<0)
+            //return 1;
+        return Math.round((perlin.get(x/128,z/128)+1)*30);
         }
         catch(error)
         {}

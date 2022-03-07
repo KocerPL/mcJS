@@ -29,7 +29,7 @@ export class Chunk {
     }
     render() {
         for (let i = 0; i < this.subchunks.length; i++) {
-            if (this.subchunks[i] != undefined && this.subchunks[i].generated) {
+            if (this.subchunks[i] != undefined && this.subchunks[i].generated && !this.subchunks[i].empty) {
                 this.subchunks[i].vao.bind();
                 Main.shader.loadUniforms(Main.player.camera.getProjection(), this.subchunks[i].transformation, Main.player.camera.getView(), Main.sunPos);
                 //console.log(this.subchunks[i].count);

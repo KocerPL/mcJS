@@ -24,6 +24,7 @@ export class SubChunk
     generated:boolean=false;
     inReGeneration:boolean=false;
     lightUpdate:boolean = false;
+    empty:boolean = false;
     count:number;
     static defBlocks :Array<Array<Array<number>>>= new Array(16);
     static rand:Array<number> = new Array(64);
@@ -115,6 +116,7 @@ export class SubChunk
      for(let z=0;z<16;z++)
      {
        let ah = World.getHeight(x+xPos,z+zPos)
+      
        if(ah-3>=(y+yPos))
        {
        if(Math.round(Math.random()*10) ==1)
@@ -130,10 +132,15 @@ export class SubChunk
        this.blocks[x][y][z]=new Block(1);
        else if(ah>=(y+yPos))
        {
+         
+         if(Math.round(Math.random()*100) ==1 &&  !(World.waterLevel>y+yPos))
+         World.generateTree(new Vector(xPos+ x,y+yPos,zPos+ z));
          heightmap[x][z] = ah;
        this.blocks[x][y][z]=new Block(2);
        this.blocks[x][y][z].lightLevel=15;
       }
+       else if( World.waterLevel>y+yPos)
+       this.blocks[x][y][z]=new Block(7);
        else
        this.blocks[x][y][z]=new Block(0);
       
@@ -341,6 +348,11 @@ export class SubChunk
     }
     bufferVIC()
     {
+      if(this.indices.length<=1)
+      this.empty =true;
+    else
+    {
+    this.empty=false
         this.vao.bind();
         this.vbo.bufferData(this.vertices);
         this.vlo.bufferData(this.lightLevels);
@@ -349,6 +361,7 @@ export class SubChunk
         this.vtc.bufferData(this.colors);
         this.ebo.bufferData(this.indices);
         VAO.unbind();
+    }
     }
     static blockTextureCoords = Object.freeze({
         1:[
