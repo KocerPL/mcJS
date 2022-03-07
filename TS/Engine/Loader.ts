@@ -56,7 +56,6 @@ export class Loader
          let testCanv = document.createElement("canvas");
          testCanv.width=img.width;
          testCanv.height=img.height;
-         document.body.appendChild(testCanv);
          let ctx =testCanv.getContext("2d");
          ctx.clearRect(0,0,img.width,img.height);
          ctx.drawImage(img,0,0,img.width,img.height);
