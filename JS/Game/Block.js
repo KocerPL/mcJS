@@ -76,7 +76,7 @@ export var blocks = [
         }
     },
     {
-        name: "*****",
+        name: "Light blue",
         textureIndex: {
             top: 8,
             bottom: 8,
@@ -87,7 +87,7 @@ export var blocks = [
         }
     },
     {
-        name: "Put***",
+        name: "Yellow",
         textureIndex: {
             top: 9,
             bottom: 9,

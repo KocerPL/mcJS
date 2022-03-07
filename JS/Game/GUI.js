@@ -11,6 +11,7 @@ export class GUI {
     static vbo; //vertices
     static ebo; //Indices(vertex connections)
     static tco; //Texture coordinates
+    static ind;
     static cVert;
     static bvao; //Vertex attrib array
     static bvbo; //vertices
@@ -19,6 +20,7 @@ export class GUI {
     static vArray;
     static iArray;
     static tArray;
+    static indArray;
     static squareIndices = [
         0, 1, 2, 1, 0, 3
     ];
@@ -30,21 +32,21 @@ export class GUI {
     ];
     static crosstcords = [
         0, 0,
-        9, 9,
-        0, 9,
-        9, 0
+        1, 1,
+        0, 1,
+        1, 0
     ];
     static slotTCoords = [
-        9, 0,
-        18, 9,
-        9, 9,
-        18, 0
+        0, 0,
+        1, 1,
+        0, 1,
+        1, 0
     ];
     static selTCoords = [
-        18, 0,
-        27, 9,
-        18, 9,
-        27, 0
+        0, 0,
+        1, 1,
+        0, 1,
+        1, 0
     ];
     static init() {
         this.vao = new VAO;
@@ -52,6 +54,8 @@ export class GUI {
         this.vao.addPtr(0, 2, 0, 0);
         this.tco = new VBO;
         this.vao.addPtr(1, 2, 0, 0);
+        this.ind = new VBO;
+        this.vao.addPtr(2, 1, 0, 0);
         this.ebo = new EBO;
         this.bvao = new VAO;
         this.bvbo = new VBO;
@@ -68,10 +72,12 @@ export class GUI {
         this.vArray = new Array();
         this.tArray = new Array();
         this.iArray = new Array();
+        this.indArray = new Array();
         //pushing vertices, indices, textureCoordinates
         this.vArray = this.vArray.concat(this.crosscords);
         this.tArray = this.tArray.concat(this.crosstcords);
         this.iArray = this.iArray.concat(this.squareIndices);
+        this.indArray = this.indArray.concat([1, 1, 1, 1]);
         let slCoords = [
             -0.38, -1,
             -0.30, -0.92,
@@ -86,9 +92,10 @@ export class GUI {
             //  console.log(indices);
             this.vArray = this.vArray.concat(slCoords);
             if (Main.player.selectedItem == i)
-                this.tArray = this.tArray.concat(this.selTCoords);
+                this.indArray = this.indArray.concat([2, 2, 2, 2]);
             else
-                this.tArray = this.tArray.concat(this.slotTCoords);
+                this.indArray = this.indArray.concat([3, 3, 3, 3]);
+            this.tArray = this.tArray.concat(this.slotTCoords);
             this.iArray = this.iArray.concat(indices);
             for (let a = 0; a < slCoords.length; a += 2) {
                 slCoords[a] = slCoords[a] + 0.08;
@@ -99,6 +106,7 @@ export class GUI {
         this.vbo.bufferData(this.vArray);
         this.tco.bufferData(this.tArray);
         this.ebo.bufferData(this.iArray);
+        this.ind.bufferData(this.indArray);
         VAO.unbind();
         this.cVert = this.iArray.length;
         //Blocks in gui
@@ -137,7 +145,7 @@ export class GUI {
         this.bvao.bind();
         gl.drawElements(gl.TRIANGLES, this.iArray.length, gl.UNSIGNED_INT, 0);
         shader.loadUniforms(CanvaManager.getProportion, 256);
-        gl.bindTexture(gl.TEXTURE_2D, Texture.GUI);
+        gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.GUItest);
         this.vao.bind();
         gl.drawElements(gl.TRIANGLES, this.cVert, gl.UNSIGNED_INT, 0);
     }
