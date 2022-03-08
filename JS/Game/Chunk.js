@@ -46,6 +46,7 @@ export class Chunk {
         if (this.subchunks[yPos] != undefined) {
             return this.subchunks[yPos].blocks[pos.x][y][pos.z];
         }
+        throw new Error("Undefined subchunk!");
     }
     setLight(pos, lightLevel) {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {

@@ -51,6 +51,7 @@ export class Chunk {
     {
     return this.subchunks[yPos].blocks[pos.x][y][pos.z];
     }
+    throw new Error("Undefined subchunk!");
   }
   setLight(pos:Vector,lightLevel:number)
   {
