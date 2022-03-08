@@ -97,4 +97,15 @@ export var blocks = [
             right: 9
         }
     },
+    {
+        name: "Leaves",
+        textureIndex: {
+            top: 10,
+            bottom: 10,
+            front: 10,
+            back: 10,
+            left: 10,
+            right: 10
+        }
+    },
 ];

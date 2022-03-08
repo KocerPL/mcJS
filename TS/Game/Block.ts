@@ -89,7 +89,7 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         right:8
     }
 },
-{
+{//8
     name:"Yellow",
     textureIndex:{
         top:9,
@@ -100,5 +100,15 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         right:9
     }
 },
-
+{//9
+    name:"Leaves",
+    textureIndex:{
+        top:10,
+        bottom:10,
+        front:10,
+        back:10,
+        left:10,
+        right:10
+    }
+},
 ];

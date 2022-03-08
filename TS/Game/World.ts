@@ -28,7 +28,7 @@ public static waterLevel:number = 24;
         for(let x=vec.x-2;x<=vec.x+2;x++)
         for(let z=vec.z-2;z<=vec.z+2;z++)
         {
-            this.setBlock(new Vector(x,i,z),5); 
+            this.setBlock(new Vector(x,i,z),9); 
         }
         this.setBlock(new Vector(vec.x,i,vec.z),6);
         i++;
@@ -36,24 +36,24 @@ public static waterLevel:number = 24;
         for(let z=vec.z-2;z<=vec.z+2;z++)
         {
             
-            this.setBlock(new Vector(x,i,z),5); 
+            this.setBlock(new Vector(x,i,z),9); 
         }
         this.setBlock(new Vector(vec.x+2,i,vec.z+2),0); 
         this.setBlock(new Vector(vec.x+2,i,vec.z-2),0); 
         this.setBlock(new Vector(vec.x-2,i,vec.z+2),0);
         this.setBlock(new Vector(vec.x-2,i,vec.z-2),0);
         i++;
-        this.setBlock(new Vector(vec.x+1,i,vec.z),5); 
-        this.setBlock(new Vector(vec.x-1,i,vec.z),5); 
-        this.setBlock(new Vector(vec.x,i,vec.z+1),5);
-        this.setBlock(new Vector(vec.x,i,vec.z-1),5);
+        this.setBlock(new Vector(vec.x+1,i,vec.z),9); 
+        this.setBlock(new Vector(vec.x-1,i,vec.z),9); 
+        this.setBlock(new Vector(vec.x,i,vec.z+1),9);
+        this.setBlock(new Vector(vec.x,i,vec.z-1),9);
         this.setBlock(new Vector(vec.x,i,vec.z),6);
         i++;
-        this.setBlock(new Vector(vec.x+1,i,vec.z),5); 
-        this.setBlock(new Vector(vec.x-1,i,vec.z),5); 
-        this.setBlock(new Vector(vec.x,i,vec.z+1),5);
-        this.setBlock(new Vector(vec.x,i,vec.z-1),5);
-        this.setBlock(new Vector(vec.x,i,vec.z),5);
+        this.setBlock(new Vector(vec.x+1,i,vec.z),9); 
+        this.setBlock(new Vector(vec.x-1,i,vec.z),9); 
+        this.setBlock(new Vector(vec.x,i,vec.z+1),9);
+        this.setBlock(new Vector(vec.x,i,vec.z-1),9);
+        this.setBlock(new Vector(vec.x,i,vec.z),9);
         });
     }
     public static genHeightMap()
