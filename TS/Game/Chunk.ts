@@ -15,7 +15,7 @@ export class Chunk {
       this.heightmap[i] = new Array(16);
     }
     for (let i = 0; i < this.subchunks.length; i++) {
-      this.todo.push(() => { this.subchunks[i] = new SubChunk(new Vector(x, i, z),this.heightmap); });
+     this.subchunks[i] = new SubChunk(new Vector(x, i, z),this.heightmap);
       //console.log("Completed generating subchunk: "+i);
     }
     // console.log("done constructing");
@@ -88,7 +88,7 @@ export class Chunk {
     let y = pos.y%16;
   
     let yPos = Math.floor(Math.round(pos.y)/16);
-    if(this.subchunks[yPos]!=undefined && this.subchunks[yPos].generated==true)
+    if(this.subchunks[yPos]!=undefined )//&& this.subchunks[yPos].generated==true)
     {
     this.subchunks[yPos].blocks[pos.x][y][pos.z].id=blockID;
     this.updateSubchunkAt(pos.y);

@@ -35,6 +35,7 @@ export class Main
    private static delta = 0;
    private static crossVAO:VAO;
    public static player = new Player(new Vector(0,20,0));
+   public static range = {start:-4, end:4};
    public static chunks:Array<Array<Chunk>>=new Array(8);
    private static crosscords = [
       -0.02,-0.02,
@@ -83,19 +84,20 @@ export class Main
     EBO.unbind();
     //init world
     World.init();
+    for(let i=0;i<this.tasks.length;i++)
+    {
+       this.tasks[i]=new Array();
+    }
      //loading chunks
-     for(let x=-4; x<4;x++)
+     for(let x=this.range.start; x<this.range.end;x++)
      {
       this.chunks[x] = new Array(16);
-      for(let z=-4; z<4;z++)
+      for(let z=this.range.start; z<this.range.end;z++)
        {
          this.chunks[x][z] =  new Chunk(x,z);
        }
       }
-      for(let i=0;i<this.tasks.length;i++)
-      {
-         this.tasks[i]=new Array();
-      }
+    
  //   this.TESTtransf = this.TESTtransf.scale(2,1,1);
      requestAnimationFrame(this.loop.bind(this));
     
@@ -159,8 +161,8 @@ export class Main
       let time = Date.now();
 
       
-      for(let x=-4; x<4;x++)     
-       for(let z=-4; z<4;z++)
+      for(let x=this.range.start; x<this.range.end;x++)     
+       for(let z=this.range.start; z<this.range.end;z++)
         {
           this.chunks[x][z].update(time);
         }
@@ -196,8 +198,8 @@ export class Main
       CanvaManager.preRender();
       gl.clearColor(0.0,1.0,1.0,1.0);
       gl.clear(gl.COLOR_BUFFER_BIT);
-      for(let x=-4; x<4;x++)     
-      for(let z=-4; z<4;z++)
+      for(let x=this.range.start; x<this.range.end;x++)     
+      for(let z=this.range.start; z<this.range.end;z++)
        {
          this.chunks[x][z].render();
        }

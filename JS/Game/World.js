@@ -10,7 +10,7 @@ export class World {
     }
     static generateTree(vec) {
         console.log("shedule Generating tree");
-        Main.tasks[0].push(() => {
+        Main.tasks[3].push(() => {
             let i;
             for (i = vec.y; i < vec.y + 5; i++) {
                 //console.log("Generating tree")
@@ -87,7 +87,7 @@ export class World {
             let sc = Main.chunks[chunkPos.x][chunkPos.z].getSubchunk(blockPos.y);
             if (!sc.lightUpdate) {
                 sc.lightUpdate = true;
-                console.log("okokokok");
+                // console.log("okokokok");
                 sc.updateVerticesIndices(9, Main.chunks[chunkPos.x][chunkPos.z].heightmap);
             }
             return Main.chunks[chunkPos.x][chunkPos.z];
@@ -139,7 +139,7 @@ export class World {
                 }
             }
             else {
-                console.log("ok");
+                //  console.log("ok");
                 let lightLevel = 15;
                 this.lightFunc(blockPos, lightLevel);
                 this.lightFunc(new Vector(blockPos.x, blockPos.y - 1, blockPos.z), lightLevel);

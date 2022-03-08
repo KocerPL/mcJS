@@ -16,7 +16,7 @@ public static waterLevel:number = 24;
    public static generateTree(vec:Vector)
     {
         console.log("shedule Generating tree")
-        Main.tasks[0].push(()=>{
+        Main.tasks[3].push(()=>{
             let i;
         for( i=vec.y;i<vec.y+5;i++)
         {
@@ -106,7 +106,7 @@ public static waterLevel:number = 24;
         if(!sc.lightUpdate )
         {
            sc.lightUpdate =true;
-           console.log("okokokok");
+          // console.log("okokokok");
          sc.updateVerticesIndices(9, Main.chunks[chunkPos.x][chunkPos.z].heightmap);
         }
         return Main.chunks[chunkPos.x][chunkPos.z];
@@ -174,7 +174,7 @@ public static waterLevel:number = 24;
         }
             else
             {
-                console.log("ok");
+              //  console.log("ok");
                 let lightLevel =   15;
                 this.lightFunc(blockPos,lightLevel);
                 this.lightFunc(new Vector(blockPos.x,blockPos.y-1,blockPos.z),lightLevel);
