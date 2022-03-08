@@ -49,9 +49,12 @@ export class Chunk {
     let yPos = Math.floor(pos.y/16);
     if(this.subchunks[yPos]!=undefined)
     {
+      if(! (this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
+      this.subchunks[yPos].blocks[pos.x][y][pos.z] =new Block(0);
+  //  console.log(this.subchunks[yPos].blocks[pos.x][y][pos.z]);
     return this.subchunks[yPos].blocks[pos.x][y][pos.z];
     }
-    throw new Error("Undefined subchunk!");
+    throw new Error("Undefined subchunk! ");
   }
   setLight(pos:Vector,lightLevel:number)
   {
@@ -63,6 +66,8 @@ export class Chunk {
     let yPos = Math.floor(Math.round(pos.y)/16);
     if(this.subchunks[yPos]!=undefined)
     {
+      if(! (this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
+      this.subchunks[yPos].blocks[pos.x][y][pos.z] =new Block(0);
     this.subchunks[yPos].blocks[pos.x][y][pos.z].lightLevel=lightLevel;
     }
     else
@@ -79,7 +84,8 @@ export class Chunk {
   updateSubchunkAt(y)
   {
     let yPos = Math.floor(Math.round(y)/16);
-    this.subchunks[yPos].updateVerticesIndices(10,this.heightmap);
+    if(this.subchunks[yPos].generated)
+   this.subchunks[yPos].updateVerticesIndices(10,this.heightmap);
   }
   setBlock(pos:Vector,blockID:number)
   {
@@ -91,6 +97,8 @@ export class Chunk {
     let yPos = Math.floor(Math.round(pos.y)/16);
     if(this.subchunks[yPos]!=undefined )//&& this.subchunks[yPos].generated==true)
     {
+      if(! (this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
+      this.subchunks[yPos].blocks[pos.x][y][pos.z] =new Block(0);
     this.subchunks[yPos].blocks[pos.x][y][pos.z].id=blockID;
     this.updateSubchunkAt(pos.y);
     }

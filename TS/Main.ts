@@ -97,7 +97,7 @@ export class Main
          this.chunks[x][z] =  new Chunk(x,z);
        }
       }
-    
+    console.log(this.chunks);
  //   this.TESTtransf = this.TESTtransf.scale(2,1,1);
      requestAnimationFrame(this.loop.bind(this));
     
@@ -133,7 +133,7 @@ export class Main
       while(Date.now()-testTime <20 )
       {
          this.executeTasks(testTime);
-         this.chunksUpdate();
+        // this.chunksUpdate();
       }
      if(this.lastFrame < time-(1000/this.FPS))
      {

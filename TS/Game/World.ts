@@ -107,6 +107,7 @@ public static waterLevel:number = 24;
         {
            sc.lightUpdate =true;
           // console.log("okokokok");
+          if(sc.generated)
          sc.updateVerticesIndices(9, Main.chunks[chunkPos.x][chunkPos.z].heightmap);
         }
         return Main.chunks[chunkPos.x][chunkPos.z];
@@ -215,10 +216,12 @@ public static waterLevel:number = 24;
         let chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
        try
        {
+          
         return Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos);
        }catch(error)
        {
            console.log(inChunkPos);
+          // console.log(Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos));
            console.error(error);
        }
     }

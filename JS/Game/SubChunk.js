@@ -125,11 +125,12 @@ export class SubChunk {
                         }
                         else if (World.waterLevel > y + yPos)
                             this.blocks[x][y][z] = new Block(7);
-                        else
+                        else if (!(this.blocks[x][y][z] instanceof Block))
                             this.blocks[x][y][z] = new Block(0);
                     }
                 }
             }
+            this.generated = true;
             this.vao = new VAO();
             this.vbo = new VBO();
             this.vao.addPtr(0, 3, 0, 0);
@@ -153,6 +154,7 @@ export class SubChunk {
         let textureCoords = new Array();
         let lightLevels = new Array();
         //  let index = 0;
+        //console.log(this.blocks[x][y],x,y);
         for (let z = 0; z < 16; z++) {
             if (this.blocks[x][y][z].id == 0)
                 continue;

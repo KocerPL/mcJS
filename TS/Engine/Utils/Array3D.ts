@@ -1,3 +1,5 @@
+import { Block } from "../../Game/Block.js";
+
 export class Array3D extends Array
 {
     constructor(x:number,y:number,z:number)
@@ -9,6 +11,7 @@ export class Array3D extends Array
             for(let j=0;j<y;j++)
             {
                 this[i][j] = new Array(z);
+
             }
         }
     }

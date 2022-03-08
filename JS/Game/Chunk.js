@@ -1,6 +1,7 @@
 import { CanvaManager } from "../Engine/CanvaManager.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { Main } from "../Main.js";
+import { Block } from "./Block.js";
 import { SubChunk } from "./SubChunk.js";
 let gl = CanvaManager.gl;
 export class Chunk {
@@ -44,9 +45,12 @@ export class Chunk {
         let y = pos.y % 16;
         let yPos = Math.floor(pos.y / 16);
         if (this.subchunks[yPos] != undefined) {
+            if (!(this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
+                this.subchunks[yPos].blocks[pos.x][y][pos.z] = new Block(0);
+            //  console.log(this.subchunks[yPos].blocks[pos.x][y][pos.z]);
             return this.subchunks[yPos].blocks[pos.x][y][pos.z];
         }
-        throw new Error("Undefined subchunk!");
+        throw new Error("Undefined subchunk! ");
     }
     setLight(pos, lightLevel) {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {
@@ -55,6 +59,8 @@ export class Chunk {
         let y = pos.y % 16;
         let yPos = Math.floor(Math.round(pos.y) / 16);
         if (this.subchunks[yPos] != undefined) {
+            if (!(this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
+                this.subchunks[yPos].blocks[pos.x][y][pos.z] = new Block(0);
             this.subchunks[yPos].blocks[pos.x][y][pos.z].lightLevel = lightLevel;
         }
         else {
@@ -67,7 +73,8 @@ export class Chunk {
     }
     updateSubchunkAt(y) {
         let yPos = Math.floor(Math.round(y) / 16);
-        this.subchunks[yPos].updateVerticesIndices(10, this.heightmap);
+        if (this.subchunks[yPos].generated)
+            this.subchunks[yPos].updateVerticesIndices(10, this.heightmap);
     }
     setBlock(pos, blockID) {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {
@@ -77,6 +84,8 @@ export class Chunk {
         let yPos = Math.floor(Math.round(pos.y) / 16);
         if (this.subchunks[yPos] != undefined) //&& this.subchunks[yPos].generated==true)
          {
+            if (!(this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
+                this.subchunks[yPos].blocks[pos.x][y][pos.z] = new Block(0);
             this.subchunks[yPos].blocks[pos.x][y][pos.z].id = blockID;
             this.updateSubchunkAt(pos.y);
         }

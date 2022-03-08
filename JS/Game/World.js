@@ -88,7 +88,8 @@ export class World {
             if (!sc.lightUpdate) {
                 sc.lightUpdate = true;
                 // console.log("okokokok");
-                sc.updateVerticesIndices(9, Main.chunks[chunkPos.x][chunkPos.z].heightmap);
+                if (sc.generated)
+                    sc.updateVerticesIndices(9, Main.chunks[chunkPos.x][chunkPos.z].heightmap);
             }
             return Main.chunks[chunkPos.x][chunkPos.z];
         }
@@ -173,6 +174,7 @@ export class World {
         }
         catch (error) {
             console.log(inChunkPos);
+            // console.log(Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos));
             console.error(error);
         }
     }
