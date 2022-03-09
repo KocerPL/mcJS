@@ -1,5 +1,6 @@
 export class Block {
     id;
+    lightDir = directions.UNDEF;
     lightLevel = 1;
     constructor(id) {
         this.id = id;
@@ -109,3 +110,13 @@ export var blocks = [
         }
     },
 ];
+export const directions = Object.freeze({
+    SKYLIGHT: 0,
+    POS_X: 1,
+    NEG_X: 2,
+    POS_Z: 3,
+    NEG_Z: 4,
+    POS_Y: 5,
+    NEG_Y: 6,
+    UNDEF: 7
+});

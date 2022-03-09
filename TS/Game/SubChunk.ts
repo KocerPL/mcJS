@@ -7,7 +7,7 @@ import { Vector } from "../Engine/Utils/Vector.js";
 import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
-import { Block, blocks } from "./Block.js";
+import { Block, blocks, directions } from "./Block.js";
 import { World } from "./World.js";
 
 let gl = CanvaManager.gl;
@@ -20,7 +20,7 @@ export class SubChunk
     vlo:VBO; // Light vbo
    // nor:VBO;
     normals:Array<number>;
-    blocks= new Array3D(16,16,16);
+    blocks:Array<Array<Array<Block>>>= new Array3D(16,16,16);
     tasks:Array<Function> = new Array();
     generated:boolean=false;
     inReGeneration:boolean=false;
@@ -139,12 +139,12 @@ export class SubChunk
          heightmap[x][z] = ah;
        this.blocks[x][y][z]=new Block(2);
        this.blocks[x][y][z].lightLevel=15;
+       this.blocks[x][y][z].lightDir = directions.SKYLIGHT;
       }
        else if( World.waterLevel>y+yPos)
        this.blocks[x][y][z]=new Block(7);
        else if(!(this.blocks[x][y][z] instanceof Block))
        this.blocks[x][y][z]=new Block(0);
-      
      }
     }
     }

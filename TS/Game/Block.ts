@@ -1,6 +1,7 @@
 export class Block
 {
     id:number;
+    lightDir:number = directions.UNDEF;
     lightLevel:number=1;
     constructor(id)
     {
@@ -112,3 +113,15 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
     }
 },
 ];
+export const directions = Object.freeze(
+    {
+        SKYLIGHT:0,
+        POS_X:1,
+        NEG_X:2,
+        POS_Z:3,
+        NEG_Z:4,
+        POS_Y:5,
+        NEG_Y:6,
+        UNDEF:7
+    }
+);
