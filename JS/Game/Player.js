@@ -12,25 +12,31 @@ export class Player {
         this.camera.setPosition(new Vector(pos.x, pos.y + 1, pos.z));
     }
     updatePos() {
+        let tempPos = this.pos.copy();
         if (CanvaManager.getKey(87)) {
-            this.pos.x += Math.sin(this.camera.getYaw() * Math.PI / 180) * 0.1;
-            this.pos.z += Math.cos(this.camera.getYaw() * Math.PI / 180) * 0.1;
+            tempPos.x += Math.sin(this.camera.getYaw() * Math.PI / 180) * 0.1;
+            tempPos.z += Math.cos(this.camera.getYaw() * Math.PI / 180) * 0.1;
         }
         else if (CanvaManager.getKey(83)) {
-            this.pos.x -= Math.sin(this.camera.getYaw() * Math.PI / 180) * 0.1;
-            this.pos.z -= Math.cos(this.camera.getYaw() * Math.PI / 180) * 0.1;
+            tempPos.x -= Math.sin(this.camera.getYaw() * Math.PI / 180) * 0.1;
+            tempPos.z -= Math.cos(this.camera.getYaw() * Math.PI / 180) * 0.1;
         }
         if (CanvaManager.getKey(68)) {
-            this.pos.x += Math.sin((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
-            this.pos.z += Math.cos((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
+            tempPos.x += Math.sin((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
+            tempPos.z += Math.cos((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
         }
         else if (CanvaManager.getKey(65)) {
-            this.pos.x -= Math.sin((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
-            this.pos.z -= Math.cos((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
+            tempPos.x -= Math.sin((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
+            tempPos.z -= Math.cos((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
         }
+        if (World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 0.5), Math.round(this.pos.z))).id < 1)
+            this.pos = tempPos;
         if (CanvaManager.getKey(32))
             this.pos.y += 0.1;
-        else if (CanvaManager.getKey(16))
+        else if (CanvaManager.getKey(16) && World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id < 1
+            && World.getBlock(new Vector(Math.round(this.pos.x + 0.3), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id < 1
+            && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z + 0.3))).id < 1
+            && World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y - 1.5), Math.round(this.pos.z - 0.3))).id < 1)
             this.pos.y -= 0.1;
         this.camera.setPitch(this.camera.getPitch() - (CanvaManager.mouseMovement.y / 10));
         this.camera.setYaw(this.camera.getYaw() + (CanvaManager.mouseMovement.x / 10));
