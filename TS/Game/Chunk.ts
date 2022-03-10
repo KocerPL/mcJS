@@ -8,14 +8,15 @@ export class Chunk {
   subchunks: Array<SubChunk> = new Array(16);
   todo: Array<Function> = new Array();
   heightmap: Array<Array<number>> = new Array(16);
-  constructor(x, z) {
+  lazy:boolean =false;
+  constructor(x, z,isLazy:boolean) {
     // console.log("Constructing chunk");
     for(let i =0; i<16;i++)
     {
       this.heightmap[i] = new Array(16);
     }
     for (let i = 0; i < this.subchunks.length; i++) {
-     this.subchunks[i] = new SubChunk(new Vector(x, i, z),this.heightmap);
+     this.subchunks[i] = new SubChunk(new Vector(x, i, z),this.heightmap,isLazy);
       //console.log("Completed generating subchunk: "+i);
     }
     // console.log("done constructing");
@@ -31,7 +32,7 @@ export class Chunk {
     }
   }
   render() {
-  
+    if(!this.lazy)
     for (let i = 0; i < this.subchunks.length; i++) {
       if (this.subchunks[i] != undefined && this.subchunks[i].generated && !this.subchunks[i].empty) {
         this.subchunks[i].vao.bind();

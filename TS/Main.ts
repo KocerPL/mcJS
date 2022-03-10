@@ -89,12 +89,15 @@ export class Main
        this.tasks[i]=new Array();
     }
      //loading chunks
-     for(let x=this.range.start; x<this.range.end;x++)
+     for(let x=this.range.start-1; x<this.range.end+1;x++)
      {
       this.chunks[x] = new Array(16);
-      for(let z=this.range.start; z<this.range.end;z++)
+      for(let z=this.range.start-1; z<this.range.end+1;z++)
        {
-         this.chunks[x][z] =  new Chunk(x,z);
+          if(x==this.range.start-1 ||x==this.range.end+1||z==this.range.start-1 || z==this.range.end+1   )
+          this.chunks[x][z] =  new Chunk(x,z,true);
+          else
+         this.chunks[x][z] =  new Chunk(x,z,false);
        }
       }
     console.log(this.chunks);
@@ -190,7 +193,7 @@ export class Main
    public static render()
    {
       this.Measure.frames++;
-      CanvaManager.debug.value = "Selected block: "+ blocks[this.player.itemsBar[this.player.selectedItem]].name;
+      CanvaManager.debug.value = "Fps: "+this.Measure.fps+"Selected block: "+ blocks[this.player.itemsBar[this.player.selectedItem]].name;
       gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
       this.shader.use();
       this.player.camera.preRender();

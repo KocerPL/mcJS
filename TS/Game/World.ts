@@ -21,39 +21,39 @@ public static waterLevel:number = 24;
         for( i=vec.y;i<vec.y+5;i++)
         {
             //console.log("Generating tree")
-            this.setBlock(new Vector(vec.x,i,vec.z),6);
+            this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
 
         }
         
         for(let x=vec.x-2;x<=vec.x+2;x++)
         for(let z=vec.z-2;z<=vec.z+2;z++)
         {
-            this.setBlock(new Vector(x,i,z),9); 
+            this.setBlockNoLight(new Vector(x,i,z),9); 
         }
-        this.setBlock(new Vector(vec.x,i,vec.z),6);
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
         i++;
         for(let x=vec.x-2;x<=vec.x+2;x++)
         for(let z=vec.z-2;z<=vec.z+2;z++)
         {
             
-            this.setBlock(new Vector(x,i,z),9); 
+            this.setBlockNoLight(new Vector(x,i,z),9); 
         }
-        this.setBlock(new Vector(vec.x+2,i,vec.z+2),0); 
-        this.setBlock(new Vector(vec.x+2,i,vec.z-2),0); 
-        this.setBlock(new Vector(vec.x-2,i,vec.z+2),0);
-        this.setBlock(new Vector(vec.x-2,i,vec.z-2),0);
+        this.setBlockNoLight(new Vector(vec.x+2,i,vec.z+2),0); 
+        this.setBlockNoLight(new Vector(vec.x+2,i,vec.z-2),0); 
+        this.setBlockNoLight(new Vector(vec.x-2,i,vec.z+2),0);
+        this.setBlockNoLight(new Vector(vec.x-2,i,vec.z-2),0);
         i++;
-        this.setBlock(new Vector(vec.x+1,i,vec.z),9); 
-        this.setBlock(new Vector(vec.x-1,i,vec.z),9); 
-        this.setBlock(new Vector(vec.x,i,vec.z+1),9);
-        this.setBlock(new Vector(vec.x,i,vec.z-1),9);
-        this.setBlock(new Vector(vec.x,i,vec.z),6);
+        this.setBlockNoLight(new Vector(vec.x+1,i,vec.z),9); 
+        this.setBlockNoLight(new Vector(vec.x-1,i,vec.z),9); 
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z+1),9);
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z-1),9);
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
         i++;
-        this.setBlock(new Vector(vec.x+1,i,vec.z),9); 
-        this.setBlock(new Vector(vec.x-1,i,vec.z),9); 
-        this.setBlock(new Vector(vec.x,i,vec.z+1),9);
-        this.setBlock(new Vector(vec.x,i,vec.z-1),9);
-        this.setBlock(new Vector(vec.x,i,vec.z),9);
+        this.setBlockNoLight(new Vector(vec.x+1,i,vec.z),9); 
+        this.setBlockNoLight(new Vector(vec.x-1,i,vec.z),9); 
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z+1),9);
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z-1),9);
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z),9);
         });
     }
     public static genHeightMap()
@@ -117,6 +117,30 @@ public static waterLevel:number = 24;
             console.log(error);
         }
     }
+    public static setBlockNoLight(blockPos:Vector,type:number)
+    {
+       let inChunkPos = new Vector(Math.round(Math.round(blockPos.x)%16),Math.round(blockPos.y),Math.round(Math.round(blockPos.z)%16));
+       if(inChunkPos.x<0)
+       inChunkPos.x = 16-Math.abs(inChunkPos.x);
+       if(inChunkPos.z<0)
+       inChunkPos.z = 16-Math.abs(inChunkPos.z);
+
+        let chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
+        
+      
+        
+        try
+        {
+            Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos,type);
+            Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).lightLevel = 15;
+        }
+        catch(error)
+        {
+            return;
+            //console.error(error);
+        }
+    }
+
    public static setBlock(blockPos:Vector,type:number)
     {
        let inChunkPos = new Vector(Math.round(Math.round(blockPos.x)%16),Math.round(blockPos.y),Math.round(Math.round(blockPos.z)%16));

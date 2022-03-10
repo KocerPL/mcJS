@@ -8,13 +8,14 @@ export class Chunk {
     subchunks = new Array(16);
     todo = new Array();
     heightmap = new Array(16);
-    constructor(x, z) {
+    lazy = false;
+    constructor(x, z, isLazy) {
         // console.log("Constructing chunk");
         for (let i = 0; i < 16; i++) {
             this.heightmap[i] = new Array(16);
         }
         for (let i = 0; i < this.subchunks.length; i++) {
-            this.subchunks[i] = new SubChunk(new Vector(x, i, z), this.heightmap);
+            this.subchunks[i] = new SubChunk(new Vector(x, i, z), this.heightmap, isLazy);
             //console.log("Completed generating subchunk: "+i);
         }
         // console.log("done constructing");
@@ -29,14 +30,15 @@ export class Chunk {
         }
     }
     render() {
-        for (let i = 0; i < this.subchunks.length; i++) {
-            if (this.subchunks[i] != undefined && this.subchunks[i].generated && !this.subchunks[i].empty) {
-                this.subchunks[i].vao.bind();
-                Main.shader.loadUniforms(Main.player.camera.getProjection(), this.subchunks[i].transformation, Main.player.camera.getView(), Main.sunPos);
-                //console.log(this.subchunks[i].count);
-                gl.drawElements(gl.TRIANGLES, this.subchunks[i].count, gl.UNSIGNED_INT, 0);
+        if (!this.lazy)
+            for (let i = 0; i < this.subchunks.length; i++) {
+                if (this.subchunks[i] != undefined && this.subchunks[i].generated && !this.subchunks[i].empty) {
+                    this.subchunks[i].vao.bind();
+                    Main.shader.loadUniforms(Main.player.camera.getProjection(), this.subchunks[i].transformation, Main.player.camera.getView(), Main.sunPos);
+                    //console.log(this.subchunks[i].count);
+                    gl.drawElements(gl.TRIANGLES, this.subchunks[i].count, gl.UNSIGNED_INT, 0);
+                }
             }
-        }
     }
     getBlock(pos) {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 15 || pos.y > 256 || pos.z > 15) {

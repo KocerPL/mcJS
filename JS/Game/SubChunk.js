@@ -96,7 +96,7 @@ export class SubChunk {
     colors = new Array();
     lightLevels = new Array();
     transformation = Matrix.identity();
-    constructor(pos, heightmap) {
+    constructor(pos, heightmap, isLazy) {
         this.transformation = this.transformation.translate(pos.x * 16, pos.y * 16, pos.z * 16);
         let yPos = pos.y * 16;
         let xPos = pos.x * 16;
@@ -144,9 +144,10 @@ export class SubChunk {
             VBO.unbind();
             EBO.unbind();
             //  console.log(this.blocks);
-            Main.tasks[3].push(() => {
-                this.updateVerticesIndices(3, heightmap);
-            });
+            if (!isLazy)
+                Main.tasks[3].push(() => {
+                    this.updateVerticesIndices(3, heightmap);
+                });
         });
     }
     updateVerticesOneLevel(x, y, index, heightmap) {
