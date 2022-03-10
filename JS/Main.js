@@ -30,7 +30,7 @@ export class Main {
     static shader;
     static delta = 0;
     static crossVAO;
-    static player = new Player(new Vector(0, 20, 0));
+    static player = new Player(new Vector(0, 60, 0));
     static range = { start: -4, end: 4 };
     static chunks = new Array(8);
     static crosscords = [
