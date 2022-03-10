@@ -98,6 +98,11 @@ export class SubChunk {
     transformation = Matrix.identity();
     constructor(pos, heightmap, isLazy) {
         this.transformation = this.transformation.translate(pos.x * 16, pos.y * 16, pos.z * 16);
+        if (!isLazy) {
+            this.generate(pos, heightmap);
+        }
+    }
+    generate(pos, heightmap) {
         let yPos = pos.y * 16;
         let xPos = pos.x * 16;
         let zPos = pos.z * 16;
@@ -144,10 +149,9 @@ export class SubChunk {
             VBO.unbind();
             EBO.unbind();
             //  console.log(this.blocks);
-            if (!isLazy)
-                Main.tasks[3].push(() => {
-                    this.updateVerticesIndices(3, heightmap);
-                });
+            Main.tasks[3].push(() => {
+                this.updateVerticesIndices(3, heightmap);
+            });
         });
     }
     updateVerticesOneLevel(x, y, index, heightmap) {
@@ -255,7 +259,6 @@ export class SubChunk {
         Main.tasks[priority].push(() => {
             this.bufferVIC();
             this.count = this.indices.length;
-            this.generated = true;
             this.lightUpdate = false;
             this.inReGeneration = false;
         });

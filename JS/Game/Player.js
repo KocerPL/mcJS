@@ -7,6 +7,11 @@ export class Player {
     pos;
     itemsBar = [9, 1, 2, 3, 4, 5, 6, 7, 8];
     selectedItem = 0;
+    yAcc = 0.01;
+    jump = {
+        time: 0,
+        yAcc: 0,
+    };
     constructor(pos) {
         this.pos = pos;
         this.camera.setPosition(new Vector(pos.x, pos.y + 1, pos.z));
@@ -15,7 +20,14 @@ export class Player {
         this.updatePos();
     }
     updatePos() {
+        let hop = false;
         let tempPos = this.pos.copy();
+        if (this.jump.yAcc > 0) {
+            this.jump.yAcc -= 0.01;
+            tempPos.y += this.jump.yAcc;
+            this.jump.time--;
+            hop = true;
+        }
         if (CanvaManager.getKey(87)) {
             tempPos.x += Math.sin(this.camera.getYaw() * Math.PI / 180) * 0.1;
             tempPos.z += Math.cos(this.camera.getYaw() * Math.PI / 180) * 0.1;
@@ -32,29 +44,61 @@ export class Player {
             tempPos.x -= Math.sin((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
             tempPos.z -= Math.cos((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
         }
-        let hop = false;
+        let down = false;
         if (World.getBlock(new Vector(Math.round(tempPos.x - 0.3), Math.round(tempPos.y - 0.5), Math.round(tempPos.z))).id < 1
             && World.getBlock(new Vector(Math.round(tempPos.x + 0.3), Math.round(tempPos.y - 0.5), Math.round(tempPos.z))).id < 1
             && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 0.5), Math.round(tempPos.z + 0.3))).id < 1
             && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 0.5), Math.round(tempPos.z - 0.3))).id < 1)
-            this.pos = tempPos;
-        else if (World.getBlock(new Vector(Math.round(tempPos.x - 0.3), Math.round(tempPos.y + 0.5), Math.round(tempPos.z))).id < 1
+            down = true;
+        if (World.getBlock(new Vector(Math.round(tempPos.x - 0.3), Math.round(tempPos.y + 0.5), Math.round(tempPos.z))).id < 1
             && World.getBlock(new Vector(Math.round(tempPos.x + 0.3), Math.round(tempPos.y + 0.5), Math.round(tempPos.z))).id < 1
             && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y + 0.5), Math.round(tempPos.z + 0.3))).id < 1
             && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y + 0.5), Math.round(tempPos.z - 0.3))).id < 1) {
-            hop = true;
-            this.pos.y += 0.4;
+            if (down && (this.pos.y == tempPos.y || World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
+                && World.getBlock(new Vector(Math.round(this.pos.x + 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
+                && World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
+                && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z + 0.3))).id < 1
+                && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z - 0.3))).id < 1))
+                this.pos = tempPos;
+            else
+                this.jump.yAcc = 0;
+            if (!down && this.jump.yAcc <= 0 && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 1.5), Math.round(tempPos.z))).id != 0) {
+                this.jump.yAcc = 0.2;
+            }
         }
-        if (CanvaManager.getKey(32))
-            this.pos.y += 0.1;
+        if (CanvaManager.getKey(32)) {
+            //  hop=true;
+            if (World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
+                && World.getBlock(new Vector(Math.round(this.pos.x + 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
+                && World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
+                && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z + 0.3))).id < 1
+                && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z - 0.3))).id < 1) {
+                if (this.jump.yAcc <= 0 && (World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id > 0 || World.getBlock(new Vector(Math.round(this.pos.x + 0.3), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id > 0
+                    || World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id > 0
+                    || World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z + 0.3))).id > 0
+                    || World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z - 0.3))).id > 0))
+                    this.jump.yAcc = 0.3;
+            }
+        }
         else if (CanvaManager.getKey(16) && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id < 1)
             this.pos.y -= 0.1;
-        else if (!hop) {
-            let block = World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z)));
-            if (block.id < 1)
-                this.pos.y -= 0.2;
-            else
-                this.pos.y = Math.round(this.pos.y - 1.5) + 1.5;
+        if (!hop) {
+            let subc = World.getSubchunk(this.pos);
+            // console.log(subc);
+            if (subc != undefined && subc.generated) {
+                let block = World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z)));
+                if (block.id < 1 && World.getBlock(new Vector(Math.round(this.pos.x + 0.3), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id < 1
+                    && World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id < 1
+                    && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z + 0.3))).id < 1
+                    && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z - 0.3))).id < 1) {
+                    this.yAcc += 0.01;
+                    this.pos.y -= this.yAcc;
+                }
+                else {
+                    this.pos.y = Math.round(this.pos.y - 1.5) + 1.5;
+                    this.yAcc = 0.01;
+                }
+            }
         }
         this.camera.setPitch(this.camera.getPitch() - (CanvaManager.mouseMovement.y / 10));
         this.camera.setYaw(this.camera.getYaw() + (CanvaManager.mouseMovement.x / 10));
@@ -76,7 +120,7 @@ export class Player {
             this.mine();
         if (CanvaManager.mouse.right)
             this.place();
-        this.camera.setPosition(new Vector(this.pos.x, this.pos.y + 1, this.pos.z));
+        this.camera.setPosition(new Vector(this.pos.x, this.pos.y + 0.7, this.pos.z));
     }
     mine() {
         let dist = 0.1;
@@ -109,7 +153,7 @@ export class Player {
                 i += dist;
                 blockPos = new Vector(blockPos.x + (Math.sin(this.camera.getYaw() * Math.PI / 180) * Math.cos(this.camera.getPitch() * Math.PI / 180) * dist), blockPos.y + (Math.sin(this.camera.getPitch() * Math.PI / 180) * dist), blockPos.z + (Math.cos(this.camera.getYaw() * Math.PI / 180) * Math.cos(this.camera.getPitch() * Math.PI / 180) * dist));
             }
-            if (World.getBlock(lastPos).id == 0 && i < 5) {
+            if (World.getBlock(lastPos).id == 0 && i < 5 && !lastPos.round().equals(new Vector(this.pos.x, this.pos.y - 0.5, this.pos.z).round()) && !lastPos.round().equals(this.pos.round())) {
                 World.setBlock(lastPos, this.itemsBar[this.selectedItem]);
                 CanvaManager.mouse.right = false;
                 console.log("placed block!! at: ", lastPos);

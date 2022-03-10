@@ -23,4 +23,13 @@ export class Vector
     {
         return new Vector(vecA.x+vecB.x,vecA.y+vecB.y,vecA.z+vecB.z);
     }
+    equals(vec):boolean
+    {
+        return (vec.x==this.x && vec.y==this.y && vec.z==this.z);
+    }
+    round()
+    {
+        return new Vector(Math.round(this.x),Math.round(this.y),Math.round(this.z));
+    }
+
 }

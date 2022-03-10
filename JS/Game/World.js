@@ -114,6 +114,15 @@ export class World {
             //console.error(error);
         }
     }
+    static getSubchunk(blockPos) {
+        let chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
+        try {
+            return Main.chunks[chunkPos.x][chunkPos.z].getSubchunk(chunkPos.y);
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
     static setBlock(blockPos, type) {
         let inChunkPos = new Vector(Math.round(Math.round(blockPos.x) % 16), Math.round(blockPos.y), Math.round(Math.round(blockPos.z) % 16));
         if (inChunkPos.x < 0)

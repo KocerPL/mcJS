@@ -31,7 +31,7 @@ export class Main {
     static delta = 0;
     static crossVAO;
     static player = new Player(new Vector(0, 60, 0));
-    static range = { start: -4, end: 4 };
+    static range = { start: -2, end: 2 };
     static chunks = new Array(8);
     static crosscords = [
         -0.02, -0.02,
@@ -83,9 +83,9 @@ export class Main {
             this.tasks[i] = new Array();
         }
         //loading chunks
-        for (let x = this.range.start - 1; x < this.range.end + 1; x++) {
+        for (let x = this.range.start; x < this.range.end; x++) {
             this.chunks[x] = new Array(16);
-            for (let z = this.range.start - 1; z < this.range.end + 1; z++) {
+            for (let z = this.range.start; z < this.range.end; z++) {
                 if (x == this.range.start - 1 || x == this.range.end + 1 || z == this.range.start - 1 || z == this.range.end + 1)
                     this.chunks[x][z] = new Chunk(x, z, true);
                 else
@@ -140,13 +140,6 @@ export class Main {
             }
         }
     }
-    static chunksUpdate() {
-        let time = Date.now();
-        for (let x = this.range.start; x < this.range.end; x++)
-            for (let z = this.range.start; z < this.range.end; z++) {
-                this.chunks[x][z].update(time);
-            }
-    }
     static update() {
         this.Measure.ticks++;
         // this.count++;
@@ -175,7 +168,15 @@ export class Main {
         gl.clear(gl.COLOR_BUFFER_BIT);
         for (let x = this.range.start; x < this.range.end; x++)
             for (let z = this.range.start; z < this.range.end; z++) {
-                this.chunks[x][z].render();
+                let x2 = Math.floor(Math.round(this.player.pos.x) / 16) + x;
+                let z2 = Math.floor(Math.round(this.player.pos.z) / 16) + z;
+                if (this.chunks[x2] == undefined)
+                    this.chunks[x2] = new Array();
+                if (this.chunks[x2][z2] == undefined)
+                    this.chunks[x2][z2] = new Chunk(x2, z2, false);
+                if (this.chunks[x2][z2].lazy)
+                    this.chunks[x2][z2].generate();
+                this.chunks[x2][z2].render();
             }
         //render crosshair
         GUI.render(this.shader2d);

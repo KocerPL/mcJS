@@ -105,10 +105,19 @@ export class SubChunk
     constructor(pos:Vector,heightmap,isLazy)
     {
      this.transformation =  this.transformation.translate(pos.x*16,pos.y*16,pos.z*16);
+      
+      if(!isLazy)
+      {
+    this.generate(pos,heightmap);
+      }
+    }
+    generate(pos,heightmap)
+    {
       let yPos =pos.y*16;
       let xPos =pos.x*16;
       let zPos =pos.z*16;
-      Main.tasks[2].push(()=>{
+      Main.tasks[2].push(()=>
+      {
      for(let x =0;x<16;x++)
      {
        
@@ -161,13 +170,12 @@ export class SubChunk
         VBO.unbind();
         EBO.unbind();
       //  console.log(this.blocks);
-      if(!isLazy)
+    
       Main.tasks[3].push(
         ()=>{
         this.updateVerticesIndices(3,heightmap);
         });
   });
-
     }
   updateVerticesOneLevel(x,y,index,heightmap)
     {
@@ -288,7 +296,7 @@ export class SubChunk
       {
         this.bufferVIC();
         this.count = this.indices.length;
-        this.generated = true;
+       
         this.lightUpdate =false;
         this.inReGeneration =false;
       });

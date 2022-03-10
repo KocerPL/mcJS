@@ -9,8 +9,10 @@ export class Chunk {
   todo: Array<Function> = new Array();
   heightmap: Array<Array<number>> = new Array(16);
   lazy:boolean =false;
+  pos:Vector;
   constructor(x, z,isLazy:boolean) {
     // console.log("Constructing chunk");
+    this.pos = new Vector(x,0,z);
     for(let i =0; i<16;i++)
     {
       this.heightmap[i] = new Array(16);
@@ -77,9 +79,20 @@ export class Chunk {
     }
    
   }
+  generate()
+  {
+    
+    for (let i = 0; i < this.subchunks.length; i++) {
+    
+      this.subchunks[i].generate(new Vector(this.pos.x,i,this.pos.z),this.heightmap);
+    }
+    this.lazy=false;
+
+  }
   getSubchunk(y)
   {
     let yPos = Math.floor(Math.round(y)/16);
+    if(this.subchunks[yPos]!= undefined)
    return this.subchunks[yPos];
   }
   updateSubchunkAt(y)
