@@ -46,24 +46,42 @@ export class Player {
         }
         let down = false;
         if (World.getBlock(new Vector(Math.round(tempPos.x - 0.3), Math.round(tempPos.y - 0.5), Math.round(tempPos.z))).id < 1
-            && World.getBlock(new Vector(Math.round(tempPos.x + 0.3), Math.round(tempPos.y - 0.5), Math.round(tempPos.z))).id < 1
-            && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 0.5), Math.round(tempPos.z + 0.3))).id < 1
-            && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 0.5), Math.round(tempPos.z - 0.3))).id < 1)
+            && World.getBlock(new Vector(Math.round(tempPos.x + 0.3), Math.round(tempPos.y - 0.5), Math.round(tempPos.z))).id < 1) {
+            //  down=false;
+        }
+        else {
+            tempPos.x = this.pos.x;
             down = true;
+        }
+        if (World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 0.5), Math.round(tempPos.z + 0.3))).id < 1
+            && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 0.5), Math.round(tempPos.z - 0.3))).id < 1) {
+            // down=false;
+        }
+        else {
+            down = true;
+            tempPos.z = this.pos.z;
+        }
+        if (!(World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
+            && World.getBlock(new Vector(Math.round(this.pos.x + 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
+            && World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
+            && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z + 0.3))).id < 1
+            && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z - 0.3))).id < 1)) {
+            tempPos.y = this.pos.y;
+            this.jump.yAcc = 0;
+        }
         if (World.getBlock(new Vector(Math.round(tempPos.x - 0.3), Math.round(tempPos.y + 0.5), Math.round(tempPos.z))).id < 1
             && World.getBlock(new Vector(Math.round(tempPos.x + 0.3), Math.round(tempPos.y + 0.5), Math.round(tempPos.z))).id < 1
             && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y + 0.5), Math.round(tempPos.z + 0.3))).id < 1
             && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y + 0.5), Math.round(tempPos.z - 0.3))).id < 1) {
-            if (down && (this.pos.y == tempPos.y || World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
+            if (World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
                 && World.getBlock(new Vector(Math.round(this.pos.x + 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
                 && World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
                 && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z + 0.3))).id < 1
-                && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z - 0.3))).id < 1))
+                && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z - 0.3))).id < 1) {
                 this.pos = tempPos;
-            else
-                this.jump.yAcc = 0;
-            if (!down && this.jump.yAcc <= 0 && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 1.5), Math.round(tempPos.z))).id != 0) {
-                this.jump.yAcc = 0.2;
+                if (down && this.jump.yAcc <= 0 && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 1.5), Math.round(tempPos.z))).id != 0) {
+                    this.jump.yAcc = 0.2;
+                }
             }
         }
         if (CanvaManager.getKey(32)) {
@@ -77,7 +95,7 @@ export class Player {
                     || World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id > 0
                     || World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z + 0.3))).id > 0
                     || World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z - 0.3))).id > 0))
-                    this.jump.yAcc = 0.3;
+                    this.jump.yAcc = 0.2;
             }
         }
         else if (CanvaManager.getKey(16) && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id < 1)
