@@ -107,7 +107,16 @@ export class World {
         let chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
         try {
             Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos, type);
-            Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).lightLevel = 15;
+            if (inChunkPos.y >= Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z]) {
+                //  console.log("heightmap");
+                let i = 0;
+                if (type <= 0) {
+                    while (World.getBlock(new Vector(blockPos.x, blockPos.y - i, blockPos.z)).id <= 0) {
+                        i++;
+                    }
+                }
+                Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y - i;
+            }
         }
         catch (error) {
             return;

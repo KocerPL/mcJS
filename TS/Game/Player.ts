@@ -36,6 +36,7 @@ export class Player
            tempPos.y+=this.jump.yAcc;
             this.jump.time--;
             hop=true;
+            this.yAcc=0;
         }
   
         if(CanvaManager.getKey(87))
@@ -94,7 +95,12 @@ export class Player
                     tempPos.y = this.pos.y;
                     this.jump.yAcc=0;
                 }
-              
+                if( World.getBlock( new Vector(Math.round(tempPos.x-0.3),Math.round(tempPos.y+0.5),Math.round(tempPos.z)) ).id >0 
+                || World.getBlock( new Vector(Math.round(tempPos.x+0.3),Math.round(tempPos.y+0.5),Math.round(tempPos.z)) ).id >0)
+                tempPos.x = this.pos.x;
+               if(World.getBlock( new Vector(Math.round(tempPos.x),Math.round(tempPos.y+0.5),Math.round(tempPos.z+0.3)) ).id >0
+                || World.getBlock( new Vector(Math.round(tempPos.x),Math.round(tempPos.y+0.5),Math.round(tempPos.z-0.3)) ).id >0 )
+                tempPos.z = this.pos.z;
          if( World.getBlock( new Vector(Math.round(tempPos.x-0.3),Math.round(tempPos.y+0.5),Math.round(tempPos.z)) ).id <1 
         && World.getBlock( new Vector(Math.round(tempPos.x+0.3),Math.round(tempPos.y+0.5),Math.round(tempPos.z)) ).id <1
         && World.getBlock( new Vector(Math.round(tempPos.x),Math.round(tempPos.y+0.5),Math.round(tempPos.z+0.3)) ).id <1
@@ -106,7 +112,7 @@ export class Player
                 && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y+1.5),Math.round(this.pos.z+0.3))).id<1
                 && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y+1.5),Math.round(this.pos.z-0.3))).id<1)
             {
-                this.pos = tempPos;
+               
            
              if(down && this.jump.yAcc<=0&&  World.getBlock( new Vector(Math.round(tempPos.x),Math.round(tempPos.y-1.5),Math.round(tempPos.z)) ).id!=0)
                         {
@@ -116,7 +122,7 @@ export class Player
         }
            
      }
-
+     this.pos = tempPos;
     if(CanvaManager.getKey(32))
     {
   //  hop=true;
@@ -126,7 +132,8 @@ export class Player
             && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y+1.5),Math.round(this.pos.z+0.3))).id<1
             && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y+1.5),Math.round(this.pos.z-0.3))).id<1)
         {
-            if(this.jump.yAcc<=0&& (World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z))).id>0 ||World.getBlock( new Vector(Math.round(this.pos.x+0.3),Math.round(this.pos.y-1.5),Math.round(this.pos.z))).id>0
+            if(this.jump.yAcc<=0&& (World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z))).id>0 ||
+            World.getBlock( new Vector(Math.round(this.pos.x+0.3),Math.round(this.pos.y-1.5),Math.round(this.pos.z))).id>0
             || World.getBlock( new Vector(Math.round(this.pos.x-0.3),Math.round(this.pos.y-1.5),Math.round(this.pos.z))).id>0
             || World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z+0.3))).id>0
             || World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z-0.3))).id>0))
@@ -155,12 +162,14 @@ export class Player
             this.pos.y-=this.yAcc;
           
             }
-            else
+            else if( this.pos.y!= (Math.round(this.pos.y-1.5))+1.5)
             {
-            this.pos.y= Math.round(this.pos.y-1.5)+1.5;
-                
-            this.yAcc=0.01;
+            this.pos.y+= (((Math.round(this.pos.y-1.5))+1.5)-this.pos.y)/2;
+            this.yAcc=0;
+            
             }
+            
+           
             }
         }
       
@@ -199,7 +208,7 @@ export class Player
         }
         if( World.getBlock(blockPos).id!=0)
         {
-       World.setBlock(blockPos,0);
+       World.setBlockNoLight(blockPos,0);
         console.log("mined block!!");
         }
     }
@@ -226,7 +235,7 @@ export class Player
         }
        if(  World.getBlock(lastPos).id==0 && i<5 &&  !lastPos.round().equals(new Vector(this.pos.x,this.pos.y-0.5,this.pos.z).round()) &&  !lastPos.round().equals(this.pos.round()) )
        {
-       World.setBlock(lastPos,this.itemsBar[this.selectedItem]);
+       World.setBlockNoLight(lastPos,this.itemsBar[this.selectedItem]);
         CanvaManager.mouse.right=false;
         console.log("placed block!! at: ",lastPos);
        }
