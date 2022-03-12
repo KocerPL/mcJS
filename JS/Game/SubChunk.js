@@ -60,37 +60,6 @@ export class SubChunk {
         0.5, 0.5, 0.5,
         0.5, 0.5, -0.5
     ];
-    static defNormals = [
-        0, 0, -1,
-        0, 0, -1,
-        0, 0, -1,
-        0, 0, -1,
-        //tył
-        0, 0, 1,
-        0, 0, 1,
-        0, 0, 1,
-        0, 0, 1,
-        //lewo
-        -1, 0, 0,
-        -1, 0, 0,
-        -1, 0, 0,
-        -1, 0, 0,
-        //prawo
-        1, 0, 0,
-        1, 0, 0,
-        1, 0, 0,
-        1, 0, 0,
-        //dół
-        0, -1, 0,
-        0, -1, 0,
-        0, -1, 0,
-        0, -1, 0,
-        //góra
-        0, 1, 0,
-        0, 1, 0,
-        0, 1, 0,
-        0, 1, 0
-    ];
     vertices = new Array();
     indices = new Array();
     colors = new Array();
@@ -155,11 +124,192 @@ export class SubChunk {
             EBO.unbind();
             //  console.log(this.blocks);
             Main.tasks[3].push(() => {
-                this.updateVerticesIndices(3, heightmap);
+                this.update(3);
             });
         });
     }
-    //TODO: update vertices One level blocks shorted
+    update(priority) {
+        if (this.inReGeneration)
+            return;
+        this.clearLight();
+        this.updateLightLevels();
+        this.updateVerticesIndices(priority);
+    }
+    clearLight() {
+        for (let x = 0; x < 16; x++)
+            for (let y = 0; y < 16; y++)
+                for (let z = 0; z < 16; z++) {
+                    if (this.blocks[x][y][z].id > 0)
+                        continue;
+                    this.blocks[x][y][z].lightLevel = 0;
+                    if (y + (this.pos.y * 16) == Main.chunks[this.pos.x][this.pos.z].heightmap[x][z] + 1) {
+                        this.blocks[x][y][z].lightLevel = 15;
+                        //console.count("light");
+                    }
+                }
+        //  console.countReset("light");
+    }
+    updateLightLevels() {
+        for (let x = 0; x < 16; x++)
+            for (let y = 0; y < 16; y++)
+                for (let z = 0; z < 16; z++)
+                    this.updateLightOneBlock(x, y, z);
+        for (let x = 15; x > -1; x--)
+            for (let y = 15; y > -1; y--)
+                for (let z = 15; z > -1; z--)
+                    this.updateLightOneBlock(x, y, z);
+    }
+    updateLightOneBlock(x, y, z) {
+        let light = 0;
+        let theBlock = this.blocks[x][y][z];
+        if (theBlock.id > 0)
+            return;
+        if (y + (this.pos.y * 16) >= Main.chunks[this.pos.x][this.pos.z].heightmap[x][z] + 1)
+            light = 15;
+        else {
+            let side = (vec) => {
+                if ((x + vec.x >= 0 && y + vec.y >= 0 && z + vec.z >= 0 && x + vec.x < 16 && y + vec.y < 16 && z + vec.z < 16)) {
+                    let block = this.blocks[x + vec.x][y + vec.y][z + vec.z];
+                    if (block.id < 1 && light + 1 < block.lightLevel)
+                        light = block.lightLevel - 1;
+                }
+                else {
+                    let subCpos = this.pos.copy();
+                    let inscPos = new Vector(x, y, z);
+                    if (vec.x < 0) {
+                        subCpos.x -= 1;
+                        inscPos.x = 15;
+                    }
+                    else if (vec.x > 0) {
+                        subCpos.x += 1;
+                        inscPos.x = 0;
+                    }
+                    else if (vec.y < 0) {
+                        subCpos.y -= 1;
+                        inscPos.y = 15;
+                    }
+                    else if (vec.y > 0) {
+                        subCpos.y += 1;
+                        inscPos.y = 0;
+                    }
+                    else if (vec.z < 0) {
+                        subCpos.z -= 1;
+                        inscPos.z = 15;
+                    }
+                    else if (vec.z > 0) {
+                        subCpos.z += 1;
+                        inscPos.z = 0;
+                    }
+                    try {
+                        let block = Main.chunks[subCpos.x][subCpos.z].subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
+                        if (block.id < 1 && block.lightLevel > light + 1)
+                            light = block.lightLevel - 1;
+                    }
+                    catch (error) {
+                    }
+                }
+            };
+            side(new Vector(-1, 0, 0));
+            side(new Vector(1, 0, 0));
+            side(new Vector(0, -1, 0));
+            side(new Vector(0, 1, 0));
+            side(new Vector(0, 0, -1));
+            side(new Vector(0, 0, 1));
+        }
+        theBlock.lightLevel = light;
+    }
+    //DONE: update vertices One level blocks shorted
+    updateVerticesOneBlock(x, y, index) {
+        let indices = new Array();
+        let vertices = new Array();
+        let textureCoords = new Array();
+        let lightLevels = new Array();
+        for (let z = 0; z < 16; z++) {
+            if (this.blocks[x][y][z].id < 1)
+                continue;
+            let todo = new Array();
+            let temp = new Array();
+            for (let i = 0; i < SubChunk.defVertices.length; i += 3) {
+                temp.push(SubChunk.defVertices[i] + x);
+                temp.push(SubChunk.defVertices[i + 1] + y);
+                temp.push(SubChunk.defVertices[i + 2] + z);
+            }
+            if (y + (this.pos.y * 16) == Main.chunks[this.pos.x][this.pos.z].heightmap[x][z] + 1) {
+                vertices = vertices.concat(temp.slice(0, 12));
+                textureCoords = textureCoords.concat(SubChunk.getTextureCords2(10, "top"));
+                indices = indices.concat(index + 2, index + 1, index, index + 2, index, index + 3);
+                lightLevels = lightLevels.concat(15, 15, 15, 15);
+                index += 4;
+            }
+            let side = (vec, vStart, side) => {
+                // console.log(this.blocks);
+                if ((x + vec.x >= 0 && y + vec.y >= 0 && z + vec.z >= 0 && x + vec.x < 16 && y + vec.y < 16 && z + vec.z < 16)) {
+                    if (this.blocks[x + vec.x][y + vec.y][z + vec.z].id <= 0) {
+                        vertices = vertices.concat(temp.slice(vStart, vStart + 12));
+                        textureCoords = textureCoords.concat(SubChunk.getTextureCords(this.blocks[x][y][z], side));
+                        indices = indices.concat(index + 2, index + 1, index, index + 2, index, index + 3);
+                        lightLevels = lightLevels.concat(this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel);
+                        index += 4;
+                    }
+                }
+                else {
+                    let light = -2;
+                    let subCpos = this.pos.copy();
+                    let inscPos = new Vector(x, y, z);
+                    if (vec.x < 0) {
+                        subCpos.x -= 1;
+                        inscPos.x = 15;
+                    }
+                    else if (vec.x > 0) {
+                        subCpos.x += 1;
+                        inscPos.x = 0;
+                    }
+                    else if (vec.y < 0) {
+                        subCpos.y -= 1;
+                        inscPos.y = 15;
+                    }
+                    else if (vec.y > 0) {
+                        subCpos.y += 1;
+                        inscPos.y = 0;
+                    }
+                    else if (vec.z < 0) {
+                        subCpos.z -= 1;
+                        inscPos.z = 15;
+                    }
+                    else if (vec.z > 0) {
+                        subCpos.z += 1;
+                        inscPos.z = 0;
+                    }
+                    try {
+                        let block = Main.chunks[subCpos.x][subCpos.z].subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
+                        if (block.id < 1 && block.lightLevel > light + 1)
+                            light = block.lightLevel - 1;
+                    }
+                    catch (error) {
+                    }
+                    if (light == -2)
+                        light = 15;
+                    vertices = vertices.concat(temp.slice(vStart, vStart + 12));
+                    textureCoords = textureCoords.concat(SubChunk.getTextureCords(this.blocks[x][y][z], side));
+                    indices = indices.concat(index + 2, index + 1, index, index + 2, index, index + 3);
+                    lightLevels = lightLevels.concat(light, light, light, light);
+                    index += 4;
+                }
+                // else
+                // console.count("hehe");
+            };
+            side(new Vector(-1, 0, 0), 24, "right");
+            side(new Vector(1, 0, 0), 36, "left");
+            side(new Vector(0, -1, 0), 48, "bottom");
+            side(new Vector(0, 1, 0), 60, "top");
+            side(new Vector(0, 0, -1), 0, "back");
+            side(new Vector(0, 0, 1), 12, "front");
+            while (todo.length > 0) {
+                todo.shift()();
+            }
+        }
+        return { v: vertices, i: indices, c: textureCoords, ind: index, lL: lightLevels };
+    }
     updateVerticesOneAir(x, y, index, heightmap, once) {
         let subUpdate = new Array();
         let indices = new Array();
@@ -264,7 +414,7 @@ export class SubChunk {
         while (subUpdate.length > 0) {
             let sub = subUpdate.shift();
             if (sub.generated && !sub.inReGeneration)
-                sub.updateVerticesIndices(3, Main.chunks[sub.pos.x][sub.pos.z].heightmap, true);
+                sub.updateVerticesIndices(3);
         }
         return { v: vertices, i: indices, c: textureCoords, ind: index, lL: lightLevels };
     }
@@ -363,13 +513,8 @@ export class SubChunk {
         }
         return { v: vertices, i: indices, c: textureCoords, ind: index, lL: lightLevels };
     }
-    updateVerticesIndices(priority, heightmap, Once) {
+    updateVerticesIndices(priority) {
         // console.time("Updating");
-        let once = Once ?? false;
-        if (this.inReGeneration) { //Main.tasks[priority].push( ()=>{this.updateVerticesIndices(priority,heightmap); console.log("self lock")});
-            return;
-        }
-        ;
         this.vertices = new Array();
         this.indices = new Array();
         this.colors = new Array();
@@ -380,7 +525,7 @@ export class SubChunk {
         for (let x = 0; x < 16; x++) {
             for (let y = 0; y < 16; y++) {
                 Main.tasks[priority].push(() => {
-                    let vic = this.updateVerticesOneAir(x, y, index, heightmap, once);
+                    let vic = this.updateVerticesOneBlock(x, y, index);
                     //    console.log(x,y,vic);
                     this.vertices = this.vertices.concat(vic.v);
                     //  this.normals =   this.vertices.concat(vic.n);
@@ -440,6 +585,16 @@ export class SubChunk {
     });
     static getTextureCords(block, face) {
         let index = blocks[block.id].textureIndex[face];
+        let temp = [
+            0.0, 1.0, index,
+            1.0, 1.0, index,
+            1.0, 0.0, index,
+            0.0, 0.0, index
+        ];
+        return temp;
+    }
+    static getTextureCords2(blockID, face) {
+        let index = blocks[blockID].textureIndex[face];
         let temp = [
             0.0, 1.0, index,
             1.0, 1.0, index,

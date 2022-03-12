@@ -35,7 +35,7 @@ export class Main
    private static delta = 0;
    private static crossVAO:VAO;
    public static player = new Player(new Vector(0,60,0));
-   public static range = {start:-2, end:2};
+   public static range = {start:-4, end:4};
    public static chunks:Array<Array<Chunk>>=new Array(8);
    private static crosscords = [
       -0.02,-0.02,

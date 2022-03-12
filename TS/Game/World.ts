@@ -108,7 +108,7 @@ public static waterLevel:number = 24;
            sc.lightUpdate =true;
           // console.log("okokokok");
           if(sc.generated)
-         sc.updateVerticesIndices(9, Main.chunks[chunkPos.x][chunkPos.z].heightmap);
+         sc.update(9);
         }
         return Main.chunks[chunkPos.x][chunkPos.z];
         }
@@ -119,7 +119,7 @@ public static waterLevel:number = 24;
     }
     public static setBlockNoLight(blockPos:Vector,type:number)
     {
-       let inChunkPos = new Vector(Math.round(Math.round(blockPos.x)%16),Math.round(blockPos.y),Math.round(Math.round(blockPos.z)%16));
+       let inChunkPos:Vector = new Vector(Math.round(Math.round(blockPos.x)%16),Math.round(blockPos.y),Math.round(Math.round(blockPos.z)%16));
        if(inChunkPos.x<0)
        inChunkPos.x = 16-Math.abs(inChunkPos.x);
        if(inChunkPos.z<0)
@@ -131,25 +131,28 @@ public static waterLevel:number = 24;
         
         try
         {
-            Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos,type);
+            
             if(inChunkPos.y>=Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] )
             {
               //  console.log("heightmap");
                 let i=0;
                 if(type<=0)
                 {
-                while(World.getBlock(new Vector(blockPos.x,blockPos.y-i,blockPos.z)).id<=0)
+                    i=1;
+                while(Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).id<=0)
                 {
                     i++;
                 }
                 }
                 Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y-i;
             }
+            Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos,type);
         }
         catch(error)
         {
+          
+          //  console.error(error);
             return;
-            //console.error(error);
         }
     }
     public static getSubchunk(blockPos:Vector)

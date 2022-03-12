@@ -85,7 +85,7 @@ export class Chunk {
     updateSubchunkAt(y) {
         let yPos = Math.floor(Math.round(y) / 16);
         if (this.subchunks[yPos].generated)
-            this.subchunks[yPos].updateVerticesIndices(10, this.heightmap);
+            this.subchunks[yPos].update(10);
     }
     setBlock(pos, blockID) {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {
@@ -99,6 +99,29 @@ export class Chunk {
                 this.subchunks[yPos].blocks[pos.x][y][pos.z] = new Block(0);
             this.subchunks[yPos].blocks[pos.x][y][pos.z].id = blockID;
             this.updateSubchunkAt(pos.y);
+            try {
+                if (pos.x == 0) {
+                    Main.chunks[this.pos.x - 1][this.pos.z].subchunks[yPos].update(10);
+                }
+                else if (pos.x == 15) {
+                    Main.chunks[this.pos.x + 1][this.pos.z].subchunks[yPos].update(10);
+                }
+                if (y == 0) {
+                    Main.chunks[this.pos.x][this.pos.z].subchunks[yPos - 1].update(10);
+                }
+                else if (y == 15) {
+                    Main.chunks[this.pos.x + 1][this.pos.z].subchunks[yPos + 1].update(10);
+                }
+                if (pos.z == 0) {
+                    Main.chunks[this.pos.x][this.pos.z - 1].subchunks[yPos].update(10);
+                }
+                else if (pos.z == 15) {
+                    Main.chunks[this.pos.x][this.pos.z + 1].subchunks[yPos].update(10);
+                }
+            }
+            catch (error) {
+                // console.log(error);
+            }
         }
         else {
             console.log("Subchunk is undefined");
@@ -152,7 +175,7 @@ export class Chunk {
             }
             catch (error) {
             }
-            this.subchunks[yPos].updateVerticesIndices(10, this.heightmap);
+            this.subchunks[yPos].update(10);
         }
         else
             console.log("undefined Chunk!");

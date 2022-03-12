@@ -109,6 +109,17 @@ export var blocks = [
             right: 10
         }
     },
+    {
+        name: "heightmap",
+        textureIndex: {
+            top: 11,
+            bottom: 11,
+            front: 11,
+            back: 11,
+            left: 11,
+            right: 11
+        }
+    },
 ];
 export const directions = Object.freeze({
     SKYLIGHT: 0,
