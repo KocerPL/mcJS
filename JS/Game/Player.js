@@ -150,7 +150,7 @@ export class Player {
     }
     mine() {
         let dist = 0.1;
-        let blockPos = new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1), Math.round(this.pos.z));
+        let blockPos = new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 0.7), Math.round(this.pos.z));
         let i = 0;
         try {
             while (World.getBlock(blockPos).id == 0 && i < 5) {
@@ -167,7 +167,7 @@ export class Player {
         }
     }
     place() {
-        let blockPos = new Vector(this.pos.x, this.pos.y + 1, this.pos.z);
+        let blockPos = new Vector(this.pos.x, this.pos.y + 0.7, this.pos.z);
         let i = 0;
         let dist = 0.1;
         try {

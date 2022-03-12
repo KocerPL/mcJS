@@ -188,8 +188,9 @@ export class SubChunk
   });
     }
     //TODO: update vertices One level blocks shorted
-    updateVerticesOneAir(x,y,index,heightmap)
+    updateVerticesOneAir(x,y,index,heightmap,once)
     {
+      let subUpdate:Array<SubChunk> = new Array();
       let indices = new Array();
       let vertices = new Array();
       let textureCoords = new Array();
@@ -199,7 +200,7 @@ export class SubChunk
       for(let z=0;z<16;z++)
       {
          
-          if(this.blocks[x][y][z].id!=0) continue;
+          if(this.blocks[x][y][z].id>0) continue;
 
           let todo = new Array();
           let temp = new Array();
@@ -270,6 +271,7 @@ export class SubChunk
                 }
                 try {
                 let block:Block = Main.chunks[subCpos.x][subCpos.z].subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
+                let subc =  Main.chunks[subCpos.x][subCpos.z].subchunks[subCpos.y];
                 if( block instanceof Block)
                 if( block.id>0 )
                 {
@@ -281,12 +283,14 @@ export class SubChunk
               lightLevels = lightLevels.concat(this.blocks[x][y][z].lightLevel,this.blocks[x][y][z].lightLevel,this.blocks[x][y][z].lightLevel,this.blocks[x][y][z].lightLevel);
               index+=4;
             });
+           
                 }
                 else if(block.lightLevel>light+1)
               {
                 light=block.lightLevel-1;
               }
-                
+              if(!once && !subUpdate.includes(subc))
+              subUpdate.push(subc);
               } catch (error) {
                
               }
@@ -307,7 +311,14 @@ export class SubChunk
           {
             todo.shift()();
           }
+          
        }
+       while(subUpdate.length>0)
+          {
+            let sub = subUpdate.shift();
+            if( sub.generated && !sub.inReGeneration )
+            sub.updateVerticesIndices(3,Main.chunks[sub.pos.x][sub.pos.z].heightmap,true);
+          }
 
     
     return {v:vertices,i:indices,c:textureCoords,ind:index,lL:lightLevels};
@@ -432,9 +443,10 @@ export class SubChunk
         }   
         return {v:vertices,i:indices,c:textureCoords,ind:index,lL:lightLevels};
     }
-   updateVerticesIndices(priority:number,heightmap) 
+   updateVerticesIndices(priority:number,heightmap,Once?) 
     {
      // console.time("Updating");
+     let once = Once?? false;
       if(this.inReGeneration) {//Main.tasks[priority].push( ()=>{this.updateVerticesIndices(priority,heightmap); console.log("self lock")});
            return;};
         this.vertices= new Array();
@@ -449,7 +461,7 @@ export class SubChunk
             for(let y=0;y<16;y++)
             {
                 Main.tasks[priority].push(()=>{
-              let vic = this.updateVerticesOneAir(x,y,index,heightmap);
+              let vic = this.updateVerticesOneAir(x,y,index,heightmap,once);
          //    console.log(x,y,vic);
                 
               this.vertices =   this.vertices.concat(vic.v);
