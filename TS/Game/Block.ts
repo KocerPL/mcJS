@@ -3,6 +3,7 @@ import { Vector } from "../Engine/Utils/Vector.js";
 export class Block
 {
     id:number;
+   lightFBlock:number=0;
     lightDir:number = directions.UNDEF;
     lightLevel:number=1;
     constructor(id)
@@ -115,7 +116,7 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
     }
 },
 {//10
-    name:"heightmap",
+    name:"Glowstone",
     textureIndex:{
         top:11,
         bottom:11,

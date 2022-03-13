@@ -5,12 +5,13 @@ export class CanvaManager
     private static canva:HTMLCanvasElement = document.createElement("canvas"); 
     private static HEIGHT:number = window.innerHeight;
     private static WIDTH:number = window.innerWidth;
+    public static rPointer =true;
     public static gl:WebGL2RenderingContext =this.canva.getContext("webgl2");
     public static debug:HTMLOutputElement = document.createElement("output"); 
     private static proportion:number  = 1024/1920;
     private static keys:Array<Boolean> = new Array(100);
     public static mouseMovement = new Vector(0,0,0);
-    public static mouse = {left:false,right:false};
+    public static mouse = {left:false,right:false,pos: new Vector(0,0,0)};
     public static scrollAmount =0;
    public static setupCanva(location:Node,proportion?:number) : HTMLCanvasElement
     {
@@ -29,7 +30,7 @@ export class CanvaManager
         window.addEventListener("mousedown",this.onMouseDown.bind(this),false);
         window.addEventListener("mouseup",this.onMouseUp.bind(this),false);
         window.addEventListener("wheel",this.onScroll.bind(this),false)
-        this.canva.addEventListener("click",()=>{      this.canva.requestPointerLock()},false);
+        this.canva.addEventListener("click",()=>{ if(this.rPointer) this.canva.requestPointerLock()},false);
    
     this.onResize();
         return this.canva;
@@ -41,7 +42,10 @@ this.scrollAmount+=(Math.round(ev.deltaY/50));
     }
     static onMouseMove(ev: MouseEvent) 
     {
-        this.mouseMovement.x = ev.movementX;
+       // console.log((ev.x/(this.canva.width/2))-1, (ev.y/(this.canva.height/2))-1);
+       this.mouse.pos.x = ((ev.x/(this.canva.width/2))-1)/CanvaManager.getProportion;
+       this.mouse.pos.y = -((ev.y/(this.canva.height/2))-1); 
+       this.mouseMovement.x = ev.movementX;
         this.mouseMovement.y = ev.movementY;
     }
     private static onKeyDown(ev)
@@ -72,6 +76,12 @@ this.scrollAmount+=(Math.round(ev.deltaY/50));
     public static getKey(keycode:number)
     {
         return this.keys[keycode] ?? false;
+    }
+    public static getKeyOnce(keycode:number)
+    {
+        let key = this.keys[keycode];
+        this.keys[keycode] =false;
+        return key ?? false;
     }
     private static onResize():void
     {

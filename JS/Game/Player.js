@@ -14,6 +14,8 @@ export class Player {
     camera = new Camera();
     pos;
     itemsBar = [9, 1, 2, 3, 4, 5, 6, 7, 8];
+    inventory = [10, 10, 9, 9, 9, 9, 9, 9, 9, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8];
+    locked = false;
     selectedItem = 0;
     person = "First";
     vao;
@@ -91,6 +93,8 @@ export class Player {
             this.camera.offset = 0;
     }
     updatePos() {
+        if (this.locked)
+            return;
         let hop = false;
         let tempPos = this.pos.copy();
         if (this.jump.yAcc > 0) {

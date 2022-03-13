@@ -22,6 +22,9 @@ export class GUI {
     static iArray;
     static tArray;
     static indArray;
+    static invOpened = false;
+    static pickedBlock = null;
+    static mouse = false;
     static squareIndices = [
         0, 1, 2, 1, 0, 3
     ];
@@ -69,7 +72,23 @@ export class GUI {
         this.updateBuffers();
     }
     static update() {
+        if (CanvaManager.getKeyOnce(69))
+            if (!this.invOpened)
+                this.openInventory();
+            else
+                this.closeInventory();
         this.updateBuffers();
+    }
+    static openInventory() {
+        this.invOpened = true;
+        Main.player.locked = true;
+        CanvaManager.rPointer = false;
+        document.exitPointerLock();
+    }
+    static closeInventory() {
+        Main.player.locked = false;
+        CanvaManager.rPointer = true;
+        this.invOpened = false;
     }
     static updateBuffers() {
         this.vArray = new Array();
@@ -87,13 +106,29 @@ export class GUI {
             -0.38, -0.92,
             -0.30, -1
         ];
+        let slCoords2 = new Array();
+        slCoords2 = slCoords2.concat(slCoords);
         let indices = this.squareIndices.slice(0, this.squareIndices.length);
+        //Hotbar
         for (let i = 0; i < 9; i++) {
             for (let a = 0; a < indices.length; a++) {
                 indices[a] = indices[a] + 4;
             }
             //  console.log(indices);
             this.vArray = this.vArray.concat(slCoords);
+            if (this.invOpened && CanvaManager.mouse.left && !this.mouse) {
+                if (slCoords[0] < CanvaManager.mouse.pos.x && slCoords[1] < CanvaManager.mouse.pos.y && slCoords[2] > CanvaManager.mouse.pos.x && slCoords[3] > CanvaManager.mouse.pos.y) {
+                    if (this.pickedBlock == null) {
+                        this.pickedBlock = Main.player.itemsBar[i];
+                        Main.player.itemsBar[i] = 0;
+                        this.mouse = true;
+                    }
+                    else {
+                        Main.player.itemsBar[i] = this.pickedBlock;
+                        this.pickedBlock = null;
+                    }
+                }
+            }
             if (Main.player.selectedItem == i)
                 this.indArray = this.indArray.concat([2, 2, 2, 2]);
             else
@@ -104,6 +139,44 @@ export class GUI {
                 slCoords[a] = slCoords[a] + 0.08;
             }
         }
+        let y = 0.5;
+        if (this.invOpened)
+            for (let x = 0; x < 3; x++) {
+                slCoords = new Array();
+                slCoords = slCoords.concat(slCoords2);
+                for (let a = 0; a < slCoords.length; a += 2) {
+                    slCoords[a + 1] = slCoords[a + 1] + y;
+                }
+                for (let i = 0; i < 9; i++) {
+                    for (let a = 0; a < indices.length; a++) {
+                        indices[a] = indices[a] + 4;
+                    }
+                    //  console.log(indices);
+                    if (CanvaManager.mouse.left && !this.mouse) {
+                        if (slCoords[0] < CanvaManager.mouse.pos.x && slCoords[1] < CanvaManager.mouse.pos.y && slCoords[2] > CanvaManager.mouse.pos.x && slCoords[3] > CanvaManager.mouse.pos.y) {
+                            if (this.pickedBlock == null) {
+                                this.pickedBlock = Main.player.inventory[(x * 9) + i];
+                                Main.player.inventory[(x * 9) + i] = 0;
+                            }
+                            else {
+                                Main.player.inventory[(x * 9) + i] = this.pickedBlock;
+                                this.pickedBlock = null;
+                            }
+                        }
+                        this.mouse = true;
+                    }
+                    else
+                        this.mouse = false;
+                    this.vArray = this.vArray.concat(slCoords);
+                    this.indArray = this.indArray.concat([1, 1, 1, 1]);
+                    this.tArray = this.tArray.concat(this.slotTCoords);
+                    this.iArray = this.iArray.concat(indices);
+                    for (let a = 0; a < slCoords.length; a += 2) {
+                        slCoords[a] = slCoords[a] + 0.08;
+                    }
+                }
+                y += 0.08;
+            }
         //  console.log(this.iArray)
         this.vao.bind();
         this.vbo.bufferData(this.vArray);
@@ -123,19 +196,61 @@ export class GUI {
             -0.36, -0.94,
             -0.32, -0.98
         ];
+        slCoords2 = new Array();
+        slCoords2 = slCoords2.concat(slCoords);
         indices = this.squareIndices.slice(0, this.squareIndices.length);
         for (let i = 0; i < 9; i++) {
             //   console.log(indices);
-            this.vArray = this.vArray.concat(slCoords);
-            this.tArray = this.tArray.concat(this.crosstcords);
-            this.iArray = this.iArray.concat(indices);
-            this.indArray = this.indArray.concat([blocks[Main.player.itemsBar[i]].textureIndex.front, blocks[Main.player.itemsBar[i]].textureIndex.front, blocks[Main.player.itemsBar[i]].textureIndex.front, blocks[Main.player.itemsBar[i]].textureIndex.front]);
-            for (let a = 0; a < indices.length; a++) {
-                indices[a] = indices[a] + 4;
+            if (Main.player.itemsBar[i] != 0) {
+                this.vArray = this.vArray.concat(slCoords);
+                this.tArray = this.tArray.concat(this.crosstcords);
+                this.iArray = this.iArray.concat(indices);
+                this.indArray = this.indArray.concat([blocks[Main.player.itemsBar[i]].textureIndex.front, blocks[Main.player.itemsBar[i]].textureIndex.front, blocks[Main.player.itemsBar[i]].textureIndex.front, blocks[Main.player.itemsBar[i]].textureIndex.front]);
+                for (let a = 0; a < indices.length; a++) {
+                    indices[a] = indices[a] + 4;
+                }
             }
             for (let a = 0; a < slCoords.length; a += 2) {
                 slCoords[a] = slCoords[a] + 0.08;
             }
+        }
+        y = 0.5;
+        if (this.invOpened)
+            for (let x = 0; x < 3; x++) {
+                slCoords = new Array();
+                slCoords = slCoords.concat(slCoords2);
+                for (let a = 0; a < slCoords.length; a += 2) {
+                    slCoords[a + 1] = slCoords[a + 1] + y;
+                }
+                for (let i = 0; i < 9; i++) {
+                    //   console.log(indices);
+                    if (Main.player.inventory[(x * 9) + i] != 0) {
+                        this.vArray = this.vArray.concat(slCoords);
+                        this.tArray = this.tArray.concat(this.crosstcords);
+                        this.iArray = this.iArray.concat(indices);
+                        this.indArray = this.indArray.concat(blocks[Main.player.inventory[(x * 9) + i]].textureIndex.front, blocks[Main.player.inventory[(x * 9) + i]].textureIndex.front, blocks[Main.player.inventory[(x * 9) + i]].textureIndex.front, blocks[Main.player.inventory[(x * 9) + i]].textureIndex.front);
+                        for (let a = 0; a < indices.length; a++) {
+                            indices[a] = indices[a] + 4;
+                        }
+                    }
+                    for (let a = 0; a < slCoords.length; a += 2) {
+                        slCoords[a] = slCoords[a] + 0.08;
+                    }
+                }
+                y += 0.08;
+            }
+        if (this.invOpened && this.pickedBlock != null) {
+            let mouseX = CanvaManager.mouse.pos.x;
+            slCoords = [
+                0 + mouseX, 0 + CanvaManager.mouse.pos.y,
+                0.04 + mouseX, 0.04 + CanvaManager.mouse.pos.y,
+                0 + mouseX, 0.04 + CanvaManager.mouse.pos.y,
+                0.04 + mouseX, 0 + CanvaManager.mouse.pos.y
+            ];
+            this.vArray = this.vArray.concat(slCoords);
+            this.tArray = this.tArray.concat(this.crosstcords);
+            this.iArray = this.iArray.concat(indices);
+            this.indArray = this.indArray.concat(blocks[this.pickedBlock].textureIndex.front, blocks[this.pickedBlock].textureIndex.front, blocks[this.pickedBlock].textureIndex.front, blocks[this.pickedBlock].textureIndex.front, blocks[this.pickedBlock].textureIndex.front);
         }
         this.bvao.bind();
         this.bvbo.bufferData(this.vArray);

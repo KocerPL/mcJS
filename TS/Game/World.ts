@@ -18,7 +18,7 @@ public static waterLevel:number = 24;
         console.log("shedule Generating tree")
         Main.tasks[3].push(()=>{
             let i;
-        for( i=vec.y;i<vec.y+5;i++)
+        for( i=vec.y+1;i<vec.y+5;i++)
         {
             //console.log("Generating tree")
             this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
@@ -38,6 +38,7 @@ public static waterLevel:number = 24;
             
             this.setBlockNoLight(new Vector(x,i,z),9); 
         }
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
         this.setBlockNoLight(new Vector(vec.x+2,i,vec.z+2),0); 
         this.setBlockNoLight(new Vector(vec.x+2,i,vec.z-2),0); 
         this.setBlockNoLight(new Vector(vec.x-2,i,vec.z+2),0);

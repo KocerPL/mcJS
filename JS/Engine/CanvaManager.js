@@ -3,12 +3,13 @@ export class CanvaManager {
     static canva = document.createElement("canvas");
     static HEIGHT = window.innerHeight;
     static WIDTH = window.innerWidth;
+    static rPointer = true;
     static gl = this.canva.getContext("webgl2");
     static debug = document.createElement("output");
     static proportion = 1024 / 1920;
     static keys = new Array(100);
     static mouseMovement = new Vector(0, 0, 0);
-    static mouse = { left: false, right: false };
+    static mouse = { left: false, right: false, pos: new Vector(0, 0, 0) };
     static scrollAmount = 0;
     static setupCanva(location, proportion) {
         this.proportion = proportion ?? this.proportion;
@@ -25,7 +26,8 @@ export class CanvaManager {
         window.addEventListener("mousedown", this.onMouseDown.bind(this), false);
         window.addEventListener("mouseup", this.onMouseUp.bind(this), false);
         window.addEventListener("wheel", this.onScroll.bind(this), false);
-        this.canva.addEventListener("click", () => { this.canva.requestPointerLock(); }, false);
+        this.canva.addEventListener("click", () => { if (this.rPointer)
+            this.canva.requestPointerLock(); }, false);
         this.onResize();
         return this.canva;
     }
@@ -34,6 +36,9 @@ export class CanvaManager {
         //   console.log(ev);
     }
     static onMouseMove(ev) {
+        // console.log((ev.x/(this.canva.width/2))-1, (ev.y/(this.canva.height/2))-1);
+        this.mouse.pos.x = ((ev.x / (this.canva.width / 2)) - 1) / CanvaManager.getProportion;
+        this.mouse.pos.y = -((ev.y / (this.canva.height / 2)) - 1);
         this.mouseMovement.x = ev.movementX;
         this.mouseMovement.y = ev.movementY;
     }
@@ -60,6 +65,11 @@ export class CanvaManager {
     }
     static getKey(keycode) {
         return this.keys[keycode] ?? false;
+    }
+    static getKeyOnce(keycode) {
+        let key = this.keys[keycode];
+        this.keys[keycode] = false;
+        return key ?? false;
     }
     static onResize() {
         if (window.innerHeight > window.innerWidth) {

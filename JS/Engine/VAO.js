@@ -6,8 +6,8 @@ export class VAO {
         this.ID = gl.createVertexArray();
         this.bind();
     }
-    addPtr(location, length, stride, offset) {
-        gl.vertexAttribPointer(location, length, gl.FLOAT, false, stride, offset);
+    addPtr(location, length, stride, offset, type) {
+        gl.vertexAttribPointer(location, length, type ?? gl.FLOAT, false, stride, offset);
         gl.enableVertexAttribArray(location);
     }
     bind() {

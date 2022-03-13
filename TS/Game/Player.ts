@@ -16,6 +16,8 @@ export class Player
     camera:Camera = new Camera();
     pos:Vector;
     itemsBar:Array<number> = [9,1,2,3,4,5,6,7,8];
+    inventory:Array<number> = [10,10,9,9,9,9,9,9,9, 9,1,2,3,4,5,6,7,8, 9,1,2,3,4,5,6,7,8];
+    locked:boolean=false;
     selectedItem = 0;
     person:pers ="First"; 
     vao:VAO;
@@ -97,6 +99,7 @@ export class Player
     }
     updatePos()
     {
+        if(this.locked) return;
         let hop =false;
         let tempPos = this.pos.copy();
         if(this.jump.yAcc>0)
