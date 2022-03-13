@@ -6,6 +6,7 @@ export class Texture {
     static blocksGrid = Loader.image("/JS/Engine/Textures/Blocks.png");
     static blocksGridTest = Loader.imageArray("/JS/Engine/Textures/Blocks.png", 20, 16);
     // static GUI = Loader.image("/JS/Engine/Textures/GUI.png");
+    static skin = Loader.imageArray("/JS/Engine/Textures/skin.png", 8, 8);
     static GUItest = Loader.imageArray("/JS/Engine/Textures/GUI.png", 3, 9);
     static crossHair = Loader.image("/JS/Engine/Textures/crosshair.png");
     x;

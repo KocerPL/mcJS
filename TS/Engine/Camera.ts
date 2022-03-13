@@ -13,7 +13,8 @@ export class Camera
    private near = 0.1;
    private far =100;
    private aspect =CanvaManager.getHeight/CanvaManager.getWidth;
-
+    public offset = 0;
+    public projRot=0;
     constructor()
     {
     }
@@ -21,6 +22,9 @@ export class Camera
     {
         this.aspect = CanvaManager.getHeight/CanvaManager.getWidth;
         this.projection = Matrix.projection(this.fov,this.near,this.far,this.aspect);
+        this.projection  = this.projection.rotateX(this.projRot);
+        this.projection  = this.projection.rotateZ(this.projRot);
+        this.projection  = this.projection.translate(0,0,this.offset);
     }
     public preRender()
     {

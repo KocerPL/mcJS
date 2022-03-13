@@ -12,11 +12,16 @@ export class Camera {
     near = 0.1;
     far = 100;
     aspect = CanvaManager.getHeight / CanvaManager.getWidth;
+    offset = 0;
+    projRot = 0;
     constructor() {
     }
     updateProjection() {
         this.aspect = CanvaManager.getHeight / CanvaManager.getWidth;
         this.projection = Matrix.projection(this.fov, this.near, this.far, this.aspect);
+        this.projection = this.projection.rotateX(this.projRot);
+        this.projection = this.projection.rotateZ(this.projRot);
+        this.projection = this.projection.translate(0, 0, this.offset);
     }
     preRender() {
         this.updatePos();

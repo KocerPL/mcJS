@@ -1,13 +1,29 @@
 import { Camera } from "../Engine/Camera.js";
 import { CanvaManager } from "../Engine/CanvaManager.js";
+import { EBO } from "../Engine/EBO.js";
+import { Texture } from "../Engine/Texture.js";
+import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Vector } from "../Engine/Utils/Vector.js";
+import { VAO } from "../Engine/VAO.js";
+import { VBO } from "../Engine/VBO.js";
+import { Main } from "../Main.js";
+import { SubChunk } from "./SubChunk.js";
 import { World } from "./World.js";
+let gl = CanvaManager.gl;
 export class Player {
     camera = new Camera();
     pos;
     itemsBar = [9, 1, 2, 3, 4, 5, 6, 7, 8];
     selectedItem = 0;
+    person = "First";
+    vao;
+    vbo;
+    vtc;
+    vlo;
+    ebo;
     yAcc = 0.01;
+    rotX = 0;
+    rotY = 0;
     jump = {
         time: 0,
         yAcc: 0,
@@ -15,9 +31,64 @@ export class Player {
     constructor(pos) {
         this.pos = pos;
         this.camera.setPosition(new Vector(pos.x, pos.y + 1, pos.z));
+        this.vao = new VAO();
+        this.vbo = new VBO();
+        this.vbo.bufferData(SubChunk.defVertices);
+        this.vao.addPtr(0, 3, 0, 0);
+        this.vtc = new VBO();
+        this.vtc.bufferData([
+            0.0, 1.0, 1,
+            1.0, 1.0, 1,
+            1.0, 0.0, 1,
+            0.0, 0.0, 1,
+            0.0, 1.0, 0,
+            1.0, 1.0, 0,
+            1.0, 0.0, 0,
+            0.0, 0.0, 0,
+            0.0, 1.0, 2,
+            1.0, 1.0, 2,
+            1.0, 0.0, 2,
+            0.0, 0.0, 2,
+            0.0, 1.0, 3,
+            1.0, 1.0, 3,
+            1.0, 0.0, 3,
+            0.0, 0.0, 3,
+            0.0, 1.0, 5,
+            1.0, 1.0, 5,
+            1.0, 0.0, 5,
+            0.0, 0.0, 5,
+            0.0, 1.0, 4,
+            1.0, 1.0, 4,
+            1.0, 0.0, 4,
+            0.0, 0.0, 4
+        ]);
+        this.vao.addPtr(1, 3, 0, 0);
+        this.vlo = new VBO();
+        this.vlo.bufferData([15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]);
+        this.vao.addPtr(2, 1, 0, 0);
+        this.ebo = new EBO();
+        this.ebo.bufferData([2, 1, 0, 2, 0, 3,
+            6, 5, 4, 6, 4, 7, 10, 9, 8, 10, 8, 11, 14, 13, 12, 14, 12, 15, 18, 17, 16, 18, 16, 19, 22, 21, 20, 22, 20, 23]);
+        VAO.unbind();
+        VBO.unbind();
+        EBO.unbind();
     }
     update() {
         this.updatePos();
+    }
+    switchPerson(person) {
+        if (person == this.person)
+            return;
+        this.person = person;
+        this.camera.projRot = 0;
+        if (person == "Third")
+            this.camera.offset = 5;
+        else if (person == "Second") {
+            this.camera.offset = -5;
+            this.camera.projRot = 180;
+        }
+        else
+            this.camera.offset = 0;
     }
     updatePos() {
         let hop = false;
@@ -147,6 +218,15 @@ export class Player {
         if (CanvaManager.mouse.right)
             this.place();
         this.camera.setPosition(new Vector(this.pos.x, this.pos.y + 0.7, this.pos.z));
+        if (CanvaManager.getKey(49)) {
+            this.switchPerson("First");
+        }
+        else if (CanvaManager.getKey(50)) {
+            this.switchPerson("Second");
+        }
+        else if (CanvaManager.getKey(51)) {
+            this.switchPerson("Third");
+        }
     }
     mine() {
         let dist = 0.1;
@@ -427,5 +507,19 @@ export class Player {
                 return;
             }
         }
+    }
+    render() {
+        if (this.person == "First")
+            return;
+        let transformation = Matrix.identity();
+        transformation = transformation.translate(this.pos.x, this.camera.getPosition().y, this.pos.z);
+        transformation = transformation.rotateY(-this.camera.getYaw());
+        transformation = transformation.rotateX(-this.camera.getPitch());
+        transformation = transformation.scale(0.4, 0.4, 0.4);
+        gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.skin);
+        this.vao.bind();
+        Main.shader.loadUniforms(this.camera.getProjection(), transformation, this.camera.getView(), 15);
+        Main.shader.use();
+        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_INT, 0);
     }
 }

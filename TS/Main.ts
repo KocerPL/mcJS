@@ -17,9 +17,10 @@ import { World } from "./Game/World.js";
 let gl = CanvaManager.gl;
 export class Main
 {
+   public static dispLl = false;
    public static FPS:number=61;
    public static TPS:number=20;
-   public static sunPos:Vector = new Vector(100,100,100);
+   public static sunLight=1;
    public static Measure = {
       tps:0,
       fps:0,
@@ -60,7 +61,7 @@ export class Main
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LEQUAL);
    // gl.enable(gl.CULL_FACE);
-    //gl.cullFace(gl.BACK);
+   // gl.cullFace(gl.BACK);
     //Transparency requires blending 
     gl.enable (gl.BLEND);
    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -163,6 +164,10 @@ export class Main
    public static update()
    {
       
+      if(CanvaManager.getKey(52)&&this.sunLight<16)
+      this.sunLight++;
+      if(CanvaManager.getKey(53)&&this.sunLight>0)
+      this.sunLight--;  
       this.Measure.ticks++;
      // this.count++;
      // if(this.count>this.test.indices.length)
@@ -184,13 +189,16 @@ export class Main
    {
       this.Measure.frames++;
       CanvaManager.debug.value = "Fps: "+this.Measure.fps+"Selected block: "+ blocks[this.player.itemsBar[this.player.selectedItem]].name;
-      gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
+      
       this.shader.use();
-      this.player.camera.preRender();
       this.player.updatePos();
+      this.player.camera.preRender();
+    
       CanvaManager.preRender();
-      gl.clearColor(0.0,1.0,1.0,1.0);
+      gl.clearColor(0.0,this.sunLight/15,this.sunLight/15,1.0);
       gl.clear(gl.COLOR_BUFFER_BIT);
+      this.player.render();
+      gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
       for(let x=this.range.start; x<this.range.end;x++)     
       for(let z=this.range.start; z<this.range.end;z++)
        {
