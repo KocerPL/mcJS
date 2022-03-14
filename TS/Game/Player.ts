@@ -276,6 +276,7 @@ export class Player
         else if(CanvaManager.getKey(51))
         {
             this.switchPerson("Third");
+            console.log(Main.tasks);
         }
     }
     mine()

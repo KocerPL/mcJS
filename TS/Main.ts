@@ -9,7 +9,7 @@ import { Matrix } from "./Engine/Utils/Matrix.js";
 import { Vector } from "./Engine/Utils/Vector.js";
 import { VAO } from "./Engine/VAO.js";
 import { VBO } from "./Engine/VBO.js";
-import { blocks } from "./Game/Block.js";
+import { Block, blocks } from "./Game/Block.js";
 import { Chunk } from "./Game/Chunk.js";
 import { GUI } from "./Game/GUI.js";
 import { Player } from "./Game/Player.js";
@@ -18,10 +18,12 @@ import { World } from "./Game/World.js";
 let gl = CanvaManager.gl;
 export class Main
 {
-   public static dispLl = false;
+   public static dispLl = true;
    public static FPS:number=61;
    public static TPS:number=20;
    public static sunLight=14;
+   public static file = null;
+
    public static Measure = {
       tps:0,
       fps:0,
@@ -184,6 +186,62 @@ export class Main
       }
       if(CanvaManager.getKeyOnce(54))
       this.exportChunks();
+      if(CanvaManager.getKeyOnce(55))
+      this.upload();
+      if(this.file!=null)
+      {  
+         for(let x=0;x<Main.tasks.length;x++)
+         Main.tasks[x]=new Array();
+         for(let x=0; x<this.file.length;x++)
+         {
+            let x2=this.file[x].pos[0];
+               let z2 = this.file[x].pos[1];
+               if(x2==undefined|| z2==undefined)
+               {
+                   continue;
+               }
+            if(this.chunks[x2] == undefined)
+            this.chunks[x2]= new Array();
+            if(this.chunks[x2][z2]==undefined)
+            this.chunks[x2][z2] = new Chunk(x2,z2,true);
+            for(let k=0;k<16;k++)
+            {
+            for(let l=0;l<16;l++)
+            {
+               this.chunks[x2][z2].heightmap[k][l] = 0;
+            }
+            }
+            for(let a=0;a<16;a++)
+            {
+               this.chunks[x2][z2].subchunks[a].genBlocks();
+               
+               for(let x1=0;x1<16;x1++)
+               for(let y1=0;y1<16;y1++)
+               for(let z1=0;z1<16;z1++)
+               {
+                  if( this.file[x].blocks[x1][y1][z1] != NaN)
+                  {
+             this.chunks[x2][z2].subchunks[a].blocks[x1][y1][z1].id= this.file[x].blocks[a][x1][y1][z1];
+            
+                  }
+                  if( this.chunks[x2][z2].subchunks[a].blocks[x1][y1][z1].id>0 && y1+(  this.chunks[x2][z2].subchunks[a].pos.y*16)>this.chunks[x2][z2].heightmap[x1][z1])
+                  this.chunks[x2][z2].heightmap[x1][z1] =y1+(  this.chunks[x2][z2].subchunks[a].pos.y*16);
+               }
+               
+               
+               Main.tasks[8].push(()=>{
+               Main.chunks[x2][z2].subchunks[a].inReGeneration=false;
+               Main.chunks[x2][z2].subchunks[a].update(9);
+               });
+              // console.log( this.chunks[x2][z2].subchunks[a]);
+              
+            }
+            this.chunks[x2][z2].lazy =false;
+              
+         }
+         console.log("Loaded");
+         this.file=null;
+      }
     //  this.TESTtransf =  this.TESTtransf.rotateZ(1);
       //this.TESTtransf =  this.TESTtransf.rotateY(1);
    }
@@ -203,7 +261,8 @@ export class Main
             for(let y1=0;y1<16;y1++)
             for(let z1=0;z1<16;z1++)
             {
-               if( this.chunks[x][z].subchunks[a].blocks[x1][y1][z1]==undefined) continue;
+               if( this.chunks[x][z].subchunks[a].blocks[x1][y1][z1]==undefined || this.chunks[x][z].subchunks[a].blocks[x1][y1][z1]==null) c[x1][y1][z1]=0
+               else
             c[x1][y1][z1]=this.chunks[x][z].subchunks[a].blocks[x1][y1][z1].id;
             }
             blocks[a] = c;
@@ -217,6 +276,10 @@ export class Main
       }
       this.download(JSON.stringify(k),"world.json","text/plain");
    }
+   public static loadChunks()
+   {
+
+   }
    public static download(content, fileName, contentType) {
       var a = document.createElement("a");
       var file = new Blob([content], {type: contentType});
@@ -224,6 +287,31 @@ export class Main
       a.download = fileName;
       a.click();
   }
+  public static upload() {
+   var a = document.createElement("input");
+   a.type="file";
+   
+   a.click();
+   a.oninput = (ev)=>{
+     let file =    a.files.item(0);
+     //console.log(file);
+     const reader = new FileReader();
+     let ok;
+     reader.onload =(okok)=>{
+        ok = okok.target.result;
+        this.file =JSON.parse(ok);
+    console.log(this.file);
+     }
+      var text = reader.result;
+   
+   let k=  reader.readAsText(file);
+    console.log(ok);
+//JSON.parse(file);
+    
+
+   };
+
+}
    public static render()
    {
       this.Measure.frames++;

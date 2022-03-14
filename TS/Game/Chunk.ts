@@ -42,6 +42,7 @@ export class Chunk {
        //console.log(this.subchunks[i].count);
         gl.drawElements(gl.TRIANGLES, this.subchunks[i].count, gl.UNSIGNED_INT, 0);
       }
+      
     }
   }
   getBlock(pos:Vector):Block {

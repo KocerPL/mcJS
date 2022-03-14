@@ -21,9 +21,7 @@ export class SubChunk
     vfb:VBO;
    // nor:VBO;
    fromBlock:Array<number>;
-    normals:Array<number>;
     blocks:Array<Array<Array<Block>>>= new Array3D(16,16,16);
-    tasks:Array<Function> = new Array();
     generated:boolean=false;
     inReGeneration:boolean=false;
     lightUpdate:boolean = false;
@@ -106,6 +104,33 @@ export class SubChunk
       {
     this.generate(pos,heightmap);
       }
+      this.vao = new VAO();
+      this.vbo = new VBO();
+      this.vao.addPtr(0,3,0,0);
+      this.vtc = new VBO();
+      this.vao.addPtr(1,3,0,0);
+    this.vlo = new VBO();
+      this.vao.addPtr(2,1,0,0);
+      this.vfb = new VBO();
+      this.vao.addPtr(3,1,0,0);
+      this.ebo = new EBO();
+      VAO.unbind();
+      VBO.unbind();
+      EBO.unbind();
+    }
+    genBlocks()
+    {
+      for(let x =0;x<16;x++)
+      {
+        
+          for(let y=0;y<16;y++)
+          {
+      for(let z=0;z<16;z++)
+      {
+        this.blocks[x][y][z]= new Block(0);
+      }
+    }};
+    this.generated=true;
     }
     generate(pos,heightmap)
     {
@@ -162,19 +187,7 @@ export class SubChunk
     }
     }
     this.generated=true;
-        this.vao = new VAO();
-        this.vbo = new VBO();
-        this.vao.addPtr(0,3,0,0);
-        this.vtc = new VBO();
-        this.vao.addPtr(1,3,0,0);
-      this.vlo = new VBO();
-        this.vao.addPtr(2,1,0,0);
-        this.vfb = new VBO();
-        this.vao.addPtr(3,1,0,0);
-        this.ebo = new EBO();
-        VAO.unbind();
-        VBO.unbind();
-        EBO.unbind();
+       
       //  console.log(this.blocks);
     
       Main.tasks[3].push(
@@ -197,6 +210,7 @@ export class SubChunk
       for(let y=0;y<16; y++)
       for(let z=0;z<16; z++)
       {
+       
         if(this.blocks[x][y][z].id>0) continue;
         this.blocks[x][y][z].lightLevel=0;
         this.blocks[x][y][z].lightFBlock=0;
@@ -206,6 +220,7 @@ export class SubChunk
           //console.count("light");
           
     }
+
       }
     //  console.countReset("light");
     }
@@ -776,7 +791,7 @@ export class SubChunk
     }
    updateVerticesIndices(priority:number) 
     {
-     // console.time("Updating");
+     console.log("Updating");
     
       this.fromBlock = new Array();
         this.vertices= new Array();
