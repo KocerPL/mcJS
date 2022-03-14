@@ -4,6 +4,7 @@ import { EBO } from "./Engine/EBO.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Shader2d } from "./Engine/Shader/Shader2d.js";
 import { Texture } from "./Engine/Texture.js";
+import { Array3D } from "./Engine/Utils/Array3D.js";
 import { Matrix } from "./Engine/Utils/Matrix.js";
 import { Vector } from "./Engine/Utils/Vector.js";
 import { VAO } from "./Engine/VAO.js";
@@ -20,7 +21,7 @@ export class Main
    public static dispLl = false;
    public static FPS:number=61;
    public static TPS:number=20;
-   public static sunLight=1;
+   public static sunLight=14;
    public static Measure = {
       tps:0,
       fps:0,
@@ -181,10 +182,48 @@ export class Main
     //  this.test.blocks[Math.floor(Math.random()*16)][Math.floor(Math.random()*16)][Math.floor(Math.random()*16)] =Math.ceil(Math.random()*2);
       //this.test.updateVerticesIndices();
       }
+      if(CanvaManager.getKeyOnce(54))
+      this.exportChunks();
     //  this.TESTtransf =  this.TESTtransf.rotateZ(1);
       //this.TESTtransf =  this.TESTtransf.rotateY(1);
    }
- 
+   public static exportChunks()
+   {
+      let k = new Array();
+      for(let x=this.range.start; x<this.range.end;x++)     
+      for(let z=this.range.start; z<this.range.end;z++)
+      {
+         if(this.chunks[x][z]==undefined) continue;
+         let blocks = new Array(16);
+         for(let a=0;a<16;a++)
+         {
+            if(this.chunks[x][z].subchunks[a]==undefined)continue;
+            let c = new Array3D(16,16,16);
+            for(let x1=0;x1<16;x1++)
+            for(let y1=0;y1<16;y1++)
+            for(let z1=0;z1<16;z1++)
+            {
+               if( this.chunks[x][z].subchunks[a].blocks[x1][y1][z1]==undefined) continue;
+            c[x1][y1][z1]=this.chunks[x][z].subchunks[a].blocks[x1][y1][z1].id;
+            }
+            blocks[a] = c;
+         }
+            k.push(
+               {
+                  pos:[this.chunks[x][z].pos.x,this.chunks[x][z].pos.z],
+                  blocks:blocks
+               }
+            )
+      }
+      this.download(JSON.stringify(k),"world.json","text/plain");
+   }
+   public static download(content, fileName, contentType) {
+      var a = document.createElement("a");
+      var file = new Blob([content], {type: contentType});
+      a.href = URL.createObjectURL(file);
+      a.download = fileName;
+      a.click();
+  }
    public static render()
    {
       this.Measure.frames++;

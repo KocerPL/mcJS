@@ -69,7 +69,7 @@ export class Player
             0.0, 0.0,4]);
         this.vao.addPtr(1,3,0,0);
         this.vlo = new VBO();
-        this.vlo.bufferData([15,15,15,15 ,15,15,15,15 ,15,15,15,15, 15,15,15,15, 15,15,15,15, 15,15,15,15]);
+        this.vlo.bufferData([14,14,14,14 ,14,14,14,14 ,14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14]);
         this.vao.addPtr(2,1,0,0);
         this.ebo = new EBO();
         this.ebo.bufferData([2,1,0,2,0,3

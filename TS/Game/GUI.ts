@@ -29,6 +29,8 @@ export class GUI
     static indArray:Array<number>;
     static invOpened:boolean =false;
     static pickedBlock:number=null;
+    static pickedSlot=null;
+    static pSisInv=null;
     static mouse =false;
     private static squareIndices =[
         0,1,2, 1,0,3
@@ -139,9 +141,21 @@ export class GUI
           this.pickedBlock=Main.player.itemsBar[i]
           Main.player.itemsBar[i]=0;
           this.mouse =true;
+          this.pickedSlot = i;
+          this.pSisInv=false;
             }
           else
           {
+           
+            
+            if(this.pSisInv)
+            {
+              Main.player.inventory[this.pickedSlot]=Main.player.itemsBar[i];
+            }
+            else
+            {
+              Main.player.itemsBar[this.pickedSlot]=Main.player.itemsBar[i];
+            }
             Main.player.itemsBar[i]= this.pickedBlock;
             this.pickedBlock=null;
           }
@@ -186,9 +200,21 @@ export class GUI
               {
             this.pickedBlock=Main.player.inventory[(x*9)+i];
             Main.player.inventory[(x*9)+i]=0;
+            this.pickedSlot = (x*9)+i;
+                this.pSisInv=true;
               }
             else
             {
+              
+             
+              if(this.pSisInv)
+              {
+                Main.player.inventory[this.pickedSlot]=Main.player.inventory[(x*9)+i];
+              }
+              else
+              {
+                Main.player.itemsBar[this.pickedSlot]=Main.player.inventory[(x*9)+i];
+              }
               Main.player.inventory[(x*9)+i]= this.pickedBlock;
               this.pickedBlock=null;
             }
