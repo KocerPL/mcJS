@@ -91,7 +91,7 @@ public static waterLevel:number = 24;
             }
         }
     }
-    public static setLight(blockPos:Vector,lightLevel:number)
+ /*   public static setLight(blockPos:Vector,lightLevel:number)
     {
         try
         {
@@ -117,7 +117,7 @@ public static waterLevel:number = 24;
         {
             console.log(error);
         }
-    }
+    }*/
     public static setBlockNoLight(blockPos:Vector,type:number)
     {
        let inChunkPos:Vector = new Vector(Math.round(Math.round(blockPos.x)%16),Math.round(blockPos.y),Math.round(Math.round(blockPos.z)%16));
@@ -132,22 +132,22 @@ public static waterLevel:number = 24;
         
         try
         {
-            
-            if(inChunkPos.y>=Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] )
+            let chunk = Main.getChunkAt(chunkPos.x,chunkPos.z)
+            if(inChunkPos.y>=chunk.heightmap[inChunkPos.x][inChunkPos.z] )
             {
               //  console.log("heightmap");
                 let i=0;
                 if(type<=0)
                 {
                     i=1;
-                while(Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).id<=0)
+                while(chunk.getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).id<=0)
                 {
                     i++;
                 }
                 }
-                Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y-i;
+               chunk.heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y-i;
             }
-            Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos,type);
+            chunk.setBlock(inChunkPos,type);
         }
         catch(error)
         {
@@ -162,14 +162,14 @@ public static waterLevel:number = 24;
 
         try
         {
-        return  Main.chunks[chunkPos.x][chunkPos.z].getSubchunk(chunkPos.y);
+        return  Main.getChunkAt(chunkPos.x,chunkPos.z).getSubchunk(chunkPos.y);
         } 
         catch(error)
         {
             console.log(error);
         }
     }
-   public static setBlock(blockPos:Vector,type:number)
+ /*  public static setBlock(blockPos:Vector,type:number)
     {
        let inChunkPos = new Vector(Math.round(Math.round(blockPos.x)%16),Math.round(blockPos.y),Math.round(Math.round(blockPos.z)%16));
        if(inChunkPos.x<0)
@@ -298,7 +298,7 @@ public static waterLevel:number = 24;
         {
             console.error(error);
         }
-    }
+    }*/
  private static   lightPropagation(vec:Vector,lightLevel:number,direction,blockList:Array<Block>)
     {
         console.log("lightning...",lightLevel);
@@ -341,7 +341,7 @@ public static waterLevel:number = 24;
        if(max!=undefined && this.getBlock(max.bl).lightLevel-1)
        {
        this.getBlock(vec).lightDir = max.dir;
-       this.setLight( vec,this.getBlock(max.bl).lightLevel-1);
+    //   this.setLight( vec,this.getBlock(max.bl).lightLevel-1);
        for(let i =0;i<arr.length; i++)
        {
            if(this.getBlock(arr[i].bl).lightDir == arr[i].negDir)
@@ -356,8 +356,8 @@ public static waterLevel:number = 24;
     }
     private static lightFunc(vec,lightLevel)
     {
-        if(this.getBlock(vec).lightLevel <lightLevel)
-        this.setLight(vec,lightLevel);
+      //  if(this.getBlock(vec).lightLevel <lightLevel)
+      //  this.setLight(vec,lightLevel);
     }
     public static getBlock(blockPos:Vector):Block
     {
@@ -378,7 +378,7 @@ public static waterLevel:number = 24;
        try
        {
           
-        return Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos);
+        return Main.getChunkAt(chunkPos.x,chunkPos.z).getBlock(inChunkPos);
        }catch(error)
        {
            console.log(inChunkPos);

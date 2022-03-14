@@ -149,7 +149,7 @@ export class SubChunk {
                             this.blocks[x][y][z] = new Block(2);
                         }
                         else if (World.waterLevel > y + yPos)
-                            this.blocks[x][y][z] = new Block(7);
+                            this.blocks[x][y][z] = new Block(-1);
                         else if (!(this.blocks[x][y][z] instanceof Block)) {
                             this.blocks[x][y][z] = new Block(0);
                             if (ah + 1 == (y + yPos)) {
@@ -182,7 +182,7 @@ export class SubChunk {
                         continue;
                     this.blocks[x][y][z].lightLevel = 0;
                     this.blocks[x][y][z].lightFBlock = 0;
-                    if (y + (this.pos.y * 16) == Main.chunks[this.pos.x][this.pos.z].heightmap[x][z] + 1) {
+                    if (y + (this.pos.y * 16) == Main.getChunkAt(this.pos.x, this.pos.z).heightmap[x][z] + 1) {
                         this.blocks[x][y][z].lightLevel = 15;
                         //console.count("light");
                     }
@@ -206,11 +206,12 @@ export class SubChunk {
         let theBlock = this.blocks[x][y][z];
         if (theBlock.id > 0)
             return;
-        if (y + (this.pos.y * 16) >= Main.chunks[this.pos.x][this.pos.z].heightmap[x][z] + 1) {
+        let chunk = Main.getChunkAt(this.pos.x, this.pos.z);
+        if (y + (this.pos.y * 16) >= chunk.heightmap[x][z] + 1) {
             light = 15;
             lightDir = directions.SKYLIGHT;
         }
-        if (y + (this.pos.y * 16) < Main.chunks[this.pos.x][this.pos.z].heightmap[x][z] + 4) {
+        if (y + (this.pos.y * 16) < chunk.heightmap[x][z] + 4) {
             let side = (dir) => {
                 let vec = dirAssoc[dir];
                 if ((x + vec.x >= 0 && y + vec.y >= 0 && z + vec.z >= 0 && x + vec.x < 16 && y + vec.y < 16 && z + vec.z < 16)) {
@@ -257,7 +258,7 @@ export class SubChunk {
                         inscPos.z = 0;
                     }
                     try {
-                        let block = Main.chunks[subCpos.x][subCpos.z].subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
+                        let block = Main.getChunkAt(subCpos.x, subCpos.z).subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
                         if (block.id < 1) {
                             if (light + 1 < block.lightLevel) {
                                 light = block.lightLevel - 1;
@@ -291,7 +292,7 @@ export class SubChunk {
         let lightLevels = new Array();
         let fB = new Array();
         for (let z = 0; z < 16; z++) {
-            if (this.blocks[x][y][z].id < 1) {
+            if (this.blocks[x][y][z].id == 0) {
                 if (!Main.dispLl)
                     continue;
                 let temp2 = new Array();
@@ -341,7 +342,7 @@ export class SubChunk {
                     fB = fB.concat(true, true, true);
                     index += 3;
                 }
-                else if (this.blocks[x][y][z].lightDir == directions.POS_Y || y + (this.pos.y * 16) == Main.chunks[this.pos.x][this.pos.z].heightmap[x][z] + 1) {
+                else if (this.blocks[x][y][z].lightDir == directions.POS_Y || y + (this.pos.y * 16) == Main.getChunkAt(this.pos.x, this.pos.z).heightmap[x][z] + 1) {
                     vertices = vertices.concat(temp2.slice(45, 54));
                     textureCoords = textureCoords.concat(SubChunk.getTextureCords2(8, "top").slice(0, 9));
                     indices = indices.concat(index + 2, index + 1, index);
@@ -355,7 +356,10 @@ export class SubChunk {
             let temp = new Array();
             for (let i = 0; i < SubChunk.defVertices.length; i += 3) {
                 temp.push(SubChunk.defVertices[i] + x);
-                temp.push(SubChunk.defVertices[i + 1] + y);
+                if (this.blocks[x][y][z].id == -1)
+                    temp.push(SubChunk.defVertices[i + 1] + y - 0.2);
+                else
+                    temp.push(SubChunk.defVertices[i + 1] + y);
                 temp.push(SubChunk.defVertices[i + 2] + z);
             }
             /*if(y+(this.pos.y*16)==Main.chunks[this.pos.x][this.pos.z].heightmap[x][z]+1)
@@ -369,7 +373,7 @@ export class SubChunk {
             let side = (vec, vStart, side) => {
                 // console.log(this.blocks);
                 if ((x + vec.x >= 0 && y + vec.y >= 0 && z + vec.z >= 0 && x + vec.x < 16 && y + vec.y < 16 && z + vec.z < 16)) {
-                    if (this.blocks[x + vec.x][y + vec.y][z + vec.z].id <= 0) {
+                    if ((this.blocks[x + vec.x][y + vec.y][z + vec.z].id <= 0 && this.blocks[x][y][z].id > 0) || (this.blocks[x + vec.x][y + vec.y][z + vec.z].id == 0)) {
                         vertices = vertices.concat(temp.slice(vStart, vStart + 12));
                         textureCoords = textureCoords.concat(SubChunk.getTextureCords(this.blocks[x][y][z], side));
                         indices = indices.concat(index + 2, index + 1, index, index + 2, index, index + 3);
@@ -408,7 +412,7 @@ export class SubChunk {
                         inscPos.z = 0;
                     }
                     try {
-                        let block = Main.chunks[subCpos.x][subCpos.z].subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
+                        let block = Main.getChunkAt(subCpos.x, subCpos.z).subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
                         if (block.id < 1) {
                             light2 = block.lightFBlock;
                             light = block.lightLevel;
@@ -430,6 +434,10 @@ export class SubChunk {
                 // else
                 // console.count("hehe");
             };
+            if (this.blocks[x][y][z].id == -1) {
+                side(new Vector(0, 1, 0), 60, "top");
+                continue;
+            }
             side(new Vector(-1, 0, 0), 24, "right");
             side(new Vector(1, 0, 0), 36, "left");
             side(new Vector(0, -1, 0), 48, "bottom");
@@ -507,8 +515,9 @@ export class SubChunk {
                         inscPos.z = 0;
                     }
                     try {
-                        let block = Main.chunks[subCpos.x][subCpos.z].subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
-                        let subc = Main.chunks[subCpos.x][subCpos.z].subchunks[subCpos.y];
+                        let chunk = Main.getChunkAt(subCpos.x, subCpos.z);
+                        let block = chunk.subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
+                        let subc = chunk.subchunks[subCpos.y];
                         if (block instanceof Block)
                             if (block.id > 0) {
                                 //      console.log(block);

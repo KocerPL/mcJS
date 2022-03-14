@@ -7,6 +7,7 @@ import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
 import { blocks } from "./Block.js";
 import { SubChunk } from "./SubChunk.js";
+import { World } from "./World.js";
 
 let gl =CanvaManager.gl;
 
@@ -49,12 +50,6 @@ export class GUI
        
      ]
      private static slotTCoords = [
-      0,0,
-      1,1,
-      0,1,
-      1,0
-     ]
-     private static selTCoords = [
       0,0,
       1,1,
       0,1,
@@ -325,8 +320,21 @@ export class GUI
         this.vArray= this.vArray.concat( slCoords);
         this.tArray= this.tArray.concat(this.crosstcords);
         this.iArray =this.iArray.concat(indices);
-        this.indArray = this.indArray.concat(blocks[this.pickedBlock].textureIndex.front,blocks[this.pickedBlock].textureIndex.front,blocks[this.pickedBlock].textureIndex.front,blocks[this.pickedBlock].textureIndex.front,blocks[this.pickedBlock].textureIndex.front);
+        this.indArray = this.indArray.concat(blocks[this.pickedBlock].textureIndex.front,blocks[this.pickedBlock].textureIndex.front,blocks[this.pickedBlock].textureIndex.front,blocks[this.pickedBlock].textureIndex.front);
       }
+      let block =World.getBlock(Main.player.pos);
+      if(block!=undefined && block.id==-1)
+      {
+        for(let a=0;a<indices.length;a++)
+        {
+            indices[a] = indices[a]+4;
+        }
+        this.vArray= this.vArray.concat( -0.5,-0.5,  0.5,0.5, -0.5,0.5, 0.5,-0.5);
+           this.tArray= this.tArray.concat(this.crosstcords);
+           this.iArray =this.iArray.concat(indices);
+        this.indArray = this.indArray.concat(11,11,11,11);
+      }
+
        this.bvao.bind();
        this.bvbo.bufferData(this.vArray);
        this.btco.bufferData(this.tArray);

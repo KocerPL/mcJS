@@ -127,6 +127,18 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
     }
 },
 ];
+blocks[-1] = 
+{
+    name:"Water",
+    textureIndex:{
+        top:12,
+        bottom:12,
+        front:12,
+        back:12,
+        left:12,
+        right:12
+    }
+}
 export const directions = Object.freeze(
     {
         SKYLIGHT:0,

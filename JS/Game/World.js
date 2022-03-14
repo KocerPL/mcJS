@@ -77,28 +77,33 @@ export class World {
             }
         }
     }
-    static setLight(blockPos, lightLevel) {
-        try {
-            let inChunkPos = new Vector(Math.round(blockPos.x) % 16, Math.round(blockPos.y), Math.round(blockPos.z) % 16);
-            if (inChunkPos.x < 0)
-                inChunkPos.x = 16 - Math.abs(inChunkPos.x);
-            if (inChunkPos.z < 0)
-                inChunkPos.z = 16 - Math.abs(inChunkPos.z);
-            let chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
-            Main.chunks[chunkPos.x][chunkPos.z].setLight(inChunkPos, lightLevel);
-            let sc = Main.chunks[chunkPos.x][chunkPos.z].getSubchunk(blockPos.y);
-            if (!sc.lightUpdate) {
-                sc.lightUpdate = true;
-                // console.log("okokokok");
-                if (sc.generated)
-                    sc.update(9);
-            }
-            return Main.chunks[chunkPos.x][chunkPos.z];
-        }
-        catch (error) {
-            console.log(error);
-        }
-    }
+    /*   public static setLight(blockPos:Vector,lightLevel:number)
+       {
+           try
+           {
+       
+          let inChunkPos = new Vector(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);
+          if(inChunkPos.x<0)
+          inChunkPos.x = 16-Math.abs(inChunkPos.x);
+          if(inChunkPos.z<0)
+          inChunkPos.z = 16-Math.abs(inChunkPos.z);
+           let chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
+           Main.chunks[chunkPos.x][chunkPos.z].setLight(inChunkPos,lightLevel);
+           let sc = Main.chunks[chunkPos.x][chunkPos.z].getSubchunk(blockPos.y)
+           if(!sc.lightUpdate )
+           {
+              sc.lightUpdate =true;
+             // console.log("okokokok");
+             if(sc.generated)
+            sc.update(9);
+           }
+           return Main.chunks[chunkPos.x][chunkPos.z];
+           }
+           catch(error)
+           {
+               console.log(error);
+           }
+       }*/
     static setBlockNoLight(blockPos, type) {
         let inChunkPos = new Vector(Math.round(Math.round(blockPos.x) % 16), Math.round(blockPos.y), Math.round(Math.round(blockPos.z) % 16));
         if (inChunkPos.x < 0)
@@ -107,18 +112,19 @@ export class World {
             inChunkPos.z = 16 - Math.abs(inChunkPos.z);
         let chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
         try {
-            if (inChunkPos.y >= Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z]) {
+            let chunk = Main.getChunkAt(chunkPos.x, chunkPos.z);
+            if (inChunkPos.y >= chunk.heightmap[inChunkPos.x][inChunkPos.z]) {
                 //  console.log("heightmap");
                 let i = 0;
                 if (type <= 0) {
                     i = 1;
-                    while (Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x, inChunkPos.y - i, inChunkPos.z)).id <= 0) {
+                    while (chunk.getBlock(new Vector(inChunkPos.x, inChunkPos.y - i, inChunkPos.z)).id <= 0) {
                         i++;
                     }
                 }
-                Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y - i;
+                chunk.heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y - i;
             }
-            Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos, type);
+            chunk.setBlock(inChunkPos, type);
         }
         catch (error) {
             //  console.error(error);
@@ -128,109 +134,142 @@ export class World {
     static getSubchunk(blockPos) {
         let chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
         try {
-            return Main.chunks[chunkPos.x][chunkPos.z].getSubchunk(chunkPos.y);
+            return Main.getChunkAt(chunkPos.x, chunkPos.z).getSubchunk(chunkPos.y);
         }
         catch (error) {
             console.log(error);
         }
     }
-    static setBlock(blockPos, type) {
-        let inChunkPos = new Vector(Math.round(Math.round(blockPos.x) % 16), Math.round(blockPos.y), Math.round(Math.round(blockPos.z) % 16));
-        if (inChunkPos.x < 0)
-            inChunkPos.x = 16 - Math.abs(inChunkPos.x);
-        if (inChunkPos.z < 0)
-            inChunkPos.z = 16 - Math.abs(inChunkPos.z);
-        let chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
-        try {
-            Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos, type);
-            if (type < 1) {
-                if (inChunkPos.y >= Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z]) {
-                    //console.log("if");
-                    let lightLevel = 15;
-                    let yPos = blockPos.y;
-                    while (this.getBlock(new Vector(blockPos.x, yPos, blockPos.z)).id == 0 && lightLevel > 0) {
-                        //  console.log("while");
-                        lightLevel--;
-                        this.setLight(new Vector(blockPos.x, yPos - 1, blockPos.z), lightLevel);
-                        this.setLight(new Vector(blockPos.x + 1, yPos, blockPos.z), lightLevel);
-                        this.setLight(new Vector(blockPos.x - 1, yPos, blockPos.z), lightLevel);
-                        this.setLight(new Vector(blockPos.x, yPos, blockPos.z + 1), lightLevel);
-                        this.setLight(new Vector(blockPos.x, yPos, blockPos.z - 1), lightLevel);
-                        yPos--;
-                    }
-                    Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] = yPos - 1;
-                    if (Main.chunks[chunkPos.x][chunkPos.z].getSubchunk(blockPos.y).generated)
-                        Main.chunks[chunkPos.x][chunkPos.z].updateSubchunkAt(blockPos.y);
-                    if (Main.chunks[chunkPos.x][chunkPos.z].getSubchunk(blockPos.y).generated)
-                        Main.chunks[chunkPos.x][chunkPos.z].updateSubchunkAt(yPos);
-                }
-                else {
-                    let lightLevel = Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).lightLevel - 1;
-                    if (lightLevel > 1) {
-                        this.lightFunc(new Vector(blockPos.x, blockPos.y - 1, blockPos.z), lightLevel);
-                        this.lightFunc(new Vector(blockPos.x, blockPos.y + 1, blockPos.z), lightLevel);
-                        this.lightFunc(new Vector(blockPos.x + 1, blockPos.y, blockPos.z), lightLevel);
-                        this.lightFunc(new Vector(blockPos.x - 1, blockPos.y, blockPos.z), lightLevel);
-                        this.lightFunc(new Vector(blockPos.x, blockPos.y, blockPos.z + 1), lightLevel);
-                        this.lightFunc(new Vector(blockPos.x, blockPos.y, blockPos.z - 1), lightLevel);
-                    }
-                }
-            }
-            else {
-                //  console.log("ok");
+    /*  public static setBlock(blockPos:Vector,type:number)
+       {
+          let inChunkPos = new Vector(Math.round(Math.round(blockPos.x)%16),Math.round(blockPos.y),Math.round(Math.round(blockPos.z)%16));
+          if(inChunkPos.x<0)
+          inChunkPos.x = 16-Math.abs(inChunkPos.x);
+          if(inChunkPos.z<0)
+          inChunkPos.z = 16-Math.abs(inChunkPos.z);
+   
+           let chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
+           
+         
+           
+           try
+           {
+               Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos,type);
+               if(type<1)
+               {
+            if(inChunkPos.y>=Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] )
+            {
+               //console.log("if");
                 let lightLevel = 15;
-                this.lightFunc(blockPos, lightLevel);
-                this.lightFunc(new Vector(blockPos.x, blockPos.y - 1, blockPos.z), lightLevel);
-                this.lightFunc(new Vector(blockPos.x, blockPos.y + 1, blockPos.z), lightLevel);
-                this.lightFunc(new Vector(blockPos.x + 1, blockPos.y, blockPos.z), lightLevel);
-                this.lightFunc(new Vector(blockPos.x - 1, blockPos.y, blockPos.z), lightLevel);
-                this.lightFunc(new Vector(blockPos.x, blockPos.y, blockPos.z + 1), lightLevel);
-                this.lightFunc(new Vector(blockPos.x, blockPos.y, blockPos.z - 1), lightLevel);
-            }
-        }
-        catch (error) {
-            return;
-        }
-    }
-    static setBlock2(blockPos, type) {
-        let inChunkPos = new Vector(Math.round(Math.round(blockPos.x) % 16), Math.round(blockPos.y), Math.round(Math.round(blockPos.z) % 16));
-        if (inChunkPos.x < 0)
-            inChunkPos.x = 16 - Math.abs(inChunkPos.x);
-        if (inChunkPos.z < 0)
-            inChunkPos.z = 16 - Math.abs(inChunkPos.z);
-        let chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
-        try {
-            Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos, type);
-            if (type < 1) {
-                if (inChunkPos.y == Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z]) {
-                    let i = 0;
-                    while (Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x, inChunkPos.y - i, inChunkPos.z)).id == 0) {
-                        i++;
-                        Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x, inChunkPos.y - i, inChunkPos.z)).lightLevel = 15;
-                    }
-                    Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x, inChunkPos.y - i, inChunkPos.z)).lightLevel = 15;
-                    Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x, inChunkPos.y - i + 1, inChunkPos.z)).lightDir = directions.SKYLIGHT;
-                    Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y - i;
+                let yPos =blockPos.y;
+                
+                while(this.getBlock(new Vector(blockPos.x,yPos,blockPos.z)).id==0 && lightLevel>0)
+                {
+                  
+                  //  console.log("while");
+                   lightLevel--;
+                   this.setLight(new Vector(blockPos.x,yPos-1,blockPos.z),lightLevel);
+                   this.setLight(new Vector(blockPos.x+1,yPos,blockPos.z),lightLevel);
+                   this.setLight(new Vector(blockPos.x-1,yPos,blockPos.z),lightLevel);
+                   this.setLight(new Vector(blockPos.x,yPos,blockPos.z+1),lightLevel);
+                   this.setLight(new Vector(blockPos.x,yPos,blockPos.z-1),lightLevel);
+                   yPos--;
+   
                 }
-                this.lightGetALG(blockPos);
+                Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] =yPos-1;
+                if(  Main.chunks[chunkPos.x][chunkPos.z].getSubchunk(blockPos.y).generated)
+                Main.chunks[chunkPos.x][chunkPos.z].updateSubchunkAt(blockPos.y);
+                if(  Main.chunks[chunkPos.x][chunkPos.z].getSubchunk(blockPos.y).generated)
+                Main.chunks[chunkPos.x][chunkPos.z].updateSubchunkAt(yPos);
             }
-            else {
-                if (inChunkPos.y > Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z]) {
-                    let i = 1;
-                    while (Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x, inChunkPos.y - i, inChunkPos.z)).id == 0) {
-                        i++;
-                        Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x, inChunkPos.y - i, inChunkPos.z)).lightLevel = 0;
-                    }
-                    Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x, inChunkPos.y - i, inChunkPos.z)).lightLevel = 0;
-                    Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y;
-                }
-                this.lightPropagation(blockPos, Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).lightLevel - 1, directions.UNDEF, new Array());
-            }
-        }
-        catch (error) {
-            console.error(error);
-        }
-    }
+            else
+            {
+               let lightLevel = Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).lightLevel-1;
+               if(lightLevel>1)
+               {
+               this.lightFunc(new Vector(blockPos.x,blockPos.y-1,blockPos.z),lightLevel);
+               this.lightFunc(new Vector(blockPos.x,blockPos.y+1,blockPos.z),lightLevel);
+                   this.lightFunc(new Vector(blockPos.x+1,blockPos.y,blockPos.z),lightLevel);
+                   this.lightFunc(new Vector(blockPos.x-1,blockPos.y,blockPos.z),lightLevel);
+                   this.lightFunc(new Vector(blockPos.x,blockPos.y,blockPos.z+1),lightLevel);
+                   this.lightFunc(new Vector(blockPos.x,blockPos.y,blockPos.z-1),lightLevel);
+               }
+               }
+           }
+               else
+               {
+                 //  console.log("ok");
+                   let lightLevel =   15;
+                   this.lightFunc(blockPos,lightLevel);
+                   this.lightFunc(new Vector(blockPos.x,blockPos.y-1,blockPos.z),lightLevel);
+                   this.lightFunc(new Vector(blockPos.x,blockPos.y+1,blockPos.z),lightLevel);
+                       this.lightFunc(new Vector(blockPos.x+1,blockPos.y,blockPos.z),lightLevel);
+                       this.lightFunc(new Vector(blockPos.x-1,blockPos.y,blockPos.z),lightLevel);
+                       this.lightFunc(new Vector(blockPos.x,blockPos.y,blockPos.z+1),lightLevel);
+                       this.lightFunc(new Vector(blockPos.x,blockPos.y,blockPos.z-1),lightLevel);
+               }
+            
+   
+           }
+           catch(error)
+           {
+             return;
+           }
+       }
+       public static setBlock2(blockPos:Vector,type:number)
+       {
+          let inChunkPos = new Vector(Math.round(Math.round(blockPos.x)%16),Math.round(blockPos.y),Math.round(Math.round(blockPos.z)%16));
+          if(inChunkPos.x<0)
+          inChunkPos.x = 16-Math.abs(inChunkPos.x);
+          if(inChunkPos.z<0)
+          inChunkPos.z = 16-Math.abs(inChunkPos.z);
+   
+           let chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
+           
+         
+           
+           try
+           {
+               Main.chunks[chunkPos.x][chunkPos.z].setBlock(inChunkPos,type);
+               if(type<1)
+               {
+                   if(inChunkPos.y==Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] )
+                   {
+                   
+                   let i =0;
+                   while(  Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).id==0)
+                   {
+                       i++;
+                       Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).lightLevel=15;
+                   }
+                   Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).lightLevel=15;
+                   Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i+1,inChunkPos.z)).lightDir=directions.SKYLIGHT;
+                   Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y-i;
+                   }
+                   this.lightGetALG(blockPos);
+               }
+               else
+               {
+                   if(inChunkPos.y>Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] )
+                   {
+                       let i =1;
+                 
+                       while(  Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).id==0)
+                       {
+                           i++;
+                           Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).lightLevel=0;
+                       }
+                       Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).lightLevel=0;
+                       Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y;
+                   }
+                   this.lightPropagation(blockPos,Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).lightLevel-1,directions.UNDEF,new Array());
+               }
+           }
+           catch(error)
+           {
+               console.error(error);
+           }
+       }*/
     static lightPropagation(vec, lightLevel, direction, blockList) {
         console.log("lightning...", lightLevel);
         if (lightLevel <= 0 || blockList.includes(this.getBlock(vec)) || (direction != directions.UNDEF && direction == this.getBlock(vec).lightDir))
@@ -266,7 +305,7 @@ export class World {
         console.log(max);
         if (max != undefined && this.getBlock(max.bl).lightLevel - 1) {
             this.getBlock(vec).lightDir = max.dir;
-            this.setLight(vec, this.getBlock(max.bl).lightLevel - 1);
+            //   this.setLight( vec,this.getBlock(max.bl).lightLevel-1);
             for (let i = 0; i < arr.length; i++) {
                 if (this.getBlock(arr[i].bl).lightDir == arr[i].negDir) {
                     this.lightGetALG(arr[i].bl);
@@ -275,8 +314,8 @@ export class World {
         }
     }
     static lightFunc(vec, lightLevel) {
-        if (this.getBlock(vec).lightLevel < lightLevel)
-            this.setLight(vec, lightLevel);
+        //  if(this.getBlock(vec).lightLevel <lightLevel)
+        //  this.setLight(vec,lightLevel);
     }
     static getBlock(blockPos) {
         let inChunkPos = new Vector(Math.round(blockPos.x) % 16, Math.round(blockPos.y), Math.round(blockPos.z) % 16);
@@ -289,7 +328,7 @@ export class World {
         }
         let chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
         try {
-            return Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos);
+            return Main.getChunkAt(chunkPos.x, chunkPos.z).getBlock(inChunkPos);
         }
         catch (error) {
             console.log(inChunkPos);

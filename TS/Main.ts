@@ -18,7 +18,7 @@ import { World } from "./Game/World.js";
 let gl = CanvaManager.gl;
 export class Main
 {
-   public static dispLl = true;
+   public static dispLl = false;
    public static FPS:number=61;
    public static TPS:number=20;
    public static sunLight=14;
@@ -40,7 +40,8 @@ export class Main
    private static crossVAO:VAO;
    public static player = new Player(new Vector(0,60,0));
    public static range = {start:-4, end:4};
-   public static chunks:Array<Array<Chunk>>=new Array(8);
+   //public static chunks:Array<Array<Chunk>>=new Array(8);
+   public static loadedChunks:Array<Chunk> = new Array();
    private static crosscords = [
       -0.02,-0.02,
       0.02,0.02,
@@ -95,16 +96,15 @@ export class Main
      //loading chunks
      for(let x=this.range.start; x<this.range.end;x++)
      {
-      this.chunks[x] = new Array(16);
       for(let z=this.range.start; z<this.range.end;z++)
        {
           if(x==this.range.start-1 ||x==this.range.end+1||z==this.range.start-1 || z==this.range.end+1   )
-          this.chunks[x][z] =  new Chunk(x,z,true);
+          this.loadedChunks.push(new Chunk(x,z,true));
           else
-         this.chunks[x][z] =  new Chunk(x,z,false);
+         this.loadedChunks.push(new Chunk(x,z,false));
        }
       }
-    console.log(this.chunks);
+  //  console.log(this.chunks);
  //   this.TESTtransf = this.TESTtransf.scale(2,1,1);
      requestAnimationFrame(this.loop.bind(this));
     
@@ -200,20 +200,22 @@ export class Main
                {
                    continue;
                }
-            if(this.chunks[x2] == undefined)
-            this.chunks[x2]= new Array();
-            if(this.chunks[x2][z2]==undefined)
-            this.chunks[x2][z2] = new Chunk(x2,z2,true);
+               let chunk:Chunk = this.getChunkAt(x2,z2);
+            if(chunk==undefined)
+            {
+               chunk= new Chunk(x2,z2,true);
+            this.loadedChunks.push(chunk);
+            }
             for(let k=0;k<16;k++)
             {
             for(let l=0;l<16;l++)
             {
-               this.chunks[x2][z2].heightmap[k][l] = 0;
+               chunk.heightmap[k][l] = 0;
             }
             }
             for(let a=0;a<16;a++)
             {
-               this.chunks[x2][z2].subchunks[a].genBlocks();
+               chunk.subchunks[a].genBlocks();
                
                for(let x1=0;x1<16;x1++)
                for(let y1=0;y1<16;y1++)
@@ -221,22 +223,22 @@ export class Main
                {
                   if( this.file[x].blocks[x1][y1][z1] != NaN)
                   {
-             this.chunks[x2][z2].subchunks[a].blocks[x1][y1][z1].id= this.file[x].blocks[a][x1][y1][z1];
+             chunk.subchunks[a].blocks[x1][y1][z1].id= this.file[x].blocks[a][x1][y1][z1];
             
                   }
-                  if( this.chunks[x2][z2].subchunks[a].blocks[x1][y1][z1].id>0 && y1+(  this.chunks[x2][z2].subchunks[a].pos.y*16)>this.chunks[x2][z2].heightmap[x1][z1])
-                  this.chunks[x2][z2].heightmap[x1][z1] =y1+(  this.chunks[x2][z2].subchunks[a].pos.y*16);
+                  if( chunk.subchunks[a].blocks[x1][y1][z1].id>0 && y1+(  chunk.subchunks[a].pos.y*16)>chunk.heightmap[x1][z1])
+                  chunk.heightmap[x1][z1] =y1+(  chunk.subchunks[a].pos.y*16);
                }
                
                
                Main.tasks[8].push(()=>{
-               Main.chunks[x2][z2].subchunks[a].inReGeneration=false;
-               Main.chunks[x2][z2].subchunks[a].update(9);
+               chunk.subchunks[a].inReGeneration=false;
+               chunk.subchunks[a].update(9);
                });
               // console.log( this.chunks[x2][z2].subchunks[a]);
               
             }
-            this.chunks[x2][z2].lazy =false;
+            chunk.lazy =false;
               
          }
          console.log("Loaded");
@@ -251,34 +253,40 @@ export class Main
       for(let x=this.range.start; x<this.range.end;x++)     
       for(let z=this.range.start; z<this.range.end;z++)
       {
-         if(this.chunks[x][z]==undefined) continue;
+         let chunk  =this.getChunkAt(x,z)
+       //  console.log(chunk);
+         if(chunk==undefined) continue;
          let blocks = new Array(16);
          for(let a=0;a<16;a++)
          {
-            if(this.chunks[x][z].subchunks[a]==undefined)continue;
+            if(chunk.subchunks[a]==undefined) continue;
             let c = new Array3D(16,16,16);
             for(let x1=0;x1<16;x1++)
             for(let y1=0;y1<16;y1++)
             for(let z1=0;z1<16;z1++)
             {
-               if( this.chunks[x][z].subchunks[a].blocks[x1][y1][z1]==undefined || this.chunks[x][z].subchunks[a].blocks[x1][y1][z1]==null) c[x1][y1][z1]=0
+               if( chunk.subchunks[a].blocks[x1][y1][z1]==undefined || chunk.subchunks[a].blocks[x1][y1][z1]==null) 
+                  c[x1][y1][z1]=0;
                else
-            c[x1][y1][z1]=this.chunks[x][z].subchunks[a].blocks[x1][y1][z1].id;
+                  c[x1][y1][z1]=chunk.subchunks[a].blocks[x1][y1][z1].id;
             }
             blocks[a] = c;
          }
             k.push(
                {
-                  pos:[this.chunks[x][z].pos.x,this.chunks[x][z].pos.z],
+                  pos:[chunk.pos.x,chunk.pos.z],
                   blocks:blocks
                }
             )
       }
       this.download(JSON.stringify(k),"world.json","text/plain");
    }
-   public static loadChunks()
+   public static getChunkAt(x:number,z:number):Chunk | undefined
    {
-
+      for(let i=0;i<this.loadedChunks.length;i++)
+      if(this.loadedChunks[i].pos.x == x && this.loadedChunks[i].pos.z == z)
+      return this.loadedChunks[i];
+      return undefined;
    }
    public static download(content, fileName, contentType) {
       var a = document.createElement("a");
@@ -329,15 +337,18 @@ export class Main
       for(let x=this.range.start; x<this.range.end;x++)     
       for(let z=this.range.start; z<this.range.end;z++)
        {
+       
           let x2 =Math.floor(Math.round(this.player.pos.x)/16)+x;
           let z2 =Math.floor(Math.round(this.player.pos.z)/16)+z;
-          if(this.chunks[x2]==undefined)
-          this.chunks[x2] =new Array();
-          if(this.chunks[x2][z2]==undefined)
-          this.chunks[x2][z2]= new Chunk(x2,z2,false)
-          if(this.chunks[x2][z2].lazy)
-          this.chunks[x2][z2].generate();
-         this.chunks[x2][z2].render();
+          let chunk =  this.getChunkAt(x2,z2);
+          if(chunk==undefined)
+          {
+         chunk =new Chunk(x2,z2,false)
+         this.loadedChunks.push(chunk); 
+         }
+          if(chunk.lazy)
+          chunk.generate();
+         chunk.render();
        }
       //render crosshair
     

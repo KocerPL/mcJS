@@ -101,22 +101,22 @@ export class Chunk {
             this.updateSubchunkAt(pos.y);
             try {
                 if (pos.x == 0) {
-                    Main.chunks[this.pos.x - 1][this.pos.z].subchunks[yPos].update(10);
+                    Main.getChunkAt(this.pos.x - 1, this.pos.z).subchunks[yPos].update(10);
                 }
                 else if (pos.x == 15) {
-                    Main.chunks[this.pos.x + 1][this.pos.z].subchunks[yPos].update(10);
+                    Main.getChunkAt(this.pos.x + 1, this.pos.z).subchunks[yPos].update(10);
                 }
                 if (y == 0) {
-                    Main.chunks[this.pos.x][this.pos.z].subchunks[yPos - 1].update(10);
+                    Main.getChunkAt(this.pos.x, this.pos.z).subchunks[yPos - 1].update(10);
                 }
                 else if (y == 15) {
-                    Main.chunks[this.pos.x + 1][this.pos.z].subchunks[yPos + 1].update(10);
+                    Main.getChunkAt(this.pos.x, this.pos.z).subchunks[yPos + 1].update(10);
                 }
                 if (pos.z == 0) {
-                    Main.chunks[this.pos.x][this.pos.z - 1].subchunks[yPos].update(10);
+                    Main.getChunkAt(this.pos.x, this.pos.z - 1).subchunks[yPos].update(10);
                 }
                 else if (pos.z == 15) {
-                    Main.chunks[this.pos.x][this.pos.z + 1].subchunks[yPos].update(10);
+                    Main.getChunkAt(this.pos.x, this.pos.z + 1).subchunks[yPos].update(10);
                 }
             }
             catch (error) {

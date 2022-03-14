@@ -285,12 +285,12 @@ export class Player
         let  blockPos =new Vector(Math.round(this.pos.x),Math.round(this.pos.y+0.7),Math.round(this.pos.z));
         let i=0;
         try{
-        while(World.getBlock(blockPos).id==0 && i<5)
+        while(World.getBlock(blockPos).id<1 && i<5)
         {
             i+=dist;
             blockPos = new Vector(blockPos.x+(Math.sin(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)*dist),blockPos.y+(Math.sin(this.camera.getPitch()*Math.PI/180)*dist),blockPos.z+(Math.cos(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)*dist) );
         }
-        if( World.getBlock(blockPos).id!=0)
+        if( World.getBlock(blockPos).id>0)
         {
        World.setBlockNoLight(blockPos,0);
         console.log("mined block!!");
@@ -309,7 +309,7 @@ export class Player
         let dist = 0.1;
         try{
             let lastPos =new Vector(0,0,0);
-        while( World.getBlock(blockPos).id==0 && i<5)
+        while( World.getBlock(blockPos).id<1 && i<5)
         {
         //    console.log(Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos));
           //  console.log(blockPos);
@@ -317,7 +317,7 @@ export class Player
             i+=dist;
             blockPos = new Vector(blockPos.x+(Math.sin(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)*dist),blockPos.y+(Math.sin(this.camera.getPitch()*Math.PI/180)*dist),blockPos.z+(Math.cos(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)*dist) );
         }
-       if(  World.getBlock(lastPos).id==0 && i<5 &&  !lastPos.round().equals(new Vector(this.pos.x,this.pos.y-0.5,this.pos.z).round()) &&  !lastPos.round().equals(this.pos.round()) )
+       if(  World.getBlock(lastPos).id<1 && i<5 &&  !lastPos.round().equals(new Vector(this.pos.x,this.pos.y-0.5,this.pos.z).round()) &&  !lastPos.round().equals(this.pos.round()) )
        {
        World.setBlockNoLight(lastPos,this.itemsBar[this.selectedItem]);
         CanvaManager.mouse.right=false;
@@ -330,7 +330,7 @@ export class Player
     }
         
     }
-    placeBlock()//Breesenham
+   /* placeBlock()//Breesenham
     {
         let secondPos =  this.pos.copy();
         secondPos.y = secondPos.y+1;
@@ -608,7 +608,7 @@ export class Player
              }
         }
   
-    }
+    }*/
     render()
     {
         if(this.person == "First") return;
