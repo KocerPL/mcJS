@@ -212,6 +212,17 @@ export class GUI {
         slCoords2 = new Array();
         slCoords2 = slCoords2.concat(slCoords);
         indices = this.squareIndices.slice(0, this.squareIndices.length);
+        let block = World.getBlock(Main.player.pos);
+        if (block != undefined && block.id == -1) {
+            //console.log("underwater")
+            this.vArray = this.vArray.concat([-1 / CanvaManager.getProportion, -1, 1 / CanvaManager.getProportion, 1, -1 / CanvaManager.getProportion, 1, 1 / CanvaManager.getProportion, -1]);
+            this.tArray = this.tArray.concat(this.crosstcords);
+            this.iArray = this.iArray.concat(indices);
+            this.indArray = this.indArray.concat([12, 12, 12, 12]);
+            for (let a = 0; a < indices.length; a++) {
+                indices[a] = indices[a] + 4;
+            }
+        }
         for (let i = 0; i < 9; i++) {
             //   console.log(indices);
             if (Main.player.itemsBar[i] != 0) {
@@ -241,7 +252,7 @@ export class GUI {
                         this.vArray = this.vArray.concat(slCoords);
                         this.tArray = this.tArray.concat(this.crosstcords);
                         this.iArray = this.iArray.concat(indices);
-                        this.indArray = this.indArray.concat(blocks[Main.player.inventory[(x * 9) + i]].textureIndex.front, blocks[Main.player.inventory[(x * 9) + i]].textureIndex.front, blocks[Main.player.inventory[(x * 9) + i]].textureIndex.front, blocks[Main.player.inventory[(x * 9) + i]].textureIndex.front);
+                        this.indArray = this.indArray.concat([blocks[Main.player.inventory[(x * 9) + i]].textureIndex.front, blocks[Main.player.inventory[(x * 9) + i]].textureIndex.front, blocks[Main.player.inventory[(x * 9) + i]].textureIndex.front, blocks[Main.player.inventory[(x * 9) + i]].textureIndex.front]);
                         for (let a = 0; a < indices.length; a++) {
                             indices[a] = indices[a] + 4;
                         }
@@ -263,17 +274,10 @@ export class GUI {
             this.vArray = this.vArray.concat(slCoords);
             this.tArray = this.tArray.concat(this.crosstcords);
             this.iArray = this.iArray.concat(indices);
-            this.indArray = this.indArray.concat(blocks[this.pickedBlock].textureIndex.front, blocks[this.pickedBlock].textureIndex.front, blocks[this.pickedBlock].textureIndex.front, blocks[this.pickedBlock].textureIndex.front);
-        }
-        let block = World.getBlock(Main.player.pos);
-        if (block != undefined && block.id == -1) {
+            this.indArray = this.indArray.concat([blocks[this.pickedBlock].textureIndex.front, blocks[this.pickedBlock].textureIndex.front, blocks[this.pickedBlock].textureIndex.front, blocks[this.pickedBlock].textureIndex.front]);
             for (let a = 0; a < indices.length; a++) {
                 indices[a] = indices[a] + 4;
             }
-            this.vArray = this.vArray.concat(-0.5, -0.5, 0.5, 0.5, -0.5, 0.5, 0.5, -0.5);
-            this.tArray = this.tArray.concat(this.crosstcords);
-            this.iArray = this.iArray.concat(indices);
-            this.indArray = this.indArray.concat(11, 11, 11, 11);
         }
         this.bvao.bind();
         this.bvbo.bufferData(this.vArray);

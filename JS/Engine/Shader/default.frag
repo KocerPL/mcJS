@@ -15,5 +15,6 @@ void main()
 //float diff = max(dot(norm, lightDir), 0.0);
 //vec3 diffuse = diff *vec3(0.1,0.1,0.1);
 vec3 ambient = vec3(0.1+pass_Light,0.1+pass_Light,0.1+pass_Light);
-    color=vec4(ambient,1.0)* texture(tex,pass_tc);
+vec4 texOk =  texture(tex,pass_tc);
+    color=vec4(ambient,1.0)*vec4(texOk.x,texOk.y,texOk.z,1.0);
 }

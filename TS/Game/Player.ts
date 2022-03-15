@@ -13,6 +13,10 @@ let gl = CanvaManager.gl;
 export type pers = "First" | "Second" |"Third";
 export class Player
 {
+//model
+
+
+
     camera:Camera = new Camera();
     pos:Vector;
     itemsBar:Array<number> = [9,1,2,3,4,5,6,7,8];
@@ -66,14 +70,20 @@ export class Player
             0.0, 1.0, 4,
             1.0, 1.0, 4,
             1.0, 0.0,4,
-            0.0, 0.0,4]);
+            0.0, 0.0,4,
+        //End head, Body:
+        0.0, 1.0, 1,
+            1.0, 1.0, 1,
+            1.0, 0.0,1,
+            0.0, 0.0,1,
+            ]);
         this.vao.addPtr(1,3,0,0);
         this.vlo = new VBO();
-        this.vlo.bufferData([14,14,14,14 ,14,14,14,14 ,14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14]);
+        this.vlo.bufferData([14,14,14,14 ,14,14,14,14 ,14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, /*Body */, 14,14,14,14]);
         this.vao.addPtr(2,1,0,0);
         this.ebo = new EBO();
         this.ebo.bufferData([2,1,0,2,0,3
-        ,6,5,4,6,4,7, 10,9,8,10,8,11, 14,13,12,14,12,15, 18,17,16,18,16,19, 22,21,20,22,20,23 ]);
+        ,6,5,4,6,4,7, 10,9,8,10,8,11, 14,13,12,14,12,15, 18,17,16,18,16,19, 22,21,20,22,20,23,/**Body */ 26,25,24,26,24,27]);
         VAO.unbind();
         VBO.unbind();
         EBO.unbind();
@@ -622,5 +632,9 @@ export class Player
         Main.shader.loadUniforms(this.camera.getProjection(),transformation,this.camera.getView(),15);
         Main.shader.use();
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,0);
+        transformation = Matrix.identity();
+        transformation =transformation.translate(this.pos.x,this.pos.y,this.pos.z);
+        Main.shader.loadUniforms(this.camera.getProjection(),transformation,this.camera.getView(),15);
+     //   gl.drawElements(gl.TRIANGLES,4,gl.UNSIGNED_INT,36*2);
     }
 }

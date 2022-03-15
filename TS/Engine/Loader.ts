@@ -95,4 +95,53 @@ export class Loader
 
         return texture;
     }
+  public static  imageArrayByJSON(path:string,json)
+   {
+      let img =  new Image();
+      img.src = path;
+     img.decode();
+    
+     //loading image ^
+     //Buffering image
+     let texture = gl.createTexture();
+     gl.bindTexture(gl.TEXTURE_2D_ARRAY,texture);
+     gl.activeTexture(gl.TEXTURE0);
+     img.onload = ()=>{
+       let testCanv = document.createElement("canvas");
+       testCanv.width=img.width;
+       testCanv.height=img.height;
+       let ctx =testCanv.getContext("2d");
+       ctx.clearRect(0,0,img.width,img.height);
+       ctx.drawImage(img,0,0,img.width,img.height);
+        gl.bindTexture(gl.TEXTURE_2D_ARRAY,texture);  
+      gl.texImage3D(gl.TEXTURE_2D_ARRAY,0,gl.RGBA8,json[0].size[0],json[0].size[1],json.length,0,gl.RGBA,gl.UNSIGNED_BYTE,img);
+      let pos= new Vector(0,0,0);
+      for(let i=0;i<json.length;i++)
+      {
+         let sizeX = json[i].size[0]
+         let sizeY =  json[i].size[1]
+         pos.x = json[i].pos[0];
+         pos.y = json[i].pos[1];
+       let buff = ctx.getImageData(pos.x,pos.y,sizeX,sizeY).data;
+      gl.texSubImage3D(gl.TEXTURE_2D_ARRAY,0,0,0,pos.z,sizeX,sizeY,1,gl.RGBA,gl.UNSIGNED_BYTE,buff);
+      pos.z++;
+      }
+          gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+           gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+           gl.texParameteri(gl.TEXTURE_2D_ARRAY,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        //   gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+           console.log("loaded json");
+           
+        };
+        if(img.complete)
+        {
+        img.onload(new Event("loaded"));
+        }
+
+
+
+
+      return texture;
+   }
 }
