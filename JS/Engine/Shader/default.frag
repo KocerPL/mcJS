@@ -16,5 +16,5 @@ void main()
 //vec3 diffuse = diff *vec3(0.1,0.1,0.1);
 vec3 ambient = vec3(0.1+pass_Light,0.1+pass_Light,0.1+pass_Light);
 vec4 texOk =  texture(tex,pass_tc);
-    color=vec4(ambient,1.0)*vec4(texOk.x,texOk.y,texOk.z,1.0);
+    color=vec4(ambient,1.0)*texOk;
 }

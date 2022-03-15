@@ -21,7 +21,8 @@ export var blocks = [
             back: 0,
             left: 0,
             right: 0
-        }
+        },
+        breakTime: 3
     },
     {
         name: "Grass",
@@ -32,7 +33,8 @@ export var blocks = [
             back: 1,
             left: 1,
             right: 1
-        }
+        },
+        breakTime: 3
     },
     {
         name: "Stone",
@@ -43,7 +45,8 @@ export var blocks = [
             back: 3,
             left: 3,
             right: 3
-        }
+        },
+        breakTime: 20
     },
     {
         name: "Greenstone ore",
@@ -54,7 +57,8 @@ export var blocks = [
             back: 4,
             left: 4,
             right: 4
-        }
+        },
+        breakTime: 20
     },
     {
         name: "Greenstone block",
@@ -65,7 +69,8 @@ export var blocks = [
             back: 5,
             left: 5,
             right: 5
-        }
+        },
+        breakTime: 10
     },
     {
         name: "log",
@@ -76,7 +81,8 @@ export var blocks = [
             back: 6,
             left: 6,
             right: 6
-        }
+        },
+        breakTime: 10
     },
     {
         name: "Light blue",
@@ -87,7 +93,8 @@ export var blocks = [
             back: 8,
             left: 8,
             right: 8
-        }
+        },
+        breakTime: 20
     },
     {
         name: "Yellow",
@@ -98,7 +105,8 @@ export var blocks = [
             back: 9,
             left: 9,
             right: 9
-        }
+        },
+        breakTime: 20
     },
     {
         name: "Leaves",
@@ -109,7 +117,8 @@ export var blocks = [
             back: 10,
             left: 10,
             right: 10
-        }
+        },
+        breakTime: 0.2
     },
     {
         name: "Glowstone",
@@ -120,19 +129,20 @@ export var blocks = [
             back: 11,
             left: 11,
             right: 11
-        }
+        },
+        breakTime: 5
     },
 ];
 blocks[-1] =
     {
         name: "Water",
         textureIndex: {
-            top: 12,
-            bottom: 12,
-            front: 12,
-            back: 12,
-            left: 12,
-            right: 12
+            top: 13,
+            bottom: 13,
+            front: 13,
+            back: 13,
+            left: 13,
+            right: 13
         }
     };
 export const directions = Object.freeze({

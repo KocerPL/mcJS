@@ -4,7 +4,7 @@ import { directions } from "./Block.js";
 export class World {
     Chunks = new Array();
     static heightMap = new Array(256);
-    static waterLevel = 25;
+    static waterLevel = 20;
     static init() {
         this.genHeightMap();
         console.log(perlin);

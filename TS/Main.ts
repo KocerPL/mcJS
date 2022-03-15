@@ -20,6 +20,7 @@ declare var perlin;
 export class Main
 {
    public static dispLl = false;
+   public static fastBreaking=false;
    public static FPS:number=61;
    public static TPS:number=20;
    public static sunLight=14;
@@ -137,7 +138,7 @@ export class Main
       this.update();
       };
       let testTime = Date.now();
-      if(this.Measure.fps>30)
+      if(this.Measure.fps>20)
       while(Date.now()-testTime <20 )
       {
          this.executeTasks(testTime);
@@ -333,13 +334,13 @@ export class Main
       CanvaManager.debug.value = "Fps: "+this.Measure.fps+"Selected block: "+ blocks[this.player.itemsBar[this.player.selectedItem]].name;
       
       this.shader.use();
-      this.player.updatePos();
+      this.player.update();
       this.player.camera.preRender();
     
       CanvaManager.preRender();
       gl.clearColor(0.0,this.sunLight/15,this.sunLight/15,1.0);
       gl.clear(gl.COLOR_BUFFER_BIT);
-      this.player.render();
+   
       gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
       for(let x=this.range.start; x<this.range.end;x++)     
       for(let z=this.range.start; z<this.range.end;z++)
@@ -358,7 +359,7 @@ export class Main
          chunk.render();
        }
       //render crosshair
-    
+      this.player.render();
       GUI.render(this.shader2d);
    }
 }

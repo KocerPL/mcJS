@@ -1,12 +1,14 @@
 import { Camera } from "../Engine/Camera.js";
 import { CanvaManager } from "../Engine/CanvaManager.js";
 import { EBO } from "../Engine/EBO.js";
+import { RenderSet } from "../Engine/RenderSet.js";
 import { Texture } from "../Engine/Texture.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
+import { Block, blocks } from "./Block.js";
 import { SubChunk } from "./SubChunk.js";
 import { World } from "./World.js";
 let gl = CanvaManager.gl;
@@ -16,8 +18,13 @@ export class Player {
     pos;
     inWater;
     itemsBar = [9, 1, 2, 3, 4, 5, 6, 7, 8];
-    inventory = [10, 10, 9, 9, 9, 9, 9, 9, 9, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8];
+    inventory = [-1, 10, 9, 9, 9, 9, 9, 9, 9, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8];
     locked = false;
+    targetedBlock = null;
+    startTime = 0;
+    tbPos = new Vector(0, 0, 0);
+    blockOverlay = new RenderSet();
+    blockBreakingTime = 0;
     selectedItem = 0;
     person = "First";
     vao;
@@ -27,6 +34,38 @@ export class Player {
     ebo;
     yAcc = 0.01;
     mainAcc = 0.1;
+    static blVertices = [
+        //przód
+        -0.55, -0.55, -0.55,
+        0.55, -0.55, -0.55,
+        0.55, 0.55, -0.55,
+        -0.55, 0.55, -0.55,
+        //tył
+        -0.55, -0.55, 0.55,
+        0.55, -0.55, 0.55,
+        0.55, 0.55, 0.55,
+        -0.55, 0.55, 0.55,
+        //lewo
+        -0.55, -0.55, -0.55,
+        -0.55, -0.55, 0.55,
+        -0.55, 0.55, 0.55,
+        -0.55, 0.55, -0.55,
+        //prawo
+        0.55, -0.55, -0.55,
+        0.55, -0.55, 0.55,
+        0.55, 0.55, 0.55,
+        0.55, 0.55, -0.55,
+        //dół
+        -0.55, -0.55, -0.55,
+        -0.55, -0.55, 0.55,
+        0.55, -0.55, 0.55,
+        0.55, -0.55, -0.55,
+        //góra
+        -0.55, 0.55, -0.55,
+        -0.55, 0.55, 0.55,
+        0.55, 0.55, 0.55,
+        0.55, 0.55, -0.55
+    ];
     rotX = 0;
     rotY = 0;
     jump = {
@@ -38,9 +77,49 @@ export class Player {
         this.camera.setPosition(new Vector(pos.x, pos.y + 1, pos.z));
         this.vao = new VAO();
         this.vbo = new VBO();
-        this.vbo.bufferData(SubChunk.defVertices);
         this.vao.addPtr(0, 3, 0, 0);
         this.vtc = new VBO();
+        this.vao.addPtr(1, 3, 0, 0);
+        this.vlo = new VBO();
+        this.vao.addPtr(2, 1, 0, 0);
+        this.ebo = new EBO();
+        VAO.unbind();
+        VBO.unbind();
+        EBO.unbind();
+        this.bufferVertexes();
+    }
+    update() {
+        if (this.targetedBlock instanceof Block) {
+            let vertices = new Array();
+            vertices = vertices.concat(Player.blVertices);
+            for (let i = 0; i < vertices.length; i += 3) {
+                vertices[i] = vertices[i] + this.tbPos.x;
+                vertices[i + 1] = vertices[i + 1] + this.tbPos.y;
+                vertices[i + 2] = vertices[i + 2] + this.tbPos.z;
+            }
+            let index = 5 - Math.round((((Date.now() / 1000) - this.startTime) / blocks[this.targetedBlock.id].breakTime) * 5);
+            let indices = new Array();
+            let light = new Array();
+            let textureCoords = new Array();
+            for (let i = 0; i < 6; i++) {
+                textureCoords = textureCoords.concat([0.0, 1.0, index,
+                    1.0, 1.0, index,
+                    1.0, 0.0, index,
+                    0.0, 0.0, index]);
+                light = light.concat([14, 14, 14, 14]);
+                let k = 4 * i;
+                indices = indices.concat([2 + k, 1 + k, k, 2 + k, 0 + k, 3 + k]);
+            }
+            this.blockOverlay.bufferArrays(vertices, textureCoords, light, indices);
+        }
+        else
+            this.blockOverlay.count = 0;
+        this.updatePos();
+    }
+    bufferVertexes() {
+        this.vao.bind();
+        this.vbo.bufferData(SubChunk.defVertices);
+        this.vlo.bufferData([14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, /*Body */ , 14, 14, 14, 14]);
         this.vtc.bufferData([
             0.0, 1.0, 1,
             1.0, 1.0, 1,
@@ -67,24 +146,15 @@ export class Player {
             1.0, 0.0, 4,
             0.0, 0.0, 4,
             //End head, Body:
-            0.0, 1.0, 1,
-            1.0, 1.0, 1,
-            1.0, 0.0, 1,
-            0.0, 0.0, 1,
         ]);
-        this.vao.addPtr(1, 3, 0, 0);
-        this.vlo = new VBO();
-        this.vlo.bufferData([14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, /*Body */ , 14, 14, 14, 14]);
-        this.vao.addPtr(2, 1, 0, 0);
-        this.ebo = new EBO();
+        let array = new Array();
+        for (let i = 0; i < 7; i++) {
+            let k = 4 * i;
+            array.concat([2 + k, 1 + k, k, 2 + k, 0 + k, 3 + k]);
+        }
         this.ebo.bufferData([2, 1, 0, 2, 0, 3,
             6, 5, 4, 6, 4, 7, 10, 9, 8, 10, 8, 11, 14, 13, 12, 14, 12, 15, 18, 17, 16, 18, 16, 19, 22, 21, 20, 22, 20, 23, /**Body */ 26, 25, 24, 26, 24, 27]);
         VAO.unbind();
-        VBO.unbind();
-        EBO.unbind();
-    }
-    update() {
-        this.updatePos();
     }
     switchPerson(person) {
         if (person == this.person)
@@ -199,7 +269,7 @@ export class Player {
                     && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z - 0.3))).id < 1) {
                     if (this.inWater) {
                         hop = true;
-                        tempPos.y += 0.05;
+                        this.jump.yAcc = 0.05;
                     }
                     else if (this.jump.yAcc <= 0 && (World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id > 0 ||
                         World.getBlock(new Vector(Math.round(this.pos.x + 0.3), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id > 0
@@ -254,6 +324,8 @@ export class Player {
         }
         if (CanvaManager.mouse.left)
             this.mine();
+        else
+            this.blockBreakingTime = 0;
         if (CanvaManager.mouse.right)
             this.place();
         this.camera.setPosition(new Vector(this.pos.x, this.pos.y + 0.7, this.pos.z));
@@ -270,15 +342,28 @@ export class Player {
     }
     mine() {
         let dist = 0.1;
-        let blockPos = new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 0.7), Math.round(this.pos.z));
+        let blockPos = this.camera.getPosition().copy();
         let i = 0;
         try {
             while (World.getBlock(blockPos).id < 1 && i < 5) {
                 i += dist;
                 blockPos = new Vector(blockPos.x + (Math.sin(this.camera.getYaw() * Math.PI / 180) * Math.cos(this.camera.getPitch() * Math.PI / 180) * dist), blockPos.y + (Math.sin(this.camera.getPitch() * Math.PI / 180) * dist), blockPos.z + (Math.cos(this.camera.getYaw() * Math.PI / 180) * Math.cos(this.camera.getPitch() * Math.PI / 180) * dist));
             }
-            if (World.getBlock(blockPos).id > 0) {
-                World.setBlockNoLight(blockPos, 0);
+            let block = World.getBlock(blockPos);
+            if (block.id > 0) {
+                if (this.blockBreakingTime == 0) {
+                    this.tbPos = blockPos.copy().round();
+                    this.targetedBlock = block;
+                    this.blockBreakingTime = 10;
+                    this.startTime = Date.now() / 1000;
+                }
+                if (this.targetedBlock != block) {
+                    this.blockBreakingTime = 0;
+                }
+                if ((Date.now() / 1000) - blocks[this.targetedBlock.id].breakTime >= this.startTime || Main.fastBreaking) {
+                    World.setBlockNoLight(blockPos, 0);
+                    this.targetedBlock = null;
+                }
                 console.log("mined block!!");
             }
         }
@@ -589,21 +674,24 @@ export class Player {
    
      }*/
     render() {
-        if (this.person == "First")
-            return;
-        let transformation = Matrix.identity();
-        transformation = transformation.translate(this.pos.x, this.camera.getPosition().y, this.pos.z);
-        transformation = transformation.rotateY(-this.camera.getYaw());
-        transformation = transformation.rotateX(-this.camera.getPitch());
-        transformation = transformation.scale(0.4, 0.4, 0.4);
-        gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.skin);
-        this.vao.bind();
-        Main.shader.loadUniforms(this.camera.getProjection(), transformation, this.camera.getView(), 15);
-        Main.shader.use();
-        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_INT, 0);
-        transformation = Matrix.identity();
-        transformation = transformation.translate(this.pos.x, this.pos.y, this.pos.z);
-        Main.shader.loadUniforms(this.camera.getProjection(), transformation, this.camera.getView(), 15);
-        //   gl.drawElements(gl.TRIANGLES,4,gl.UNSIGNED_INT,36*2);
+        if (this.person != "First") {
+            let transformation = Matrix.identity();
+            transformation = transformation.translate(this.pos.x, this.camera.getPosition().y, this.pos.z);
+            transformation = transformation.rotateY(-this.camera.getYaw());
+            transformation = transformation.rotateX(-this.camera.getPitch());
+            transformation = transformation.scale(0.4, 0.4, 0.4);
+            gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.skin);
+            this.vao.bind();
+            Main.shader.loadUniforms(this.camera.getProjection(), transformation, this.camera.getView(), 15);
+            Main.shader.use();
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_INT, 0);
+        }
+        if (this.blockBreakingTime > 1) {
+            let transformation = Matrix.identity();
+            this.blockOverlay.vao.bind();
+            gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.blockOverlay);
+            Main.shader.loadUniforms(this.camera.getProjection(), transformation, this.camera.getView(), 15);
+            gl.drawElements(gl.TRIANGLES, this.blockOverlay.count, gl.UNSIGNED_INT, 0);
+        }
     }
 }

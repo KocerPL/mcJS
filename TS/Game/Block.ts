@@ -12,7 +12,7 @@ this.id = id;
     }
 }
 
-export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}> = [
+export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right},breakTime?}> = [
 {//0
     name:"Air"
 },
@@ -25,7 +25,8 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         back:0,
         left:0,
         right:0
-    }
+    },
+    breakTime:3
 },
 {//2
  name:"Grass",
@@ -36,7 +37,8 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
     back:1,
     left:1,
     right:1
-}
+},
+breakTime:3
 },
 {//3
     name:"Stone",
@@ -47,7 +49,8 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         back:3,
         left:3,
         right:3
-        }
+        },
+        breakTime:20
 },
 {//4
     name:"Greenstone ore",
@@ -58,7 +61,8 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         back:4,
         left:4,
         right:4
-    }
+    },
+    breakTime:20
 },
 {//5
     name:"Greenstone block",
@@ -69,7 +73,8 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         back:5,
         left:5,
         right:5
-    }
+    },
+    breakTime:10
 },
 {//6
     name:"log",
@@ -80,7 +85,8 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         back:6,
         left:6,
         right:6
-    }
+    },
+    breakTime:10
 },
 {//7
     name:"Light blue",
@@ -91,7 +97,9 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         back:8,
         left:8,
         right:8
-    }
+    },
+    breakTime:20
+
 },
 {//8
     name:"Yellow",
@@ -102,7 +110,8 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         back:9,
         left:9,
         right:9
-    }
+    },
+    breakTime:20
 },
 {//9
     name:"Leaves",
@@ -113,7 +122,8 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         back:10,
         left:10,
         right:10
-    }
+    },
+    breakTime:0.2
 },
 {//10
     name:"Glowstone",
@@ -124,19 +134,20 @@ export var blocks:Array<{name,textureIndex?:{top,bottom,front,back,left,right}}>
         back:11,
         left:11,
         right:11
-    }
+    },
+    breakTime:5
 },
 ];
 blocks[-1] = 
 {
     name:"Water",
     textureIndex:{
-        top:12,
-        bottom:12,
-        front:12,
-        back:12,
-        left:12,
-        right:12
+        top:13,
+        bottom:13,
+        front:13,
+        back:13,
+        left:13,
+        right:13
     }
 }
 export const directions = Object.freeze(

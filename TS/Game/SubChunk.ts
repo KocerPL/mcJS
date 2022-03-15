@@ -354,14 +354,14 @@ export class SubChunk
       theBlock.lightFBlock = light2;
     }
     //DONE: update vertices One level blocks shorted
-    updateVerticesOneBlock(x,y,index)
+    updateVerticesOneBlock(x,z,index)
     {
       let indices = new Array();
       let vertices = new Array();
       let textureCoords = new Array();
       let lightLevels = new Array();
       let fB = new Array();
-      for(let z=0;z<16;z++)
+      for(let y=0;y<16;y++)
       {
    
       
@@ -827,10 +827,10 @@ export class SubChunk
       // let done = new Array();
         for(let x=0;x<16;x++)
         {
-            for(let y=0;y<16;y++)
+            for(let z=0;z<16;z++)
             {
                 Main.tasks[priority].push(()=>{
-              let vic = this.updateVerticesOneBlock(x,y,index);
+              let vic = this.updateVerticesOneBlock(x,z,index);
          //    console.log(x,y,vic);
                 
               this.vertices =   this.vertices.concat(vic.v);
