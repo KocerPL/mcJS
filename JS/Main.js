@@ -167,7 +167,7 @@ export class Main {
         if (this.file != null) {
             for (let x = 0; x < Main.tasks.length; x++)
                 Main.tasks[x] = new Array();
-            for (let x = 0; x < this.file.length; x++) {
+            for (let x = 0; x < this.file.length - 1; x++) {
                 let x2 = this.file[x].pos[0];
                 let z2 = this.file[x].pos[1];
                 if (x2 == undefined || z2 == undefined) {
@@ -202,6 +202,11 @@ export class Main {
                 }
                 chunk.lazy = false;
             }
+            if (!(this.file[this.file.length - 1] instanceof Array) && this.file[this.file.length - 1].pPos != undefined) {
+                let k = this.file[this.file.length - 1].pPos;
+                console.log(k);
+                this.player.pos = new Vector(k[0], k[1], k[2]);
+            }
             console.log("Loaded");
             this.file = null;
         }
@@ -210,32 +215,32 @@ export class Main {
     }
     static exportChunks() {
         let k = new Array();
-        for (let x = this.range.start; x < this.range.end; x++)
-            for (let z = this.range.start; z < this.range.end; z++) {
-                let chunk = this.getChunkAt(x, z);
-                //  console.log(chunk);
-                if (chunk == undefined)
+        for (let x = 0; x < this.loadedChunks.length; x++) {
+            let chunk = this.loadedChunks[x];
+            //  console.log(chunk);
+            if (chunk == undefined)
+                continue;
+            let blocks = new Array(16);
+            for (let a = 0; a < 16; a++) {
+                if (chunk.subchunks[a] == undefined)
                     continue;
-                let blocks = new Array(16);
-                for (let a = 0; a < 16; a++) {
-                    if (chunk.subchunks[a] == undefined)
-                        continue;
-                    let c = new Array3D(16, 16, 16);
-                    for (let x1 = 0; x1 < 16; x1++)
-                        for (let y1 = 0; y1 < 16; y1++)
-                            for (let z1 = 0; z1 < 16; z1++) {
-                                if (chunk.subchunks[a].blocks[x1][y1][z1] == undefined || chunk.subchunks[a].blocks[x1][y1][z1] == null)
-                                    c[x1][y1][z1] = 0;
-                                else
-                                    c[x1][y1][z1] = chunk.subchunks[a].blocks[x1][y1][z1].id;
-                            }
-                    blocks[a] = c;
-                }
-                k.push({
-                    pos: [chunk.pos.x, chunk.pos.z],
-                    blocks: blocks
-                });
+                let c = new Array3D(16, 16, 16);
+                for (let x1 = 0; x1 < 16; x1++)
+                    for (let y1 = 0; y1 < 16; y1++)
+                        for (let z1 = 0; z1 < 16; z1++) {
+                            if (chunk.subchunks[a].blocks[x1][y1][z1] == undefined || chunk.subchunks[a].blocks[x1][y1][z1] == null)
+                                c[x1][y1][z1] = 0;
+                            else
+                                c[x1][y1][z1] = chunk.subchunks[a].blocks[x1][y1][z1].id;
+                        }
+                blocks[a] = c;
             }
+            k.push({
+                pos: [chunk.pos.x, chunk.pos.z],
+                blocks: blocks
+            });
+        }
+        k.push({ pPos: [this.player.pos.x, this.player.pos.y, this.player.pos.z] });
         this.download(JSON.stringify(k), "world.json", "text/plain");
     }
     static getChunkAt(x, z) {

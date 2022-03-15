@@ -7,7 +7,7 @@ export class World
 {
     private Chunks:Array<Array<Chunk>> = new Array();
     public static heightMap:Array<Array<number>> = new Array(256);
-public static waterLevel:number = 24;
+public static waterLevel:number = 25;
     public static init()
     {
         this.genHeightMap();

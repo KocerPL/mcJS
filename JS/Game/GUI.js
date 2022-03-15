@@ -5,7 +5,6 @@ import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
 import { blocks } from "./Block.js";
-import { World } from "./World.js";
 let gl = CanvaManager.gl;
 export class GUI {
     static vao; //Vertex attrib array
@@ -212,8 +211,7 @@ export class GUI {
         slCoords2 = new Array();
         slCoords2 = slCoords2.concat(slCoords);
         indices = this.squareIndices.slice(0, this.squareIndices.length);
-        let block = World.getBlock(Main.player.pos);
-        if (block != undefined && block.id == -1) {
+        if (Main.player.inWater) {
             //console.log("underwater")
             this.vArray = this.vArray.concat([-1 / CanvaManager.getProportion, -1, 1 / CanvaManager.getProportion, 1, -1 / CanvaManager.getProportion, 1, 1 / CanvaManager.getProportion, -1]);
             this.tArray = this.tArray.concat(this.crosstcords);

@@ -19,6 +19,7 @@ export class Player
 
     camera:Camera = new Camera();
     pos:Vector;
+    inWater:boolean;
     itemsBar:Array<number> = [9,1,2,3,4,5,6,7,8];
     inventory:Array<number> = [10,10,9,9,9,9,9,9,9, 9,1,2,3,4,5,6,7,8, 9,1,2,3,4,5,6,7,8];
     locked:boolean=false;
@@ -30,6 +31,7 @@ export class Player
     vlo:VBO;
     ebo:EBO;
     yAcc =0.01;
+   mainAcc=0.1;
     rotX=0;
     rotY=0;
     jump ={
@@ -114,17 +116,21 @@ export class Player
         let tempPos = this.pos.copy();
         if(this.jump.yAcc>0)
         {
-            this.jump.yAcc-=0.01;
+            this.jump.yAcc-=0.015;
            tempPos.y+=this.jump.yAcc;
             this.jump.time--;
             hop=true;
             this.yAcc=0;
         }
-  
+        let speed=1;
+        try
+        {
+        if(CanvaManager.getKey(16))
+        speed=2;
         if(CanvaManager.getKey(87))
         {
-            tempPos.x+=Math.sin(this.camera.getYaw()*Math.PI/180)*0.1;
-            tempPos.z+=Math.cos(this.camera.getYaw()*Math.PI/180)*0.1;
+            tempPos.x+=Math.sin(this.camera.getYaw()*Math.PI/180)*0.1*speed;
+            tempPos.z +=Math.cos(this.camera.getYaw()*Math.PI/180)*0.1*speed;
         }
         else if(CanvaManager.getKey(83))
         {
@@ -145,7 +151,10 @@ export class Player
             
         }
        
-        
+        if(World.getBlock(this.camera.getPosition()).id ==-1)
+        this.inWater =true;
+        else 
+        this.inWater=false;
       
         let down = false
         if( World.getBlock( new Vector(Math.round(tempPos.x-0.3),Math.round(tempPos.y-0.5),Math.round(tempPos.z)) ).id <1 
@@ -204,6 +213,14 @@ export class Player
         }
            
      }
+     if(!(World.getBlock(new Vector(Math.round(tempPos.x+0.3),Math.round(tempPos.y+0.5),Math.round(tempPos.z+0.3))).id>0 ||
+      World.getBlock(new Vector(Math.round(tempPos.x-0.3),Math.round(tempPos.y+0.5),Math.round(tempPos.z+0.3))).id>0 ||
+      World.getBlock(new Vector(Math.round(tempPos.x-0.3),Math.round(tempPos.y+0.5),Math.round(tempPos.z-0.3))).id>0 ||
+      World.getBlock(new Vector(Math.round(tempPos.x+0.3),Math.round(tempPos.y+0.5),Math.round(tempPos.z-0.3))).id>0 ||
+      World.getBlock(new Vector(Math.round(tempPos.x+0.3),Math.round(tempPos.y-0.5),Math.round(tempPos.z+0.3))).id>0 ||
+      World.getBlock(new Vector(Math.round(tempPos.x-0.3),Math.round(tempPos.y-0.5),Math.round(tempPos.z+0.3))).id>0 ||
+      World.getBlock(new Vector(Math.round(tempPos.x-0.3),Math.round(tempPos.y-0.5),Math.round(tempPos.z-0.3))).id>0 ||
+      World.getBlock(new Vector(Math.round(tempPos.x+0.3),Math.round(tempPos.y-0.5),Math.round(tempPos.z-0.3))).id>0)) 
      this.pos = tempPos;
     if(CanvaManager.getKey(32))
     {
@@ -214,20 +231,25 @@ export class Player
             && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y+1.5),Math.round(this.pos.z+0.3))).id<1
             && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y+1.5),Math.round(this.pos.z-0.3))).id<1)
         {
-            if(this.jump.yAcc<=0&& (World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z))).id>0 ||
+            if(this.inWater)
+            {
+                hop=true;
+                tempPos.y+=0.05;
+            }
+           else if(this.jump.yAcc<=0&& (World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z))).id>0 ||
             World.getBlock( new Vector(Math.round(this.pos.x+0.3),Math.round(this.pos.y-1.5),Math.round(this.pos.z))).id>0
             || World.getBlock( new Vector(Math.round(this.pos.x-0.3),Math.round(this.pos.y-1.5),Math.round(this.pos.z))).id>0
             || World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z+0.3))).id>0
             || World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z-0.3))).id>0))
-            this.jump.yAcc = 0.2
+            this.jump.yAcc = 0.2;
 
 
             
                 }
             }
-        else if(CanvaManager.getKey(16) && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z)) ).id<1)
+      /*  else if(CanvaManager.getKey(16) && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z)) ).id<1)
         this.pos.y-=0.1;
-            
+        */    
          if( !hop )
         {
             let subc = World.getSubchunk(this.pos);
@@ -240,7 +262,10 @@ export class Player
             && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z+0.3))).id<1
             && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z-0.3))).id<1)
             {
-                this.yAcc+=0.01;
+                if(this.inWater)
+                this.yAcc+=0.001;
+                else
+                this.yAcc+=0.015;
             this.pos.y-=this.yAcc;
           
             }
@@ -254,6 +279,10 @@ export class Player
            
             }
         }
+    } catch(error)
+    {
+
+    }
       
         this.camera.setPitch(this.camera.getPitch()- (CanvaManager.mouseMovement.y/10));
         this.camera.setYaw(this.camera.getYaw()+(CanvaManager.mouseMovement.x/10));

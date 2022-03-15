@@ -16,6 +16,7 @@ import { Player } from "./Game/Player.js";
 import { SubChunk } from "./Game/SubChunk.js";
 import { World } from "./Game/World.js";
 let gl = CanvaManager.gl;
+declare var perlin;
 export class Main
 {
    public static dispLl = false;
@@ -192,7 +193,7 @@ export class Main
       {  
          for(let x=0;x<Main.tasks.length;x++)
          Main.tasks[x]=new Array();
-         for(let x=0; x<this.file.length;x++)
+         for(let x=0; x<this.file.length-1;x++)
          {
             let x2=this.file[x].pos[0];
                let z2 = this.file[x].pos[1];
@@ -241,6 +242,12 @@ export class Main
             chunk.lazy =false;
               
          }
+         if(!(this.file[this.file.length-1] instanceof Array) && this.file[this.file.length-1].pPos!=undefined)
+         {
+            let k =this.file[this.file.length-1].pPos;
+            console.log(k);
+            this.player.pos = new Vector(k[0],k[1],k[2]);
+         }
          console.log("Loaded");
          this.file=null;
       }
@@ -250,10 +257,9 @@ export class Main
    public static exportChunks()
    {
       let k = new Array();
-      for(let x=this.range.start; x<this.range.end;x++)     
-      for(let z=this.range.start; z<this.range.end;z++)
+     for(let x=0;x<this.loadedChunks.length;x++)
       {
-         let chunk  =this.getChunkAt(x,z)
+         let chunk  =this.loadedChunks[x];
        //  console.log(chunk);
          if(chunk==undefined) continue;
          let blocks = new Array(16);
@@ -279,6 +285,7 @@ export class Main
                }
             )
       }
+      k.push({pPos:[this.player.pos.x,this.player.pos.y,this.player.pos.z]});
       this.download(JSON.stringify(k),"world.json","text/plain");
    }
    public static getChunkAt(x:number,z:number):Chunk | undefined

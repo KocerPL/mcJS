@@ -249,7 +249,7 @@ export class SubChunk
       light=15;
       lightDir = directions.SKYLIGHT;
     }
-      
+      let waterCount=0;
       if(y+(this.pos.y*16)< chunk.heightmap[x][z]+4)
       { 
     let side = (dir)=>
@@ -266,6 +266,10 @@ export class SubChunk
         }
         else if(block.id<1 )
           {
+            if(block.id==-1 && dir!=directions.NEG_Y && dir!=directions.POS_Y )
+            {
+               waterCount++;
+             }   
           if( light+1<block.lightLevel)
             {
             light = block.lightLevel-1;
@@ -313,8 +317,13 @@ export class SubChunk
               }
               try {
               let block:Block = Main.getChunkAt(subCpos.x,subCpos.z).subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
+             
               if(block.id<1 )
               {
+                if(block.id==-1 && dir!=directions.NEG_Y && dir!=directions.POS_Y )
+                {
+                  waterCount++;
+                }
               if( light+1<block.lightLevel)
                 {
                 light = block.lightLevel-1;
@@ -338,6 +347,8 @@ export class SubChunk
       side(directions.NEG_Z);
       side(directions.POS_Z);
     }
+    if(waterCount>1)
+    theBlock.id=-1;
       theBlock.lightDir = lightDir;
       theBlock.lightLevel = light;
       theBlock.lightFBlock = light2;
@@ -496,12 +507,13 @@ export class SubChunk
               subCpos.z+=1;
               inscPos.z= 0
               }
+              let blocked= false;
               try {
               let block:Block = Main.getChunkAt(subCpos.x,subCpos.z).subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
               if(block.id<1 )
               {
               light2 = block.lightFBlock;
-              
+              if((this.blocks[x][y][z].id<0 && block.id<0)) blocked=true;
                 light=block.lightLevel;
               }
               }
@@ -511,13 +523,15 @@ export class SubChunk
               }
               if(light2==-2) light2=0;
               if(light==-2) light=15;
+              if(!blocked)
+              {
               vertices = vertices.concat(temp.slice(vStart,vStart+12));
             textureCoords = textureCoords.concat(SubChunk.getTextureCords(this.blocks[x][y][z],side));
             indices = indices.concat(index+2,index+1,index,index+2,index,index+3);
             lightLevels = lightLevels.concat(light,light,light,light);
             fB=fB.concat(light2,light2,light2,light2);
             index+=4;
-         
+              }
             }
             
            // else

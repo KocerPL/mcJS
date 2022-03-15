@@ -253,8 +253,8 @@ export class GUI
         slCoords2 = slCoords2.concat(slCoords);
         indices = this.squareIndices.slice(0,this.squareIndices.length);
        
-        let block =World.getBlock(Main.player.pos);
-   if(block!=undefined && block.id==-1)
+       
+   if(Main.player.inWater)
       {
         //console.log("underwater")
        
