@@ -11,6 +11,7 @@ import { VAO } from "./Engine/VAO.js";
 import { VBO } from "./Engine/VBO.js";
 import { Block, blocks } from "./Game/Block.js";
 import { Chunk } from "./Game/Chunk.js";
+import { Entity } from "./Game/Entity.js";
 import { GUI } from "./Game/GUI.js";
 import { Player } from "./Game/Player.js";
 import { SubChunk } from "./Game/SubChunk.js";
@@ -25,7 +26,7 @@ export class Main
    public static TPS:number=20;
    public static sunLight=14;
    public static file = null;
-
+   public static entities:Array<Entity> = new Array();
    public static Measure = {
       tps:0,
       fps:0,
@@ -177,6 +178,10 @@ export class Main
      // this.count++;
      // if(this.count>this.test.indices.length)
       //this.count=3;
+      for(let i=0;i<this.entities.length;i++)
+      {
+         this.entities[i].update(i);
+      }
       GUI.update();
       if(Math.floor(Math.random()*50) == 1)
       {
@@ -364,7 +369,10 @@ export class Main
        {
           toRender.shift()();
        }
-       
+       for(let i=0;i<this.entities.length;i++)
+       {
+          this.entities[i].render();
+       }
       //render crosshair
       this.player.render();
       GUI.render(this.shader2d);

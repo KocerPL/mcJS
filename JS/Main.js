@@ -20,6 +20,7 @@ export class Main {
     static TPS = 20;
     static sunLight = 14;
     static file = null;
+    static entities = new Array();
     static Measure = {
         tps: 0,
         fps: 0,
@@ -153,6 +154,9 @@ export class Main {
         // this.count++;
         // if(this.count>this.test.indices.length)
         //this.count=3;
+        for (let i = 0; i < this.entities.length; i++) {
+            this.entities[i].update(i);
+        }
         GUI.update();
         if (Math.floor(Math.random() * 50) == 1) {
             let rand = 0;
@@ -304,6 +308,9 @@ export class Main {
             }
         while (toRender.length > 0) {
             toRender.shift()();
+        }
+        for (let i = 0; i < this.entities.length; i++) {
+            this.entities[i].render();
         }
         //render crosshair
         this.player.render();

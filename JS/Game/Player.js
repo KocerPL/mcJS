@@ -9,6 +9,7 @@ import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
 import { Block, blocks, dirAssoc } from "./Block.js";
+import { Item } from "./entities/Item.js";
 import { SubChunk } from "./SubChunk.js";
 import { World } from "./World.js";
 let gl = CanvaManager.gl;
@@ -184,6 +185,10 @@ export class Player {
         }
         let speed = 1;
         try {
+            if (CanvaManager.getKeyOnce(81)) {
+                Main.entities.push(new Item(this.camera.getPosition().copy(), Main.player.itemsBar[Main.player.selectedItem]));
+                console.log("heh");
+            }
             if (CanvaManager.getKey(16))
                 speed = 2;
             if (CanvaManager.getKey(87)) {
@@ -258,7 +263,7 @@ export class Player {
                     && World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
                     && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z + 0.3))).id < 1
                     && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z - 0.3))).id < 1) {
-                    if (down && this.jump.yAcc <= 0 && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 1.5), Math.round(tempPos.z))).id != 0) {
+                    if (down && this.jump.yAcc <= 0 && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 1.5), Math.round(tempPos.z))).id > 0) {
                         this.jump.yAcc = 0.2;
                     }
                 }
@@ -317,6 +322,7 @@ export class Player {
             }
         }
         catch (error) {
+            console.log(error);
         }
         this.camera.setPitch(this.camera.getPitch() - (CanvaManager.mouseMovement.y / 10));
         this.camera.setYaw(this.camera.getYaw() + (CanvaManager.mouseMovement.x / 10));
@@ -685,6 +691,12 @@ export class Player {
          }
    
      }*/
+    isTouching(vec) {
+        if (vec.x > this.pos.x - 0.3 && vec.z > this.pos.z - 0.3 && vec.y > this.pos.y - 1
+            && vec.x < this.pos.x + 0.3 && vec.z < this.pos.z + 0.3 && vec.y < this.pos.y + 1)
+            return true;
+        return false;
+    }
     render() {
         if (this.person != "First") {
             let transformation = Matrix.identity();

@@ -26,7 +26,8 @@ export class Chunk {
   update(startTime: number) {
     let actualTime = Date.now();
 
-    while (this.todo.length > 0 && actualTime - 200 < startTime) {
+    while (this.todo.length > 0 && actualTime - 200 < startTime)
+     {
       actualTime = Date.now();
       //console.log(actualTime);
       let work = this.todo.shift();

@@ -4,7 +4,6 @@ export class Texture {
     static SIZE = 64;
     static imageSize = 1024;
     static rowSize = 16;
-    static blocksGrid = Loader.image("/JS/Engine/Textures/Blocks.png");
     static blocksGridTest = Loader.imageArray("/JS/Engine/Textures/Blocks.png", 20, 16);
     // static GUI = Loader.image("/JS/Engine/Textures/GUI.png");
     static blockOverlay = Loader.imageArray("/JS/Engine/Textures/blockOverlay.png", 6, 8);
