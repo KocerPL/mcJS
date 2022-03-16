@@ -628,7 +628,7 @@ export class SubChunk
            // console.count("hehe");
            
           }
-          if(this.blocks[x][y][z].id==-1)
+          if(this.blocks[x][y][z].id<0)
           {
             side(new Vector(0,1,0),60,"top");
             continue;
