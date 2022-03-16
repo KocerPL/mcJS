@@ -9,6 +9,12 @@ export class RenderSet
     vtc:VBO;
     vlo:VBO;
     ebo:EBO;
+    vfb:VBO;
+    index:number = 0;
+    vertices:Array<number> = new Array();
+    textureCoords:Array<number> = new Array();
+    lightLevels:Array<number> = new Array();
+    indices:Array<number> = new Array();
     count:number=0;
     constructor()
     {
@@ -22,6 +28,8 @@ export class RenderSet
         this.vlo = new VBO();
      
         this.vao.addPtr(2,1,0,0);
+        this.vfb = new VBO();
+        this.vao.addPtr(3,1,0,0);
         this.ebo = new EBO();
       
         VAO.unbind();
@@ -34,8 +42,25 @@ export class RenderSet
         this.vbo.bufferData(vertices);
         this.vtc.bufferData(textureCoords);
         this.vlo.bufferData(light);
+        this.vfb.bufferData(light);
         this.ebo.bufferData(indices);
         VAO.unbind();
         this.count=indices.length;
+    }
+    add(vertices:Array<number>,textureCoords:Array<number>,lightLevels:Array<number>,indices:Array<number>,index:number)
+    {
+        this.vertices = this.vertices.concat(vertices);
+        this.textureCoords = this.textureCoords.concat(textureCoords);
+        this.lightLevels = this.lightLevels.concat(lightLevels);
+        this.indices= this.indices.concat(indices);
+        this.index+=index; 
+    }
+    resetArrays()
+    {
+        this.vertices = new Array();
+        this.textureCoords = new Array();
+       this.lightLevels = new Array();
+        this.indices = new Array();
+        this.index=0;
     }
 }

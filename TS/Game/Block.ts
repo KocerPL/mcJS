@@ -142,12 +142,12 @@ blocks[-1] =
 {
     name:"Water",
     textureIndex:{
-        top:13,
-        bottom:13,
-        front:13,
-        back:13,
-        left:13,
-        right:13
+        top:12,
+        bottom:12,
+        front:12,
+        back:12,
+        left:12,
+        right:12
     }
 }
 export const directions = Object.freeze(

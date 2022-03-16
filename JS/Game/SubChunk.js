@@ -1,5 +1,6 @@
 import { CanvaManager } from "../Engine/CanvaManager.js";
 import { EBO } from "../Engine/EBO.js";
+import { RenderSet } from "../Engine/RenderSet.js";
 import { Texture } from "../Engine/Texture.js";
 import { Array3D } from "../Engine/Utils/Array3D.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
@@ -18,6 +19,7 @@ export class SubChunk {
     vlo; // Light vbo
     vfb;
     // nor:VBO;
+    RsWater = new RenderSet();
     fromBlock;
     blocks = new Array3D(16, 16, 16);
     generated = false;
@@ -382,13 +384,16 @@ export class SubChunk {
             let side = (vec, vStart, side) => {
                 // console.log(this.blocks);
                 if ((x + vec.x >= 0 && y + vec.y >= 0 && z + vec.z >= 0 && x + vec.x < 16 && y + vec.y < 16 && z + vec.z < 16)) {
-                    if ((this.blocks[x + vec.x][y + vec.y][z + vec.z].id <= 0 && this.blocks[x][y][z].id > 0) || (this.blocks[x + vec.x][y + vec.y][z + vec.z].id == 0)) {
+                    if ((this.blocks[x + vec.x][y + vec.y][z + vec.z].id <= 0 && this.blocks[x][y][z].id > 0)) {
                         vertices = vertices.concat(temp.slice(vStart, vStart + 12));
                         textureCoords = textureCoords.concat(SubChunk.getTextureCords(this.blocks[x][y][z], side));
                         indices = indices.concat(index + 2, index + 1, index, index + 2, index, index + 3);
                         lightLevels = lightLevels.concat(this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel);
                         fB = fB.concat(this.blocks[x + vec.x][y + vec.y][z + vec.z].lightFBlock, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightFBlock, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightFBlock, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightFBlock);
                         index += 4;
+                    }
+                    else if (this.blocks[x + vec.x][y + vec.y][z + vec.z].id == 0 && this.blocks[x][y][z].id < 0) {
+                        this.RsWater.add(temp.slice(vStart, vStart + 12), SubChunk.getTextureCords(this.blocks[x][y][z], side), [this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel], [this.RsWater.index + 2, this.RsWater.index + 1, this.RsWater.index, this.RsWater.index + 2, this.RsWater.index, this.RsWater.index + 3], 4);
                     }
                 }
                 else {
@@ -437,12 +442,17 @@ export class SubChunk {
                     if (light == -2)
                         light = 15;
                     if (!blocked) {
-                        vertices = vertices.concat(temp.slice(vStart, vStart + 12));
-                        textureCoords = textureCoords.concat(SubChunk.getTextureCords(this.blocks[x][y][z], side));
-                        indices = indices.concat(index + 2, index + 1, index, index + 2, index, index + 3);
-                        lightLevels = lightLevels.concat(light, light, light, light);
-                        fB = fB.concat(light2, light2, light2, light2);
-                        index += 4;
+                        if (this.blocks[x][y][z].id > 0) {
+                            vertices = vertices.concat(temp.slice(vStart, vStart + 12));
+                            textureCoords = textureCoords.concat(SubChunk.getTextureCords(this.blocks[x][y][z], side));
+                            indices = indices.concat(index + 2, index + 1, index, index + 2, index, index + 3);
+                            lightLevels = lightLevels.concat(light, light, light, light);
+                            fB = fB.concat(light2, light2, light2, light2);
+                            index += 4;
+                        }
+                        else if (this.blocks[x][y][z].id < 0) {
+                            this.RsWater.add(temp.slice(vStart, vStart + 12), SubChunk.getTextureCords(this.blocks[x][y][z], side), [light, light, light, light], [this.RsWater.index + 2, this.RsWater.index + 1, this.RsWater.index, this.RsWater.index + 2, this.RsWater.index, this.RsWater.index + 3], 4);
+                        }
                     }
                 }
                 // else
@@ -676,8 +686,8 @@ export class SubChunk {
         this.colors = new Array();
         this.lightLevels = new Array();
         let index = 0;
+        this.RsWater.resetArrays();
         this.inReGeneration = true;
-        // let done = new Array();
         for (let x = 0; x < 16; x++) {
             for (let z = 0; z < 16; z++) {
                 Main.tasks[priority].push(() => {
@@ -708,7 +718,7 @@ export class SubChunk {
         //console.log(this.colors);
     }
     bufferVIC() {
-        if (this.indices.length <= 1)
+        if (this.indices.length <= 1 && this.RsWater.indices.length <= 1)
             this.empty = true;
         else {
             this.empty = false;
@@ -719,6 +729,7 @@ export class SubChunk {
             this.ebo.bufferData(this.indices);
             this.vfb.bufferData(this.fromBlock);
             VAO.unbind();
+            this.RsWater.bufferArrays(this.RsWater.vertices, this.RsWater.textureCoords, this.RsWater.lightLevels, this.RsWater.indices);
         }
     }
     static blockTextureCoords = Object.freeze({

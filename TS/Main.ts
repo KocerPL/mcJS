@@ -342,6 +342,7 @@ export class Main
       gl.clear(gl.COLOR_BUFFER_BIT);
    
       gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
+      let toRender = new Array();
       for(let x=this.range.start; x<this.range.end;x++)     
       for(let z=this.range.start; z<this.range.end;z++)
        {
@@ -357,7 +358,13 @@ export class Main
           if(chunk.lazy)
           chunk.generate();
          chunk.render();
+         toRender.push(()=>{chunk.renderWater()});
        }
+       while(toRender.length>0)
+       {
+          toRender.shift()();
+       }
+       
       //render crosshair
       this.player.render();
       GUI.render(this.shader2d);
