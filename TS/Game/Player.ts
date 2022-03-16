@@ -8,7 +8,7 @@ import { Vector } from "../Engine/Utils/Vector.js";
 import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
-import { Block, blocks } from "./Block.js";
+import { Block, blocks, dirAssoc } from "./Block.js";
 import { SubChunk } from "./SubChunk.js";
 import { World } from "./World.js";
 let gl = CanvaManager.gl;
@@ -232,12 +232,25 @@ export class Player
             tempPos.z-=Math.cos((this.camera.getYaw()+90)*Math.PI/180)*0.1;
             
         }
-       
-        if(World.getBlock(this.camera.getPosition()).id ==-1)
+        let block =World.getBlock(this.camera.getPosition());
+        if(block.id <0)
+        {
         this.inWater =true;
+        
+        }
         else 
         this.inWater=false;
-      
+        block =World.getBlock(new Vector(Math.round(tempPos.x),Math.round(tempPos.y-0.5),Math.round(tempPos.z)));
+        let block2 = World.getBlock(this.camera.getPosition());
+        if(block.id==-2 )
+        {
+            let vec = dirAssoc[block.attribute[1]];
+             tempPos = Vector.add(tempPos,vec.mult(-(0.1* (block.attribute[0]/15))));
+        } else if(block2.id==-2)
+        {
+            let vec = dirAssoc[block2.attribute[1]];
+             tempPos = Vector.add(tempPos,vec.mult(-(0.05* (block2.attribute[0]/15))));
+        }
         let down = false
         if( World.getBlock( new Vector(Math.round(tempPos.x-0.3),Math.round(tempPos.y-0.5),Math.round(tempPos.z)) ).id <1 
         && World.getBlock( new Vector(Math.round(tempPos.x+0.3),Math.round(tempPos.y-0.5),Math.round(tempPos.z)) ).id <1)

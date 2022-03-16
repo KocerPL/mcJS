@@ -6,6 +6,7 @@ export class Block
    lightFBlock:number=0;
     lightDir:number = directions.UNDEF;
     lightLevel:number=1;
+    attribute:Array<number>;
     constructor(id)
     {
 this.id = id;
@@ -141,6 +142,18 @@ breakTime:3
 blocks[-1] = 
 {
     name:"Water",
+    textureIndex:{
+        top:12,
+        bottom:12,
+        front:12,
+        back:12,
+        left:12,
+        right:12
+    }
+}
+blocks[-2] = 
+{
+    name:"Flowing water",
     textureIndex:{
         top:12,
         bottom:12,

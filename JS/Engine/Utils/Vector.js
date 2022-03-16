@@ -24,4 +24,7 @@ export class Vector {
     round() {
         return new Vector(Math.round(this.x), Math.round(this.y), Math.round(this.z));
     }
+    mult(scalar) {
+        return new Vector(this.x * scalar, this.y * scalar, this.z * scalar);
+    }
 }

@@ -4,6 +4,7 @@ export class Block {
     lightFBlock = 0;
     lightDir = directions.UNDEF;
     lightLevel = 1;
+    attribute;
     constructor(id) {
         this.id = id;
     }
@@ -136,6 +137,18 @@ export var blocks = [
 blocks[-1] =
     {
         name: "Water",
+        textureIndex: {
+            top: 12,
+            bottom: 12,
+            front: 12,
+            back: 12,
+            left: 12,
+            right: 12
+        }
+    };
+blocks[-2] =
+    {
+        name: "Flowing water",
         textureIndex: {
             top: 12,
             bottom: 12,

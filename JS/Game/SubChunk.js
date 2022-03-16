@@ -183,6 +183,8 @@ export class SubChunk {
                     if (this.blocks[x][y][z].id > 0)
                         continue;
                     this.blocks[x][y][z].lightLevel = 0;
+                    if (this.blocks[x][y][z].id == -2)
+                        this.blocks[x][y][z].id = 0;
                     this.blocks[x][y][z].lightFBlock = 0;
                     if (y + (this.pos.y * 16) == Main.getChunkAt(this.pos.x, this.pos.z).heightmap[x][z] + 1) {
                         this.blocks[x][y][z].lightLevel = 15;
@@ -214,6 +216,8 @@ export class SubChunk {
             lightDir = directions.SKYLIGHT;
         }
         let waterCount = 0;
+        let nearWater = 0;
+        let watDir = 0;
         if (y + (this.pos.y * 16) < chunk.heightmap[x][z] + 4) {
             let side = (dir) => {
                 let vec = dirAssoc[dir];
@@ -224,8 +228,21 @@ export class SubChunk {
                         light2 = 15;
                     }
                     else if (block.id < 1) {
-                        if (block.id == -1 && dir != directions.NEG_Y && dir != directions.POS_Y) {
-                            waterCount++;
+                        if (dir != directions.NEG_Y) {
+                            if (block.id == -1 && dir != directions.POS_Y) {
+                                watDir = dir;
+                                waterCount++;
+                            }
+                            else if (block.id == -2) {
+                                if (dir == directions.NEG_Y) {
+                                    nearWater = 14;
+                                    watDir = dir;
+                                }
+                                else if (block.attribute[0] - 1 > nearWater) {
+                                    nearWater = block.attribute[0] - 1;
+                                    watDir = dir;
+                                }
+                            }
                         }
                         if (light + 1 < block.lightLevel) {
                             light = block.lightLevel - 1;
@@ -266,8 +283,19 @@ export class SubChunk {
                     try {
                         let block = Main.getChunkAt(subCpos.x, subCpos.z).subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
                         if (block.id < 1) {
-                            if (block.id == -1 && dir != directions.NEG_Y && dir != directions.POS_Y) {
+                            if (block.id == -1 && dir != directions.POS_Y) {
+                                watDir = dir;
                                 waterCount++;
+                            }
+                            else if (block.id == -2) {
+                                if (dir == directions.NEG_Y) {
+                                    nearWater = 14;
+                                    watDir = dir;
+                                }
+                                else if (block.attribute[0] - 1 > nearWater) {
+                                    nearWater = block.attribute[0] - 1;
+                                    watDir = dir;
+                                }
                             }
                             if (light + 1 < block.lightLevel) {
                                 light = block.lightLevel - 1;
@@ -291,6 +319,25 @@ export class SubChunk {
         }
         if (waterCount > 1)
             theBlock.id = -1;
+        else if (waterCount == 1) {
+            theBlock.id = -2;
+            if (!(theBlock.attribute instanceof Array))
+                theBlock.attribute = new Array();
+            theBlock.attribute[0] = 14;
+            theBlock.attribute[1] = watDir;
+        }
+        else if (nearWater > 0) {
+            if (!(theBlock.attribute instanceof Array))
+                theBlock.attribute = new Array();
+            if (theBlock.id != -2 && theBlock.id != -1) {
+                theBlock.id = -2;
+                theBlock.attribute[0] = 0;
+            }
+            if (theBlock.attribute[0] < nearWater) {
+                theBlock.attribute[0] = nearWater;
+                theBlock.attribute[1] = watDir;
+            }
+        }
         theBlock.lightDir = lightDir;
         theBlock.lightLevel = light;
         theBlock.lightFBlock = light2;
@@ -369,6 +416,12 @@ export class SubChunk {
                 temp.push(SubChunk.defVertices[i] + x);
                 if (this.blocks[x][y][z].id == -1)
                     temp.push(SubChunk.defVertices[i + 1] + y - 0.2);
+                else if (this.blocks[x][y][z].id == -2) {
+                    let k = ((this.blocks[x][y][z].attribute[0] / 15) * 0.8) - 1.8;
+                    temp.push(SubChunk.defVertices[i + 1] + 0.8 + y + k);
+                    if (k > 1)
+                        console.log(k, this.blocks[x][y][z].attribute[0]);
+                }
                 else
                     temp.push(SubChunk.defVertices[i + 1] + y);
                 temp.push(SubChunk.defVertices[i + 2] + z);
@@ -392,7 +445,7 @@ export class SubChunk {
                         fB = fB.concat(this.blocks[x + vec.x][y + vec.y][z + vec.z].lightFBlock, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightFBlock, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightFBlock, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightFBlock);
                         index += 4;
                     }
-                    else if (this.blocks[x + vec.x][y + vec.y][z + vec.z].id == 0 && this.blocks[x][y][z].id < 0) {
+                    else if (this.blocks[x + vec.x][y + vec.y][z + vec.z].id == 0 && this.blocks[x][y][z].id < 0 && vec.y == 1) {
                         this.RsWater.add(temp.slice(vStart, vStart + 12), SubChunk.getTextureCords(this.blocks[x][y][z], side), [this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel], [this.RsWater.index + 2, this.RsWater.index + 1, this.RsWater.index, this.RsWater.index + 2, this.RsWater.index, this.RsWater.index + 3], 4);
                     }
                 }
