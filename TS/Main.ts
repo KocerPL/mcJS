@@ -3,6 +3,7 @@ import { CanvaManager } from "./Engine/CanvaManager.js";
 import { EBO } from "./Engine/EBO.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Shader2d } from "./Engine/Shader/Shader2d.js";
+import { Task } from "./Engine/Task.js";
 import { Texture } from "./Engine/Texture.js";
 import { Array3D } from "./Engine/Utils/Array3D.js";
 import { Matrix } from "./Engine/Utils/Matrix.js";
@@ -35,7 +36,7 @@ export class Main
       frames:0
    }
    private static shader2d:Shader2d;
-   public static tasks:Array<Array<Function>> = new Array(11);
+   public static tasks:Array<Array<Task>> = new Array(11);
    private static lastTick = 0;
    private static lastFrame=0;
    public static shader:DefaultShader;
@@ -112,6 +113,17 @@ export class Main
      requestAnimationFrame(this.loop.bind(this));
     
    }
+   public static addTask(task:Task,priority)
+   {
+      this.tasks[priority].push(task);
+   }
+   public static cancelTasks(caller,label:string|undefined)
+   {
+      for(let x=0;x<this.tasks.length;x++)
+      for(let y= this.tasks[x].length-1;y>-1;y--)
+      if(this.tasks[x][y].caller ==caller && this.tasks[x][y].label ==label)
+      this.tasks[x].splice(y,1);
+   }
    public static loop(time:number):void
    {
       if(this.Measure.lastTime <= time-1000)
@@ -160,7 +172,7 @@ export class Main
          while(this.tasks[i].length>0)
          {
             let task = this.tasks[i].shift();
-            task();
+            task.func();
             if(Date.now()-time >20)
             return;
          }
@@ -238,10 +250,10 @@ export class Main
                }
                
                
-               Main.tasks[8].push(()=>{
+            Main.addTask(new Task(()=>{
                chunk.subchunks[a].inReGeneration=false;
                chunk.subchunks[a].update(9);
-               });
+               },Main),9);
               // console.log( this.chunks[x2][z2].subchunks[a]);
               
             }

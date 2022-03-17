@@ -1,3 +1,4 @@
+import { Task } from "../Engine/Task.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { Main } from "../Main.js";
 import { directions } from "./Block.js";
@@ -11,7 +12,7 @@ export class World {
     }
     static generateTree(vec) {
         console.log("shedule Generating tree");
-        Main.tasks[3].push(() => {
+        Main.addTask(new Task(() => {
             let i;
             for (i = vec.y + 1; i < vec.y + 5; i++) {
                 //console.log("Generating tree")
@@ -44,7 +45,7 @@ export class World {
             this.setBlockNoLight(new Vector(vec.x, i, vec.z + 1), 9);
             this.setBlockNoLight(new Vector(vec.x, i, vec.z - 1), 9);
             this.setBlockNoLight(new Vector(vec.x, i, vec.z), 9);
-        });
+        }, this), 3);
     }
     static genHeightMap() {
         let height = 20;
@@ -104,7 +105,7 @@ export class World {
                console.log(error);
            }
        }*/
-    static setBlockNoLight(blockPos, type) {
+    static setBlockNoLight(blockPos, type, update) {
         let inChunkPos = new Vector(Math.round(Math.round(blockPos.x) % 16), Math.round(blockPos.y), Math.round(Math.round(blockPos.z) % 16));
         if (inChunkPos.x < 0)
             inChunkPos.x = 16 - Math.abs(inChunkPos.x);
@@ -124,7 +125,7 @@ export class World {
                 }
                 chunk.heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y - i;
             }
-            chunk.setBlock(inChunkPos, type);
+            chunk.setBlock(inChunkPos, type, update);
         }
         catch (error) {
             //  console.error(error);

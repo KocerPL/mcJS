@@ -96,9 +96,9 @@ export class Chunk {
     updateSubchunkAt(y) {
         let yPos = Math.floor(Math.round(y) / 16);
         if (this.subchunks[yPos].generated)
-            this.subchunks[yPos].update(10);
+            this.subchunks[yPos].update(10, true);
     }
-    setBlock(pos, blockID) {
+    setBlock(pos, blockID, update) {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {
             throw new Error("Incorrect cordinates");
         }
@@ -109,7 +109,8 @@ export class Chunk {
             if (!(this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
                 this.subchunks[yPos].blocks[pos.x][y][pos.z] = new Block(0);
             this.subchunks[yPos].blocks[pos.x][y][pos.z].id = blockID;
-            this.updateSubchunkAt(pos.y);
+            if (update != undefined || update == true)
+                this.updateSubchunkAt(pos.y);
             try {
                 if (pos.x == 0) {
                     Main.getChunkAt(this.pos.x - 1, this.pos.z).subchunks[yPos].update(10);

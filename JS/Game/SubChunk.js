@@ -1,6 +1,7 @@
 import { CanvaManager } from "../Engine/CanvaManager.js";
 import { EBO } from "../Engine/EBO.js";
 import { RenderSet } from "../Engine/RenderSet.js";
+import { Task } from "../Engine/Task.js";
 import { Texture } from "../Engine/Texture.js";
 import { Array3D } from "../Engine/Utils/Array3D.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
@@ -94,12 +95,13 @@ export class SubChunk {
     lightLevels = new Array();
     transformation = Matrix.identity();
     pos;
+    isLazy;
     constructor(pos, heightmap, isLazy) {
         this.pos = pos;
         this.transformation = this.transformation.translate(pos.x * 16, pos.y * 16, pos.z * 16);
-        if (!isLazy) {
+        this.isLazy = isLazy;
+        if (!isLazy)
             this.generate(pos, heightmap);
-        }
         this.vao = new VAO();
         this.vbo = new VBO();
         this.vao.addPtr(0, 3, 0, 0);
@@ -129,7 +131,7 @@ export class SubChunk {
         let yPos = pos.y * 16;
         let xPos = pos.x * 16;
         let zPos = pos.z * 16;
-        Main.tasks[2].push(() => {
+        Main.addTask(new Task(() => {
             for (let x = 0; x < 16; x++) {
                 for (let y = 0; y < 16; y++) {
                     for (let z = 0; z < 16; z++) {
@@ -164,14 +166,20 @@ export class SubChunk {
             }
             this.generated = true;
             //  console.log(this.blocks);
-            Main.tasks[3].push(() => {
-                this.update(3);
-            });
-        });
+            if (!this.isLazy) {
+                Main.addTask(new Task(() => {
+                    this.update(2);
+                }, this), 3);
+            }
+        }, this), 4);
     }
-    update(priority) {
-        if (this.inReGeneration)
-            return;
+    update(priority, immediate) {
+        if (this.inReGeneration) {
+            if (!this.generated || immediate == undefined || immediate == false)
+                return;
+            Main.cancelTasks(this, "update");
+            // console.log("lagggiing")
+        }
         this.clearLight();
         this.updateLightLevels();
         this.updateVerticesIndices(priority);
@@ -192,6 +200,41 @@ export class SubChunk {
                     }
                 }
         //  console.countReset("light");
+    }
+    getBlock(pos) {
+        if (pos.x > -1 && pos.x < 16 && pos.y > -1 && pos.y < 16 && pos.z > -1 && pos.z < 16) {
+            return this.blocks[pos.x][pos.y][pos.z];
+        }
+        else {
+            let transPos = new Vector(0, 0, 0);
+            let func = (par) => {
+                if (pos[par] < 0) {
+                    pos[par] = 15;
+                    transPos[par] = -1;
+                    return true;
+                }
+                else if (pos[par] > 15) {
+                    pos[par] = 0;
+                    transPos[par] = 1;
+                    return true;
+                }
+                return false;
+            };
+            if (func("x") || func("y") || func("z")) {
+                // transPos = Vector.add(transPos,this.pos);
+                try {
+                    return Main.getChunkAt(this.pos.x + transPos.x, this.pos.z + transPos.z).subchunks[this.pos.y + transPos.y].getBlock(pos);
+                }
+                catch (error) {
+                    // console.log(transPos);
+                    //console.log(this.pos);
+                    //  console.log(Main.getChunkAt(this.pos.x+transPos.x,this.pos.z+transPos.z));
+                    // debugger;
+                    return undefined;
+                }
+            }
+            return undefined;
+        }
     }
     updateLightLevels() {
         for (let x = 0; x < 16; x++)
@@ -341,6 +384,78 @@ export class SubChunk {
         theBlock.lightDir = lightDir;
         theBlock.lightLevel = light;
         theBlock.lightFBlock = light2;
+    }
+    //DONE: update vertices only tree sides
+    updateVerticesOptimized(x, z, index) {
+        let indices = new Array();
+        let vertices = new Array();
+        let textureCoords = new Array();
+        let lightLevels = new Array();
+        let fB = new Array();
+        for (let y = 0; y < 16; y++) {
+            let block = this.blocks[x][y][z];
+            let temp = new Array();
+            for (let i = 0; i < SubChunk.defVertices.length; i += 3) {
+                temp.push(SubChunk.defVertices[i] + x);
+                temp.push(SubChunk.defVertices[i + 1] + y);
+                temp.push(SubChunk.defVertices[i + 2] + z);
+            }
+            let side = (vec, vStart, side) => {
+                // console.log(this.blocks);
+                let testedBlock = this.getBlock(new Vector(vec.x + x, vec.y + y, vec.z + z));
+                if (testedBlock == undefined)
+                    return;
+                if (block.id < 1) {
+                    if (testedBlock.id > 0) {
+                        vertices = vertices.concat(temp.slice(vStart, vStart + 12));
+                        textureCoords = textureCoords.concat(SubChunk.getTextureCords(testedBlock, SubChunk.flip(side)));
+                        indices = indices.concat(index + 2, index + 1, index, index + 2, index, index + 3);
+                        lightLevels = lightLevels.concat(block.lightLevel, block.lightLevel, block.lightLevel, block.lightLevel);
+                        fB = fB.concat(block.lightFBlock, block.lightFBlock, block.lightFBlock, block.lightFBlock);
+                        index += 4;
+                    }
+                    else if (block.id == 0 && testedBlock.id < 0 && side == "bottom") {
+                        let hv = new Array(...temp.slice(vStart, vStart + 12));
+                        let yVal = 0.2;
+                        if (testedBlock.id == -2) {
+                            yVal += (1 - (testedBlock.attribute[0] / 15)) * 0.8;
+                        }
+                        for (let i = 1; i < 12; i += 3) {
+                            hv[i] -= yVal;
+                        }
+                        this.RsWater.add(hv, SubChunk.getTextureCords(testedBlock, SubChunk.flip(side)), [block.lightLevel, block.lightLevel, block.lightLevel, block.lightLevel], [this.RsWater.index + 2, this.RsWater.index + 1, this.RsWater.index, this.RsWater.index + 2, this.RsWater.index, this.RsWater.index + 3], 4);
+                    }
+                }
+                else {
+                    if (testedBlock.id < 1) {
+                        vertices = vertices.concat(temp.slice(vStart, vStart + 12));
+                        textureCoords = textureCoords.concat(SubChunk.getTextureCords(block, side));
+                        indices = indices.concat(index + 2, index + 1, index, index + 2, index, index + 3);
+                        lightLevels = lightLevels.concat(testedBlock.lightLevel, testedBlock.lightLevel, testedBlock.lightLevel, testedBlock.lightLevel);
+                        fB = fB.concat(testedBlock.lightFBlock, testedBlock.lightFBlock, testedBlock.lightFBlock, testedBlock.lightFBlock);
+                        index += 4;
+                    }
+                }
+            };
+            side(new Vector(1, 0, 0), 36, "left");
+            side(new Vector(0, -1, 0), 48, "bottom");
+            side(new Vector(0, 0, -1), 0, "back");
+        }
+        return { v: vertices, i: indices, c: textureCoords, ind: index, lL: lightLevels, fB: fB };
+    }
+    static flip(side) {
+        if (side == "back")
+            return "front";
+        else if (side == "bottom")
+            return "top";
+        else if (side == "left")
+            return "right";
+        else if (side == "front")
+            return "back";
+        else if (side == "top")
+            return "bottom";
+        else if (side == "right")
+            return "left";
     }
     //DONE: update vertices One level blocks shorted
     updateVerticesOneBlock(x, z, index) {
@@ -743,8 +858,8 @@ export class SubChunk {
         this.inReGeneration = true;
         for (let x = 0; x < 16; x++) {
             for (let z = 0; z < 16; z++) {
-                Main.tasks[priority].push(() => {
-                    let vic = this.updateVerticesOneBlock(x, z, index);
+                Main.addTask(new Task(() => {
+                    let vic = this.updateVerticesOptimized(x, z, index);
                     //    console.log(x,y,vic);
                     this.vertices = this.vertices.concat(vic.v);
                     //  this.normals =   this.vertices.concat(vic.n);
@@ -755,17 +870,17 @@ export class SubChunk {
                     this.fromBlock = this.fromBlock.concat(vic.fB);
                     index = vic.ind;
                     //console.log("c:",this.colors);
-                });
+                }, this, "update"), priority);
             }
         }
         // console.timeEnd("Updating");
         //   if(this.indices.length>0)
-        Main.tasks[priority].push(() => {
+        Main.addTask(new Task(() => {
             this.bufferVIC();
             this.count = this.indices.length;
             this.lightUpdate = false;
             this.inReGeneration = false;
-        });
+        }, this, "update"), priority);
         //  console.log(this.vertices);
         // console.log(this.indices);
         //console.log(this.colors);

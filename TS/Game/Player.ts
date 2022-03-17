@@ -445,11 +445,12 @@ console.log(error);
             this.blockBreakingTime=0;
         }
         if((Date.now()/1000)-blocks[this.targetedBlock.id].breakTime>=this.startTime || Main.fastBreaking)
-        {
-       World.setBlockNoLight(blockPos,0);
+        {  Main.entities.push(new Item(blockPos,World.getBlock(blockPos).id));
+       World.setBlockNoLight(blockPos,0,true);
+     
     this.targetedBlock=null;    
     }
-        console.log("mined block!!");
+        
         }
     }
     catch(error)
@@ -475,7 +476,7 @@ console.log(error);
         }
        if(  World.getBlock(lastPos).id<1 && i<5 &&  !lastPos.round().equals(new Vector(this.pos.x,this.pos.y-0.5,this.pos.z).round()) &&  !lastPos.round().equals(this.pos.round()) )
        {
-       World.setBlockNoLight(lastPos,this.itemsBar[this.selectedItem]);
+       World.setBlockNoLight(lastPos,this.itemsBar[this.selectedItem],true);
         CanvaManager.mouse.right=false;
         console.log("placed block!! at: ",lastPos);
        }

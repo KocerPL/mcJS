@@ -1,3 +1,4 @@
+import { Task } from "../Engine/Task.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { Main } from "../Main.js";
 import { Block, directions } from "./Block.js";
@@ -16,7 +17,7 @@ public static waterLevel:number = 20;
    public static generateTree(vec:Vector)
     {
         console.log("shedule Generating tree")
-        Main.tasks[3].push(()=>{
+       Main.addTask(new Task(()=>{
             let i;
         for( i=vec.y+1;i<vec.y+5;i++)
         {
@@ -55,7 +56,7 @@ public static waterLevel:number = 20;
         this.setBlockNoLight(new Vector(vec.x,i,vec.z+1),9);
         this.setBlockNoLight(new Vector(vec.x,i,vec.z-1),9);
         this.setBlockNoLight(new Vector(vec.x,i,vec.z),9);
-        });
+        },this),3);
     }
     public static genHeightMap()
     {
@@ -118,7 +119,7 @@ public static waterLevel:number = 20;
             console.log(error);
         }
     }*/
-    public static setBlockNoLight(blockPos:Vector,type:number)
+    public static setBlockNoLight(blockPos:Vector,type:number,update?:boolean)
     {
        let inChunkPos:Vector = new Vector(Math.round(Math.round(blockPos.x)%16),Math.round(blockPos.y),Math.round(Math.round(blockPos.z)%16));
        if(inChunkPos.x<0)
@@ -147,7 +148,7 @@ public static waterLevel:number = 20;
                 }
                chunk.heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y-i;
             }
-            chunk.setBlock(inChunkPos,type);
+            chunk.setBlock(inChunkPos,type,update);
         }
         catch(error)
         {

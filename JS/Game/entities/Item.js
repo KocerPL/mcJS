@@ -10,7 +10,9 @@ let gl = CanvaManager.gl;
 export class Item extends Entity {
     type;
     cooldown = 100;
+    lifeTime = 60000;
     rotation = 0;
+    yAcc = 0;
     constructor(pos, type) {
         super(pos);
         this.type = type;
@@ -19,7 +21,8 @@ export class Item extends Entity {
     update(i) {
         if (this.cooldown > 0)
             this.cooldown--;
-        if (this.cooldown < 1 && Main.player.isTouching(this.pos))
+        this.lifeTime--;
+        if (this.lifeTime < 1 || (this.cooldown < 1 && Main.player.isTouching(this.pos)))
             Main.entities.splice(i, 1);
     }
     prepareModel() {
@@ -35,11 +38,20 @@ export class Item extends Entity {
     }
     render() {
         // console.log("rendered")
-        if (World.getBlock(new Vector(this.pos.x, this.pos.y - 0.5, this.pos.z)).id == 0)
-            this.pos.y -= 0.03;
-        this.rotation++;
+        if (World.getBlock(new Vector(this.pos.x, this.pos.y, this.pos.z)).id > 0)
+            this.yAcc -= 0.01;
+        else if (World.getBlock(new Vector(this.pos.x, this.pos.y - 0.5, this.pos.z)).id == 0)
+            this.yAcc += 0.01;
+        else
+            this.yAcc = 0;
+        this.pos.y -= this.yAcc;
+        if (this.rotation < 360)
+            this.rotation++;
+        else {
+            this.rotation = 0;
+        }
         this.transformation = Matrix.identity();
-        this.transformation = this.transformation.translate(this.pos.x, this.pos.y, this.pos.z);
+        this.transformation = this.transformation.translate(this.pos.x, this.pos.y + (Math.abs(this.rotation - 180) / 360), this.pos.z);
         this.transformation = this.transformation.scale(0.3, 0.3, 0.3);
         this.transformation = this.transformation.rotateY(this.rotation);
         gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.blocksGridTest);

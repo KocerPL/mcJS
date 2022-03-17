@@ -2,6 +2,7 @@ import { CanvaManager } from "./Engine/CanvaManager.js";
 import { EBO } from "./Engine/EBO.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Shader2d } from "./Engine/Shader/Shader2d.js";
+import { Task } from "./Engine/Task.js";
 import { Texture } from "./Engine/Texture.js";
 import { Array3D } from "./Engine/Utils/Array3D.js";
 import { Vector } from "./Engine/Utils/Vector.js";
@@ -101,6 +102,15 @@ export class Main {
         //   this.TESTtransf = this.TESTtransf.scale(2,1,1);
         requestAnimationFrame(this.loop.bind(this));
     }
+    static addTask(task, priority) {
+        this.tasks[priority].push(task);
+    }
+    static cancelTasks(caller, label) {
+        for (let x = 0; x < this.tasks.length; x++)
+            for (let y = this.tasks[x].length - 1; y > -1; y--)
+                if (this.tasks[x][y].caller == caller && this.tasks[x][y].label == label)
+                    this.tasks[x].splice(y, 1);
+    }
     static loop(time) {
         if (this.Measure.lastTime <= time - 1000) {
             this.Measure.lastTime = time;
@@ -139,7 +149,7 @@ export class Main {
         for (let i = this.tasks.length - 1; i >= 0; i--) {
             while (this.tasks[i].length > 0) {
                 let task = this.tasks[i].shift();
-                task();
+                task.func();
                 if (Date.now() - time > 20)
                     return;
             }
@@ -199,10 +209,10 @@ export class Main {
                                 if (chunk.subchunks[a].blocks[x1][y1][z1].id > 0 && y1 + (chunk.subchunks[a].pos.y * 16) > chunk.heightmap[x1][z1])
                                     chunk.heightmap[x1][z1] = y1 + (chunk.subchunks[a].pos.y * 16);
                             }
-                    Main.tasks[8].push(() => {
+                    Main.addTask(new Task(() => {
                         chunk.subchunks[a].inReGeneration = false;
                         chunk.subchunks[a].update(9);
-                    });
+                    }, Main), 9);
                     // console.log( this.chunks[x2][z2].subchunks[a]);
                 }
                 chunk.lazy = false;
