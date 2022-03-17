@@ -348,7 +348,7 @@ export class Main
    public static render()
    {
       this.Measure.frames++;
-      CanvaManager.debug.value = "Fps: "+this.Measure.fps+"Selected block: "+ blocks[this.player.itemsBar[this.player.selectedItem]].name;
+      CanvaManager.debug.value = "Fps: "+this.Measure.fps+" Selected block: "+ blocks[this.player.itemsBar[this.player.selectedItem].id].name +" Count:"+this.player.itemsBar[this.player.selectedItem].count;
       
       this.shader.use();
       this.player.update();

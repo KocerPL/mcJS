@@ -6,6 +6,7 @@ import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
 import { blocks } from "./Block.js";
+import { invItem } from "./Player.js";
 import { SubChunk } from "./SubChunk.js";
 import { World } from "./World.js";
 
@@ -29,7 +30,7 @@ export class GUI
     static tArray:Array<number>;
     static indArray:Array<number>;
     static invOpened:boolean =false;
-    static pickedBlock:number=null;
+    static pickedBlock:invItem=null;
     static pickedSlot=null;
     static pSisInv=null;
     static mouse =false;
@@ -131,10 +132,10 @@ export class GUI
         if(this.invOpened && CanvaManager.mouse.left && !this.mouse)
         {            if(slCoords[0]<CanvaManager.mouse.pos.x &&slCoords[1]<CanvaManager.mouse.pos.y &&slCoords[2]>CanvaManager.mouse.pos.x &&slCoords[3]>CanvaManager.mouse.pos.y )
           {
-            if(this.pickedBlock==null)
+            if(this.pickedBlock==null && Main.player.itemsBar[i].id!=0)
             {
-          this.pickedBlock=Main.player.itemsBar[i]
-          Main.player.itemsBar[i]=0;
+          this.pickedBlock=Main.player.itemsBar[i];
+          Main.player.itemsBar[i].id=0;
           this.mouse =true;
           this.pickedSlot = i;
           this.pSisInv=false;
@@ -191,10 +192,10 @@ export class GUI
           if(CanvaManager.mouse.left && !this.mouse)
           {            if(slCoords[0]<CanvaManager.mouse.pos.x &&slCoords[1]<CanvaManager.mouse.pos.y &&slCoords[2]>CanvaManager.mouse.pos.x &&slCoords[3]>CanvaManager.mouse.pos.y )
             {
-              if(this.pickedBlock==null)
+              if(this.pickedBlock==null &&  Main.player.inventory[(x*9)+i]!=undefined && Main.player.inventory[(x*9)+i].id!=0)
               {
             this.pickedBlock=Main.player.inventory[(x*9)+i];
-            Main.player.inventory[(x*9)+i]=0;
+            Main.player.inventory[(x*9)+i].id=0;
             this.pickedSlot = (x*9)+i;
                 this.pSisInv=true;
               }
@@ -271,12 +272,12 @@ export class GUI
        {
        
         //   console.log(indices);
-        if(Main.player.itemsBar[i]!=0)
+        if(Main.player.itemsBar[i].id!=0)
         {
        this.vArray= this.vArray.concat( slCoords);
        this.tArray= this.tArray.concat(this.crosstcords);
        this.iArray =this.iArray.concat(indices);
-       this.indArray = this.indArray.concat([blocks[Main.player.itemsBar[i]].textureIndex.front,blocks[Main.player.itemsBar[i]].textureIndex.front,blocks[Main.player.itemsBar[i]].textureIndex.front,blocks[Main.player.itemsBar[i]].textureIndex.front])
+       this.indArray = this.indArray.concat([blocks[Main.player.itemsBar[i].id].textureIndex.front,blocks[Main.player.itemsBar[i].id].textureIndex.front,blocks[Main.player.itemsBar[i].id].textureIndex.front,blocks[Main.player.itemsBar[i].id].textureIndex.front])
        for(let a=0;a<indices.length;a++)
        {
            indices[a] = indices[a]+4;
@@ -302,12 +303,12 @@ export class GUI
        {
        
         //   console.log(indices);
-        if(Main.player.inventory[(x*9)+i]!=0)
+        if(Main.player.inventory[(x*9)+i]!=undefined && Main.player.inventory[(x*9)+i].id!=0)
         {
        this.vArray= this.vArray.concat( slCoords);
        this.tArray= this.tArray.concat(this.crosstcords);
        this.iArray =this.iArray.concat(indices);
-       this.indArray = this.indArray.concat([blocks[Main.player.inventory[(x*9)+i]].textureIndex.front,blocks[Main.player.inventory[(x*9)+i]].textureIndex.front,blocks[Main.player.inventory[(x*9)+i]].textureIndex.front,blocks[Main.player.inventory[(x*9)+i]].textureIndex.front]);
+       this.indArray = this.indArray.concat([blocks[Main.player.inventory[(x*9)+i].id].textureIndex.front,blocks[Main.player.inventory[(x*9)+i].id].textureIndex.front,blocks[Main.player.inventory[(x*9)+i].id].textureIndex.front,blocks[Main.player.inventory[(x*9)+i].id].textureIndex.front]);
        for(let a=0;a<indices.length;a++)
        {
            indices[a] = indices[a]+4;
@@ -322,7 +323,7 @@ export class GUI
        y+=0.08;
       }
       
-      if(this.invOpened && this.pickedBlock!=null)
+      if(this.invOpened && this.pickedBlock instanceof invItem)
       {
         let mouseX= CanvaManager.mouse.pos.x;
         slCoords = [
@@ -335,7 +336,8 @@ export class GUI
         this.vArray= this.vArray.concat( slCoords);
         this.tArray= this.tArray.concat(this.crosstcords);
         this.iArray =this.iArray.concat(indices);
-        this.indArray = this.indArray.concat([blocks[this.pickedBlock].textureIndex.front,blocks[this.pickedBlock].textureIndex.front,blocks[this.pickedBlock].textureIndex.front,blocks[this.pickedBlock].textureIndex.front]);
+        console.log(this.pickedBlock);
+        this.indArray = this.indArray.concat([blocks[this.pickedBlock.id].textureIndex.front,blocks[this.pickedBlock.id].textureIndex.front,blocks[this.pickedBlock.id].textureIndex.front,blocks[this.pickedBlock.id].textureIndex.front]);
         for(let a=0;a<indices.length;a++)
         {
           indices[a] = indices[a]+4;

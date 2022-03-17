@@ -167,9 +167,7 @@ export class SubChunk {
             this.generated = true;
             //  console.log(this.blocks);
             if (!this.isLazy) {
-                Main.addTask(new Task(() => {
-                    this.update(2);
-                }, this), 3);
+                this.update(2);
             }
         }, this), 4);
     }

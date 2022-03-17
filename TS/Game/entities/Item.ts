@@ -10,7 +10,7 @@ let gl = CanvaManager.gl;
 export class Item extends Entity
 {
     type:number; 
-    cooldown:number = 100;
+    cooldown:number = 40;
     lifeTime:number = 60000;
     rotation:number =0;
     yAcc=0;
@@ -26,7 +26,12 @@ export class Item extends Entity
         if(this.cooldown>0)
         this.cooldown--;
         this.lifeTime--;
-        if(this.lifeTime<1 ||( this.cooldown<1 && Main.player.isTouching(this.pos)))
+        if( this.cooldown<1 && Main.player.isTouching(this.pos))
+        {
+            Main.player.pickupItem(this.type);    
+        Main.entities.splice(i,1);
+    }
+        if(this.lifeTime<1 )
         Main.entities.splice(i,1);
 
     }

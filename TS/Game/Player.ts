@@ -14,6 +14,17 @@ import { SubChunk } from "./SubChunk.js";
 import { World } from "./World.js";
 let gl = CanvaManager.gl;
 export type pers = "First" | "Second" |"Third";
+export class invItem 
+{
+    id:number;
+    count:number;
+
+    constructor(id)
+    {
+        this.id=id;
+        this.count=1;
+    }
+}
 export class Player
 {
 //model
@@ -23,8 +34,8 @@ export class Player
     camera:Camera = new Camera();
     pos:Vector;
     inWater:boolean;
-    itemsBar:Array<number> = [9,1,2,3,4,5,6,7,8];
-    inventory:Array<number> = [-1,10,9,9,9,9,9,9,9, 9,1,2,3,4,5,6,7,8, 9,1,2,3,4,5,6,7,8];
+    itemsBar:Array<invItem>=new Array(9);
+    inventory:Array<invItem>=new Array(27);
     locked:boolean=false;
     targetedBlock=null;
     startTime=0;
@@ -84,6 +95,10 @@ export class Player
     {
         this.pos = pos;
         this.camera.setPosition(new Vector(pos.x,pos.y+1,pos.z));
+        for(let i=0;i<9;i++)
+        this.itemsBar[i]= new invItem(0);
+        for(let i=0;i<27;i++)
+        this.inventory[i]= new invItem(0);
         this.vao = new VAO();
         this.vbo = new VBO();
       
@@ -210,7 +225,11 @@ export class Player
         {
             if(CanvaManager.getKeyOnce(81))
             {
-            Main.entities.push(new Item(this.camera.getPosition().copy(),Main.player.itemsBar[Main.player.selectedItem]));
+               
+            Main.entities.push(new Item(this.camera.getPosition().copy(),this.itemsBar[this.selectedItem].id));
+            this.itemsBar[this.selectedItem].count--;
+            if( this.itemsBar[this.selectedItem].count<1)
+            this.itemsBar[this.selectedItem].id=0;
                 console.log("heh");
         }
             if(CanvaManager.getKey(16))
@@ -476,7 +495,10 @@ console.log(error);
         }
        if(  World.getBlock(lastPos).id<1 && i<5 &&  !lastPos.round().equals(new Vector(this.pos.x,this.pos.y-0.5,this.pos.z).round()) &&  !lastPos.round().equals(this.pos.round()) )
        {
-       World.setBlockNoLight(lastPos,this.itemsBar[this.selectedItem],true);
+       World.setBlockNoLight(lastPos,this.itemsBar[this.selectedItem].id,true);
+       this.itemsBar[this.selectedItem].count--;
+       if(this.itemsBar[this.selectedItem].count==0)
+       this.itemsBar[this.selectedItem].id=0;
         CanvaManager.mouse.right=false;
         console.log("placed block!! at: ",lastPos);
        }
@@ -774,6 +796,33 @@ console.log(error);
       return false;
         
     }
+   pickupItem(id)
+   {
+       for(let x=0;x<this.itemsBar.length;x++)
+       {
+           if(this.itemsBar[x].id==id && this.itemsBar[x].count<65)
+           {
+           this.itemsBar[x].count++;
+        return   
+        }
+       if(this.itemsBar[x].id ==0 ) 
+       {this.itemsBar[x].id = id;
+     return;
+       }   
+        }
+        for(let x=0;x<this.inventory.length;x++)
+        {
+            if(this.inventory[x].id==id && this.inventory[x].count<65)
+            {
+            this.inventory[x].count++;
+         return   
+         }
+        if(this.inventory[x].id ==0 ) 
+        {this.inventory[x].id = id;
+      return;
+        }   
+         }
+   } 
     render()
     {
      

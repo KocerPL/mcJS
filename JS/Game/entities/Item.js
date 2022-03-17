@@ -9,7 +9,7 @@ import { World } from "../World.js";
 let gl = CanvaManager.gl;
 export class Item extends Entity {
     type;
-    cooldown = 100;
+    cooldown = 40;
     lifeTime = 60000;
     rotation = 0;
     yAcc = 0;
@@ -22,7 +22,11 @@ export class Item extends Entity {
         if (this.cooldown > 0)
             this.cooldown--;
         this.lifeTime--;
-        if (this.lifeTime < 1 || (this.cooldown < 1 && Main.player.isTouching(this.pos)))
+        if (this.cooldown < 1 && Main.player.isTouching(this.pos)) {
+            Main.player.pickupItem(this.type);
+            Main.entities.splice(i, 1);
+        }
+        if (this.lifeTime < 1)
             Main.entities.splice(i, 1);
     }
     prepareModel() {
