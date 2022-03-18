@@ -17,7 +17,8 @@ let gl = CanvaManager.gl;
 export class Main {
     static dispLl = false;
     static fastBreaking = false;
-    static FPS = 61;
+    static FPS = 100;
+    static fastTPS = 60;
     static TPS = 20;
     static sunLight = 14;
     static file = null;
@@ -36,6 +37,8 @@ export class Main {
     static shader;
     static delta = 0;
     static crossVAO;
+    static fastDelta = 0;
+    static lastFastTick = 0;
     static player = new Player(new Vector(0, 60, 0));
     static range = { start: -4, end: 4 };
     //public static chunks:Array<Array<Chunk>>=new Array(8);
@@ -133,6 +136,21 @@ export class Main {
             this.update();
         }
         ;
+        //60 updates
+        let fastDelta = time - this.lastFastTick;
+        this.fastDelta += fastDelta / (2000 / this.fastTPS);
+        // console.log(this.fastDelta);
+        if (this.fastDelta >= 1)
+            this.lastFastTick = time;
+        while (this.fastDelta >= 1) {
+            if (this.fastDelta > 100) {
+                console.log("Is game overloaded? Skipping " + fastDelta + "ms");
+                this.fastDelta = 0;
+            }
+            this.fastDelta--;
+            this.fastUpdate();
+        }
+        ;
         let testTime = Date.now();
         if (this.Measure.fps > 20)
             while (Date.now() - testTime < 20) {
@@ -154,6 +172,9 @@ export class Main {
                     return;
             }
         }
+    }
+    static fastUpdate() {
+        this.player.update();
     }
     static update() {
         if (CanvaManager.getKey(52) && this.sunLight < 16)
@@ -228,6 +249,15 @@ export class Main {
         //  this.TESTtransf =  this.TESTtransf.rotateZ(1);
         //this.TESTtransf =  this.TESTtransf.rotateY(1);
     }
+    static limitChunks() {
+        let x2 = Math.floor(Math.round(this.player.pos.x) / 16);
+        let z2 = Math.floor(Math.round(this.player.pos.z) / 16);
+        let chunk = this.getChunkAt(x2, z2);
+        let step = 1;
+        for (let i = 0; i < 20; i++) {
+            //x
+        }
+    }
     static exportChunks() {
         let k = new Array();
         for (let x = 0; x < this.loadedChunks.length; x++) {
@@ -295,27 +325,16 @@ export class Main {
         this.Measure.frames++;
         CanvaManager.debug.value = "Fps: " + this.Measure.fps + " Selected block: " + blocks[this.player.itemsBar[this.player.selectedItem].id].name + " Count:" + this.player.itemsBar[this.player.selectedItem].count;
         this.shader.use();
-        this.player.update();
         this.player.camera.preRender();
         CanvaManager.preRender();
         gl.clearColor(0.0, this.sunLight / 15, this.sunLight / 15, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.blocksGridTest);
         let toRender = new Array();
-        for (let x = this.range.start; x < this.range.end; x++)
-            for (let z = this.range.start; z < this.range.end; z++) {
-                let x2 = Math.floor(Math.round(this.player.pos.x) / 16) + x;
-                let z2 = Math.floor(Math.round(this.player.pos.z) / 16) + z;
-                let chunk = this.getChunkAt(x2, z2);
-                if (chunk == undefined) {
-                    chunk = new Chunk(x2, z2, false);
-                    this.loadedChunks.push(chunk);
-                }
-                if (chunk.lazy)
-                    chunk.generate();
-                chunk.render();
-                toRender.push(() => { chunk.renderWater(); });
-            }
+        for (let chunk of this.loadedChunks) {
+            chunk.render();
+            toRender.push(() => { chunk.renderWater(); });
+        }
         while (toRender.length > 0) {
             toRender.shift()();
         }
@@ -325,6 +344,22 @@ export class Main {
         //render crosshair
         this.player.render();
         GUI.render(this.shader2d);
+    }
+    static test() {
+        for (let x = this.range.start - 1; x < this.range.end + 1; x++)
+            for (let z = this.range.start - 1; z < this.range.end + 1; z++) {
+                let x2 = Math.floor(Math.round(this.player.pos.x) / 16) + x;
+                let z2 = Math.floor(Math.round(this.player.pos.z) / 16) + z;
+                let chunk = this.getChunkAt(x2, z2);
+                if (chunk == undefined) {
+                    chunk = new Chunk(x2, z2, true);
+                    this.loadedChunks.push(chunk);
+                }
+                if (chunk.lazy && !(x == this.range.start - 1 || x == this.range.end + 1 || z == this.range.start - 1 || z == this.range.end + 1))
+                    chunk.generate();
+                chunk.render();
+                //    toRender.push(()=>{chunk.renderWater()});
+            }
     }
 }
 Main.run();

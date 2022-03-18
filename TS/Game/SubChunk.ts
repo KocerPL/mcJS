@@ -10,6 +10,7 @@ import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
 import { Block, blocks, dirAssoc, directions } from "./Block.js";
+import { Chunk } from "./Chunk.js";
 import { World } from "./World.js";
 
 let gl = CanvaManager.gl; 
@@ -29,7 +30,7 @@ export class SubChunk
     generated:boolean=false;
     inReGeneration:boolean=false;
     lightUpdate:boolean = false;
-    empty:boolean = false;
+    empty:boolean = true;
     count:number;
     static defBlocks :Array<Array<Array<number>>>= new Array(16);
     static rand:Array<number> = new Array(64);
@@ -95,18 +96,18 @@ export class SubChunk
     ];
     vertices = new Array();
     indices = new Array();
+    chunk:Chunk;
     colors = new Array();
     lightLevels = new Array();
     transformation = Matrix.identity();
     pos:Vector;
-    isLazy:boolean;
-    constructor(pos:Vector,heightmap,isLazy)
+    constructor(pos:Vector,heightmap,chunk:Chunk,dontRender?)
     {
       this.pos = pos;
      this.transformation =  this.transformation.translate(pos.x*16,pos.y*16,pos.z*16);
       
-     this.isLazy = isLazy;
-     if(!isLazy)
+     this.chunk = chunk;
+     if(!dontRender??true)
     this.generate(pos,heightmap);
       this.vao = new VAO();
       this.vbo = new VBO();
@@ -193,7 +194,7 @@ export class SubChunk
     this.generated=true;
        
       //  console.log(this.blocks);
-      if(!this.isLazy)
+      if(!this.chunk.lazy)
       {
           this.update(2);
       }
@@ -208,18 +209,32 @@ export class SubChunk
        // console.log("lagggiing")
       }
       this.clearLight();
+      try
+      {
+      if(this.empty
+      ) 
+      {
+        return;
+      }
+    }
+    catch(error)
+    {
+     // console.log(error,this)
+    }
       this.updateLightLevels();
       this.updateVerticesIndices(priority);
-      
+     
     }
     clearLight()
     {
+      let airCount =4096;
       for(let x=0;x<16; x++)
       for(let y=0;y<16; y++)
       for(let z=0;z<16; z++)
       {
        
         if(this.blocks[x][y][z].id>0) continue;
+        if(this.blocks[x][y][z].id==0) airCount--;
         this.blocks[x][y][z].lightLevel=0;
         if(this.blocks[x][y][z].id==-2) this.blocks[x][y][z].id =0;
         this.blocks[x][y][z].lightFBlock=0;
@@ -231,6 +246,7 @@ export class SubChunk
     }
 
       }
+      if(airCount<1) this.empty=true; else this.empty=false;
     //  console.countReset("light");
     }
     getBlock(pos:Vector):Block
@@ -1100,11 +1116,7 @@ export class SubChunk
     }
     bufferVIC()
     {
-      if(this.indices.length<=1 && this.RsWater.indices.length<=1)
-      this.empty =true;
-    else
-    {
-    this.empty=false
+    
         this.vao.bind();
         this.vbo.bufferData(this.vertices);
         this.vlo.bufferData(this.lightLevels);
@@ -1113,7 +1125,7 @@ export class SubChunk
         this.vfb.bufferData(this.fromBlock);
         VAO.unbind();
         this.RsWater.bufferArrays(this.RsWater.vertices,this.RsWater.textureCoords,this.RsWater.lightLevels,this.RsWater.indices);
-    }
+  
     }
     static blockTextureCoords = Object.freeze({
         1:[

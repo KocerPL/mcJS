@@ -117,7 +117,7 @@ export class GUI {
                 if (slCoords[0] < CanvaManager.mouse.pos.x && slCoords[1] < CanvaManager.mouse.pos.y && slCoords[2] > CanvaManager.mouse.pos.x && slCoords[3] > CanvaManager.mouse.pos.y) {
                     if (this.pickedBlock == null && Main.player.itemsBar[i].id != 0) {
                         this.pickedBlock = Main.player.itemsBar[i];
-                        Main.player.itemsBar[i].id = 0;
+                        Main.player.itemsBar[i] = new invItem(0);
                         this.mouse = true;
                         this.pickedSlot = i;
                         this.pSisInv = false;
@@ -161,7 +161,7 @@ export class GUI {
                         if (slCoords[0] < CanvaManager.mouse.pos.x && slCoords[1] < CanvaManager.mouse.pos.y && slCoords[2] > CanvaManager.mouse.pos.x && slCoords[3] > CanvaManager.mouse.pos.y) {
                             if (this.pickedBlock == null && Main.player.inventory[(x * 9) + i] != undefined && Main.player.inventory[(x * 9) + i].id != 0) {
                                 this.pickedBlock = Main.player.inventory[(x * 9) + i];
-                                Main.player.inventory[(x * 9) + i].id = 0;
+                                Main.player.inventory[(x * 9) + i] = new invItem(0);
                                 this.pickedSlot = (x * 9) + i;
                                 this.pSisInv = true;
                             }

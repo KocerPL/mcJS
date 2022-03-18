@@ -26,7 +26,7 @@ export class SubChunk {
     generated = false;
     inReGeneration = false;
     lightUpdate = false;
-    empty = false;
+    empty = true;
     count;
     static defBlocks = new Array(16);
     static rand = new Array(64);
@@ -91,16 +91,16 @@ export class SubChunk {
     ];
     vertices = new Array();
     indices = new Array();
+    chunk;
     colors = new Array();
     lightLevels = new Array();
     transformation = Matrix.identity();
     pos;
-    isLazy;
-    constructor(pos, heightmap, isLazy) {
+    constructor(pos, heightmap, chunk, dontRender) {
         this.pos = pos;
         this.transformation = this.transformation.translate(pos.x * 16, pos.y * 16, pos.z * 16);
-        this.isLazy = isLazy;
-        if (!isLazy)
+        this.chunk = chunk;
+        if (!dontRender ?? true)
             this.generate(pos, heightmap);
         this.vao = new VAO();
         this.vbo = new VBO();
@@ -166,7 +166,7 @@ export class SubChunk {
             }
             this.generated = true;
             //  console.log(this.blocks);
-            if (!this.isLazy) {
+            if (!this.chunk.lazy) {
                 this.update(2);
             }
         }, this), 4);
@@ -179,15 +179,26 @@ export class SubChunk {
             // console.log("lagggiing")
         }
         this.clearLight();
+        try {
+            if (this.empty) {
+                return;
+            }
+        }
+        catch (error) {
+            // console.log(error,this)
+        }
         this.updateLightLevels();
         this.updateVerticesIndices(priority);
     }
     clearLight() {
+        let airCount = 4096;
         for (let x = 0; x < 16; x++)
             for (let y = 0; y < 16; y++)
                 for (let z = 0; z < 16; z++) {
                     if (this.blocks[x][y][z].id > 0)
                         continue;
+                    if (this.blocks[x][y][z].id == 0)
+                        airCount--;
                     this.blocks[x][y][z].lightLevel = 0;
                     if (this.blocks[x][y][z].id == -2)
                         this.blocks[x][y][z].id = 0;
@@ -197,6 +208,10 @@ export class SubChunk {
                         //console.count("light");
                     }
                 }
+        if (airCount < 1)
+            this.empty = true;
+        else
+            this.empty = false;
         //  console.countReset("light");
     }
     getBlock(pos) {
@@ -884,19 +899,14 @@ export class SubChunk {
         //console.log(this.colors);
     }
     bufferVIC() {
-        if (this.indices.length <= 1 && this.RsWater.indices.length <= 1)
-            this.empty = true;
-        else {
-            this.empty = false;
-            this.vao.bind();
-            this.vbo.bufferData(this.vertices);
-            this.vlo.bufferData(this.lightLevels);
-            this.vtc.bufferData(this.colors);
-            this.ebo.bufferData(this.indices);
-            this.vfb.bufferData(this.fromBlock);
-            VAO.unbind();
-            this.RsWater.bufferArrays(this.RsWater.vertices, this.RsWater.textureCoords, this.RsWater.lightLevels, this.RsWater.indices);
-        }
+        this.vao.bind();
+        this.vbo.bufferData(this.vertices);
+        this.vlo.bufferData(this.lightLevels);
+        this.vtc.bufferData(this.colors);
+        this.ebo.bufferData(this.indices);
+        this.vfb.bufferData(this.fromBlock);
+        VAO.unbind();
+        this.RsWater.bufferArrays(this.RsWater.vertices, this.RsWater.textureCoords, this.RsWater.lightLevels, this.RsWater.indices);
     }
     static blockTextureCoords = Object.freeze({
         1: [

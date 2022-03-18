@@ -6,6 +6,7 @@ import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
 import { blocks } from "./Block.js";
+import { Item } from "./entities/Item.js";
 import { invItem } from "./Player.js";
 import { SubChunk } from "./SubChunk.js";
 import { World } from "./World.js";
@@ -135,7 +136,7 @@ export class GUI
             if(this.pickedBlock==null && Main.player.itemsBar[i].id!=0)
             {
           this.pickedBlock=Main.player.itemsBar[i];
-          Main.player.itemsBar[i].id=0;
+          Main.player.itemsBar[i]= new invItem(0);
           this.mouse =true;
           this.pickedSlot = i;
           this.pSisInv=false;
@@ -195,7 +196,7 @@ export class GUI
               if(this.pickedBlock==null &&  Main.player.inventory[(x*9)+i]!=undefined && Main.player.inventory[(x*9)+i].id!=0)
               {
             this.pickedBlock=Main.player.inventory[(x*9)+i];
-            Main.player.inventory[(x*9)+i].id=0;
+            Main.player.inventory[(x*9)+i]= new invItem(0);
             this.pickedSlot = (x*9)+i;
                 this.pSisInv=true;
               }

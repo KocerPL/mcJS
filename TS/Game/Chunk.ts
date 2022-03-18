@@ -18,7 +18,7 @@ export class Chunk {
       this.heightmap[i] = new Array(16);
     }
     for (let i = 0; i < this.subchunks.length; i++) {
-     this.subchunks[i] = new SubChunk(new Vector(x, i, z),this.heightmap,isLazy);
+     this.subchunks[i] = new SubChunk(new Vector(x, i, z),this.heightmap,this);
       //console.log("Completed generating subchunk: "+i);
     }
     // console.log("done constructing");
@@ -101,8 +101,17 @@ export class Chunk {
     
       this.subchunks[i].generate(new Vector(this.pos.x,i,this.pos.z),this.heightmap);
     }
-    this.lazy=false;
+   // this.lazy=false;
 
+  }
+  updateAllSubchunks(priority)
+  {
+      
+    for (let i = 0; i < this.subchunks.length; i++) {
+    
+      this.subchunks[i].update(priority);
+    }
+    this.lazy=false;
   }
   getSubchunk(y)
   {
