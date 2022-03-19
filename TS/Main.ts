@@ -1,6 +1,7 @@
 import { Camera } from "./Engine/Camera.js";
 import { CanvaManager } from "./Engine/CanvaManager.js";
 import { EBO } from "./Engine/EBO.js";
+import { AtlasShader } from "./Engine/Shader/AtlasShader.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Shader2d } from "./Engine/Shader/Shader2d.js";
 import { Task } from "./Engine/Task.js";
@@ -41,6 +42,7 @@ export class Main
    private static lastTick = 0;
    private static lastFrame=0;
    public static shader:DefaultShader;
+   public static atlasShader:AtlasShader;
    private static delta = 0;
    private static crossVAO:VAO;
    private static fastDelta=0;
@@ -78,6 +80,7 @@ export class Main
    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
    //Shader for world
      this.shader = new DefaultShader();
+     this.atlasShader = new AtlasShader();
      //shader for GUI(2d)
      this.shader2d = new Shader2d();
      //loading crosshair 

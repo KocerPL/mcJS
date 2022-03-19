@@ -34,7 +34,6 @@ export class SubChunk
     count:number;
     static defBlocks :Array<Array<Array<number>>>= new Array(16);
     static rand:Array<number> = new Array(64);
-    static dirtTexture = new Texture(0,0);
     static defArrow = [
       //Facing POS_Z
       0.2,0,-0.2,

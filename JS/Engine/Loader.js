@@ -115,4 +115,53 @@ export class Loader {
         }
         return texture;
     }
+    static imageAtlasByJSON(path, json, imgSizeX, imgSizeY) {
+        let img = new Image();
+        img.src = path;
+        img.decode();
+        //loading image ^
+        //Buffering image
+        let texture = gl.createTexture();
+        let coords = new Array();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.activeTexture(gl.TEXTURE0);
+        for (let x = 0; x < json.length; x++) {
+            coords.push({
+                x: json[x].pos[0] / imgSizeX,
+                y: json[x].pos[1] / imgSizeY,
+                dx: (json[x].pos[0] + json[x].size[0]) / imgSizeX,
+                dy: (json[x].pos[1] + json[x].size[1]) / imgSizeY,
+            });
+        }
+        img.onload = () => {
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, img.width, img.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, img);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            //   gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+            console.log("loaded json");
+        };
+        if (img.complete) {
+            img.onload(new Event("loaded"));
+        }
+        let textureHolder = new Texture2(coords, texture);
+        return textureHolder;
+    }
+}
+export class Texture2 {
+    x;
+    y;
+    dx;
+    coords;
+    dy;
+    ID;
+    constructor(coords, textureID) {
+        this.ID = textureID;
+        this.coords = coords;
+    }
+    bind() {
+        gl.bindTexture(gl.TEXTURE_2D, this.ID);
+    }
 }

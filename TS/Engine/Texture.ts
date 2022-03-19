@@ -1,10 +1,11 @@
 import { Model } from "../Game/Models.js";
 import { Player } from "../Game/Player.js";
+import { CanvaManager } from "./CanvaManager.js";
 import { Loader } from "./Loader.js";
-
+let gl = CanvaManager.gl;
 export class Texture
 {
-    static SIZE = 64;
+    static SIZE=64;
     static imageSize = 1024;
     static rowSize = 16;
     static blocksGridTest = Loader.imageArray("/JS/Engine/Textures/Blocks.png",20,16);
@@ -13,15 +14,9 @@ export class Texture
    static skin = Loader.imageArrayByJSON("/JS/Engine/Textures/skinMC.png",Model.player);
     static GUItest = Loader.imageArray("/JS/Engine/Textures/GUI.png",3,9);
     static crossHair = Loader.image("/JS/Engine/Textures/crosshair.png");
-    x:number;
-    y:number;
-    dx:number;
-    dy:number;
-    constructor(x:number,y:number)
-    {
-        this.x = 1/ (Texture.SIZE*x);
-        this.y = 1/(Texture.SIZE*y);
-        this.dx = 1/((Texture.SIZE*x)+Texture.SIZE);
-        this.dy = 1/((Texture.SIZE*y)+Texture.SIZE);
-    }
+  
+    static skinAtlas =  Loader.imageAtlasByJSON("/JS/Engine/Textures/skinMC.png",Model.player,64,64);
+
+  
+    
 }

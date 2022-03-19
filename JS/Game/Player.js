@@ -92,7 +92,7 @@ export class Player {
         this.vbo = new VBO();
         this.vao.addPtr(0, 3, 0, 0);
         this.vtc = new VBO();
-        this.vao.addPtr(1, 3, 0, 0);
+        this.vao.addPtr(1, 2, 0, 0);
         this.vlo = new VBO();
         this.vao.addPtr(2, 1, 0, 0);
         this.ebo = new EBO();
@@ -131,42 +131,40 @@ export class Player {
     }
     bufferVertexes() {
         this.vao.bind();
-        this.vbo.bufferData(SubChunk.defVertices);
-        this.vlo.bufferData([14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, /*Body */ , 14, 14, 14, 14]);
-        this.vtc.bufferData([
-            0.0, 1.0, 1,
-            1.0, 1.0, 1,
-            1.0, 0.0, 1,
-            0.0, 0.0, 1,
-            0.0, 1.0, 0,
-            1.0, 1.0, 0,
-            1.0, 0.0, 0,
-            0.0, 0.0, 0,
-            0.0, 1.0, 2,
-            1.0, 1.0, 2,
-            1.0, 0.0, 2,
-            0.0, 0.0, 2,
-            0.0, 1.0, 3,
-            1.0, 1.0, 3,
-            1.0, 0.0, 3,
-            0.0, 0.0, 3,
-            0.0, 1.0, 5,
-            1.0, 1.0, 5,
-            1.0, 0.0, 5,
-            0.0, 0.0, 5,
-            0.0, 1.0, 4,
-            1.0, 1.0, 4,
-            1.0, 0.0, 4,
-            0.0, 0.0, 4,
-            //End head, Body:
-        ]);
+        this.vbo.bufferData([...SubChunk.defVertices, -0.5, -0.7, -0.2,
+            0.5, -0.7, -0.2,
+            0.5, 0.7, -0.2,
+            -0.5, 0.7, -0.2,
+            -0.5, -0.7, 0.2,
+            0.5, -0.7, 0.2,
+            0.5, 0.7, 0.2,
+            -0.5, 0.7, 0.2,]);
+        this.vlo.bufferData([14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, /*Body */ , 14, 14, 14, 14, 14, 14, 14, 14]);
+        let tc = new Array();
+        let pushFunc = (ind) => {
+            tc = tc.concat([
+                Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].dy,
+                Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].dy,
+                Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].y,
+                Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].y
+            ]);
+        };
+        pushFunc(1);
+        pushFunc(0);
+        pushFunc(2);
+        pushFunc(3);
+        pushFunc(5);
+        pushFunc(4);
+        pushFunc(7);
+        pushFunc(6);
+        this.vtc.bufferData(tc);
         let array = new Array();
         for (let i = 0; i < 7; i++) {
             let k = 4 * i;
             array.concat([2 + k, 1 + k, k, 2 + k, 0 + k, 3 + k]);
         }
         this.ebo.bufferData([2, 1, 0, 2, 0, 3,
-            6, 5, 4, 6, 4, 7, 10, 9, 8, 10, 8, 11, 14, 13, 12, 14, 12, 15, 18, 17, 16, 18, 16, 19, 22, 21, 20, 22, 20, 23, /**Body */ 26, 25, 24, 26, 24, 27]);
+            6, 5, 4, 6, 4, 7, 10, 9, 8, 10, 8, 11, 14, 13, 12, 14, 12, 15, 18, 17, 16, 18, 16, 19, 22, 21, 20, 22, 20, 23, /**Body */ 26, 25, 24, 26, 24, 27, 30, 29, 28, 30, 28, 31]);
         VAO.unbind();
     }
     switchPerson(person) {
@@ -746,11 +744,14 @@ export class Player {
             transformation = transformation.rotateY(-this.camera.getYaw());
             transformation = transformation.rotateX(-this.camera.getPitch());
             transformation = transformation.scale(0.4, 0.4, 0.4);
-            gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.skin);
+            Texture.skinAtlas.bind();
             this.vao.bind();
-            Main.shader.loadUniforms(this.camera.getProjection(), transformation, this.camera.getView(), 15);
-            Main.shader.use();
+            Main.atlasShader.use();
+            Main.atlasShader.loadUniforms(this.camera.getProjection(), transformation, this.camera.getView(), 15);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_INT, 0);
+            Main.atlasShader.loadTransformation(Matrix.identity().translate(this.pos.x, this.pos.y + 0.15, this.pos.z).scale(0.55, 0.55, 0.55).rotateY(-this.camera.getYaw()));
+            gl.drawElements(gl.TRIANGLES, 12, gl.UNSIGNED_INT, 36 * 4);
+            Main.shader.use();
         }
         if (this.blockBreakingTime > 1) {
             let transformation = Matrix.identity();

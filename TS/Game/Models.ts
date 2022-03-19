@@ -25,7 +25,7 @@ export var Model=
         pos:[16,0],
         size:[8,8]
     },
- /*    {//6 front Body
+    {//6 front Body
         pos:[20,20],
         size:[8,12]
     },
@@ -48,6 +48,6 @@ export var Model=
      {//11 bottom Body
         pos:[28,16],
         size:[8,4]
-    },*/
+    },
 ]
 }

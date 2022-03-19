@@ -2,7 +2,6 @@ import { CanvaManager } from "../Engine/CanvaManager.js";
 import { EBO } from "../Engine/EBO.js";
 import { RenderSet } from "../Engine/RenderSet.js";
 import { Task } from "../Engine/Task.js";
-import { Texture } from "../Engine/Texture.js";
 import { Array3D } from "../Engine/Utils/Array3D.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Vector } from "../Engine/Utils/Vector.js";
@@ -30,7 +29,6 @@ export class SubChunk {
     count;
     static defBlocks = new Array(16);
     static rand = new Array(64);
-    static dirtTexture = new Texture(0, 0);
     static defArrow = [
         //Facing POS_Z
         0.2, 0, -0.2,
