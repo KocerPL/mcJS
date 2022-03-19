@@ -8,7 +8,8 @@ export class Chunk {
     subchunks = new Array(16);
     todo = new Array();
     heightmap = new Array(16);
-    lazy = false;
+    neighbours = {};
+    lazy = true;
     pos;
     constructor(x, z, isLazy) {
         // console.log("Constructing chunk");
@@ -20,7 +21,65 @@ export class Chunk {
             this.subchunks[i] = new SubChunk(new Vector(x, i, z), this.heightmap, this);
             //console.log("Completed generating subchunk: "+i);
         }
+        this.sendNeighbours();
         // console.log("done constructing");
+    }
+    updateNeighbour(neigbDir, chunk) {
+        if (chunk == undefined)
+            return;
+        this.neighbours[neigbDir] = chunk;
+    }
+    gatherNeighbours() {
+        try {
+            let neighbour = Main.getChunkAt(this.pos.x - 1, this.pos.z);
+            this.updateNeighbour("NEG_X", neighbour);
+        }
+        catch (error) {
+        }
+        try {
+            let neighbour = Main.getChunkAt(this.pos.x + 1, this.pos.z);
+            this.updateNeighbour("POS_X", neighbour);
+        }
+        catch (error) {
+        }
+        try {
+            let neighbour = Main.getChunkAt(this.pos.x, this.pos.z - 1);
+            this.updateNeighbour("NEG_Z", neighbour);
+        }
+        catch (error) {
+        }
+        try {
+            let neighbour = Main.getChunkAt(this.pos.x, this.pos.z + 1);
+            this.updateNeighbour("POS_Z", neighbour);
+        }
+        catch (error) {
+        }
+    }
+    sendNeighbours() {
+        try {
+            let neighbour = Main.getChunkAt(this.pos.x - 1, this.pos.z);
+            neighbour.updateNeighbour("POS_X", this);
+        }
+        catch (error) {
+        }
+        try {
+            let neighbour = Main.getChunkAt(this.pos.x + 1, this.pos.z);
+            neighbour.updateNeighbour("NEG_X", this);
+        }
+        catch (error) {
+        }
+        try {
+            let neighbour = Main.getChunkAt(this.pos.x, this.pos.z - 1);
+            neighbour.updateNeighbour("POS_Z", this);
+        }
+        catch (error) {
+        }
+        try {
+            let neighbour = Main.getChunkAt(this.pos.x, this.pos.z + 1);
+            neighbour.updateNeighbour("NEG_Z", this);
+        }
+        catch (error) {
+        }
     }
     update(startTime) {
         let actualTime = Date.now();
@@ -36,7 +95,7 @@ export class Chunk {
             for (let i = 0; i < this.subchunks.length; i++) {
                 if (this.subchunks[i] != undefined && this.subchunks[i].generated && !this.subchunks[i].empty) {
                     this.subchunks[i].vao.bind();
-                    Main.shader.loadUniforms(Main.player.camera.getProjection(), this.subchunks[i].transformation, Main.player.camera.getView(), Main.sunLight);
+                    Main.shader.loadTransformation(this.subchunks[i].transformation);
                     //console.log(this.subchunks[i].count);
                     gl.drawElements(gl.TRIANGLES, this.subchunks[i].count, gl.UNSIGNED_INT, 0);
                 }
@@ -89,10 +148,16 @@ export class Chunk {
         // this.lazy=false;
     }
     updateAllSubchunks(priority) {
+        if (this.neighbours.NEG_X == undefined || this.neighbours.POS_X == undefined || this.neighbours.POS_Z == undefined || this.neighbours.NEG_Z == undefined) {
+            this.gatherNeighbours();
+            if (this.neighbours.NEG_X == undefined || this.neighbours.POS_X == undefined || this.neighbours.POS_Z == undefined || this.neighbours.NEG_Z == undefined)
+                return;
+        }
         for (let i = 0; i < this.subchunks.length; i++) {
             this.subchunks[i].update(priority);
         }
         this.lazy = false;
+        console.log("now not lazy hehehehe");
     }
     getSubchunk(y) {
         let yPos = Math.floor(Math.round(y) / 16);

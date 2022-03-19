@@ -15,4 +15,8 @@ export class DefaultShader extends Shader
         this.loadMatrix("view",view);
         this.loadFloat("light",light);
     }
+    loadTransformation(transf:Matrix)
+    {
+        this.loadMatrix("transformation",transf);  
+    }
 }

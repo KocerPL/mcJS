@@ -10,7 +10,7 @@ import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
 import { Block, blocks, dirAssoc, directions } from "./Block.js";
-import { Chunk } from "./Chunk.js";
+import { Chunk, DIR } from "./Chunk.js";
 import { World } from "./World.js";
 
 let gl = CanvaManager.gl; 
@@ -208,11 +208,11 @@ export class SubChunk
         Main.cancelTasks(this,"update");
        // console.log("lagggiing")
       }
-      this.clearLight();
+      if(!this.generated) return;
+            this.clearLight();
       try
       {
-      if(this.empty
-      ) 
+      if(this.empty) 
       {
         return;
       }
@@ -238,7 +238,7 @@ export class SubChunk
         this.blocks[x][y][z].lightLevel=0;
         if(this.blocks[x][y][z].id==-2) this.blocks[x][y][z].id =0;
         this.blocks[x][y][z].lightFBlock=0;
-        if(y+(this.pos.y*16)== Main.getChunkAt(this.pos.x,this.pos.z).heightmap[x][z]+1)
+        if(y+(this.pos.y*16)==this.chunk.heightmap[x][z]+1)
         {
      this.blocks[x][y][z].lightLevel=15;
           //console.count("light");
@@ -311,7 +311,7 @@ export class SubChunk
       let light2 =0;
       let theBlock = this.blocks[x][y][z];
       if(theBlock.id >0) return;
-      let chunk =Main.getChunkAt(this.pos.x,this.pos.z)
+      let chunk = this.chunk;
       if(y+(this.pos.y*16)>= chunk.heightmap[x][z]+1)
       {
       light=15;
@@ -646,7 +646,7 @@ export class SubChunk
           fB=fB.concat(true,true,true);
           index+=3;
           }
-          else if(this.blocks[x][y][z].lightDir == directions.POS_Y  || y+(this.pos.y*16)==Main.getChunkAt(this.pos.x,this.pos.z).heightmap[x][z]+1)
+          else if(this.blocks[x][y][z].lightDir == directions.POS_Y  || y+(this.pos.y*16)==this.chunk.heightmap[x][z]+1)
           {
             vertices = vertices.concat(temp2.slice(45,54));
             textureCoords = textureCoords.concat(SubChunk.getTextureCords2(8,"top").slice(0,9));
@@ -717,15 +717,18 @@ export class SubChunk
             {
               let light=-2;
               let light2 =-2;
+              let dir:DIR;
               let subCpos = this.pos.copy();
               let inscPos =new Vector(x,y,z);
               if(vec.x<0)
               {
+                dir="NEG_X";
               subCpos.x-=1;
               inscPos.x= 15
               }
               else if(vec.x>0)
               {
+                dir="POS_X";
               subCpos.x+=1;
               inscPos.x= 0
               }
@@ -741,17 +744,23 @@ export class SubChunk
               }
               else if(vec.z<0)
               {
+                dir="NEG_Z";
               subCpos.z-=1;
               inscPos.z= 15
               }
               else if(vec.z>0)
               {
+                dir="POS_Z";
               subCpos.z+=1;
               inscPos.z= 0
               }
               let blocked= false;
               try {
-              let block:Block = Main.getChunkAt(subCpos.x,subCpos.z).subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
+                let block:Block;
+                if(dir!=undefined)
+              block =this.chunk.neighbours[dir].subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
+              else
+              block =this.chunk.subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
               if(block.id<1 )
               {
               light2 = block.lightFBlock;

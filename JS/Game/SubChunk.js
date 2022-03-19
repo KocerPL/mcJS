@@ -178,6 +178,8 @@ export class SubChunk {
             Main.cancelTasks(this, "update");
             // console.log("lagggiing")
         }
+        if (!this.generated)
+            return;
         this.clearLight();
         try {
             if (this.empty) {
@@ -203,7 +205,7 @@ export class SubChunk {
                     if (this.blocks[x][y][z].id == -2)
                         this.blocks[x][y][z].id = 0;
                     this.blocks[x][y][z].lightFBlock = 0;
-                    if (y + (this.pos.y * 16) == Main.getChunkAt(this.pos.x, this.pos.z).heightmap[x][z] + 1) {
+                    if (y + (this.pos.y * 16) == this.chunk.heightmap[x][z] + 1) {
                         this.blocks[x][y][z].lightLevel = 15;
                         //console.count("light");
                     }
@@ -266,7 +268,7 @@ export class SubChunk {
         let theBlock = this.blocks[x][y][z];
         if (theBlock.id > 0)
             return;
-        let chunk = Main.getChunkAt(this.pos.x, this.pos.z);
+        let chunk = this.chunk;
         if (y + (this.pos.y * 16) >= chunk.heightmap[x][z] + 1) {
             light = 15;
             lightDir = directions.SKYLIGHT;
@@ -528,7 +530,7 @@ export class SubChunk {
                     fB = fB.concat(true, true, true);
                     index += 3;
                 }
-                else if (this.blocks[x][y][z].lightDir == directions.POS_Y || y + (this.pos.y * 16) == Main.getChunkAt(this.pos.x, this.pos.z).heightmap[x][z] + 1) {
+                else if (this.blocks[x][y][z].lightDir == directions.POS_Y || y + (this.pos.y * 16) == this.chunk.heightmap[x][z] + 1) {
                     vertices = vertices.concat(temp2.slice(45, 54));
                     textureCoords = textureCoords.concat(SubChunk.getTextureCords2(8, "top").slice(0, 9));
                     indices = indices.concat(index + 2, index + 1, index);
@@ -580,13 +582,16 @@ export class SubChunk {
                 else {
                     let light = -2;
                     let light2 = -2;
+                    let dir;
                     let subCpos = this.pos.copy();
                     let inscPos = new Vector(x, y, z);
                     if (vec.x < 0) {
+                        dir = "NEG_X";
                         subCpos.x -= 1;
                         inscPos.x = 15;
                     }
                     else if (vec.x > 0) {
+                        dir = "POS_X";
                         subCpos.x += 1;
                         inscPos.x = 0;
                     }
@@ -599,16 +604,22 @@ export class SubChunk {
                         inscPos.y = 0;
                     }
                     else if (vec.z < 0) {
+                        dir = "NEG_Z";
                         subCpos.z -= 1;
                         inscPos.z = 15;
                     }
                     else if (vec.z > 0) {
+                        dir = "POS_Z";
                         subCpos.z += 1;
                         inscPos.z = 0;
                     }
                     let blocked = false;
                     try {
-                        let block = Main.getChunkAt(subCpos.x, subCpos.z).subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
+                        let block;
+                        if (dir != undefined)
+                            block = this.chunk.neighbours[dir].subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
+                        else
+                            block = this.chunk.subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
                         if (block.id < 1) {
                             light2 = block.lightFBlock;
                             if ((this.blocks[x][y][z].id < 0 && block.id < 0))

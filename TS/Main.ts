@@ -23,7 +23,7 @@ export class Main
 {
    public static dispLl = false;
    public static fastBreaking=false;
-   public static FPS:number=100;
+   public static FPS:number=61;
    public static fastTPS=60;
    public static TPS:number=20;
    public static sunLight=14;
@@ -46,7 +46,7 @@ export class Main
    private static fastDelta=0;
    private static lastFastTick=0;
    public static player = new Player(new Vector(0,60,0));
-   public static range = {start:-4, end:4};
+   public static range = {start:0, end:1};
    //public static chunks:Array<Array<Chunk>>=new Array(8);
    public static loadedChunks:Array<Chunk> = new Array();
    private static crosscords = [
@@ -101,16 +101,6 @@ export class Main
        this.tasks[i]=new Array();
     }
      //loading chunks
-     for(let x=this.range.start; x<this.range.end;x++)
-     {
-      for(let z=this.range.start; z<this.range.end;z++)
-       {
-          if(x==this.range.start-1 ||x==this.range.end+1||z==this.range.start-1 || z==this.range.end+1   )
-          this.loadedChunks.push(new Chunk(x,z,true));
-          else
-         this.loadedChunks.push(new Chunk(x,z,false));
-       }
-      }
   //  console.log(this.chunks);
  //   this.TESTtransf = this.TESTtransf.scale(2,1,1);
      requestAnimationFrame(this.loop.bind(this));
@@ -153,6 +143,7 @@ export class Main
       this.delta--;
       this.update();
       };
+      this.limitChunks();
       //60 updates
       let fastDelta = time-this.lastFastTick;
       this.fastDelta += fastDelta/(2000/this.fastTPS);
@@ -203,7 +194,7 @@ export class Main
    }
    public static update()
    {
-      
+     
       if(CanvaManager.getKey(52)&&this.sunLight<16)
       this.sunLight++;
       if(CanvaManager.getKey(53)&&this.sunLight>0)
@@ -296,16 +287,52 @@ export class Main
    }
    private static limitChunks()
    {
-      let x2 =Math.floor(Math.round(this.player.pos.x)/16);
-      let z2 =Math.floor(Math.round(this.player.pos.z)/16);
-      let chunk =  this.getChunkAt(x2,z2);
+      let x =Math.floor(Math.round(this.player.pos.x)/16);
+      let z =Math.floor(Math.round(this.player.pos.z)/16);
+      let chunk =  this.getORnew(x,z,false);
       let step=1;
-
-      for(let i=0;i<20;i++)
+      let iter =1;
+      let howMuch=100;
+      let loadBuffer = new Array();
+      loadBuffer.push(chunk);
+      if(chunk.lazy) chunk.updateAllSubchunks(2);
+      let nextCoords= new Vector(x,0,z);
+      //Spiral chunk loading algorithm
+      let lazyChunkPhase=false;
+      let k=0;
+     while(k<2)
       {
+         if(lazyChunkPhase)
+         k++;
+         if(loadBuffer.length>=howMuch) lazyChunkPhase=true;
             //x
-
+            for(let i=0;i<iter;i++)
+            {
+         nextCoords.x+=step;
+         let chunk = this.getORnew(nextCoords.x,nextCoords.z,lazyChunkPhase)
+         if(!lazyChunkPhase && chunk.lazy) chunk.updateAllSubchunks(2);
+         loadBuffer.push(chunk);
+         if(loadBuffer.length>=howMuch) lazyChunkPhase=true;
+            }
+         //z
+         for(let i=0;i<iter;i++)
+            {
+         nextCoords.z+=step;
+         let chunk = this.getORnew(nextCoords.x,nextCoords.z,lazyChunkPhase)
+         if(!lazyChunkPhase && chunk.lazy) chunk.updateAllSubchunks(2);
+         loadBuffer.push(chunk);
+         if(loadBuffer.length>=howMuch) lazyChunkPhase=true;
+            }
+         //increase and invert step
+         
+        iter++;
+        step= -step;
       }
+      this.loadedChunks=loadBuffer;
+   }
+   private static getORnew(x:number,z:number,lazy:boolean):Chunk
+   {
+     return this.getChunkAt(x,z) ?? new Chunk(x,z,lazy); 
    }
    public static exportChunks()
    {
@@ -394,11 +421,14 @@ export class Main
    
       gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
       let toRender = new Array();
+      Main.shader.loadUniforms(Main.player.camera.getProjection(), Matrix.identity(), Main.player.camera.getView(),Main.sunLight);
       for(let chunk of this.loadedChunks)
       {
+         if(!chunk.lazy)
+         {
          chunk.render()   
       toRender.push(()=>{chunk.renderWater()});
-   
+         }
    } 
       while(toRender.length>0)
        {
