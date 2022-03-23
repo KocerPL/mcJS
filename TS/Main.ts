@@ -22,6 +22,7 @@ let gl = CanvaManager.gl;
 declare var perlin;
 export class Main
 {
+   public static okok = false;
    public static dispLl = false;
    public static fastBreaking=false;
    public static FPS:number=61;
