@@ -163,10 +163,6 @@ export class SubChunk {
                 }
             }
             this.generated = true;
-            //  console.log(this.blocks);
-            if (!this.chunk.lazy) {
-                this.update(2);
-            }
         }, this), 4);
     }
     update(priority, immediate) {
@@ -180,7 +176,8 @@ export class SubChunk {
             return;
         this.clearLight();
         try {
-            if (this.empty) {
+            if (this.empty && this.chunk.subchunks[this.pos.y + 1].empty && this.chunk.subchunks[this.pos.y - 1].empty) {
+                console.log(this.chunk.subchunks[this.pos.y - 1].empty);
                 return;
             }
         }

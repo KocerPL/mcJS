@@ -37,6 +37,7 @@ export class Main
       ticks:0,
       frames:0
    }
+   private static unloadedChunks:Array<Chunk> = new Array();
    private static shader2d:Shader2d;
    public static tasks:Array<Array<Task>> = new Array(11);
    private static lastTick = 0;
@@ -51,6 +52,7 @@ export class Main
    public static range = {start:0, end:1};
    //public static chunks:Array<Array<Chunk>>=new Array(8);
    public static loadedChunks:Array<Chunk> = new Array();
+  private static tempChunkBuffer:Array<Chunk> = new Array();
    private static crosscords = [
       -0.02,-0.02,
       0.02,0.02,
@@ -66,6 +68,10 @@ export class Main
    private static crossindices =[
       0,1,2, 3,1,0
    ]
+   public static heh():void
+   {
+      console.log("heh");
+   }
    public static run():void
    {
       CanvaManager.setupCanva(document.body);
@@ -292,11 +298,13 @@ export class Main
    {
       let x =Math.floor(Math.round(this.player.pos.x)/16);
       let z =Math.floor(Math.round(this.player.pos.z)/16);
-      let chunk =  this.getORnew(x,z,false);
+      
       let step=1;
       let iter =1;
       let howMuch=100;
       let loadBuffer = new Array();
+      this.tempChunkBuffer = [...this.loadedChunks];
+      let chunk =  this.getORnew(x,z,false);
       loadBuffer.push(chunk);
       if(chunk.lazy) chunk.updateAllSubchunks(2);
       let nextCoords= new Vector(x,0,z);
@@ -332,10 +340,24 @@ export class Main
         step= -step;
       }
       this.loadedChunks=loadBuffer;
+      this.unloadedChunks = this.unloadedChunks.concat([...this.tempChunkBuffer]);
    }
    private static getORnew(x:number,z:number,lazy:boolean):Chunk
    {
-     return this.getChunkAt(x,z) ?? new Chunk(x,z,lazy); 
+      for(let l=0;l<this.tempChunkBuffer.length;l++)
+      if(this.tempChunkBuffer[l].pos.x == x && this.tempChunkBuffer[l].pos.z == z)
+      {
+      return  [...this.tempChunkBuffer.splice(l,1)][0];
+        
+      }
+
+      for(let l=0;l<this.unloadedChunks.length;l++)
+      if(this.unloadedChunks[l].pos.x == x && this.unloadedChunks[l].pos.z == z)
+      {
+      return  [...this.unloadedChunks.splice(l,1)][0];
+        
+      }
+  return new Chunk(x,z,lazy); 
    }
    public static exportChunks()
    {

@@ -48,5 +48,9 @@ export var Model = {
             pos: [28, 16],
             size: [8, 4]
         },
+        {
+            pos: [0, 20],
+            size: [4, 12]
+        }
     ]
 };

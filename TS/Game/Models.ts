@@ -49,5 +49,9 @@ export var Model=
         pos:[28,16],
         size:[8,4]
     },
+    {//12 left left leg
+        pos:[0,20],
+        size:[4,12]
+    }
 ]
 }

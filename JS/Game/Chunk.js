@@ -93,7 +93,7 @@ export class Chunk {
     render() {
         if (!this.lazy)
             for (let i = 0; i < this.subchunks.length; i++) {
-                if (this.subchunks[i] != undefined && this.subchunks[i].generated && !this.subchunks[i].empty) {
+                if (this.subchunks[i] != undefined && this.subchunks[i].generated && this.subchunks[i].count > 0) {
                     this.subchunks[i].vao.bind();
                     Main.shader.loadTransformation(this.subchunks[i].transformation);
                     //console.log(this.subchunks[i].count);
@@ -104,7 +104,7 @@ export class Chunk {
     renderWater() {
         if (!this.lazy)
             for (let i = 0; i < this.subchunks.length; i++) {
-                if (this.subchunks[i] != undefined && this.subchunks[i].generated && !this.subchunks[i].empty) {
+                if (this.subchunks[i] != undefined && this.subchunks[i].generated && this.subchunks[i].RsWater.count > 0) {
                     this.subchunks[i].RsWater.vao.bind();
                     Main.shader.loadUniforms(Main.player.camera.getProjection(), this.subchunks[i].transformation, Main.player.camera.getView(), Main.sunLight);
                     //  console.log( this.subchunks[i].RsWater.count);

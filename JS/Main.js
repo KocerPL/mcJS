@@ -32,6 +32,7 @@ export class Main {
         ticks: 0,
         frames: 0
     };
+    static unloadedChunks = new Array();
     static shader2d;
     static tasks = new Array(11);
     static lastTick = 0;
@@ -46,6 +47,7 @@ export class Main {
     static range = { start: 0, end: 1 };
     //public static chunks:Array<Array<Chunk>>=new Array(8);
     static loadedChunks = new Array();
+    static tempChunkBuffer = new Array();
     static crosscords = [
         -0.02, -0.02,
         0.02, 0.02,
@@ -61,6 +63,9 @@ export class Main {
     static crossindices = [
         0, 1, 2, 3, 1, 0
     ];
+    static heh() {
+        console.log("heh");
+    }
     static run() {
         CanvaManager.setupCanva(document.body);
         // EBO.unbind();
@@ -249,11 +254,12 @@ export class Main {
     static limitChunks() {
         let x = Math.floor(Math.round(this.player.pos.x) / 16);
         let z = Math.floor(Math.round(this.player.pos.z) / 16);
-        let chunk = this.getORnew(x, z, false);
         let step = 1;
         let iter = 1;
         let howMuch = 100;
         let loadBuffer = new Array();
+        this.tempChunkBuffer = [...this.loadedChunks];
+        let chunk = this.getORnew(x, z, false);
         loadBuffer.push(chunk);
         if (chunk.lazy)
             chunk.updateAllSubchunks(2);
@@ -291,9 +297,18 @@ export class Main {
             step = -step;
         }
         this.loadedChunks = loadBuffer;
+        this.unloadedChunks = this.unloadedChunks.concat([...this.tempChunkBuffer]);
     }
     static getORnew(x, z, lazy) {
-        return this.getChunkAt(x, z) ?? new Chunk(x, z, lazy);
+        for (let l = 0; l < this.tempChunkBuffer.length; l++)
+            if (this.tempChunkBuffer[l].pos.x == x && this.tempChunkBuffer[l].pos.z == z) {
+                return [...this.tempChunkBuffer.splice(l, 1)][0];
+            }
+        for (let l = 0; l < this.unloadedChunks.length; l++)
+            if (this.unloadedChunks[l].pos.x == x && this.unloadedChunks[l].pos.z == z) {
+                return [...this.unloadedChunks.splice(l, 1)][0];
+            }
+        return new Chunk(x, z, lazy);
     }
     static exportChunks() {
         let k = new Array();

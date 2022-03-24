@@ -160,8 +160,29 @@ export class Player
             -0.5,-0.7,0.2,
             0.5,-0.7,0.2,
             0.5,0.7,0.2,
-            -0.5,0.7,0.2, ]);
-        this.vlo.bufferData([14,14,14,14 ,14,14,14,14 ,14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, /*Body */, 14,14,14,14, 14,14,14,14]);
+            -0.5,0.7,0.2,
+            //right body
+            -0.5,-0.7,-0.2,
+            -0.5,-0.7,0.2,
+            -0.5,0.7,0.2,
+            -0.5,0.7,-0.2,
+            //left body
+            0.5,-0.7,-0.2,
+            0.5,-0.7,0.2,
+            0.5,0.7,0.2,
+            0.5,0.7,-0.2,
+            //bottom body
+            -0.5,-0.7,-0.2,
+            0.5,-0.7,-0.2,
+            0.5,-0.7,0.2,
+            -0.5,-0.7,0.2,
+            //top body
+            -0.5,0.7,-0.2,
+            0.5,0.7,-0.2,
+            0.5,0.7,0.2,
+            -0.5,0.7,0.2,
+        ]);
+        this.vlo.bufferData([14,14,14,14 ,14,14,14,14 ,14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, /*Body */, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14]);
      let tc = new Array();
    
         let pushFunc = (ind)=>{
@@ -179,15 +200,18 @@ export class Player
    pushFunc(4);
    pushFunc(7);
    pushFunc(6);
+   pushFunc(9);
+   pushFunc(8);
+   pushFunc(11);
+   pushFunc(10);
            this.vtc.bufferData(tc);
            let array=new Array();
-        for(let i=0;i<7;i++)
+        for(let i=0;i<12;i++)
         {
             let k = 4*i;
-            array.concat([2+k,1+k,k,2+k,0+k,3+k])
+        array =    array.concat([2+k,1+k,k,2+k,0+k,3+k])
         }
-           this.ebo.bufferData([2,1,0,2,0,3
-            ,6,5,4,6,4,7, 10,9,8,10,8,11, 14,13,12,14,12,15, 18,17,16,18,16,19, 22,21,20,22,20,23,/**Body */ 26,25,24,26,24,27, 30,29,28,30,28,31]);
+           this.ebo.bufferData(array);
             VAO.unbind();
     }
     switchPerson(person:pers)
@@ -841,7 +865,8 @@ console.log(error);
         Main.atlasShader.loadUniforms(this.camera.getProjection(),transformation,this.camera.getView(),15);
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,0);
         Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.15,this.pos.z).scale(0.55,0.55,0.55).rotateY(-this.camera.getYaw()))
-        gl.drawElements(gl.TRIANGLES,12,gl.UNSIGNED_INT,36*4);
+        //Body
+        gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,36*4);
         Main.shader.use();
         }
         if(this.blockBreakingTime>1)

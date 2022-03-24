@@ -96,6 +96,7 @@ export class SubChunk
     vertices = new Array();
     indices = new Array();
     chunk:Chunk;
+ 
     colors = new Array();
     lightLevels = new Array();
     transformation = Matrix.identity();
@@ -191,12 +192,6 @@ export class SubChunk
     }
     }
     this.generated=true;
-       
-      //  console.log(this.blocks);
-      if(!this.chunk.lazy)
-      {
-          this.update(2);
-      }
   },this),4);
     }
     update(priority:number,immediate?:boolean)
@@ -208,11 +203,12 @@ export class SubChunk
        // console.log("lagggiing")
       }
       if(!this.generated) return;
-            this.clearLight();
+      this.clearLight();
       try
       {
-      if(this.empty) 
+      if(this.empty && this.chunk.subchunks[this.pos.y+1].empty && this.chunk.subchunks[this.pos.y-1].empty) 
       {
+        console.log(this.chunk.subchunks[this.pos.y-1].empty);
         return;
       }
     }
