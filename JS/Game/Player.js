@@ -45,35 +45,35 @@ export class Player {
     mainAcc = 0.1;
     static blVertices = [
         //przód
-        -0.55, -0.55, -0.55,
-        0.55, -0.55, -0.55,
-        0.55, 0.55, -0.55,
-        -0.55, 0.55, -0.55,
+        -0.501, -0.501, -0.501,
+        0.501, -0.501, -0.501,
+        0.501, 0.501, -0.501,
+        -0.501, 0.501, -0.501,
         //tył
-        -0.55, -0.55, 0.55,
-        0.55, -0.55, 0.55,
-        0.55, 0.55, 0.55,
-        -0.55, 0.55, 0.55,
+        -0.501, -0.501, 0.501,
+        0.501, -0.501, 0.501,
+        0.501, 0.501, 0.501,
+        -0.501, 0.501, 0.501,
         //lewo
-        -0.55, -0.55, -0.55,
-        -0.55, -0.55, 0.55,
-        -0.55, 0.55, 0.55,
-        -0.55, 0.55, -0.55,
+        -0.501, -0.501, -0.501,
+        -0.501, -0.501, 0.501,
+        -0.501, 0.501, 0.501,
+        -0.501, 0.501, -0.501,
         //prawo
-        0.55, -0.55, -0.55,
-        0.55, -0.55, 0.55,
-        0.55, 0.55, 0.55,
-        0.55, 0.55, -0.55,
+        0.501, -0.501, -0.501,
+        0.501, -0.501, 0.501,
+        0.501, 0.501, 0.501,
+        0.501, 0.501, -0.501,
         //dół
-        -0.55, -0.55, -0.55,
-        -0.55, -0.55, 0.55,
-        0.55, -0.55, 0.55,
-        0.55, -0.55, -0.55,
+        -0.501, -0.501, -0.501,
+        -0.501, -0.501, 0.501,
+        0.501, -0.501, 0.501,
+        0.501, -0.501, -0.501,
         //góra
-        -0.55, 0.55, -0.55,
-        -0.55, 0.55, 0.55,
-        0.55, 0.55, 0.55,
-        0.55, 0.55, -0.55
+        -0.501, 0.501, -0.501,
+        -0.501, 0.501, 0.501,
+        0.501, 0.501, 0.501,
+        0.501, 0.501, -0.501
     ];
     rotX = 0;
     rotY = 0;
@@ -773,7 +773,7 @@ export class Player {
             Main.atlasShader.use();
             Main.atlasShader.loadUniforms(this.camera.getProjection(), transformation, this.camera.getView(), 15);
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_INT, 0);
-            Main.atlasShader.loadTransformation(Matrix.identity().translate(this.pos.x, this.pos.y + 0.15, this.pos.z).scale(0.55, 0.55, 0.55).rotateY(-this.camera.getYaw()));
+            Main.atlasShader.loadTransformation(Matrix.identity().translate(this.pos.x, this.pos.y + 0.15, this.pos.z).scale(0.51, 0.51, 0.51).rotateY(-this.camera.getYaw()));
             //Body
             gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_INT, 36 * 4);
             Main.shader.use();

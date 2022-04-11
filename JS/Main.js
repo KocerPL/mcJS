@@ -17,10 +17,12 @@ import { Player } from "./Game/Player.js";
 import { World } from "./Game/World.js";
 let gl = CanvaManager.gl;
 export class Main {
+    static okok = false;
     static dispLl = false;
     static fastBreaking = false;
     static FPS = 61;
     static fastTPS = 60;
+    static minimalStorage = new Array();
     static TPS = 20;
     static sunLight = 14;
     static file = null;
@@ -157,6 +159,7 @@ export class Main {
         if (this.Measure.fps > 20)
             while (Date.now() - testTime < 20) {
                 this.executeTasks(testTime);
+                this.minChunks();
                 // this.chunksUpdate();
             }
         if (this.lastFrame < time - (1000 / this.FPS)) {
@@ -297,6 +300,15 @@ export class Main {
             step = -step;
         }
         this.loadedChunks = loadBuffer;
+        for (let chunk of this.tempChunkBuffer) {
+            for (let i = this.entities.length - 1; i >= 0; i--) {
+                let entity = this.entities[i];
+                console.log(entity);
+                console.log(chunk);
+                if (chunk.pos.x * 16 < entity.pos.x && chunk.pos.z * 16 < entity.pos.z && chunk.pos.x * 16 > entity.pos.x - 16 && chunk.pos.z * 16 < entity.pos.z - 16)
+                    this.entities.splice(i, 1);
+            }
+        }
         this.unloadedChunks = this.unloadedChunks.concat([...this.tempChunkBuffer]);
     }
     static getORnew(x, z, lazy) {
@@ -339,6 +351,31 @@ export class Main {
         }
         k.push({ pPos: [this.player.pos.x, this.player.pos.y, this.player.pos.z] });
         this.download(JSON.stringify(k), "world.json", "text/plain");
+    }
+    static minChunks() {
+        let chunk = this.unloadedChunks.splice(0, 1)[0];
+        if (chunk == undefined)
+            return;
+        console.log(this.unloadedChunks);
+        let blocks = new Array(16);
+        for (let a = 0; a < 16; a++) {
+            if (chunk.subchunks[a] == undefined)
+                continue;
+            let c = new Array3D(16, 16, 16);
+            for (let x1 = 0; x1 < 16; x1++)
+                for (let y1 = 0; y1 < 16; y1++)
+                    for (let z1 = 0; z1 < 16; z1++) {
+                        if (chunk.subchunks[a].blocks[x1][y1][z1] == undefined || chunk.subchunks[a].blocks[x1][y1][z1] == null)
+                            c[x1][y1][z1] = 0;
+                        else
+                            c[x1][y1][z1] = chunk.subchunks[a].blocks[x1][y1][z1].id;
+                    }
+            blocks[a] = c;
+        }
+        this.minimalStorage.push({
+            pos: [chunk.pos.x, chunk.pos.z],
+            blocks: blocks
+        });
     }
     static getChunkAt(x, z) {
         for (let i = 0; i < this.loadedChunks.length; i++)
@@ -399,22 +436,6 @@ export class Main {
         //render crosshair
         this.player.render();
         GUI.render(this.shader2d);
-    }
-    static test() {
-        for (let x = this.range.start - 1; x < this.range.end + 1; x++)
-            for (let z = this.range.start - 1; z < this.range.end + 1; z++) {
-                let x2 = Math.floor(Math.round(this.player.pos.x) / 16) + x;
-                let z2 = Math.floor(Math.round(this.player.pos.z) / 16) + z;
-                let chunk = this.getChunkAt(x2, z2);
-                if (chunk == undefined) {
-                    chunk = new Chunk(x2, z2, true);
-                    this.loadedChunks.push(chunk);
-                }
-                if (chunk.lazy && !(x == this.range.start - 1 || x == this.range.end + 1 || z == this.range.start - 1 || z == this.range.end + 1))
-                    chunk.generate();
-                chunk.render();
-                //    toRender.push(()=>{chunk.renderWater()});
-            }
     }
 }
 Main.run();

@@ -49,12 +49,20 @@ export class Item extends Entity
     }
     render(): void {
        // console.log("rendered")
+       try
+       {
        if(World.getBlock(new Vector(this.pos.x,this.pos.y ,this.pos.z)).id>0 )
        this.yAcc-=0.01;
        else if(World.getBlock(new Vector(this.pos.x,this.pos.y-0.5 ,this.pos.z)).id==0 )
        this.yAcc+=0.01;
        else 
        this.yAcc=0;
+       }
+       catch(erro)
+       {
+      this.lifeTime=0;
+      
+       }
        
        this.pos.y-=this.yAcc;
        if(this.rotation<360)
