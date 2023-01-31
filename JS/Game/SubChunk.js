@@ -1,141 +1,45 @@
-import { CanvaManager } from "../Engine/CanvaManager.js";
-import { RenderSet } from "../Engine/RenderSet.js";
 import { Array3D } from "../Engine/Utils/Array3D.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { Main } from "../Main.js";
 import { Block, blocks, dirAssoc, directions } from "./Block.js";
 import { World } from "./World.js";
 import { Mesh } from "./Mesh.js";
-let gl = CanvaManager.gl;
 export class SubChunk {
-    mesh = new Mesh();
-    // nor:VBO;
-    RsWater = new RenderSet();
-    fromBlock;
-    blocks = new Array3D(16, 16, 16);
-    generated = false;
-    inReGeneration = false;
-    lightUpdate = false;
-    empty = true;
-    count;
-    static defBlocks = new Array(16);
-    static rand = new Array(64);
-    static defArrow = [
-        //Facing POS_Z
-        0.2, 0, -0.2,
-        0, 0, 0.3,
-        -0.2, 0, -0.2,
-        //Facing NEG_Z
-        0.2, 0, 0.2,
-        0, 0, -0.3,
-        -0.2, 0, 0.2,
-        //Facing POS_X
-        -0.2, 0, 0.2,
-        0.3, 0, 0,
-        -0.2, 0, -0.2,
-        //Facing NEG_X
-        0.2, 0, 0.2,
-        -0.3, 0, 0,
-        0.2, 0, -0.2,
-        //Facing POS_Y
-        0, -0.2, 0.2,
-        0, 0.3, 0,
-        0, -0.2, -0.2,
-        //Facing NEG_Y
-        0, 0.2, 0.2,
-        0, -0.3, 0,
-        0, 0.2, -0.2
-    ];
-    static defVertices = [
-        //przód
-        -0.5, -0.5, -0.5,
-        0.5, -0.5, -0.5,
-        0.5, 0.5, -0.5,
-        -0.5, 0.5, -0.5,
-        //tył
-        -0.5, -0.5, 0.5,
-        0.5, -0.5, 0.5,
-        0.5, 0.5, 0.5,
-        -0.5, 0.5, 0.5,
-        //lewo
-        -0.5, -0.5, -0.5,
-        -0.5, -0.5, 0.5,
-        -0.5, 0.5, 0.5,
-        -0.5, 0.5, -0.5,
-        //prawo
-        0.5, -0.5, -0.5,
-        0.5, -0.5, 0.5,
-        0.5, 0.5, 0.5,
-        0.5, 0.5, -0.5,
-        //dół
-        -0.5, -0.5, -0.5,
-        -0.5, -0.5, 0.5,
-        0.5, -0.5, 0.5,
-        0.5, -0.5, -0.5,
-        //góra
-        -0.5, 0.5, -0.5,
-        -0.5, 0.5, 0.5,
-        0.5, 0.5, 0.5,
-        0.5, 0.5, -0.5
-    ];
-    vertices = new Array();
-    indices = new Array();
-    chunk;
-    colors = new Array();
-    lightLevels = new Array();
-    pos;
+    mesh = new Mesh(); //Mesh that contains all data needed for rendering  
+    blocks = new Array3D(16, 16, 16); //Array of blocks
+    generated = false; //Is SubChunk already generated
+    inReGeneration = false; //Is subchunk in regeneration state
+    lightUpdate = false; //Is subchunk updating light
+    empty = true; //Is subchunk empty
+    chunk; //parent Chunk of this subchunk
+    pos; //subchunk position in world
     constructor(pos, heightmap, chunk, dontRender) {
+        //Setting up variables
         this.pos = pos;
         this.chunk = chunk;
-        /*
-            this.vao = new VAO();
-            this.vbo = new VBO();
-            this.vao.addPtr(0,3,0,0);
-            this.vtc = new VBO();
-            this.vao.addPtr(1,3,0,0);
-          this.vlo = new VBO();
-            this.vao.addPtr(2,1,0,0);
-            this.vfb = new VBO();
-            this.vao.addPtr(3,1,0,0);
-            this.ebo = new EBO();
-            VAO.unbind();
-            VBO.unbind();
-            EBO.unbind();*/
-        if (!dontRender ?? true)
-            this.generate(pos, heightmap);
+        //Calling generate if allowed by dontRender flag
+        this.preGenerate(heightmap);
     }
-    genBlocks() {
-        for (let x = 0; x < 16; x++) {
-            for (let y = 0; y < 16; y++) {
-                for (let z = 0; z < 16; z++) {
-                    this.blocks[x][y][z] = new Block(0);
-                }
-            }
-        }
-        ;
-        this.generated = true;
-    }
-    generate(pos, heightmap) {
-        let yPos = pos.y * 16;
-        let xPos = pos.x * 16;
-        let zPos = pos.z * 16;
-        for (let x = 0; x < 16; x++) {
-            for (let y = 0; y < 16; y++) {
+    preGenerate(heightmap) {
+        //setting position according to subchunk pos in world
+        let yPos = this.pos.y * 16;
+        let xPos = this.pos.x * 16;
+        let zPos = this.pos.z * 16;
+        //Iterating for each block
+        for (let x = 0; x < 16; x++)
+            for (let y = 0; y < 16; y++)
                 for (let z = 0; z < 16; z++) {
                     let ah = World.getHeight(x + xPos, z + zPos);
-                    if (ah - 3 >= (y + yPos)) {
-                        if (Math.round(Math.random() * 10) == 1) {
+                    if (ah - 3 >= (y + yPos)) // if position lower than 3 blocks on heightmap
+                     {
+                        if (Math.round(Math.random() * 10) == 1) //Randomizing greenstone ores
                             this.blocks[x][y][z] = new Block(4);
-                        }
-                        else {
-                            this.blocks[x][y][z] = new Block(3);
-                        }
+                        else
+                            this.blocks[x][y][z] = new Block(3); //Setting stone
                     }
                     else if (ah - 1 >= (y + yPos))
-                        this.blocks[x][y][z] = new Block(1);
+                        this.blocks[x][y][z] = new Block(1); //Setting Grass block
                     else if (ah >= (y + yPos)) {
-                        // if(Math.round(Math.random()*100) ==1 &&  !(World.waterLevel>y+yPos))
-                        //  World.generateTree(new Vector(xPos+ x,y+yPos,zPos+ z));
                         heightmap[x][z] = ah;
                         this.blocks[x][y][z] = new Block(2);
                     }
@@ -149,17 +53,18 @@ export class SubChunk {
                         }
                     }
                 }
-            }
-        }
         this.generated = true;
-        this.update(0, true);
     }
-    update(priority, immediate) {
+    postGenerate(heightmap) {
+        /* TODO: implement post generation
+        if(Math.round(Math.random()*100) ==1 &&  !(World.waterLevel>y+yPos))
+        World.generateTree(new Vector(xPos+ x,y+yPos,zPos+ z));*/
+    }
+    //Subchunk update
+    async update() {
         if (this.inReGeneration) {
-            if (!this.generated || immediate == undefined || immediate == false)
+            if (!this.generated)
                 return;
-            Main.cancelTasks(this, "update");
-            // console.log("lagggiing")
         }
         if (!this.generated)
             return;
@@ -174,7 +79,7 @@ export class SubChunk {
             // console.log(error,this)
         }
         this.updateLightLevels();
-        this.updateVerticesIndices(priority);
+        this.updateVerticesIndices();
     }
     clearLight() {
         let airCount = 4096;
@@ -191,14 +96,12 @@ export class SubChunk {
                     this.blocks[x][y][z].lightFBlock = 0;
                     if (y + (this.pos.y * 16) == this.chunk.heightmap[x][z] + 1) {
                         this.blocks[x][y][z].lightLevel = 15;
-                        //console.count("light");
                     }
                 }
         if (airCount < 1)
             this.empty = true;
         else
             this.empty = false;
-        //  console.countReset("light");
     }
     getBlock(pos) {
         if (pos.x > -1 && pos.x < 16 && pos.y > -1 && pos.y < 16 && pos.z > -1 && pos.z < 16) {
@@ -219,16 +122,12 @@ export class SubChunk {
                 }
                 return false;
             };
-            if (func("x") || func("y") || func("z")) {
-                // transPos = Vector.add(transPos,this.pos);
+            if (func("x") || func("y") || func("z")) //if block out of chunk
+             {
                 try {
                     return Main.getChunkAt(this.pos.x + transPos.x, this.pos.z + transPos.z).subchunks[this.pos.y + transPos.y].getBlock(pos);
                 }
                 catch (error) {
-                    // console.log(transPos);
-                    //console.log(this.pos);
-                    //  console.log(Main.getChunkAt(this.pos.x+transPos.x,this.pos.z+transPos.z));
-                    // debugger;
                     return undefined;
                 }
             }
@@ -412,18 +311,26 @@ export class SubChunk {
                         lightLevels = lightLevels.concat(block.lightLevel, block.lightLevel, block.lightLevel, block.lightLevel);
                         fB = fB.concat(block.lightFBlock, block.lightFBlock, block.lightFBlock, block.lightFBlock);
                         index += 4;
-                    }
-                    else if (block.id == 0 && testedBlock.id < 0 && side == "bottom") {
-                        let hv = new Array(...temp.slice(vStart, vStart + 12));
-                        let yVal = 0.2;
-                        if (testedBlock.id == -2) {
-                            yVal += (1 - (testedBlock.attribute[0] / 15)) * 0.8;
-                        }
-                        for (let i = 1; i < 12; i += 3) {
-                            hv[i] -= yVal;
-                        }
-                        this.RsWater.add(hv, SubChunk.getTextureCords(testedBlock, SubChunk.flip(side)), [block.lightLevel, block.lightLevel, block.lightLevel, block.lightLevel], [this.RsWater.index + 2, this.RsWater.index + 1, this.RsWater.index, this.RsWater.index + 2, this.RsWater.index, this.RsWater.index + 3], 4);
-                    }
+                    } /* else if(block.id==0 && testedBlock.id<0 && side=="bottom" )
+                    {
+                      let hv = new Array(...temp.slice(vStart,vStart+12));
+                      let yVal=0.2;
+                      if(testedBlock.id==-2)
+                      {
+                       yVal+= (1-(testedBlock.attribute[0]/15))*0.8;
+                      }
+                      for(let i=1;i<12 ; i+=3)
+                      {
+                       hv[i]-=yVal;
+                      }
+                     this.RsWater.add(
+                       hv ,
+                       SubChunk.getTextureCords(testedBlock, SubChunk.flip(side)),
+                       [block.lightLevel,block.lightLevel,block.lightLevel,block.lightLevel],
+                       [this.RsWater.index+2,this.RsWater.index+1,this.RsWater.index,this.RsWater.index+2,this.RsWater.index,this.RsWater.index+3],
+                       4
+                     )
+                    }*/
                 }
                 else {
                     if (testedBlock.id < 1) {
@@ -559,9 +466,16 @@ export class SubChunk {
                         fB = fB.concat(this.blocks[x + vec.x][y + vec.y][z + vec.z].lightFBlock, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightFBlock, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightFBlock, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightFBlock);
                         index += 4;
                     }
-                    else if (this.blocks[x + vec.x][y + vec.y][z + vec.z].id == 0 && this.blocks[x][y][z].id < 0 && vec.y == 1) {
-                        this.RsWater.add(temp.slice(vStart, vStart + 12), SubChunk.getTextureCords(this.blocks[x][y][z], side), [this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel, this.blocks[x + vec.x][y + vec.y][z + vec.z].lightLevel], [this.RsWater.index + 2, this.RsWater.index + 1, this.RsWater.index, this.RsWater.index + 2, this.RsWater.index, this.RsWater.index + 3], 4);
-                    }
+                    /*else if( this.blocks[x+vec.x][y+vec.y][z+vec.z].id==0 && this.blocks[x][y][z].id<0 && vec.y==1)
+                    {
+                      this.RsWater.add(
+                        temp.slice(vStart,vStart+12),
+                        SubChunk.getTextureCords(this.blocks[x][y][z],side),
+                        [this.blocks[x+vec.x][y+vec.y][z+vec.z].lightLevel,this.blocks[x+vec.x][y+vec.y][z+vec.z].lightLevel,this.blocks[x+vec.x][y+vec.y][z+vec.z].lightLevel,this.blocks[x+vec.x][y+vec.y][z+vec.z].lightLevel],
+                        [this.RsWater.index+2,this.RsWater.index+1,this.RsWater.index,this.RsWater.index+2,this.RsWater.index,this.RsWater.index+3],
+                        4
+                      );
+                    }*/
                 }
                 else {
                     let light = -2;
@@ -626,9 +540,16 @@ export class SubChunk {
                             fB = fB.concat(light2, light2, light2, light2);
                             index += 4;
                         }
-                        else if (this.blocks[x][y][z].id < 0) {
-                            this.RsWater.add(temp.slice(vStart, vStart + 12), SubChunk.getTextureCords(this.blocks[x][y][z], side), [light, light, light, light], [this.RsWater.index + 2, this.RsWater.index + 1, this.RsWater.index, this.RsWater.index + 2, this.RsWater.index, this.RsWater.index + 3], 4);
-                        }
+                        /* else if( this.blocks[x][y][z].id<0)
+                         {
+                           this.RsWater.add(
+                             temp.slice(vStart,vStart+12),
+                             SubChunk.getTextureCords(this.blocks[x][y][z],side),
+                             [light,light,light,light],
+                             [this.RsWater.index+2,this.RsWater.index+1,this.RsWater.index,this.RsWater.index+2,this.RsWater.index,this.RsWater.index+3],
+                             4
+                           );
+                         }*/
                     }
                 }
                 // else
@@ -755,7 +676,7 @@ export class SubChunk {
         while (subUpdate.length > 0) {
             let sub = subUpdate.shift();
             if (sub.generated && !sub.inReGeneration)
-                sub.updateVerticesIndices(3);
+                sub.updateVerticesIndices();
         }
         return { v: vertices, i: indices, c: textureCoords, ind: index, lL: lightLevels };
     }
@@ -854,7 +775,7 @@ export class SubChunk {
         }
         return { v: vertices, i: indices, c: textureCoords, ind: index, lL: lightLevels };
     }
-    updateVerticesIndices(priority) {
+    updateVerticesIndices() {
         console.log("Updating");
         let index = 0;
         this.mesh.reset();
@@ -884,6 +805,18 @@ export class SubChunk {
         //  console.log(this.vertices);
         // console.log(this.indices);
         //console.log(this.colors);
+    }
+    //Generates full subchunk of air
+    genEmpty() {
+        for (let x = 0; x < 16; x++) {
+            for (let y = 0; y < 16; y++) {
+                for (let z = 0; z < 16; z++) {
+                    this.blocks[x][y][z] = new Block(0);
+                }
+            }
+        }
+        ;
+        this.generated = true;
     }
     static blockTextureCoords = Object.freeze({
         1: [
@@ -932,4 +865,62 @@ export class SubChunk {
             1.0, 0.0,
         ];
     }
+    static defArrow = [
+        //Facing POS_Z
+        0.2, 0, -0.2,
+        0, 0, 0.3,
+        -0.2, 0, -0.2,
+        //Facing NEG_Z
+        0.2, 0, 0.2,
+        0, 0, -0.3,
+        -0.2, 0, 0.2,
+        //Facing POS_X
+        -0.2, 0, 0.2,
+        0.3, 0, 0,
+        -0.2, 0, -0.2,
+        //Facing NEG_X
+        0.2, 0, 0.2,
+        -0.3, 0, 0,
+        0.2, 0, -0.2,
+        //Facing POS_Y
+        0, -0.2, 0.2,
+        0, 0.3, 0,
+        0, -0.2, -0.2,
+        //Facing NEG_Y
+        0, 0.2, 0.2,
+        0, -0.3, 0,
+        0, 0.2, -0.2
+    ];
+    static defVertices = [
+        //przód
+        -0.5, -0.5, -0.5,
+        0.5, -0.5, -0.5,
+        0.5, 0.5, -0.5,
+        -0.5, 0.5, -0.5,
+        //tył
+        -0.5, -0.5, 0.5,
+        0.5, -0.5, 0.5,
+        0.5, 0.5, 0.5,
+        -0.5, 0.5, 0.5,
+        //lewo
+        -0.5, -0.5, -0.5,
+        -0.5, -0.5, 0.5,
+        -0.5, 0.5, 0.5,
+        -0.5, 0.5, -0.5,
+        //prawo
+        0.5, -0.5, -0.5,
+        0.5, -0.5, 0.5,
+        0.5, 0.5, 0.5,
+        0.5, 0.5, -0.5,
+        //dół
+        -0.5, -0.5, -0.5,
+        -0.5, -0.5, 0.5,
+        0.5, -0.5, 0.5,
+        0.5, -0.5, -0.5,
+        //góra
+        -0.5, 0.5, -0.5,
+        -0.5, 0.5, 0.5,
+        0.5, 0.5, 0.5,
+        0.5, 0.5, -0.5
+    ];
 }

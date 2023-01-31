@@ -211,7 +211,7 @@ export class Main {
                 }
                 let chunk = this.getChunkAt(x2, z2);
                 if (chunk == undefined) {
-                    chunk = new Chunk(x2, z2, true);
+                    chunk = new Chunk(x2, z2);
                     this.loadedChunks.push(chunk);
                 }
                 for (let k = 0; k < 16; k++) {
@@ -220,7 +220,7 @@ export class Main {
                     }
                 }
                 for (let a = 0; a < 16; a++) {
-                    chunk.subchunks[a].genBlocks();
+                    chunk.subchunks[a].genEmpty();
                     for (let x1 = 0; x1 < 16; x1++)
                         for (let y1 = 0; y1 < 16; y1++)
                             for (let z1 = 0; z1 < 16; z1++) {
@@ -232,7 +232,7 @@ export class Main {
                             }
                     Main.addTask(new Task(() => {
                         chunk.subchunks[a].inReGeneration = false;
-                        chunk.subchunks[a].update(9);
+                        chunk.subchunks[a].update();
                     }, Main), 9);
                     // console.log( this.chunks[x2][z2].subchunks[a]);
                 }
@@ -260,7 +260,7 @@ export class Main {
         let chunk = this.getORnew(x, z, false);
         loadBuffer.push(chunk);
         if (chunk.lazy)
-            chunk.updateAllSubchunks(2);
+            chunk.updateAllSubchunks();
         let nextCoords = new Vector(x, 0, z);
         //Spiral chunk loading algorithm
         let lazyChunkPhase = false;
@@ -275,7 +275,7 @@ export class Main {
                 nextCoords.x += step;
                 let chunk = this.getORnew(nextCoords.x, nextCoords.z, lazyChunkPhase);
                 if (!lazyChunkPhase && chunk.lazy)
-                    chunk.updateAllSubchunks(2);
+                    chunk.updateAllSubchunks();
                 loadBuffer.push(chunk);
                 if (loadBuffer.length >= howMuch)
                     lazyChunkPhase = true;
@@ -285,7 +285,7 @@ export class Main {
                 nextCoords.z += step;
                 let chunk = this.getORnew(nextCoords.x, nextCoords.z, lazyChunkPhase);
                 if (!lazyChunkPhase && chunk.lazy)
-                    chunk.updateAllSubchunks(2);
+                    chunk.updateAllSubchunks();
                 loadBuffer.push(chunk);
                 if (loadBuffer.length >= howMuch)
                     lazyChunkPhase = true;
@@ -315,7 +315,7 @@ export class Main {
             if (this.unloadedChunks[l].pos.x == x && this.unloadedChunks[l].pos.z == z) {
                 return [...this.unloadedChunks.splice(l, 1)][0];
             }
-        return new Chunk(x, z, lazy);
+        return new Chunk(x, z);
     }
     static exportChunks() {
         let k = new Array();

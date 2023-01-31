@@ -16,8 +16,7 @@ public static waterLevel:number = 20;
     }
    public static generateTree(vec:Vector)
     {
-        console.log("shedule Generating tree")
-       Main.addTask(new Task(()=>{
+        console.log("shedule Generating tree");
             let i;
         for( i=vec.y+1;i<vec.y+5;i++)
         {
@@ -56,7 +55,7 @@ public static waterLevel:number = 20;
         this.setBlockNoLight(new Vector(vec.x,i,vec.z+1),9);
         this.setBlockNoLight(new Vector(vec.x,i,vec.z-1),9);
         this.setBlockNoLight(new Vector(vec.x,i,vec.z),9);
-        },this),3);
+        
     }
     public static genHeightMap()
     {

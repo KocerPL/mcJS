@@ -24,7 +24,7 @@ export class Chunk {
     vfb;
     ebo;
     transformation = Matrix.identity();
-    constructor(x, z, isLazy) {
+    constructor(x, z) {
         // console.log("Constructing chunk");
         this.transformation = this.transformation.translate(x * 16, 0, z * 16);
         this.mesh = new Mesh();
@@ -54,9 +54,15 @@ export class Chunk {
         // console.log("done constructing");
     }
     updateNeighbour(neigbDir, chunk) {
+        console.log("what");
+        console.log(this.pos, neigbDir);
         if (chunk == undefined)
             return;
         this.neighbours[neigbDir] = chunk;
+        if (this.neighbours["NEG_X"] != undefined && this.neighbours["POS_X"] != undefined && this.neighbours["POS_Z"] != undefined && this.neighbours["NEG_Z"] != undefined) {
+            console.log("gathered all neighbours :)");
+            this.updateAllSubchunks();
+        }
     }
     gatherNeighbours() {
         try {
@@ -132,15 +138,7 @@ export class Chunk {
         }
     }
     renderWater() {
-        if (!this.lazy)
-            for (let i = 0; i < this.subchunks.length; i++) {
-                if (this.subchunks[i] != undefined && this.subchunks[i].generated && this.subchunks[i].RsWater.count > 0) {
-                    this.subchunks[i].RsWater.vao.bind();
-                    Main.shader.loadUniforms(Main.player.camera.getProjection(), this.transformation, Main.player.camera.getView(), Main.sunLight);
-                    //  console.log( this.subchunks[i].RsWater.count);
-                    gl.drawElements(gl.TRIANGLES, this.subchunks[i].RsWater.count, gl.UNSIGNED_INT, 0);
-                }
-            }
+        //TODO: Water rendering
     }
     getBlock(pos) {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 15 || pos.y > 256 || pos.z > 15) {
@@ -173,18 +171,18 @@ export class Chunk {
     }
     generate() {
         for (let i = 0; i < this.subchunks.length; i++) {
-            this.subchunks[i].generate(new Vector(this.pos.x, i, this.pos.z), this.heightmap);
+            this.subchunks[i].preGenerate(this.heightmap);
         }
         // this.lazy=false;
     }
-    updateAllSubchunks(priority) {
+    updateAllSubchunks() {
         if (this.neighbours.NEG_X == undefined || this.neighbours.POS_X == undefined || this.neighbours.POS_Z == undefined || this.neighbours.NEG_Z == undefined) {
             this.gatherNeighbours();
             if (this.neighbours.NEG_X == undefined || this.neighbours.POS_X == undefined || this.neighbours.POS_Z == undefined || this.neighbours.NEG_Z == undefined)
                 return;
         }
         for (let i = 0; i < this.subchunks.length; i++) {
-            this.subchunks[i].update(priority);
+            this.subchunks[i].update();
         }
         this.lazy = false;
         console.log("now not lazy hehehehe");
@@ -197,7 +195,7 @@ export class Chunk {
     updateSubchunkAt(y) {
         let yPos = Math.floor(Math.round(y) / 16);
         if (this.subchunks[yPos].generated)
-            this.subchunks[yPos].update(10, true);
+            this.subchunks[yPos].update();
         this.updateMesh();
     }
     setBlock(pos, blockID, update) {
@@ -215,22 +213,22 @@ export class Chunk {
                 this.updateSubchunkAt(pos.y);
             try {
                 if (pos.x == 0) {
-                    Main.getChunkAt(this.pos.x - 1, this.pos.z).subchunks[yPos].update(10);
+                    Main.getChunkAt(this.pos.x - 1, this.pos.z).subchunks[yPos].update();
                 }
                 else if (pos.x == 15) {
-                    Main.getChunkAt(this.pos.x + 1, this.pos.z).subchunks[yPos].update(10);
+                    Main.getChunkAt(this.pos.x + 1, this.pos.z).subchunks[yPos].update();
                 }
                 if (y == 0) {
-                    Main.getChunkAt(this.pos.x, this.pos.z).subchunks[yPos - 1].update(10);
+                    Main.getChunkAt(this.pos.x, this.pos.z).subchunks[yPos - 1].update();
                 }
                 else if (y == 15) {
-                    Main.getChunkAt(this.pos.x, this.pos.z).subchunks[yPos + 1].update(10);
+                    Main.getChunkAt(this.pos.x, this.pos.z).subchunks[yPos + 1].update();
                 }
                 if (pos.z == 0) {
-                    Main.getChunkAt(this.pos.x, this.pos.z - 1).subchunks[yPos].update(10);
+                    Main.getChunkAt(this.pos.x, this.pos.z - 1).subchunks[yPos].update();
                 }
                 else if (pos.z == 15) {
-                    Main.getChunkAt(this.pos.x, this.pos.z + 1).subchunks[yPos].update(10);
+                    Main.getChunkAt(this.pos.x, this.pos.z + 1).subchunks[yPos].update();
                 }
             }
             catch (error) {
@@ -289,7 +287,7 @@ export class Chunk {
             }
             catch (error) {
             }
-            this.subchunks[yPos].update(10);
+            this.subchunks[yPos].update();
         }
         else
             console.log("undefined Chunk!");

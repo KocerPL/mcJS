@@ -1,4 +1,3 @@
-import { Task } from "../Engine/Task.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { Main } from "../Main.js";
 import { directions } from "./Block.js";
@@ -12,40 +11,38 @@ export class World {
     }
     static generateTree(vec) {
         console.log("shedule Generating tree");
-        Main.addTask(new Task(() => {
-            let i;
-            for (i = vec.y + 1; i < vec.y + 5; i++) {
-                //console.log("Generating tree")
-                this.setBlockNoLight(new Vector(vec.x, i, vec.z), 6);
+        let i;
+        for (i = vec.y + 1; i < vec.y + 5; i++) {
+            //console.log("Generating tree")
+            this.setBlockNoLight(new Vector(vec.x, i, vec.z), 6);
+        }
+        for (let x = vec.x - 2; x <= vec.x + 2; x++)
+            for (let z = vec.z - 2; z <= vec.z + 2; z++) {
+                this.setBlockNoLight(new Vector(x, i, z), 9);
             }
-            for (let x = vec.x - 2; x <= vec.x + 2; x++)
-                for (let z = vec.z - 2; z <= vec.z + 2; z++) {
-                    this.setBlockNoLight(new Vector(x, i, z), 9);
-                }
-            this.setBlockNoLight(new Vector(vec.x, i, vec.z), 6);
-            i++;
-            for (let x = vec.x - 2; x <= vec.x + 2; x++)
-                for (let z = vec.z - 2; z <= vec.z + 2; z++) {
-                    this.setBlockNoLight(new Vector(x, i, z), 9);
-                }
-            this.setBlockNoLight(new Vector(vec.x, i, vec.z), 6);
-            this.setBlockNoLight(new Vector(vec.x + 2, i, vec.z + 2), 0);
-            this.setBlockNoLight(new Vector(vec.x + 2, i, vec.z - 2), 0);
-            this.setBlockNoLight(new Vector(vec.x - 2, i, vec.z + 2), 0);
-            this.setBlockNoLight(new Vector(vec.x - 2, i, vec.z - 2), 0);
-            i++;
-            this.setBlockNoLight(new Vector(vec.x + 1, i, vec.z), 9);
-            this.setBlockNoLight(new Vector(vec.x - 1, i, vec.z), 9);
-            this.setBlockNoLight(new Vector(vec.x, i, vec.z + 1), 9);
-            this.setBlockNoLight(new Vector(vec.x, i, vec.z - 1), 9);
-            this.setBlockNoLight(new Vector(vec.x, i, vec.z), 6);
-            i++;
-            this.setBlockNoLight(new Vector(vec.x + 1, i, vec.z), 9);
-            this.setBlockNoLight(new Vector(vec.x - 1, i, vec.z), 9);
-            this.setBlockNoLight(new Vector(vec.x, i, vec.z + 1), 9);
-            this.setBlockNoLight(new Vector(vec.x, i, vec.z - 1), 9);
-            this.setBlockNoLight(new Vector(vec.x, i, vec.z), 9);
-        }, this), 3);
+        this.setBlockNoLight(new Vector(vec.x, i, vec.z), 6);
+        i++;
+        for (let x = vec.x - 2; x <= vec.x + 2; x++)
+            for (let z = vec.z - 2; z <= vec.z + 2; z++) {
+                this.setBlockNoLight(new Vector(x, i, z), 9);
+            }
+        this.setBlockNoLight(new Vector(vec.x, i, vec.z), 6);
+        this.setBlockNoLight(new Vector(vec.x + 2, i, vec.z + 2), 0);
+        this.setBlockNoLight(new Vector(vec.x + 2, i, vec.z - 2), 0);
+        this.setBlockNoLight(new Vector(vec.x - 2, i, vec.z + 2), 0);
+        this.setBlockNoLight(new Vector(vec.x - 2, i, vec.z - 2), 0);
+        i++;
+        this.setBlockNoLight(new Vector(vec.x + 1, i, vec.z), 9);
+        this.setBlockNoLight(new Vector(vec.x - 1, i, vec.z), 9);
+        this.setBlockNoLight(new Vector(vec.x, i, vec.z + 1), 9);
+        this.setBlockNoLight(new Vector(vec.x, i, vec.z - 1), 9);
+        this.setBlockNoLight(new Vector(vec.x, i, vec.z), 6);
+        i++;
+        this.setBlockNoLight(new Vector(vec.x + 1, i, vec.z), 9);
+        this.setBlockNoLight(new Vector(vec.x - 1, i, vec.z), 9);
+        this.setBlockNoLight(new Vector(vec.x, i, vec.z + 1), 9);
+        this.setBlockNoLight(new Vector(vec.x, i, vec.z - 1), 9);
+        this.setBlockNoLight(new Vector(vec.x, i, vec.z), 9);
     }
     static genHeightMap() {
         let height = 20;
