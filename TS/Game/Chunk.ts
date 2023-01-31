@@ -153,13 +153,10 @@ export class Chunk {
     for (let i = 0; i < this.subchunks.length; i++) {
       
         this.mesh.add(this.subchunks[i].mesh);
-    
-       console.log(this.subchunks[i].mesh.count+ "   "+this.subchunks[i].mesh.indices.length);
       
       
       
     }
-    console.log("Count is: "+this.mesh.count+"   "+this.mesh.indices.length+"   "+this.mesh.vertices.length);
     this.vao.bind();  
     this.vbo.bufferData(this.mesh.vertices);
     this.vlo.bufferData(this.mesh.lightLevels);
@@ -260,9 +257,7 @@ export class Chunk {
       if(! (this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
       this.subchunks[yPos].blocks[pos.x][y][pos.z] =new Block(0);
     this.subchunks[yPos].blocks[pos.x][y][pos.z].id=blockID;
-    if(update!=undefined || update==true)
     this.updateSubchunkAt(pos.y);
-    
     try
     {
     if(pos.x ==0)

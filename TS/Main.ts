@@ -294,7 +294,7 @@ export class Main
       
       let step=1;
       let iter =1;
-      let howMuch=100;
+      let howMuch=30;
       let loadBuffer = new Array();
       this.tempChunkBuffer = [...this.loadedChunks];
       let chunk =  this.getORnew(x,z,false);

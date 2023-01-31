@@ -73,7 +73,7 @@ export class SubChunk
       World.generateTree(new Vector(xPos+ x,y+yPos,zPos+ z));*/
     }
     //Subchunk update
-   async  update()
+ update()
     {
       if(this.inReGeneration) 
       {
@@ -411,7 +411,7 @@ export class SubChunk
          }
       };
       side(new Vector(1,0,0),36,"left");
-      side(new Vector(0,-1,0),48,"bottom");
+      side(new Vector(0,1,0),60,"top");
       side(new Vector(0,0,-1),0,"back");
 
 
