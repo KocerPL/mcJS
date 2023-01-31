@@ -1,7 +1,6 @@
 import { CanvaManager } from "../Engine/CanvaManager.js";
 import { EBO } from "../Engine/EBO.js";
 import { RenderSet } from "../Engine/RenderSet.js";
-import { Task } from "../Engine/Task.js";
 import { Array3D } from "../Engine/Utils/Array3D.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Vector } from "../Engine/Utils/Vector.js";
@@ -98,8 +97,6 @@ export class SubChunk {
         this.pos = pos;
         this.transformation = this.transformation.translate(pos.x * 16, pos.y * 16, pos.z * 16);
         this.chunk = chunk;
-        if (!dontRender ?? true)
-            this.generate(pos, heightmap);
         this.vao = new VAO();
         this.vbo = new VBO();
         this.vao.addPtr(0, 3, 0, 0);
@@ -113,6 +110,8 @@ export class SubChunk {
         VAO.unbind();
         VBO.unbind();
         EBO.unbind();
+        if (!dontRender ?? true)
+            this.generate(pos, heightmap);
     }
     genBlocks() {
         for (let x = 0; x < 16; x++) {
@@ -129,41 +128,40 @@ export class SubChunk {
         let yPos = pos.y * 16;
         let xPos = pos.x * 16;
         let zPos = pos.z * 16;
-        Main.addTask(new Task(() => {
-            for (let x = 0; x < 16; x++) {
-                for (let y = 0; y < 16; y++) {
-                    for (let z = 0; z < 16; z++) {
-                        let ah = World.getHeight(x + xPos, z + zPos);
-                        if (ah - 3 >= (y + yPos)) {
-                            if (Math.round(Math.random() * 10) == 1) {
-                                this.blocks[x][y][z] = new Block(4);
-                            }
-                            else {
-                                this.blocks[x][y][z] = new Block(3);
-                            }
+        for (let x = 0; x < 16; x++) {
+            for (let y = 0; y < 16; y++) {
+                for (let z = 0; z < 16; z++) {
+                    let ah = World.getHeight(x + xPos, z + zPos);
+                    if (ah - 3 >= (y + yPos)) {
+                        if (Math.round(Math.random() * 10) == 1) {
+                            this.blocks[x][y][z] = new Block(4);
                         }
-                        else if (ah - 1 >= (y + yPos))
-                            this.blocks[x][y][z] = new Block(1);
-                        else if (ah >= (y + yPos)) {
-                            if (Math.round(Math.random() * 100) == 1 && !(World.waterLevel > y + yPos))
-                                World.generateTree(new Vector(xPos + x, y + yPos, zPos + z));
-                            heightmap[x][z] = ah;
-                            this.blocks[x][y][z] = new Block(2);
+                        else {
+                            this.blocks[x][y][z] = new Block(3);
                         }
-                        else if (World.waterLevel > y + yPos)
-                            this.blocks[x][y][z] = new Block(-1);
-                        else if (!(this.blocks[x][y][z] instanceof Block)) {
-                            this.blocks[x][y][z] = new Block(0);
-                            if (ah + 1 == (y + yPos)) {
-                                this.blocks[x][y][z].lightLevel = 15;
-                                this.blocks[x][y][z].lightDir = directions.SKYLIGHT;
-                            }
+                    }
+                    else if (ah - 1 >= (y + yPos))
+                        this.blocks[x][y][z] = new Block(1);
+                    else if (ah >= (y + yPos)) {
+                        // if(Math.round(Math.random()*100) ==1 &&  !(World.waterLevel>y+yPos))
+                        //  World.generateTree(new Vector(xPos+ x,y+yPos,zPos+ z));
+                        heightmap[x][z] = ah;
+                        this.blocks[x][y][z] = new Block(2);
+                    }
+                    else if (World.waterLevel > y + yPos)
+                        this.blocks[x][y][z] = new Block(-1);
+                    else if (!(this.blocks[x][y][z] instanceof Block)) {
+                        this.blocks[x][y][z] = new Block(0);
+                        if (ah + 1 == (y + yPos)) {
+                            this.blocks[x][y][z].lightLevel = 15;
+                            this.blocks[x][y][z].lightDir = directions.SKYLIGHT;
                         }
                     }
                 }
             }
-            this.generated = true;
-        }, this), 4);
+        }
+        this.generated = true;
+        this.update(0, true);
     }
     update(priority, immediate) {
         if (this.inReGeneration) {
@@ -877,29 +875,25 @@ export class SubChunk {
         this.inReGeneration = true;
         for (let x = 0; x < 16; x++) {
             for (let z = 0; z < 16; z++) {
-                Main.addTask(new Task(() => {
-                    let vic = this.updateVerticesOptimized(x, z, index);
-                    //    console.log(x,y,vic);
-                    this.vertices = this.vertices.concat(vic.v);
-                    //  this.normals =   this.vertices.concat(vic.n);
-                    //  console.log(vic.lL);
-                    this.lightLevels = this.lightLevels.concat(vic.lL);
-                    this.indices = this.indices.concat(vic.i);
-                    this.colors = this.colors.concat(vic.c);
-                    this.fromBlock = this.fromBlock.concat(vic.fB);
-                    index = vic.ind;
-                    //console.log("c:",this.colors);
-                }, this, "update"), priority);
+                let vic = this.updateVerticesOptimized(x, z, index);
+                //    console.log(x,y,vic);
+                this.vertices = this.vertices.concat(vic.v);
+                //  this.normals =   this.vertices.concat(vic.n);
+                //  console.log(vic.lL);
+                this.lightLevels = this.lightLevels.concat(vic.lL);
+                this.indices = this.indices.concat(vic.i);
+                this.colors = this.colors.concat(vic.c);
+                this.fromBlock = this.fromBlock.concat(vic.fB);
+                index = vic.ind;
+                //console.log("c:",this.colors);
             }
         }
         // console.timeEnd("Updating");
         //   if(this.indices.length>0)
-        Main.addTask(new Task(() => {
-            this.bufferVIC();
-            this.count = this.indices.length;
-            this.lightUpdate = false;
-            this.inReGeneration = false;
-        }, this, "update"), priority);
+        this.bufferVIC();
+        this.count = this.indices.length;
+        this.lightUpdate = false;
+        this.inReGeneration = false;
         //  console.log(this.vertices);
         // console.log(this.indices);
         //console.log(this.colors);

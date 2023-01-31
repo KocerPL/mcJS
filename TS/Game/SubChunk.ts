@@ -107,8 +107,8 @@ export class SubChunk
      this.transformation =  this.transformation.translate(pos.x*16,pos.y*16,pos.z*16);
       
      this.chunk = chunk;
-     if(!dontRender??true)
-    this.generate(pos,heightmap);
+   
+   
       this.vao = new VAO();
       this.vbo = new VBO();
       this.vao.addPtr(0,3,0,0);
@@ -122,6 +122,8 @@ export class SubChunk
       VAO.unbind();
       VBO.unbind();
       EBO.unbind();
+      if(!dontRender??true)
+      this.generate(pos,heightmap);
     }
     genBlocks()
     {
@@ -142,8 +144,7 @@ export class SubChunk
       let yPos =pos.y*16;
       let xPos =pos.x*16;
       let zPos =pos.z*16;
-      Main.addTask(new Task(()=>
-      {
+     
      for(let x =0;x<16;x++)
      {
        
@@ -169,8 +170,8 @@ export class SubChunk
        else if(ah>=(y+yPos))
        {
          
-         if(Math.round(Math.random()*100) ==1 &&  !(World.waterLevel>y+yPos))
-         World.generateTree(new Vector(xPos+ x,y+yPos,zPos+ z));
+        // if(Math.round(Math.random()*100) ==1 &&  !(World.waterLevel>y+yPos))
+       //  World.generateTree(new Vector(xPos+ x,y+yPos,zPos+ z));
          heightmap[x][z] = ah;
        this.blocks[x][y][z]=new Block(2);
  
@@ -192,7 +193,7 @@ export class SubChunk
     }
     }
     this.generated=true;
-  },this),4);
+    this.update(0,true);
     }
     update(priority:number,immediate?:boolean)
     {
@@ -301,7 +302,7 @@ export class SubChunk
     }
     updateLightOneBlock(x,y,z)
     {
-      let lightDir =directions.UNDEF;
+      let lightDir:number =directions.UNDEF;
       let light =0;
       let light2 =0;
       let theBlock = this.blocks[x][y][z];
@@ -1088,7 +1089,7 @@ export class SubChunk
         {
             for(let z=0;z<16;z++)
             {
-               Main.addTask(new Task( ()=>{
+               
               let vic = this.updateVerticesOptimized(x,z,index);
          //    console.log(x,y,vic);
                 
@@ -1101,19 +1102,18 @@ export class SubChunk
                 this.fromBlock = this.fromBlock.concat(vic.fB);
                 index = vic.ind;
                 //console.log("c:",this.colors);
-            },this,"update"),priority);
+           
             }
         }
        // console.timeEnd("Updating");
     //   if(this.indices.length>0)
-        Main.addTask(new Task(()=>
-      {
+      
         this.bufferVIC();
         this.count = this.indices.length;
        
         this.lightUpdate =false;
         this.inReGeneration =false;
-      },this,"update"),priority);
+      
       //  console.log(this.vertices);
        // console.log(this.indices);
         //console.log(this.colors);

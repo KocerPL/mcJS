@@ -9,7 +9,7 @@ export class Chunk {
     todo = new Array();
     heightmap = new Array(16);
     neighbours = {};
-    lazy = true;
+    lazy = false;
     pos;
     constructor(x, z, isLazy) {
         // console.log("Constructing chunk");
@@ -83,12 +83,6 @@ export class Chunk {
     }
     update(startTime) {
         let actualTime = Date.now();
-        while (this.todo.length > 0 && actualTime - 200 < startTime) {
-            actualTime = Date.now();
-            //console.log(actualTime);
-            let work = this.todo.shift();
-            work();
-        }
     }
     render() {
         if (!this.lazy)

@@ -117,14 +117,16 @@ export class Main {
                 if (this.tasks[x][y].caller == caller && this.tasks[x][y].label == label)
                     this.tasks[x].splice(y, 1);
     }
+    static resetMeasure(time) {
+        this.Measure.lastTime = time;
+        this.Measure.tps = this.Measure.ticks;
+        this.Measure.ticks = 0;
+        this.Measure.fps = this.Measure.frames;
+        this.Measure.frames = 0;
+    }
     static loop(time) {
-        if (this.Measure.lastTime <= time - 1000) {
-            this.Measure.lastTime = time;
-            this.Measure.tps = this.Measure.ticks;
-            this.Measure.ticks = 0;
-            this.Measure.fps = this.Measure.frames;
-            this.Measure.frames = 0;
-        }
+        if (this.Measure.lastTime <= time - 1000)
+            this.resetMeasure(time);
         let delta = time - this.lastTick;
         this.delta += delta / (2000 / this.TPS);
         // console.log(this.delta);
@@ -155,22 +157,22 @@ export class Main {
             this.fastUpdate();
         }
         ;
-        let testTime = Date.now();
-        if (this.Measure.fps > 20)
-            while (Date.now() - testTime < 20) {
-                this.executeTasks(testTime);
-                this.minChunks();
-                // this.chunksUpdate();
-            }
-        if (this.lastFrame < time - (1000 / this.FPS)) {
-            this.render();
-            this.lastFrame = time;
-        }
+        /* let testTime = Date.now();
+        if(this.Measure.fps>20)
+        while(Date.now()-testTime <20 )
+        {
+           this.executeTasks(testTime);
+           this.minChunks();
+          // this.chunksUpdate();
+        }*/
+        //  if(this.lastFrame < time-(1000/this.FPS))
+        this.render();
+        this.lastFrame = time;
         requestAnimationFrame(this.loop.bind(this));
     }
     static executeTasks(time) {
         for (let i = this.tasks.length - 1; i >= 0; i--) {
-            while (this.tasks[i].length > 0) {
+            if (this.tasks[i].length > 0) {
                 let task = this.tasks[i].shift();
                 task.func();
                 if (Date.now() - time > 20)
@@ -194,13 +196,6 @@ export class Main {
             this.entities[i].update(i);
         }
         GUI.update();
-        if (Math.floor(Math.random() * 50) == 1) {
-            let rand = 0;
-            //   this.test.subchunks[rand].blocks[Math.floor(Math.random()*16)][Math.floor(Math.random()*16)][Math.floor(Math.random()*16)] =Math.ceil(Math.random()*2);
-            // this.test.subchunks[rand].updateVerticesIndices();
-            //  this.test.blocks[Math.floor(Math.random()*16)][Math.floor(Math.random()*16)][Math.floor(Math.random()*16)] =Math.ceil(Math.random()*2);
-            //this.test.updateVerticesIndices();
-        }
         if (CanvaManager.getKeyOnce(54))
             this.exportChunks();
         if (CanvaManager.getKeyOnce(55))
@@ -229,7 +224,7 @@ export class Main {
                     for (let x1 = 0; x1 < 16; x1++)
                         for (let y1 = 0; y1 < 16; y1++)
                             for (let z1 = 0; z1 < 16; z1++) {
-                                if (this.file[x].blocks[x1][y1][z1] != NaN) {
+                                if (!Number.isNaN(this.file[x].blocks[x1][y1][z1])) {
                                     chunk.subchunks[a].blocks[x1][y1][z1].id = this.file[x].blocks[a][x1][y1][z1];
                                 }
                                 if (chunk.subchunks[a].blocks[x1][y1][z1].id > 0 && y1 + (chunk.subchunks[a].pos.y * 16) > chunk.heightmap[x1][z1])
@@ -259,7 +254,7 @@ export class Main {
         let z = Math.floor(Math.round(this.player.pos.z) / 16);
         let step = 1;
         let iter = 1;
-        let howMuch = 100;
+        let howMuch = 4;
         let loadBuffer = new Array();
         this.tempChunkBuffer = [...this.loadedChunks];
         let chunk = this.getORnew(x, z, false);
@@ -419,16 +414,13 @@ export class Main {
         gl.clearColor(0.0, this.sunLight / 15, this.sunLight / 15, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.blocksGridTest);
-        let toRender = new Array();
         Main.shader.loadUniforms(Main.player.camera.getProjection(), Matrix.identity(), Main.player.camera.getView(), Main.sunLight);
         for (let chunk of this.loadedChunks) {
             if (!chunk.lazy) {
+                console.log("rendering");
                 chunk.render();
-                toRender.push(() => { chunk.renderWater(); });
+                // toRender.push(()=>{chunk.renderWater()});
             }
-        }
-        while (toRender.length > 0) {
-            toRender.shift()();
         }
         for (let i = 0; i < this.entities.length; i++) {
             this.entities[i].render();
