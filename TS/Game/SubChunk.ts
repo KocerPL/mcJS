@@ -12,17 +12,12 @@ import { Main } from "../Main.js";
 import { Block, blocks, dirAssoc, directions } from "./Block.js";
 import { Chunk, DIR } from "./Chunk.js";
 import { World } from "./World.js";
-
+import { Mesh } from "./Mesh.js"
 let gl = CanvaManager.gl; 
    type SIDE = "left"| "right" | "bottom" | "top" | "back" | "front" ;
 export class SubChunk
 {
-    ebo:EBO;
-    vbo:VBO;
-    vtc:VBO;
-    vao:VAO;
-    vlo:VBO; // Light vbo
-    vfb:VBO;
+   public mesh:Mesh;
    // nor:VBO;
    RsWater:RenderSet =new RenderSet();
    fromBlock:Array<number>;
@@ -108,7 +103,7 @@ export class SubChunk
       
      this.chunk = chunk;
    
-   
+  /* 
       this.vao = new VAO();
       this.vbo = new VBO();
       this.vao.addPtr(0,3,0,0);
@@ -121,7 +116,7 @@ export class SubChunk
       this.ebo = new EBO();
       VAO.unbind();
       VBO.unbind();
-      EBO.unbind();
+      EBO.unbind();*/
       if(!dontRender??true)
       this.generate(pos,heightmap);
     }
@@ -1093,13 +1088,12 @@ export class SubChunk
               let vic = this.updateVerticesOptimized(x,z,index);
          //    console.log(x,y,vic);
                 
-               this.vertices =   this.vertices.concat(vic.v);
+               this.mesh.vertices =   this.vertices.concat(vic.v);
             //  this.normals =   this.vertices.concat(vic.n);
           //  console.log(vic.lL);
-                this.lightLevels = this.lightLevels.concat(vic.lL);
-                this.indices =   this.indices.concat(vic.i)
-                this.colors = this.colors.concat(vic.c);
-                this.fromBlock = this.fromBlock.concat(vic.fB);
+                this.mesh.lightLevels = this.lightLevels.concat(vic.lL);
+                this.mesh.indices =   this.indices.concat(vic.i);
+                this.mesh.fb = this.fromBlock.concat(vic.fB);
                 index = vic.ind;
                 //console.log("c:",this.colors);
            
@@ -1121,14 +1115,14 @@ export class SubChunk
     bufferVIC()
     {
     
-        this.vao.bind();
+      /*  this.vao.bind();
         this.vbo.bufferData(this.vertices);
         this.vlo.bufferData(this.lightLevels);
         this.vtc.bufferData(this.colors);
         this.ebo.bufferData(this.indices);
         this.vfb.bufferData(this.fromBlock);
         VAO.unbind();
-        this.RsWater.bufferArrays(this.RsWater.vertices,this.RsWater.textureCoords,this.RsWater.lightLevels,this.RsWater.indices);
+        this.RsWater.bufferArrays(this.RsWater.vertices,this.RsWater.textureCoords,this.RsWater.lightLevels,this.RsWater.indices);*/
   
     }
     static blockTextureCoords = Object.freeze({

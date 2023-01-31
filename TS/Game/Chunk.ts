@@ -1,5 +1,8 @@
 import { CanvaManager } from "../Engine/CanvaManager.js";
+import { EBO } from "../Engine/EBO.js";
 import { Vector } from "../Engine/Utils/Vector.js";
+import { VAO } from "../Engine/VAO.js";
+import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
 import { Block } from "./Block.js";
 import { SubChunk } from "./SubChunk.js"
@@ -12,8 +15,29 @@ export class Chunk {
   neighbours:{POS_X?:Chunk,POS_Z?:Chunk,NEG_X?:Chunk,NEG_Z?:Chunk}={};
   lazy:boolean =false;
   pos:Vector;
+  vao:VAO;
+  vbo:VBO;
+  vtc:VBO;
+  vlo:VBO;
+  vfb:VBO;
+  ebo:EBO;
   constructor(x:number, z:number,isLazy:boolean) {
     // console.log("Constructing chunk");
+
+      
+      this.vao = new VAO();
+      this.vbo = new VBO();
+      this.vao.addPtr(0,3,0,0);
+      this.vtc = new VBO();
+      this.vao.addPtr(1,3,0,0);
+    this.vlo = new VBO();
+      this.vao.addPtr(2,1,0,0);
+      this.vfb = new VBO();
+      this.vao.addPtr(3,1,0,0);
+      this.ebo = new EBO();
+      VAO.unbind();
+      VBO.unbind();
+      EBO.unbind();
     this.pos = new Vector(x,0,z);
     for(let i =0; i<16;i++)
     {
@@ -106,21 +130,26 @@ export class Chunk {
     }
   }
   update(startTime: number) {
-    let actualTime = Date.now();
+    for (let i = 0; i < this.subchunks.length; i++) {
+      {
+      
+      
+       //console.log(this.subchunks[i].count);
+      
+      }
+      
+    }
 
   
   }
   render() {
     if(!this.lazy)
-    for (let i = 0; i < this.subchunks.length; i++) {
-      if (this.subchunks[i] != undefined && this.subchunks[i].generated && this.subchunks[i].count>0) {
-        this.subchunks[i].vao.bind();
-       Main.shader.loadTransformation(this.subchunks[i].transformation);
-       //console.log(this.subchunks[i].count);
-        gl.drawElements(gl.TRIANGLES, this.subchunks[i].count, gl.UNSIGNED_INT, 0);
-      }
-      
+    {
+    this.vao.bind();
+    Main.shader.loadTransformation(this.transformation);
+    gl.drawElements(gl.TRIANGLES, this.subchunks[i].count, gl.UNSIGNED_INT, 0);
     }
+
   }
   renderWater() {
     if(!this.lazy)

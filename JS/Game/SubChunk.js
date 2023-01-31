@@ -1,22 +1,14 @@
 import { CanvaManager } from "../Engine/CanvaManager.js";
-import { EBO } from "../Engine/EBO.js";
 import { RenderSet } from "../Engine/RenderSet.js";
 import { Array3D } from "../Engine/Utils/Array3D.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Vector } from "../Engine/Utils/Vector.js";
-import { VAO } from "../Engine/VAO.js";
-import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
 import { Block, blocks, dirAssoc, directions } from "./Block.js";
 import { World } from "./World.js";
 let gl = CanvaManager.gl;
 export class SubChunk {
-    ebo;
-    vbo;
-    vtc;
-    vao;
-    vlo; // Light vbo
-    vfb;
+    mesh;
     // nor:VBO;
     RsWater = new RenderSet();
     fromBlock;
@@ -97,19 +89,20 @@ export class SubChunk {
         this.pos = pos;
         this.transformation = this.transformation.translate(pos.x * 16, pos.y * 16, pos.z * 16);
         this.chunk = chunk;
-        this.vao = new VAO();
-        this.vbo = new VBO();
-        this.vao.addPtr(0, 3, 0, 0);
-        this.vtc = new VBO();
-        this.vao.addPtr(1, 3, 0, 0);
-        this.vlo = new VBO();
-        this.vao.addPtr(2, 1, 0, 0);
-        this.vfb = new VBO();
-        this.vao.addPtr(3, 1, 0, 0);
-        this.ebo = new EBO();
-        VAO.unbind();
-        VBO.unbind();
-        EBO.unbind();
+        /*
+            this.vao = new VAO();
+            this.vbo = new VBO();
+            this.vao.addPtr(0,3,0,0);
+            this.vtc = new VBO();
+            this.vao.addPtr(1,3,0,0);
+          this.vlo = new VBO();
+            this.vao.addPtr(2,1,0,0);
+            this.vfb = new VBO();
+            this.vao.addPtr(3,1,0,0);
+            this.ebo = new EBO();
+            VAO.unbind();
+            VBO.unbind();
+            EBO.unbind();*/
         if (!dontRender ?? true)
             this.generate(pos, heightmap);
     }
@@ -877,13 +870,12 @@ export class SubChunk {
             for (let z = 0; z < 16; z++) {
                 let vic = this.updateVerticesOptimized(x, z, index);
                 //    console.log(x,y,vic);
-                this.vertices = this.vertices.concat(vic.v);
+                this.mesh.vertices = this.vertices.concat(vic.v);
                 //  this.normals =   this.vertices.concat(vic.n);
                 //  console.log(vic.lL);
-                this.lightLevels = this.lightLevels.concat(vic.lL);
-                this.indices = this.indices.concat(vic.i);
-                this.colors = this.colors.concat(vic.c);
-                this.fromBlock = this.fromBlock.concat(vic.fB);
+                this.mesh.lightLevels = this.lightLevels.concat(vic.lL);
+                this.mesh.indices = this.indices.concat(vic.i);
+                this.mesh.fb = this.fromBlock.concat(vic.fB);
                 index = vic.ind;
                 //console.log("c:",this.colors);
             }
@@ -899,14 +891,14 @@ export class SubChunk {
         //console.log(this.colors);
     }
     bufferVIC() {
-        this.vao.bind();
-        this.vbo.bufferData(this.vertices);
-        this.vlo.bufferData(this.lightLevels);
-        this.vtc.bufferData(this.colors);
-        this.ebo.bufferData(this.indices);
-        this.vfb.bufferData(this.fromBlock);
-        VAO.unbind();
-        this.RsWater.bufferArrays(this.RsWater.vertices, this.RsWater.textureCoords, this.RsWater.lightLevels, this.RsWater.indices);
+        /*  this.vao.bind();
+          this.vbo.bufferData(this.vertices);
+          this.vlo.bufferData(this.lightLevels);
+          this.vtc.bufferData(this.colors);
+          this.ebo.bufferData(this.indices);
+          this.vfb.bufferData(this.fromBlock);
+          VAO.unbind();
+          this.RsWater.bufferArrays(this.RsWater.vertices,this.RsWater.textureCoords,this.RsWater.lightLevels,this.RsWater.indices);*/
     }
     static blockTextureCoords = Object.freeze({
         1: [
