@@ -15,6 +15,8 @@ export class Chunk {
   todo: Array<Function> = new Array();
   heightmap: Array<Array<number>> = new Array(16);
   neighbours:{POS_X?:Chunk,POS_Z?:Chunk,NEG_X?:Chunk,NEG_Z?:Chunk}={};
+  allNeighbours:boolean=false;
+  sended:boolean =false;
   lazy:boolean =false;
   pos:Vector;
   mesh:Mesh;
@@ -42,6 +44,7 @@ export class Chunk {
       VAO.unbind();
       VBO.unbind();
       EBO.unbind();
+    
     this.pos = new Vector(x,0,z);
     for(let i =0; i<16;i++)
     {
@@ -64,11 +67,13 @@ export class Chunk {
     if(this.neighbours["NEG_X"]!=undefined && this.neighbours["POS_X"]!=undefined && this.neighbours["POS_Z"]!=undefined && this.neighbours["NEG_Z"]!=undefined)
     {
       console.log("gathered all neighbours :)")
+      this.allNeighbours = true;
     this.updateAllSubchunks();
     }
   }
   gatherNeighbours()
   {
+    if(this.allNeighbours) return;
     try
     {
     let neighbour = Main.getChunkAt(this.pos.x-1,this.pos.z);
@@ -106,14 +111,16 @@ export class Chunk {
   }
   sendNeighbours()
   {
+    if(this.allNeighbours) return;
     try
     {
     let neighbour = Main.getChunkAt(this.pos.x-1,this.pos.z);
+     console.log(neighbour.pos);
     neighbour.updateNeighbour("POS_X",this);
     }
     catch(error)
     {
-
+      console.log("hehe");
     }
     try{
    
@@ -219,17 +226,12 @@ export class Chunk {
   }
   updateAllSubchunks()
   {
-     if(this.neighbours.NEG_X==undefined || this.neighbours.POS_X==undefined || this.neighbours.POS_Z==undefined || this.neighbours.NEG_Z==undefined  ) 
-     {
-       this.gatherNeighbours();
-       if(this.neighbours.NEG_X==undefined || this.neighbours.POS_X==undefined || this.neighbours.POS_Z==undefined || this.neighbours.NEG_Z==undefined  ) 
-      return;
-     } 
     for (let i = 0; i < this.subchunks.length; i++) {
     
       this.subchunks[i].update();
     }
     this.lazy=false;
+    this.updateMesh();
     console.log("now not lazy hehehehe")
   }
   getSubchunk(y)

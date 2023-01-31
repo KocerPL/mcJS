@@ -85,8 +85,6 @@ export class SubChunk
       {
       if(this.empty && this.chunk.subchunks[this.pos.y+1].empty && this.chunk.subchunks[this.pos.y-1].empty) 
       {
-        console.log(this.chunk.subchunks[this.pos.y-1].empty);
-        return;
       }
     }
     catch(error)

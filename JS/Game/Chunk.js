@@ -14,6 +14,8 @@ export class Chunk {
     todo = new Array();
     heightmap = new Array(16);
     neighbours = {};
+    allNeighbours = false;
+    sended = false;
     lazy = false;
     pos;
     mesh;
@@ -61,10 +63,13 @@ export class Chunk {
         this.neighbours[neigbDir] = chunk;
         if (this.neighbours["NEG_X"] != undefined && this.neighbours["POS_X"] != undefined && this.neighbours["POS_Z"] != undefined && this.neighbours["NEG_Z"] != undefined) {
             console.log("gathered all neighbours :)");
+            this.allNeighbours = true;
             this.updateAllSubchunks();
         }
     }
     gatherNeighbours() {
+        if (this.allNeighbours)
+            return;
         try {
             let neighbour = Main.getChunkAt(this.pos.x - 1, this.pos.z);
             this.updateNeighbour("NEG_X", neighbour);
@@ -91,11 +96,15 @@ export class Chunk {
         }
     }
     sendNeighbours() {
+        if (this.allNeighbours)
+            return;
         try {
             let neighbour = Main.getChunkAt(this.pos.x - 1, this.pos.z);
+            console.log(neighbour.pos);
             neighbour.updateNeighbour("POS_X", this);
         }
         catch (error) {
+            console.log("hehe");
         }
         try {
             let neighbour = Main.getChunkAt(this.pos.x + 1, this.pos.z);
@@ -176,15 +185,11 @@ export class Chunk {
         // this.lazy=false;
     }
     updateAllSubchunks() {
-        if (this.neighbours.NEG_X == undefined || this.neighbours.POS_X == undefined || this.neighbours.POS_Z == undefined || this.neighbours.NEG_Z == undefined) {
-            this.gatherNeighbours();
-            if (this.neighbours.NEG_X == undefined || this.neighbours.POS_X == undefined || this.neighbours.POS_Z == undefined || this.neighbours.NEG_Z == undefined)
-                return;
-        }
         for (let i = 0; i < this.subchunks.length; i++) {
             this.subchunks[i].update();
         }
         this.lazy = false;
+        this.updateMesh();
         console.log("now not lazy hehehehe");
     }
     getSubchunk(y) {

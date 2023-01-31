@@ -254,7 +254,7 @@ export class Main {
         let z = Math.floor(Math.round(this.player.pos.z) / 16);
         let step = 1;
         let iter = 1;
-        let howMuch = 4;
+        let howMuch = 100;
         let loadBuffer = new Array();
         this.tempChunkBuffer = [...this.loadedChunks];
         let chunk = this.getORnew(x, z, false);
@@ -295,6 +295,13 @@ export class Main {
             step = -step;
         }
         this.loadedChunks = loadBuffer;
+        for (let chunk of this.loadedChunks) {
+            if (!chunk.sended) {
+                chunk.sendNeighbours();
+                chunk.gatherNeighbours();
+                chunk.sended = true;
+            }
+        }
         for (let chunk of this.tempChunkBuffer) {
             for (let i = this.entities.length - 1; i >= 0; i--) {
                 let entity = this.entities[i];
@@ -407,7 +414,7 @@ export class Main {
     }
     static render() {
         this.Measure.frames++;
-        CanvaManager.debug.value = "Fps: " + this.Measure.fps + " Selected block: " + blocks[this.player.itemsBar[this.player.selectedItem].id].name + " Count:" + this.player.itemsBar[this.player.selectedItem].count;
+        CanvaManager.debug.value = "Fps: " + this.Measure.fps + " Selected block: " + blocks[this.player.itemsBar[this.player.selectedItem].id].name + " Count:" + this.player.itemsBar[this.player.selectedItem].count + "\n XYZ:  X:" + this.player.pos.x + "  Y:" + this.player.pos.y + "  Z:" + this.player.pos.z;
         this.shader.use();
         this.player.camera.preRender();
         CanvaManager.preRender();
