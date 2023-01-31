@@ -6,6 +6,8 @@ import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
 import { Block } from "./Block.js";
 import { SubChunk } from "./SubChunk.js"
+import { Matrix } from "../Engine/Utils/Matrix.js";
+import { Mesh } from "./Mesh.js";
 let gl = CanvaManager.gl;
 export type DIR = "POS_X" | "POS_Z" | "NEG_X"  | "NEG_Z";
 export class Chunk {
@@ -15,16 +17,18 @@ export class Chunk {
   neighbours:{POS_X?:Chunk,POS_Z?:Chunk,NEG_X?:Chunk,NEG_Z?:Chunk}={};
   lazy:boolean =false;
   pos:Vector;
+  mesh:Mesh;
   vao:VAO;
   vbo:VBO;
   vtc:VBO;
   vlo:VBO;
   vfb:VBO;
   ebo:EBO;
+  transformation = Matrix.identity();
   constructor(x:number, z:number,isLazy:boolean) {
     // console.log("Constructing chunk");
-
-      
+    this.transformation= this.transformation.translate(x*16,0,z*16)
+      this.mesh = new Mesh();
       this.vao = new VAO();
       this.vbo = new VBO();
       this.vao.addPtr(0,3,0,0);
@@ -47,6 +51,7 @@ export class Chunk {
      this.subchunks[i] = new SubChunk(new Vector(x, i, z),this.heightmap,this);
       //console.log("Completed generating subchunk: "+i);
     }
+    this.updateMesh();
     this.sendNeighbours();
     // console.log("done constructing");
   }
@@ -129,25 +134,31 @@ export class Chunk {
       
     }
   }
-  update(startTime: number) {
+  updateMesh() {
+    this.mesh.reset();
     for (let i = 0; i < this.subchunks.length; i++) {
-      {
+      
+        this.mesh.add(this.subchunks[i].mesh);
+    
+       console.log(this.subchunks[i].mesh.count+ "   "+this.subchunks[i].mesh.indices.length);
       
       
-       //console.log(this.subchunks[i].count);
-      
-      }
       
     }
-
-  
+    console.log("Count is: "+this.mesh.count+"   "+this.mesh.indices.length+"   "+this.mesh.vertices.length);
+    this.vao.bind();  
+    this.vbo.bufferData(this.mesh.vertices);
+    this.vlo.bufferData(this.mesh.lightLevels);
+    this.vfb.bufferData(this.mesh.fb);
+    this.vtc.bufferData(this.mesh.tCoords);
+    this.ebo.bufferData(this.mesh.indices);
   }
   render() {
     if(!this.lazy)
     {
     this.vao.bind();
     Main.shader.loadTransformation(this.transformation);
-    gl.drawElements(gl.TRIANGLES, this.subchunks[i].count, gl.UNSIGNED_INT, 0);
+    gl.drawElements(gl.TRIANGLES, this.mesh.count, gl.UNSIGNED_INT, 0);
     }
 
   }
@@ -156,7 +167,7 @@ export class Chunk {
     for (let i = 0; i < this.subchunks.length; i++) {
       if (this.subchunks[i] != undefined && this.subchunks[i].generated && this.subchunks[i].RsWater.count>0) {
         this.subchunks[i].RsWater.vao.bind();
-        Main.shader.loadUniforms(Main.player.camera.getProjection(), this.subchunks[i].transformation, Main.player.camera.getView(),Main.sunLight);
+        Main.shader.loadUniforms(Main.player.camera.getProjection(), this.transformation, Main.player.camera.getView(),Main.sunLight);
      //  console.log( this.subchunks[i].RsWater.count);
        
         gl.drawElements(gl.TRIANGLES, this.subchunks[i].RsWater.count, gl.UNSIGNED_INT, 0);
@@ -235,6 +246,7 @@ export class Chunk {
     let yPos = Math.floor(Math.round(y)/16);
     if(this.subchunks[yPos].generated)
    this.subchunks[yPos].update(10,true);
+   this.updateMesh();
   }
   setBlock(pos:Vector,blockID:number,update?:boolean)
   {
