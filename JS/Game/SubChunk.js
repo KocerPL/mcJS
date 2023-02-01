@@ -305,26 +305,7 @@ export class SubChunk {
                         lightLevels = lightLevels.concat(block.lightLevel, block.lightLevel, block.lightLevel, block.lightLevel);
                         fB = fB.concat(block.lightFBlock, block.lightFBlock, block.lightFBlock, block.lightFBlock);
                         index += 4;
-                    } /* else if(block.id==0 && testedBlock.id<0 && side=="bottom" )
-                    {
-                      let hv = new Array(...temp.slice(vStart,vStart+12));
-                      let yVal=0.2;
-                      if(testedBlock.id==-2)
-                      {
-                       yVal+= (1-(testedBlock.attribute[0]/15))*0.8;
-                      }
-                      for(let i=1;i<12 ; i+=3)
-                      {
-                       hv[i]-=yVal;
-                      }
-                     this.RsWater.add(
-                       hv ,
-                       SubChunk.getTextureCords(testedBlock, SubChunk.flip(side)),
-                       [block.lightLevel,block.lightLevel,block.lightLevel,block.lightLevel],
-                       [this.RsWater.index+2,this.RsWater.index+1,this.RsWater.index,this.RsWater.index+2,this.RsWater.index,this.RsWater.index+3],
-                       4
-                     )
-                    }*/
+                    }
                 }
                 else {
                     if (testedBlock.id < 1) {

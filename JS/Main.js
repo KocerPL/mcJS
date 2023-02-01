@@ -45,7 +45,7 @@ export class Main {
     static crossVAO;
     static fastDelta = 0;
     static lastFastTick = 0;
-    static player = new Player(new Vector(0, 60, 0));
+    static player = new Player(new Vector(0, 130, 0));
     static range = { start: 0, end: 1 };
     //public static chunks:Array<Array<Chunk>>=new Array(8);
     static loadedChunks = new Array();
@@ -184,6 +184,8 @@ export class Main {
         this.player.update();
     }
     static update() {
+        if (CanvaManager.getKeyOnce(71))
+            console.log(World.getSubchunk(this.player.pos));
         if (CanvaManager.getKey(52) && this.sunLight < 16)
             this.sunLight++;
         if (CanvaManager.getKey(53) && this.sunLight > 0)

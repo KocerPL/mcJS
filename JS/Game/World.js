@@ -338,6 +338,7 @@ export class World {
     static getHeight(x, z) {
         try {
             //  if(x<0||z<0)
+            //    return this.height;
             //return 1;
             return Math.round((perlin.get(x / 128, z / 128) + 1) * 30) + this.height;
         }

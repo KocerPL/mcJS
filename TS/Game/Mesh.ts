@@ -14,8 +14,10 @@ export class Mesh
 
     public add(mesh:Mesh)
     {
+        this.count = this.indices.length;
         this.vertices= this.vertices.concat(mesh.vertices);
-        this.indices= this.indices.concat(mesh.indices);
+        for(let indice of mesh.indices)
+        this.indices.push( indice+((this.count*2)/3));
         this.tCoords= this.tCoords.concat(mesh.tCoords);
         this.lightLevels= this.lightLevels.concat(mesh.lightLevels);
         this.fb= this.fb.concat(mesh.fb);
