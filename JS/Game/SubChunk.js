@@ -295,8 +295,6 @@ export class SubChunk {
             let side = (vec, vStart, side) => {
                 // console.log(this.blocks);
                 let testedBlock = this.getBlock(new Vector(vec.x + x, vec.y + y, vec.z + z));
-                if (vec.y + y == -1 && block.id > 0)
-                    console.log("get block");
                 if (testedBlock == undefined)
                     return;
                 if (block.id < 1) {
@@ -361,7 +359,6 @@ export class SubChunk {
     }
     //DONE: update vertices One level blocks shorted
     updateVerticesIndices() {
-        console.log("Updating");
         let index = 0;
         this.mesh.reset();
         this.inReGeneration = true;
@@ -383,8 +380,6 @@ export class SubChunk {
         // console.timeEnd("Updating");
         //   if(this.indices.length>0)
         this.mesh.count = this.mesh.indices.length;
-        if (this.mesh.count > 0)
-            console.log("SC count:" + this.mesh.count);
         this.lightUpdate = false;
         this.inReGeneration = false;
         //  console.log(this.vertices);

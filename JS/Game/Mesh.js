@@ -4,7 +4,7 @@ export class Mesh {
     tCoords = [];
     lightLevels = [];
     fb = [];
-    count;
+    count = 0;
     constructor() {
         this.reset();
     }

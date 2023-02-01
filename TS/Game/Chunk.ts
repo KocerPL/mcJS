@@ -149,11 +149,7 @@ export class Chunk {
   updateMesh() {
     this.mesh.reset();
     for (let i = 0; i < this.subchunks.length; i++) {
-      
         this.mesh.add(this.subchunks[i].mesh);
-      
-      
-      
     }
     this.vao.bind();  
     this.vbo.bufferData(this.mesh.vertices);

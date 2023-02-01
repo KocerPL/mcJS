@@ -8,7 +8,8 @@ export class World
 {
     private Chunks:Array<Array<Chunk>> = new Array();
     public static heightMap:Array<Array<number>> = new Array(256);
-public static waterLevel:number = 20;
+public static waterLevel:number = 0;
+public static height=100;
     public static init()
     {
         this.genHeightMap();
@@ -59,12 +60,12 @@ public static waterLevel:number = 20;
     }
     public static genHeightMap()
     {
-        let height = 20;
+        let height = 100;
         let height2 =20;
         for(let x=0; x<256;x++)
         {
-            if(x%4)
-            height+= Math.round(Math.random()*2)-1;
+           // if(x%4)
+         //   height+= Math.round(Math.random()*2)-1;
             this.heightMap[x] = new Array();
             for(let z=0;z<256;z++)
             {
@@ -87,7 +88,7 @@ public static waterLevel:number = 20;
                 } catch (error) {
                     
                 }*/
-                this.heightMap[x][z] =Math.round((perlin.get(x/128,z/128)+1)*30);
+                this.heightMap[x][z] =Math.round((perlin.get(x/128,z/128)+1)*30)+height;
             }
         }
     }
@@ -392,7 +393,7 @@ public static waterLevel:number = 20;
         {
           //  if(x<0||z<0)
             //return 1;
-        return Math.round((perlin.get(x/128,z/128)+1)*30);
+        return Math.round((perlin.get(x/128,z/128)+1)*30)+this.height;
         }
         catch(error)
         {}

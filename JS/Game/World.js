@@ -4,7 +4,8 @@ import { directions } from "./Block.js";
 export class World {
     Chunks = new Array();
     static heightMap = new Array(256);
-    static waterLevel = 20;
+    static waterLevel = 0;
+    static height = 100;
     static init() {
         this.genHeightMap();
         console.log(perlin);
@@ -45,11 +46,11 @@ export class World {
         this.setBlockNoLight(new Vector(vec.x, i, vec.z), 9);
     }
     static genHeightMap() {
-        let height = 20;
+        let height = 100;
         let height2 = 20;
         for (let x = 0; x < 256; x++) {
-            if (x % 4)
-                height += Math.round(Math.random() * 2) - 1;
+            // if(x%4)
+            //   height+= Math.round(Math.random()*2)-1;
             this.heightMap[x] = new Array();
             for (let z = 0; z < 256; z++) {
                 /*try {
@@ -71,7 +72,7 @@ export class World {
                 } catch (error) {
                     
                 }*/
-                this.heightMap[x][z] = Math.round((perlin.get(x / 128, z / 128) + 1) * 30);
+                this.heightMap[x][z] = Math.round((perlin.get(x / 128, z / 128) + 1) * 30) + height;
             }
         }
     }
@@ -338,7 +339,7 @@ export class World {
         try {
             //  if(x<0||z<0)
             //return 1;
-            return Math.round((perlin.get(x / 128, z / 128) + 1) * 30);
+            return Math.round((perlin.get(x / 128, z / 128) + 1) * 30) + this.height;
         }
         catch (error) { }
         return 0;

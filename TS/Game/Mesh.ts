@@ -6,7 +6,7 @@ export class Mesh
     tCoords:Array<number>=[];
     lightLevels:Array<number>=[];
     fb:Array<number> =[];
-    count:number;
+    count:number=0;
     constructor()
     {
         this.reset();
