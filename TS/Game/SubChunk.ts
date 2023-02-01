@@ -135,17 +135,33 @@ export class SubChunk
         }
         return false;
       }
-      if( func("x") || func("y") || func("z")) //if block out of chunk
+      if( func("x") || func("z")) //if block out of chunk
       {
        try 
        {
-        return Main.getChunkAt(this.pos.x+transPos.x,this.pos.z+transPos.z).subchunks[this.pos.y+transPos.y].getBlock(pos);
+       
+        return Main.getChunkAt(this.pos.x+transPos.x,this.pos.z+transPos.z).subchunks[this.pos.y].getBlock(pos);
        }
        catch(error)
        {
+        console.log("Cannot get block of next subchunk!!",transPos);
          return undefined;
        }
       }
+      if(func("y") )
+      {
+        try 
+       {
+       
+        return this.chunk.subchunks[this.pos.y+transPos.y].getBlock(pos);
+       }
+       catch(error)
+       {
+        console.log("Cannot get block of next subchunk!!",transPos.y+this.pos.y);
+         return undefined;
+       }
+      }
+      console.log("Cannot get block");
       return undefined;
       }
     }

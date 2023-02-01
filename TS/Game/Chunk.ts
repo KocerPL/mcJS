@@ -54,7 +54,6 @@ export class Chunk {
      this.subchunks[i] = new SubChunk(new Vector(x, i, z),this.heightmap,this);
       //console.log("Completed generating subchunk: "+i);
     }
-    this.updateMesh();
     this.sendNeighbours();
     // console.log("done constructing");
   }
