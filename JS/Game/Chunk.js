@@ -47,11 +47,10 @@ export class Chunk {
         for (let i = 0; i < 16; i++) {
             this.heightmap[i] = new Array(16);
         }
-        for (let i = 0; i < this.subchunks.length; i++) {
+        for (let i = 0; i < 16; i++) {
             this.subchunks[i] = new SubChunk(new Vector(x, i, z), this.heightmap, this);
             //console.log("Completed generating subchunk: "+i);
         }
-        this.sendNeighbours();
         // console.log("done constructing");
     }
     updateNeighbour(neigbDir, chunk) {
@@ -196,8 +195,7 @@ export class Chunk {
     }
     updateSubchunkAt(y) {
         let yPos = Math.floor(Math.round(y) / 16);
-        if (this.subchunks[yPos].generated)
-            this.subchunks[yPos].update();
+        this.subchunks[yPos].update();
         this.updateMesh();
     }
     setBlock(pos, blockID, update) {
@@ -215,21 +213,27 @@ export class Chunk {
             try {
                 if (pos.x == 0) {
                     Main.getChunkAt(this.pos.x - 1, this.pos.z).subchunks[yPos].update();
+                    Main.getChunkAt(this.pos.x - 1, this.pos.z).updateMesh();
                 }
                 else if (pos.x == 15) {
                     Main.getChunkAt(this.pos.x + 1, this.pos.z).subchunks[yPos].update();
+                    Main.getChunkAt(this.pos.x + 1, this.pos.z).updateMesh();
                 }
                 if (y == 0) {
-                    Main.getChunkAt(this.pos.x, this.pos.z).subchunks[yPos - 1].update();
+                    this.subchunks[yPos - 1].update();
+                    this.updateMesh();
                 }
                 else if (y == 15) {
-                    Main.getChunkAt(this.pos.x, this.pos.z).subchunks[yPos + 1].update();
+                    this.subchunks[yPos + 1].update();
+                    this.updateMesh();
                 }
                 if (pos.z == 0) {
                     Main.getChunkAt(this.pos.x, this.pos.z - 1).subchunks[yPos].update();
+                    Main.getChunkAt(this.pos.x, this.pos.z - 1).updateMesh();
                 }
                 else if (pos.z == 15) {
                     Main.getChunkAt(this.pos.x, this.pos.z + 1).subchunks[yPos].update();
+                    Main.getChunkAt(this.pos.x, this.pos.z + 1).updateMesh();
                 }
             }
             catch (error) {

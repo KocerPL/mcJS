@@ -64,14 +64,6 @@ export class SubChunk {
     update() {
         // if(!this.generated) return;
         this.clearLight();
-        try {
-            //   if(this.empty && this.chunk.subchunks[this.pos.y+1].empty && this.chunk.subchunks[this.pos.y-1].empty) 
-            // {
-            // }
-        }
-        catch (error) {
-            // console.log(error,this)
-        }
         this.updateLightLevels();
         this.updateVerticesIndices();
     }
