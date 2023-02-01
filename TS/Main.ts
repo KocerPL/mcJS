@@ -22,7 +22,7 @@ export class Main
 {
    public static okok = false;
    public static dispLl = false;
-   public static fastBreaking=false;
+   public static fastBreaking=true;
    public static FPS:number=61;
    public static fastTPS=60;
    public static minimalStorage = new Array();

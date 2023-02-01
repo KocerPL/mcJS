@@ -19,7 +19,7 @@ let gl = CanvaManager.gl;
 export class Main {
     static okok = false;
     static dispLl = false;
-    static fastBreaking = false;
+    static fastBreaking = true;
     static FPS = 61;
     static fastTPS = 60;
     static minimalStorage = new Array();
