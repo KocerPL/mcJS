@@ -27,7 +27,7 @@ export class Chunk {
   vfb:VBO;
   ebo:EBO;
   transformation = Matrix.identity();
-  constructor(x:number, z:number) {
+constructor(x:number, z:number) {
     // console.log("Constructing chunk");
     this.transformation= this.transformation.translate(x*16,0,z*16)
       this.mesh = new Mesh();
@@ -50,11 +50,15 @@ export class Chunk {
     {
       this.heightmap[i] = new Array(16);
     }
-    for (let i = 0; i < 16; i++) {
-     this.subchunks[i] = new SubChunk(new Vector(x, i, z),this.heightmap,this);
-      //console.log("Completed generating subchunk: "+i);
-    }
+   this.preGenSubchunks();
     // console.log("done constructing");
+  }
+  async preGenSubchunks()
+  {
+    for (let i = 0; i < 16; i++) {
+      this.subchunks[i] = new SubChunk(new Vector(this.pos.x, i, this.pos.z),this);
+      this.subchunks[i].preGenerate(this.heightmap);
+     }
   }
   updateNeighbour(neigbDir:DIR,chunk:Chunk)
   {
@@ -215,11 +219,11 @@ export class Chunk {
    // this.lazy=false;
 
   }
-  updateAllSubchunks()
+  async updateAllSubchunks()
   {
     for (let i = 0; i < this.subchunks.length; i++) {
     
-      this.subchunks[i].update();
+     await this.subchunks[i].update();
     }
     this.lazy=false;
     this.updateMesh();

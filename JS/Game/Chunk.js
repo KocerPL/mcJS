@@ -47,11 +47,14 @@ export class Chunk {
         for (let i = 0; i < 16; i++) {
             this.heightmap[i] = new Array(16);
         }
-        for (let i = 0; i < 16; i++) {
-            this.subchunks[i] = new SubChunk(new Vector(x, i, z), this.heightmap, this);
-            //console.log("Completed generating subchunk: "+i);
-        }
+        this.preGenSubchunks();
         // console.log("done constructing");
+    }
+    async preGenSubchunks() {
+        for (let i = 0; i < 16; i++) {
+            this.subchunks[i] = new SubChunk(new Vector(this.pos.x, i, this.pos.z), this);
+            this.subchunks[i].preGenerate(this.heightmap);
+        }
     }
     updateNeighbour(neigbDir, chunk) {
         console.log("what");
@@ -180,9 +183,9 @@ export class Chunk {
         }
         // this.lazy=false;
     }
-    updateAllSubchunks() {
+    async updateAllSubchunks() {
         for (let i = 0; i < this.subchunks.length; i++) {
-            this.subchunks[i].update();
+            await this.subchunks[i].update();
         }
         this.lazy = false;
         this.updateMesh();

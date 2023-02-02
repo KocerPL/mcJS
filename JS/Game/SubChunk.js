@@ -13,14 +13,12 @@ export class SubChunk {
     // empty:boolean = true;    //Is subchunk empty
     chunk; //parent Chunk of this subchunk
     pos; //subchunk position in world
-    constructor(pos, heightmap, chunk, dontRender) {
+    constructor(pos, chunk) {
         //Setting up variables
         this.pos = pos;
         this.chunk = chunk;
-        //Calling generate if allowed by dontRender flag
-        this.preGenerate(heightmap);
     }
-    preGenerate(heightmap) {
+    async preGenerate(heightmap) {
         //setting position according to subchunk pos in world
         let yPos = this.pos.y * 16;
         let xPos = this.pos.x * 16;
@@ -61,7 +59,7 @@ export class SubChunk {
         World.generateTree(new Vector(xPos+ x,y+yPos,zPos+ z));*/
     }
     //Subchunk update
-    update() {
+    async update() {
         // if(!this.generated) return;
         this.clearLight();
         this.updateLightLevels();

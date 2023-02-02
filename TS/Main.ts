@@ -35,7 +35,8 @@ export class Main
       fps:0,
       lastTime:0,
       ticks:0,
-      frames:0
+      frames:0,
+      lastLimit:0
    }
    private static unloadedChunks:Array<Chunk> = new Array();
    private static shader2d:Shader2d;
@@ -153,7 +154,11 @@ export class Main
       this.delta--;
       this.update();
       };
+      if(time-this.Measure.lastLimit>300 && this.Measure.fps>50)
+      {
+         this.Measure.lastLimit=time;
       this.limitChunks();
+      }
       //60 updates
      let fastDelta = time-this.lastFastTick;
       this.fastDelta += fastDelta/(2000/this.fastTPS);
@@ -223,113 +228,46 @@ export class Main
       this.exportChunks();
       if(CanvaManager.getKeyOnce(55))
       this.upload();
-      if(this.file!=null)
-      {  
-         for(let x=0;x<Main.tasks.length;x++)
-         Main.tasks[x]=new Array();
-         for(let x=0; x<this.file.length-1;x++)
-         {
-            let x2=this.file[x].pos[0];
-               let z2 = this.file[x].pos[1];
-               if(x2==undefined|| z2==undefined)
-               {
-                   continue;
-               }
-               let chunk:Chunk = this.getChunkAt(x2,z2);
-            if(chunk==undefined)
-            {
-               chunk= new Chunk(x2,z2);
-            this.loadedChunks.push(chunk);
-            }
-            for(let k=0;k<16;k++)
-            {
-            for(let l=0;l<16;l++)
-            {
-               chunk.heightmap[k][l] = 0;
-            }
-            }
-            for(let a=0;a<16;a++)
-            {
-               chunk.subchunks[a].genEmpty();
-               
-               for(let x1=0;x1<16;x1++)
-               for(let y1=0;y1<16;y1++)
-               for(let z1=0;z1<16;z1++)
-               {
-                  if( !Number.isNaN(this.file[x].blocks[x1][y1][z1]))
-                  {
-             chunk.subchunks[a].blocks[x1][y1][z1].id= this.file[x].blocks[a][x1][y1][z1];
-            
-                  }
-                  if( chunk.subchunks[a].blocks[x1][y1][z1].id>0 && y1+(  chunk.subchunks[a].pos.y*16)>chunk.heightmap[x1][z1])
-                  chunk.heightmap[x1][z1] =y1+(  chunk.subchunks[a].pos.y*16);
-               }
-               
-               
-            Main.addTask(new Task(()=>{
-               chunk.subchunks[a].inReGeneration=false;
-               chunk.subchunks[a].update();
-               },Main),9);
-              // console.log( this.chunks[x2][z2].subchunks[a]);
-              
-            }
-            chunk.lazy =false;
-              
-         }
-         if(!(this.file[this.file.length-1] instanceof Array) && this.file[this.file.length-1].pPos!=undefined)
-         {
-            let k =this.file[this.file.length-1].pPos;
-            console.log(k);
-            this.player.pos = new Vector(k[0],k[1],k[2]);
-         }
-         console.log("Loaded");
-         this.file=null;
-      }
-    //  this.TESTtransf =  this.TESTtransf.rotateZ(1);
-      //this.TESTtransf =  this.TESTtransf.rotateY(1);
    }
-   private static limitChunks()
+   private static async limitChunks()
    {
       let x =Math.floor(Math.round(this.player.pos.x)/16);
       let z =Math.floor(Math.round(this.player.pos.z)/16);
       
       let step=1;
       let iter =1;
-      let howMuch=30;
+      let howMuch=100;
       let loadBuffer = new Array();
       this.tempChunkBuffer = [...this.loadedChunks];
-      let chunk =  this.getORnew(x,z,false);
+      let {chunk,isNew} =  this.getORnew(x,z);
       loadBuffer.push(chunk);
-      if(chunk.lazy) chunk.updateAllSubchunks();
       let nextCoords= new Vector(x,0,z);
       //Spiral chunk loading algorithm
-      let lazyChunkPhase=false;
-      let k=0;
-     while(k<2)
+   
+      let isNewAv = false;
+     while(loadBuffer.length<howMuch)
       {
-         if(lazyChunkPhase)
-         k++;
-         if(loadBuffer.length>=howMuch) lazyChunkPhase=true;
             //x
             for(let i=0;i<iter;i++)
             {
          nextCoords.x+=step;
-         let chunk = this.getORnew(nextCoords.x,nextCoords.z,lazyChunkPhase)
-         if(!lazyChunkPhase && chunk.lazy) chunk.updateAllSubchunks();
+         let {chunk,isNew} = this.getORnew(nextCoords.x,nextCoords.z)
          loadBuffer.push(chunk);
-         if(loadBuffer.length>=howMuch) lazyChunkPhase=true;
+              
+               if(isNew) {isNewAv =true; break; }
             }
          //z
+         if(isNewAv) break;
          for(let i=0;i<iter;i++)
             {
          nextCoords.z+=step;
-         let chunk = this.getORnew(nextCoords.x,nextCoords.z,lazyChunkPhase)
-         if(!lazyChunkPhase && chunk.lazy) chunk.updateAllSubchunks();
+         let {chunk,isNew} = this.getORnew(nextCoords.x,nextCoords.z)
+        // isNewAv = isNew;
          loadBuffer.push(chunk);
-         if(loadBuffer.length>=howMuch) lazyChunkPhase=true;
+         if(isNew) {isNewAv =true; break; }
             }
          //increase and invert step
-         
+         if(isNewAv) break;
         iter++;
         step= -step;
       }
@@ -348,30 +286,28 @@ export class Main
          for(let i=this.entities.length-1; i>=0;i--)
          {
             let entity = this.entities[i];
-            console.log(entity);
-            console.log(chunk);
             if(chunk.pos.x*16 < entity.pos.x && chunk.pos.z*16 < entity.pos.z && chunk.pos.x*16 > entity.pos.x-16 && chunk.pos.z*16 < entity.pos.z-16)
             this.entities.splice(i,1);
          }
       }
       this.unloadedChunks = this.unloadedChunks.concat([...this.tempChunkBuffer]);
    }
-   private static getORnew(x:number,z:number,lazy:boolean):Chunk
+   private static getORnew(x:number,z:number):{chunk:Chunk,isNew:boolean}
    {
       for(let l=0;l<this.tempChunkBuffer.length;l++)
       if(this.tempChunkBuffer[l].pos.x == x && this.tempChunkBuffer[l].pos.z == z)
       {
-      return  [...this.tempChunkBuffer.splice(l,1)][0];
+      return  {chunk:[...this.tempChunkBuffer.splice(l,1)][0],isNew:false};
         
       }
 
       for(let l=0;l<this.unloadedChunks.length;l++)
       if(this.unloadedChunks[l].pos.x == x && this.unloadedChunks[l].pos.z == z)
       {
-      return  [...this.unloadedChunks.splice(l,1)][0];
+      return  {chunk:[...this.unloadedChunks.splice(l,1)][0],isNew:false};
         
       }
-  return new Chunk(x,z); 
+  return {chunk: new Chunk(x,z),isNew:true}; 
    }
    public static exportChunks()
    {
