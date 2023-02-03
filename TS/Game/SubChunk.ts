@@ -27,7 +27,7 @@ export class SubChunk
       this.chunk = chunk;
      
     }
-  async  preGenerate(heightmap) //Generation method
+ preGenerate(heightmap) //Generation method
     {
       //setting position according to subchunk pos in world
       let yPos =this.pos.y*16;
@@ -72,7 +72,7 @@ export class SubChunk
       World.generateTree(new Vector(xPos+ x,y+yPos,zPos+ z));*/
     }
     //Subchunk update
- async update()
+  update()
     {
      // if(!this.generated) return;
       this.clearLight();

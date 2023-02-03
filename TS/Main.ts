@@ -20,7 +20,8 @@ import { World } from "./Game/World.js";
 let gl = CanvaManager.gl;
 export class Main
 {
-   public static okok = false;
+   public static maxChunks =121;
+      public static okok = false;
    public static dispLl = false;
    public static fastBreaking=true;
    public static FPS:number=61;
@@ -138,7 +139,7 @@ export class Main
    public static loop(time:number):void
    {
       let test =this.lastFrame-time;
-      if(test<30)
+      if(test<1000/this.FPS)
       {
          this.Measure.lastLimit=time;
       this.limitChunks();
@@ -224,15 +225,16 @@ export class Main
       
       let step=1;
       let iter =1;
-      let howMuch=100;
+      let howMuch=this.maxChunks;
       let loadBuffer = new Array();
       this.tempChunkBuffer = [...this.loadedChunks];
       let {chunk,isNew} =  this.getORnew(x,z);
+      if(isNew) chunk.preGenSubchunks();
       loadBuffer.push(chunk);
       let nextCoords= new Vector(x,0,z);
       //Spiral chunk loading algorithm
    
-      let isNewAv = false;
+      let stop = false;
      while(loadBuffer.length<howMuch)
       {
             //x
@@ -242,33 +244,39 @@ export class Main
          let {chunk,isNew} = this.getORnew(nextCoords.x,nextCoords.z)
          loadBuffer.push(chunk);
               
-               if(isNew) {isNewAv =true; break; }
+               if(!chunk.generated) {chunk.preGenOne();stop =true; break; }
+               else if(!chunk.sended){
+                  chunk.sendNeighbours();
+                  //chunk.gatherNeighbours();
+                     chunk.sended =true;
+                     stop =true;
+                     break;
+               }
             }
          //z
-         if(isNewAv) break;
+         if(stop) break;
          for(let i=0;i<iter;i++)
             {
          nextCoords.z+=step;
          let {chunk,isNew} = this.getORnew(nextCoords.x,nextCoords.z)
-        // isNewAv = isNew;
+        // stop = isNew;
          loadBuffer.push(chunk);
-         if(isNew) {isNewAv =true; break; }
+         if(!chunk.generated) {chunk.preGenOne();
+            stop =true; break; }else if(!chunk.sended){
+               chunk.sendNeighbours();
+              // chunk.gatherNeighbours();
+                  chunk.sended =true;
+                  stop =true;
+                  break;
+            }
             }
          //increase and invert step
-         if(isNewAv) break;
+         if(stop) break;
         iter++;
         step= -step;
       }
       this.loadedChunks=loadBuffer;
-      for(let chunk of this.loadedChunks)
-      {
-         if(!chunk.sended)
-         {
-         chunk.sendNeighbours();
-         chunk.gatherNeighbours();
-            chunk.sended =true;
-      }
-      }
+    
       for(let chunk of this.tempChunkBuffer)
       {
          chunk.sended = false;

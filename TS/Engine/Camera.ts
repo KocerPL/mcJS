@@ -11,7 +11,7 @@ export class Camera
    private pitch =0;
    private fov =70;
    private near = 0.1;
-   private far =100;
+   private far =10000;
    private aspect =CanvaManager.getHeight/CanvaManager.getWidth;
     public offset = 0;
     public projRot=0;

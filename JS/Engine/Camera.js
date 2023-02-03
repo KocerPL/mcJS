@@ -10,7 +10,7 @@ export class Camera {
     pitch = 0;
     fov = 70;
     near = 0.1;
-    far = 100;
+    far = 10000;
     aspect = CanvaManager.getHeight / CanvaManager.getWidth;
     offset = 0;
     projRot = 0;

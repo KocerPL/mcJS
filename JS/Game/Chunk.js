@@ -11,11 +11,25 @@ import { Mesh } from "./Mesh.js";
 import { World } from "./World.js";
 import { randRange } from "../Engine/Utils/Math.js";
 let gl = CanvaManager.gl;
+export function flipDir(dir) {
+    switch (dir) {
+        case "POS_X":
+            return "NEG_X";
+        case "NEG_X":
+            return "POS_X";
+        case "POS_Z":
+            return "NEG_Z";
+        case "NEG_Z":
+            return "POS_Z";
+    }
+}
 export class Chunk {
     subchunks = new Array(16);
     heightmap = new Array(16);
     neighbours = {};
     allNeighbours = false;
+    generated = false;
+    generatingIndex = 0;
     sended = false;
     lazy = false;
     pos;
@@ -48,14 +62,25 @@ export class Chunk {
         for (let i = 0; i < 16; i++) {
             this.heightmap[i] = new Array(16);
         }
-        this.preGenSubchunks();
+        // this.preGenSubchunks();
         // console.log("done constructing");
     }
-    async preGenSubchunks() {
+    preGenOne() {
+        if (this.generatingIndex >= 16)
+            return;
+        this.subchunks[this.generatingIndex] = new SubChunk(new Vector(this.pos.x, this.generatingIndex, this.pos.z), this);
+        this.subchunks[this.generatingIndex].preGenerate(this.heightmap);
+        this.generatingIndex++;
+        if (this.generatingIndex >= 16) {
+            this.generated = true;
+        }
+    }
+    preGenSubchunks() {
         for (let i = 0; i < 16; i++) {
             this.subchunks[i] = new SubChunk(new Vector(this.pos.x, i, this.pos.z), this);
             this.subchunks[i].preGenerate(this.heightmap);
         }
+        this.generated = true;
         //  this.postGenerate();
     }
     async postGenerate() {
@@ -66,7 +91,7 @@ export class Chunk {
     updateNeighbour(neigbDir, chunk) {
         //console.log("what")
         //console.log(this.pos,neigbDir);
-        if (chunk == undefined)
+        if (chunk == undefined || this.allNeighbours)
             return;
         this.neighbours[neigbDir] = chunk;
         if (this.neighbours["NEG_X"] != undefined && this.neighbours["POS_X"] != undefined && this.neighbours["POS_Z"] != undefined && this.neighbours["NEG_Z"] != undefined) {
@@ -75,63 +100,25 @@ export class Chunk {
             this.updateAllSubchunks();
         }
     }
-    gatherNeighbours() {
-        if (this.allNeighbours)
-            return;
+    sdNeighbour(neighbour, dir) {
         try {
-            let neighbour = Main.getChunkAt(this.pos.x - 1, this.pos.z);
-            this.updateNeighbour("NEG_X", neighbour);
-        }
-        catch (error) {
-        }
-        try {
-            let neighbour = Main.getChunkAt(this.pos.x + 1, this.pos.z);
-            this.updateNeighbour("POS_X", neighbour);
-        }
-        catch (error) {
-        }
-        try {
-            let neighbour = Main.getChunkAt(this.pos.x, this.pos.z - 1);
-            this.updateNeighbour("NEG_Z", neighbour);
-        }
-        catch (error) {
-        }
-        try {
-            let neighbour = Main.getChunkAt(this.pos.x, this.pos.z + 1);
-            this.updateNeighbour("POS_Z", neighbour);
+            neighbour.updateNeighbour(dir, this);
+            this.updateNeighbour(flipDir(dir), neighbour);
         }
         catch (error) {
         }
     }
     sendNeighbours() {
-        if (this.allNeighbours)
+        if (this.allNeighbours || !this.generated)
             return;
-        try {
-            let neighbour = Main.getChunkAt(this.pos.x - 1, this.pos.z);
-            //console.log(neighbour.pos);
-            neighbour.updateNeighbour("POS_X", this);
-        }
-        catch (error) {
-            // console.log("hehe");
-        }
-        try {
-            let neighbour = Main.getChunkAt(this.pos.x + 1, this.pos.z);
-            neighbour.updateNeighbour("NEG_X", this);
-        }
-        catch (error) {
-        }
-        try {
-            let neighbour = Main.getChunkAt(this.pos.x, this.pos.z - 1);
-            neighbour.updateNeighbour("POS_Z", this);
-        }
-        catch (error) {
-        }
-        try {
-            let neighbour = Main.getChunkAt(this.pos.x, this.pos.z + 1);
-            neighbour.updateNeighbour("NEG_Z", this);
-        }
-        catch (error) {
-        }
+        let neighbour = Main.getChunkAt(this.pos.x - 1, this.pos.z);
+        this.sdNeighbour(neighbour, "POS_X");
+        neighbour = Main.getChunkAt(this.pos.x + 1, this.pos.z);
+        this.sdNeighbour(neighbour, "NEG_X");
+        neighbour = Main.getChunkAt(this.pos.x, this.pos.z - 1);
+        this.sdNeighbour(neighbour, "POS_Z");
+        neighbour = Main.getChunkAt(this.pos.x, this.pos.z + 1);
+        this.sdNeighbour(neighbour, "NEG_Z");
     }
     updateMesh() {
         this.mesh.reset();
@@ -190,11 +177,12 @@ export class Chunk {
         }
         // this.lazy=false;
     }
-    async updateAllSubchunks() {
+    updateAllSubchunks() {
+        if (!this.allNeighbours)
+            return;
         for (let i = 0; i < this.subchunks.length; i++) {
-            await this.subchunks[i].update();
+            this.subchunks[i].update();
         }
-        this.lazy = false;
         this.updateMesh();
         // console.log("now not lazy hehehehe")
     }
@@ -204,6 +192,8 @@ export class Chunk {
             return this.subchunks[yPos];
     }
     updateSubchunkAt(y) {
+        if (!this.allNeighbours)
+            return;
         let yPos = Math.floor(Math.round(y) / 16);
         this.subchunks[yPos].update();
         this.updateMesh();
