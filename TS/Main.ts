@@ -154,7 +154,7 @@ export class Main
       this.delta--;
       this.update();
       };
-      if(time-this.Measure.lastLimit>300 && this.Measure.fps>50)
+      if(time-this.Measure.lastLimit>300)
       {
          this.Measure.lastLimit=time;
       this.limitChunks();

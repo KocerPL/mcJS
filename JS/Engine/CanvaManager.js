@@ -32,7 +32,7 @@ export class CanvaManager {
         return this.canva;
     }
     static onScroll(ev) {
-        this.scrollAmount += (Math.round(ev.deltaY / 50));
+        this.scrollAmount += (Math.round(ev.deltaY / 100));
         //   console.log(ev);
     }
     static onMouseMove(ev) {
