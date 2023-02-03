@@ -23,15 +23,18 @@ export class Item extends Entity {
         if (this.cooldown > 0)
             this.cooldown--;
         this.lifeTime--;
-        if (this.cooldown < 1 && Main.player.isTouching(this.pos, 0.5)) {
-            Main.player.pickupItem(this);
-            Main.entities.splice(i, 1);
-        }
-        for (let ent of Main.entities)
-            if (ent instanceof Item && ent.type == this.type && ent != this && this.isTouching(ent.pos, 1)) {
-                ent.count += this.count;
+        if (this.cooldown < 1) {
+            if (Main.player.isTouching(this.pos, 0.5)) {
+                Main.player.pickupItem(this);
                 Main.entities.splice(i, 1);
+                return;
             }
+            for (let ent of Main.entities)
+                if (ent instanceof Item && ent.type == this.type && ent != this && this.isTouching(ent.pos, 1)) {
+                    ent.count += this.count;
+                    Main.entities.splice(i, 1);
+                }
+        }
         if (this.lifeTime < 1)
             Main.entities.splice(i, 1);
     }
@@ -85,10 +88,7 @@ export class Item extends Entity {
         if (this.count > 1) {
             gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.blocksGridTest);
             this.rs.vao.bind();
-            this.transformation = Matrix.identity();
-            this.transformation = this.transformation.translate(this.pos.x + 0.1, this.pos.y + (Math.abs(this.rotation - 180) / 360) - 0.1, this.pos.z + 0.1);
-            this.transformation = this.transformation.scale(0.3, 0.3, 0.3);
-            this.transformation = this.transformation.rotateY(this.rotation);
+            this.transformation = this.transformation.translate(0.3, -0.3, 0.3);
             Main.shader.loadUniforms(Main.player.camera.getProjection(), this.transformation, Main.player.camera.getView(), 15);
             gl.drawElements(gl.TRIANGLES, this.rs.count, gl.UNSIGNED_INT, 0);
         }

@@ -4,6 +4,7 @@ import { EBO } from "../Engine/EBO.js";
 import { RenderSet } from "../Engine/RenderSet.js";
 import { Task } from "../Engine/Task.js";
 import { Texture } from "../Engine/Texture.js";
+import { randRange } from "../Engine/Utils/Math.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { VAO } from "../Engine/VAO.js";
@@ -488,7 +489,7 @@ console.log(error);
             this.targetedBlock = block;
         }
         if((Date.now()/1000)-blocks[this.targetedBlock.id].breakTime>=this.startTime || Main.fastBreaking)
-        {  Main.entities.push(new Item(blockPos,World.getBlock(blockPos).id));
+        {  Main.entities.push(new Item(new Vector(blockPos.x+randRange(-0.2,0.2)+0.5,blockPos.y,blockPos.z+randRange(-0.2,0.2)+0.5),World.getBlock(blockPos).id));
        World.setBlockNoLight(blockPos,0,true);
      
     this.targetedBlock=null;    

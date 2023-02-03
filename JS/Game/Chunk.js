@@ -13,7 +13,6 @@ import { randRange } from "../Engine/Utils/Math.js";
 let gl = CanvaManager.gl;
 export class Chunk {
     subchunks = new Array(16);
-    todo = new Array();
     heightmap = new Array(16);
     neighbours = {};
     allNeighbours = false;

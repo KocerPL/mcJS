@@ -85,17 +85,9 @@ this.scrollAmount+=(Math.round(ev.deltaY/100));
     }
     private static onResize():void
     {
-        if(window.innerHeight>window.innerWidth)
-        {
             this.WIDTH = window.innerWidth;
-            this.HEIGHT = window.innerWidth*this.proportion;
-        }
-        else
-        {
-            
-            this.WIDTH = window.innerHeight/this.proportion;
             this.HEIGHT = window.innerHeight;
-        }
+            this.proportion = this.HEIGHT/this.WIDTH;
         this.gl.viewport(0,0,this.WIDTH,this.HEIGHT);
         this.applyResize();
     }

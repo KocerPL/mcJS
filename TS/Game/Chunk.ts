@@ -14,7 +14,6 @@ let gl = CanvaManager.gl;
 export type DIR = "POS_X" | "POS_Z" | "NEG_X"  | "NEG_Z";
 export class Chunk {
   subchunks: Array<SubChunk> = new Array(16);
-  todo: Array<Function> = new Array();
   heightmap: Array<Array<number>> = new Array(16);
   neighbours:{POS_X?:Chunk,POS_Z?:Chunk,NEG_X?:Chunk,NEG_Z?:Chunk}={};
   allNeighbours:boolean=false;

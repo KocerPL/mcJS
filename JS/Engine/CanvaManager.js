@@ -72,14 +72,9 @@ export class CanvaManager {
         return key ?? false;
     }
     static onResize() {
-        if (window.innerHeight > window.innerWidth) {
-            this.WIDTH = window.innerWidth;
-            this.HEIGHT = window.innerWidth * this.proportion;
-        }
-        else {
-            this.WIDTH = window.innerHeight / this.proportion;
-            this.HEIGHT = window.innerHeight;
-        }
+        this.WIDTH = window.innerWidth;
+        this.HEIGHT = window.innerHeight;
+        this.proportion = this.HEIGHT / this.WIDTH;
         this.gl.viewport(0, 0, this.WIDTH, this.HEIGHT);
         this.applyResize();
     }

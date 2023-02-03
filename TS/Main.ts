@@ -137,6 +137,12 @@ export class Main
    }
    public static loop(time:number):void
    {
+      let test =this.lastFrame-time;
+      if(test<30)
+      {
+         this.Measure.lastLimit=time;
+      this.limitChunks();
+      }
       if(this.Measure.lastTime <= time-1000)
       this.resetMeasure(time);
       let delta = time-this.lastTick;
@@ -154,11 +160,7 @@ export class Main
       this.delta--;
       this.update();
       };
-      if(time-this.Measure.lastLimit>300)
-      {
-         this.Measure.lastLimit=time;
-      this.limitChunks();
-      }
+    
       //60 updates
      let fastDelta = time-this.lastFastTick;
       this.fastDelta += fastDelta/(2000/this.fastTPS);
@@ -187,21 +189,7 @@ export class Main
      
       this.render();
       this.lastFrame= time;
-  
       requestAnimationFrame(this.loop.bind(this));
-   }
-   private static executeTasks(time)
-   {
-      for(let i = this.tasks.length-1; i>=0;i--)
-      {
-         if(this.tasks[i].length>0)
-         {
-            let task = this.tasks[i].shift();
-            task.func();
-            if(Date.now()-time >20)
-            return;
-         }
-      }
    }
    private static fastUpdate()
    {
