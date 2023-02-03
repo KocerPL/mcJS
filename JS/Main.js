@@ -258,6 +258,7 @@ export class Main {
             }
         }
         for (let chunk of this.tempChunkBuffer) {
+            chunk.sended = false;
             for (let i = this.entities.length - 1; i >= 0; i--) {
                 let entity = this.entities[i];
                 if (chunk.pos.x * 16 < entity.pos.x && chunk.pos.z * 16 < entity.pos.z && chunk.pos.x * 16 > entity.pos.x - 16 && chunk.pos.z * 16 < entity.pos.z - 16)
@@ -377,7 +378,6 @@ export class Main {
         Main.shader.loadUniforms(Main.player.camera.getProjection(), Matrix.identity(), Main.player.camera.getView(), Main.sunLight);
         for (let chunk of this.loadedChunks) {
             if (!chunk.lazy) {
-                console.log("rendering");
                 chunk.render();
                 // toRender.push(()=>{chunk.renderWater()});
             }

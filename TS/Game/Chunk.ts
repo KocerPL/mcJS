@@ -8,6 +8,8 @@ import { Block } from "./Block.js";
 import { SubChunk } from "./SubChunk.js"
 import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Mesh } from "./Mesh.js";
+import { World } from "./World.js";
+import { randRange } from "../Engine/Utils/Math.js";
 let gl = CanvaManager.gl;
 export type DIR = "POS_X" | "POS_Z" | "NEG_X"  | "NEG_Z";
 export class Chunk {
@@ -59,16 +61,24 @@ constructor(x:number, z:number) {
       this.subchunks[i] = new SubChunk(new Vector(this.pos.x, i, this.pos.z),this);
       this.subchunks[i].preGenerate(this.heightmap);
      }
+   //  this.postGenerate();
+  }
+  async postGenerate()
+  {
+
+    let x = randRange(0,15)+(this.pos.x*16);
+    let z= randRange(0,15)+(this.pos.z*16);
+    World.generateTree(new Vector(x,World.getHeight(x,z),z));
   }
   updateNeighbour(neigbDir:DIR,chunk:Chunk)
   {
-    console.log("what")
-    console.log(this.pos,neigbDir);
+    //console.log("what")
+    //console.log(this.pos,neigbDir);
     if(chunk==undefined) return;
     this.neighbours[neigbDir] =chunk;
     if(this.neighbours["NEG_X"]!=undefined && this.neighbours["POS_X"]!=undefined && this.neighbours["POS_Z"]!=undefined && this.neighbours["NEG_Z"]!=undefined)
     {
-      console.log("gathered all neighbours :)")
+      //console.log("gathered all neighbours :)")
       this.allNeighbours = true;
     this.updateAllSubchunks();
     }
@@ -117,12 +127,12 @@ constructor(x:number, z:number) {
     try
     {
     let neighbour = Main.getChunkAt(this.pos.x-1,this.pos.z);
-     console.log(neighbour.pos);
+     //console.log(neighbour.pos);
     neighbour.updateNeighbour("POS_X",this);
     }
     catch(error)
     {
-      console.log("hehe");
+     // console.log("hehe");
     }
     try{
    
@@ -205,7 +215,7 @@ constructor(x:number, z:number) {
     }
     else
     {
-      console.log("Subchunk is undefined");
+   //   console.log("Subchunk is undefined");
     }
    
   }
@@ -227,7 +237,7 @@ constructor(x:number, z:number) {
     }
     this.lazy=false;
     this.updateMesh();
-    console.log("now not lazy hehehehe")
+   // console.log("now not lazy hehehehe")
   }
   getSubchunk(y)
   {
@@ -241,13 +251,12 @@ constructor(x:number, z:number) {
    this.subchunks[yPos].update();
    this.updateMesh();
   }
-  setBlock(pos:Vector,blockID:number,update?:boolean)
+  setBlock(pos:Vector,blockID:number)
   {
     if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {
       throw new Error("Incorrect cordinates");
     }
     let y = pos.y%16;
-    
     let yPos = Math.floor(Math.round(pos.y)/16);
     if(this.subchunks[yPos]!=undefined )//&& this.subchunks[yPos].generated==true)
     {

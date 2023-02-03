@@ -283,6 +283,7 @@ export class Main
       }
       for(let chunk of this.tempChunkBuffer)
       {
+         chunk.sended = false;
          for(let i=this.entities.length-1; i>=0;i--)
          {
             let entity = this.entities[i];
@@ -430,7 +431,6 @@ export class Main
       {
          if(!chunk.lazy)
          {
-            console.log("rendering");
          chunk.render()   
      // toRender.push(()=>{chunk.renderWater()});
          }

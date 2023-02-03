@@ -109,7 +109,7 @@ export class SubChunk {
                     return Main.getChunkAt(this.pos.x + transPos.x, this.pos.z + transPos.z).subchunks[this.pos.y].getBlock(pos);
                 }
                 catch (error) {
-                    console.log("Cannot get block of next subchunk!!", transPos);
+                    // console.log("Cannot get block of next subchunk!!",transPos);
                     return undefined;
                 }
             }
@@ -118,11 +118,11 @@ export class SubChunk {
                     return this.chunk.subchunks[this.pos.y + transPos.y].getBlock(pos);
                 }
                 catch (error) {
-                    console.log("Cannot get block of next subchunk!!", transPos.y + this.pos.y);
+                    // console.log("Cannot get block of next subchunk!!",transPos.y+this.pos.y);
                     return undefined;
                 }
             }
-            console.log("Cannot get block");
+            //  console.log("Cannot get block");
             return undefined;
         }
     }

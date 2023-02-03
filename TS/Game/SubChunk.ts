@@ -129,7 +129,7 @@ export class SubChunk
        }
        catch(error)
        {
-        console.log("Cannot get block of next subchunk!!",transPos);
+       // console.log("Cannot get block of next subchunk!!",transPos);
          return undefined;
        }
       }
@@ -142,11 +142,11 @@ export class SubChunk
        }
        catch(error)
        {
-        console.log("Cannot get block of next subchunk!!",transPos.y+this.pos.y);
+       // console.log("Cannot get block of next subchunk!!",transPos.y+this.pos.y);
          return undefined;
        }
       }
-      console.log("Cannot get block");
+    //  console.log("Cannot get block");
       return undefined;
       }
     }

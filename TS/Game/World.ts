@@ -128,13 +128,10 @@ public static height=100;
        inChunkPos.z = 16-Math.abs(inChunkPos.z);
 
         let chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
-        
-      
-        
         try
         {
             let chunk = Main.getChunkAt(chunkPos.x,chunkPos.z)
-            if(inChunkPos.y>=chunk.heightmap[inChunkPos.x][inChunkPos.z] )
+         /*   if(inChunkPos.y>=chunk.heightmap[inChunkPos.x][inChunkPos.z] )
             {
               //  console.log("heightmap");
                 let i=0;
@@ -147,8 +144,8 @@ public static height=100;
                 }
                 }
                chunk.heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y-i;
-            }
-            chunk.setBlock(inChunkPos,type,update);
+            }*/
+            chunk.setBlock(inChunkPos,type);
         }
         catch(error)
         {
