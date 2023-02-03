@@ -141,7 +141,7 @@ export class Main {
             this.update();
         }
         ;
-        if (time - this.Measure.lastLimit > 300 && this.Measure.fps > 50) {
+        if (time - this.Measure.lastLimit > 300) {
             this.Measure.lastLimit = time;
             this.limitChunks();
         }

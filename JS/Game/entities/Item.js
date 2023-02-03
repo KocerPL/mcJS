@@ -9,9 +9,10 @@ import { World } from "../World.js";
 let gl = CanvaManager.gl;
 export class Item extends Entity {
     type;
-    cooldown = 40;
+    cooldown = 10;
     lifeTime = 60000;
     rotation = 0;
+    count = 1;
     yAcc = 0;
     constructor(pos, type) {
         super(pos);
@@ -22,10 +23,15 @@ export class Item extends Entity {
         if (this.cooldown > 0)
             this.cooldown--;
         this.lifeTime--;
-        if (this.cooldown < 1 && Main.player.isTouching(this.pos)) {
-            Main.player.pickupItem(this.type);
+        if (this.cooldown < 1 && Main.player.isTouching(this.pos, 0.5)) {
+            Main.player.pickupItem(this);
             Main.entities.splice(i, 1);
         }
+        for (let ent of Main.entities)
+            if (ent instanceof Item && ent.type == this.type && ent != this && this.isTouching(ent.pos, 1)) {
+                ent.count += this.count;
+                Main.entities.splice(i, 1);
+            }
         if (this.lifeTime < 1)
             Main.entities.splice(i, 1);
     }
@@ -39,6 +45,13 @@ export class Item extends Entity {
             6, 5, 4, 6, 4, 7, 10, 9, 8, 10, 8, 11, 14, 13, 12, 14, 12, 15, 18, 17, 16, 18, 16, 19, 22, 21, 20, 22, 20, 23];
         this.rs.lightLevels = [14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14];
         this.rs.bufferArrays(this.rs.vertices, this.rs.textureCoords, this.rs.lightLevels, this.rs.indices);
+    }
+    isTouching(vec, offset) {
+        offset ??= 0;
+        if (vec.x > this.pos.x - 0.3 - offset && vec.z > this.pos.z - 0.3 - offset && vec.y > this.pos.y - 1
+            && vec.x < this.pos.x + 0.3 + offset && vec.z < this.pos.z + 0.3 + offset && vec.y < this.pos.y + 1)
+            return true;
+        return false;
     }
     render() {
         // console.log("rendered")
@@ -69,5 +82,15 @@ export class Item extends Entity {
         Main.shader.loadUniforms(Main.player.camera.getProjection(), this.transformation, Main.player.camera.getView(), 15);
         //     Main.shader.use();
         gl.drawElements(gl.TRIANGLES, this.rs.count, gl.UNSIGNED_INT, 0);
+        if (this.count > 1) {
+            gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.blocksGridTest);
+            this.rs.vao.bind();
+            this.transformation = Matrix.identity();
+            this.transformation = this.transformation.translate(this.pos.x + 0.1, this.pos.y + (Math.abs(this.rotation - 180) / 360) - 0.1, this.pos.z + 0.1);
+            this.transformation = this.transformation.scale(0.3, 0.3, 0.3);
+            this.transformation = this.transformation.rotateY(this.rotation);
+            Main.shader.loadUniforms(Main.player.camera.getProjection(), this.transformation, Main.player.camera.getView(), 15);
+            gl.drawElements(gl.TRIANGLES, this.rs.count, gl.UNSIGNED_INT, 0);
+        }
     }
 }

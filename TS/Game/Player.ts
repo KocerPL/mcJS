@@ -812,22 +812,24 @@ console.log(error);
         }
   
     }*/
-    isTouching(vec:Vector)
+    isTouching(vec:Vector,offset?:number)
     {
-        if(vec.x > this.pos.x-0.3 && vec.z > this.pos.z-0.3 && vec.y > this.pos.y-1 
-            && vec.x < this.pos.x+0.3 && vec.z < this.pos.z+0.3 && vec.y < this.pos.y+1 )
+        offset??=0;
+        if(vec.x > this.pos.x-0.3-offset && vec.z > this.pos.z-0.3-offset && vec.y > this.pos.y-1 
+            && vec.x < this.pos.x+0.3+offset && vec.z < this.pos.z+0.3+offset && vec.y < this.pos.y+1 )
         return true;
       return false;
         
     }
-   pickupItem(id)
+   pickupItem(item:Item)
    {
+    let id= item.type;
        for(let x=0;x<this.itemsBar.length;x++)
        {
            if(this.itemsBar[x].id==id && this.itemsBar[x].count<65)
            {
-           this.itemsBar[x].count++;
-        return   
+           this.itemsBar[x].count+=item.count;
+        return;
         }
        if(this.itemsBar[x].id ==0 ) 
        {this.itemsBar[x].id = id;
@@ -838,11 +840,12 @@ console.log(error);
         {
             if(this.inventory[x].id==id && this.inventory[x].count<65)
             {
-            this.inventory[x].count++;
-         return   
+            this.inventory[x].count+=item.count;
+         return;
          }
         if(this.inventory[x].id ==0 ) 
         {this.inventory[x].id = id;
+            this.inventory[x].count+=item.count;
       return;
         }   
          }
