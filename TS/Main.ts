@@ -415,7 +415,7 @@ export class Main
       
       this.shader.use();
       this.player.camera.preRender();
-    
+      this.shader.setFogCenter(this.player.camera.getPosition());
       CanvaManager.preRender();
       gl.clearColor(0.0,this.sunLight/15,this.sunLight/15,1.0);
       gl.clear(gl.COLOR_BUFFER_BIT);

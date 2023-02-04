@@ -374,6 +374,7 @@ export class Main {
         CanvaManager.debug.value = "Fps: " + this.Measure.fps + " Selected block: " + blocks[this.player.itemsBar[this.player.selectedItem].id].name + " Count:" + this.player.itemsBar[this.player.selectedItem].count + "\n XYZ:  X:" + this.player.pos.x + "  Y:" + this.player.pos.y + "  Z:" + this.player.pos.z;
         this.shader.use();
         this.player.camera.preRender();
+        this.shader.setFogCenter(this.player.camera.getPosition());
         CanvaManager.preRender();
         gl.clearColor(0.0, this.sunLight / 15, this.sunLight / 15, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);

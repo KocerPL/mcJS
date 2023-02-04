@@ -45,7 +45,9 @@ export class Item extends Entity
    
         if(this.lifeTime<1 )
         Main.entities.splice(i,1);
-
+        let ll =Main.sunLight;
+        this.rs.lightLevels = [ll,ll,ll,ll, ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll, ll,ll,ll,ll];
+        this.rs.bufferArrays(this.rs.vertices,this.rs.textureCoords,this.rs.lightLevels,this.rs.indices);
     }
     prepareModel()
     {
@@ -57,7 +59,7 @@ export class Item extends Entity
         this.rs.indices = [2,1,0,2,0,3
             ,6,5,4,6,4,7, 10,9,8,10,8,11, 14,13,12,14,12,15, 18,17,16,18,16,19, 22,21,20,22,20,23];
             this.rs.lightLevels = [14,14,14,14, 14,14,14,14 ,14,14,14,14 ,14,14,14,14 ,14,14,14,14, 14,14,14,14];
-            this.rs.bufferArrays(this.rs.vertices,this.rs.textureCoords,this.rs.lightLevels,this.rs.indices);
+           
     }
     isTouching(vec:Vector,offset?:number)
     {

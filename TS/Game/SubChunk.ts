@@ -124,16 +124,21 @@ export class SubChunk
       {
        try 
        {
-       
-        return Main.getChunkAt(this.pos.x+transPos.x,this.pos.z+transPos.z).subchunks[this.pos.y].getBlock(pos);
+       if(transPos.x<0)
+        return this.chunk.neighbours["NEG_X"].subchunks[this.pos.y].getBlock(pos);
+        if(transPos.x>0)
+        return this.chunk.neighbours["POS_X"].subchunks[this.pos.y].getBlock(pos);
+        if(transPos.z<0)
+        return this.chunk.neighbours["NEG_Z"].subchunks[this.pos.y].getBlock(pos);
+        if(transPos.z>0)
+        return this.chunk.neighbours["POS_Z"].subchunks[this.pos.y].getBlock(pos);
        }
        catch(error)
        {
        // console.log("Cannot get block of next subchunk!!",transPos);
-         return undefined;
        }
       }
-      if(func("y") )
+      else if(func("y") )
       {
         try 
        {

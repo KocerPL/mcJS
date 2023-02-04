@@ -8,6 +8,7 @@ out vec4 color;
 in float pass_Light;
 //uniform vec3 lightPos;
 uniform sampler2DArray tex;
+in float cdistance;// Center distance
 void main()
 {
   //  vec3 norm = normalize(pass_Normal);
@@ -16,5 +17,5 @@ void main()
 //vec3 diffuse = diff *vec3(0.1,0.1,0.1);
 vec3 ambient = vec3(0.1+pass_Light,0.1+pass_Light,0.1+pass_Light);
 vec4 texOk =  texture(tex,pass_tc);
-    color=vec4(ambient,1.0)*texOk;
+    color=vec4(ambient,clamp((-cdistance+60.0)/10.0 ,0.0,1.0))*texOk;
 }

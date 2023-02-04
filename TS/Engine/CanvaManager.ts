@@ -45,8 +45,8 @@ this.scrollAmount+=(Math.round(ev.deltaY/100));
        // console.log((ev.x/(this.canva.width/2))-1, (ev.y/(this.canva.height/2))-1);
        this.mouse.pos.x = ((ev.x/(this.canva.width/2))-1)/CanvaManager.getProportion;
        this.mouse.pos.y = -((ev.y/(this.canva.height/2))-1); 
-       this.mouseMovement.x = ev.movementX;
-        this.mouseMovement.y = ev.movementY;
+       this.mouseMovement.x += ev.movementX;
+        this.mouseMovement.y += ev.movementY;
     }
     private static onKeyDown(ev)
     {

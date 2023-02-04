@@ -5,7 +5,7 @@ export class World {
     Chunks = new Array();
     static heightMap = new Array(256);
     static waterLevel = 0;
-    static height = 100;
+    static height = 50;
     static init() {
         this.genHeightMap();
         console.log(perlin);
@@ -343,7 +343,7 @@ export class World {
             //  if(x<0||z<0)
             //    return this.height;
             //return 1;
-            return Math.round((perlin.get(x / 128, z / 128) + 1) * 30) + this.height;
+            return Math.round((perlin.get(x / 128, z / 128) + 1) * 50) + this.height;
         }
         catch (error) { }
         return 0;

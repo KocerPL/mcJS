@@ -16,14 +16,10 @@ export function flipDir(dir:DIR)
 {
   switch(dir)
   {
-    case "POS_X":
-      return "NEG_X";
-    case "NEG_X":
-      return "POS_X";
-    case "POS_Z":
-      return "NEG_Z";
-    case "NEG_Z":
-      return "POS_Z";  
+    case "POS_X": return "NEG_X";
+    case "NEG_X": return "POS_X";
+    case "POS_Z": return "NEG_Z";
+    case "NEG_Z": return "POS_Z";  
   }
 }
 export class Chunk {
@@ -182,23 +178,13 @@ constructor(x:number, z:number) {
     {
       if(! (this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
       this.subchunks[yPos].blocks[pos.x][y][pos.z] =new Block(0);
-    this.subchunks[yPos].blocks[pos.x][y][pos.z].lightLevel=lightLevel;
+      this.subchunks[yPos].blocks[pos.x][y][pos.z].lightLevel=lightLevel;
     }
     else
     {
    //   console.log("Subchunk is undefined");
     }
    
-  }
-  generate()
-  {
-    
-    for (let i = 0; i < this.subchunks.length; i++) {
-    
-      this.subchunks[i].preGenerate(this.heightmap);
-    }
-   // this.lazy=false;
-
   }
    updateAllSubchunks()
   {

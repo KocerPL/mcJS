@@ -13,14 +13,10 @@ import { randRange } from "../Engine/Utils/Math.js";
 let gl = CanvaManager.gl;
 export function flipDir(dir) {
     switch (dir) {
-        case "POS_X":
-            return "NEG_X";
-        case "NEG_X":
-            return "POS_X";
-        case "POS_Z":
-            return "NEG_Z";
-        case "NEG_Z":
-            return "POS_Z";
+        case "POS_X": return "NEG_X";
+        case "NEG_X": return "POS_X";
+        case "POS_Z": return "NEG_Z";
+        case "NEG_Z": return "POS_Z";
     }
 }
 export class Chunk {
@@ -170,12 +166,6 @@ export class Chunk {
         else {
             //   console.log("Subchunk is undefined");
         }
-    }
-    generate() {
-        for (let i = 0; i < this.subchunks.length; i++) {
-            this.subchunks[i].preGenerate(this.heightmap);
-        }
-        // this.lazy=false;
     }
     updateAllSubchunks() {
         if (!this.allNeighbours)
