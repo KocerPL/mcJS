@@ -76,7 +76,7 @@ export class SubChunk
     {
      // if(!this.generated) return;
       this.clearLight();
-      this.updateLightLevels();
+     // this.updateLightLevels();
       this.updateVerticesIndices();
      
     }
@@ -89,8 +89,7 @@ export class SubChunk
         if(this.blocks[x][y][z].id==0) airCount--;
         this.blocks[x][y][z].lightLevel=0;
         if(this.blocks[x][y][z].id==-2) this.blocks[x][y][z].id =0;
-        this.blocks[x][y][z].lightFBlock=0;
-        if(y+(this.pos.y*16)==this.chunk.heightmap[x][z]+1)
+        if(y+(this.pos.y*16)>=this.chunk.heightmap[x][z]+1)
         {
           this.blocks[x][y][z].lightLevel=15;       
         }
@@ -155,7 +154,65 @@ export class SubChunk
       return undefined;
       }
     }
-    updateLightLevels() //Updates light levels in this subchunk
+    getBlockSub(pos:Vector):{block:Block,sub:SubChunk,pos:Vector} // gets block at position relative to subchunk position
+    {
+      if(pos.x>-1 && pos.x<16 && pos.y>-1 && pos.y<16 && pos.z >-1 && pos.z<16)
+      {
+        return {block:this.blocks[pos.x][pos.y][pos.z],sub:this,pos};
+      }
+      else
+      {
+        let transPos = new Vector(0,0,0);
+        let func = (par) =>{
+        if(pos[par]<0)
+        {
+        pos[par] =15
+        transPos[par]=-1;
+        return true;
+        }else if(pos[par]>15)
+        {
+          pos[par]=0;
+          transPos[par]=1;
+          return true
+        }
+        return false;
+      }
+      if( func("x") || func("z")) //if block out of chunk
+      {
+       try 
+       {
+       if(transPos.x<0)
+        return {block:this.chunk.neighbours["NEG_X"].subchunks[this.pos.y].getBlock(pos),sub:this.chunk.neighbours["NEG_X"].subchunks[this.pos.y],pos};
+        if(transPos.x>0)
+        return {block:this.chunk.neighbours["POS_X"].subchunks[this.pos.y].getBlock(pos),sub:this.chunk.neighbours["POS_X"].subchunks[this.pos.y],pos};
+        if(transPos.z<0)
+        return {block:this.chunk.neighbours["NEG_Z"].subchunks[this.pos.y].getBlock(pos),sub:this.chunk.neighbours["NEG_Z"].subchunks[this.pos.y],pos};
+        if(transPos.z>0)
+        return {block:this.chunk.neighbours["POS_Z"].subchunks[this.pos.y].getBlock(pos),sub:this.chunk.neighbours["POS_Z"].subchunks[this.pos.y],pos};
+       }
+       catch(error)
+       {
+       // console.log("Cannot get block of next subchunk!!",transPos);
+       }
+      }
+      else if(func("y") )
+      {
+        try 
+       {
+       
+        return {block:this.chunk.subchunks[this.pos.y+transPos.y].getBlock(pos),sub:this.chunk.subchunks[this.pos.y+transPos.y],pos};
+       }
+       catch(error)
+       {
+       // console.log("Cannot get block of next subchunk!!",transPos.y+this.pos.y);
+         return undefined;
+       }
+      }
+    //  console.log("Cannot get block");
+      return undefined;
+      }
+    }
+  /*  updateLightLevels() //Updates light levels in this subchunk
     {
      
       for(let x=0;x<16; x++)
@@ -340,7 +397,7 @@ export class SubChunk
       theBlock.lightDir = lightDir;
       theBlock.lightLevel = light;
       theBlock.lightFBlock = light2;
-    }
+    }*/
     //DONE: update vertices only tree sides
     updateVerticesOptimized(x,z,index)
     {

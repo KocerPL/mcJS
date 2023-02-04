@@ -5,6 +5,7 @@ in vec3 pass_tc;
 out vec4 color;
 //in vec3 FragPos;
 //in vec3 pass_Normal;
+float fogDistance =60.0;
 in float pass_Light;
 //uniform vec3 lightPos;
 uniform sampler2DArray tex;
@@ -17,5 +18,5 @@ void main()
 //vec3 diffuse = diff *vec3(0.1,0.1,0.1);
 vec3 ambient = vec3(0.1+pass_Light,0.1+pass_Light,0.1+pass_Light);
 vec4 texOk =  texture(tex,pass_tc);
-    color=vec4(ambient,clamp((-cdistance+60.0)/10.0 ,0.0,1.0))*texOk;
+    color=vec4(ambient,clamp((-cdistance+fogDistance)/10.0 ,0.0,1.0))*texOk;
 }

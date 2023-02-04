@@ -15,6 +15,16 @@ import { GUI } from "./Game/GUI.js";
 import { Player } from "./Game/Player.js";
 import { World } from "./Game/World.js";
 let gl = CanvaManager.gl;
+export class LightNode {
+    pos;
+    subchunk;
+    light;
+    constructor(pos, subchunk, light) {
+        this.pos = pos;
+        this.subchunk = subchunk;
+        this.light = light;
+    }
+}
 export class Main {
     static maxChunks = 121;
     static okok = false;
@@ -51,6 +61,8 @@ export class Main {
     //public static chunks:Array<Array<Chunk>>=new Array(8);
     static loadedChunks = new Array();
     static tempChunkBuffer = new Array();
+    static lightQueue = new Array();
+    ;
     static crosscords = [
         -0.02, -0.02,
         0.02, 0.02,
@@ -131,6 +143,37 @@ export class Main {
             this.Measure.lastLimit = time;
             this.limitChunks();
         }
+        let toUpdate = new Set();
+        let i = 0;
+        while (this.lightQueue.length > 0 && i < 1000) {
+            i++;
+            //a  console.log("processing light Queue")
+            let node = this.lightQueue.shift();
+            if (node.light <= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock)
+                continue;
+            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock = node.light;
+            if (!toUpdate.has(node.subchunk))
+                toUpdate.add(node.subchunk);
+            if (node.light > 1) {
+                //Propagate
+                let checkAndPush = (pos) => {
+                    let blockInfo = node.subchunk.getBlockSub(pos);
+                    if (blockInfo.block.lightFBlock < node.light - 1)
+                        this.lightQueue.push(new LightNode(blockInfo.pos, blockInfo.sub, node.light - 1));
+                };
+                checkAndPush(new Vector(node.pos.x - 1, node.pos.y, node.pos.z));
+                checkAndPush(new Vector(node.pos.x + 1, node.pos.y, node.pos.z));
+                checkAndPush(new Vector(node.pos.x, node.pos.y - 1, node.pos.z));
+                checkAndPush(new Vector(node.pos.x, node.pos.y + 1, node.pos.z));
+                checkAndPush(new Vector(node.pos.x, node.pos.y, node.pos.z - 1));
+                checkAndPush(new Vector(node.pos.x, node.pos.y, node.pos.z + 1));
+            }
+            else {
+                //node.subchunk.update();
+                //node.subchunk.chunk.updateMesh();
+            }
+        }
+        toUpdate.forEach((sub) => { sub.update(); sub.chunk.updateMesh(); });
         if (this.Measure.lastTime <= time - 1000)
             this.resetMeasure(time);
         let delta = time - this.lastTick;

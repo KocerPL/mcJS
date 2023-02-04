@@ -3,7 +3,7 @@ import { EBO } from "../Engine/EBO.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
-import { Main } from "../Main.js";
+import { LightNode, Main } from "../Main.js";
 import { Block } from "./Block.js";
 import { SubChunk } from "./SubChunk.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
@@ -199,6 +199,17 @@ export class Chunk {
             if (!(this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
                 this.subchunks[yPos].blocks[pos.x][y][pos.z] = new Block(0);
             this.subchunks[yPos].blocks[pos.x][y][pos.z].id = blockID;
+            if (blockID == 10)
+                Main.lightQueue.push(new LightNode(new Vector(pos.x, y, pos.z), this.subchunks[yPos], 15));
+            if (blockID != 0) {
+                if (pos.y > this.heightmap[pos.x][pos.z])
+                    this.heightmap[pos.x][pos.z] = pos.y;
+            }
+            else if (pos.y == this.heightmap[pos.x][pos.z]) {
+                while (this.getBlock(new Vector(pos.x, this.heightmap[pos.x][pos.z], pos.z)).id == 0)
+                    this.heightmap[pos.x][pos.z]--;
+                this.heightmap[pos.x][pos.z]--;
+            }
             this.updateSubchunkAt(pos.y);
             try {
                 if (pos.x == 0) {

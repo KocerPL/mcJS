@@ -1,7 +1,7 @@
 import { Array3D } from "../Engine/Utils/Array3D.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { Main } from "../Main.js";
-import { Block, blocks, dirAssoc, directions } from "./Block.js";
+import { Block, blocks, directions } from "./Block.js";
 import { World } from "./World.js";
 import { Mesh } from "./Mesh.js";
 export class SubChunk {
@@ -62,7 +62,7 @@ export class SubChunk {
     update() {
         // if(!this.generated) return;
         this.clearLight();
-        this.updateLightLevels();
+        // this.updateLightLevels();
         this.updateVerticesIndices();
     }
     clearLight() {
@@ -77,8 +77,7 @@ export class SubChunk {
                     this.blocks[x][y][z].lightLevel = 0;
                     if (this.blocks[x][y][z].id == -2)
                         this.blocks[x][y][z].id = 0;
-                    this.blocks[x][y][z].lightFBlock = 0;
-                    if (y + (this.pos.y * 16) == this.chunk.heightmap[x][z] + 1) {
+                    if (y + (this.pos.y * 16) >= this.chunk.heightmap[x][z] + 1) {
                         this.blocks[x][y][z].lightLevel = 15;
                     }
                 }
@@ -132,155 +131,240 @@ export class SubChunk {
             return undefined;
         }
     }
-    updateLightLevels() {
-        for (let x = 0; x < 16; x++)
-            for (let y = 0; y < 16; y++)
-                for (let z = 0; z < 16; z++)
-                    this.updateLightOneBlock(x, y, z);
-        for (let x = 15; x > -1; x--)
-            for (let y = 15; y > -1; y--)
-                for (let z = 15; z > -1; z--)
-                    this.updateLightOneBlock(x, y, z);
-    }
-    updateLightOneBlock(x, y, z) {
-        let lightDir = directions.UNDEF;
-        let light = 0;
-        let light2 = 0;
-        let theBlock = this.blocks[x][y][z];
-        if (theBlock.id > 0)
-            return;
-        let chunk = this.chunk;
-        if (y + (this.pos.y * 16) >= chunk.heightmap[x][z] + 1) {
-            light = 15;
-            lightDir = directions.SKYLIGHT;
+    getBlockSub(pos) {
+        if (pos.x > -1 && pos.x < 16 && pos.y > -1 && pos.y < 16 && pos.z > -1 && pos.z < 16) {
+            return { block: this.blocks[pos.x][pos.y][pos.z], sub: this, pos };
         }
-        let waterCount = 0;
-        let nearWater = 0;
-        let watDir = 0;
-        if (y + (this.pos.y * 16) < chunk.heightmap[x][z] + 4) {
-            let side = (dir) => {
-                let vec = dirAssoc[dir];
-                if ((x + vec.x >= 0 && y + vec.y >= 0 && z + vec.z >= 0 && x + vec.x < 16 && y + vec.y < 16 && z + vec.z < 16)) {
-                    let block = this.blocks[x + vec.x][y + vec.y][z + vec.z];
-                    if (block.id == 10) {
-                        //       console.log("heh");
-                        light2 = 15;
-                    }
-                    else if (block.id < 1) {
-                        if (dir != directions.NEG_Y) {
-                            if (block.id == -1 && dir != directions.POS_Y) {
-                                watDir = dir;
-                                waterCount++;
-                            }
-                            else if (block.id == -2) {
-                                if (dir == directions.NEG_Y) {
-                                    nearWater = 14;
-                                    watDir = dir;
-                                }
-                                else if (block.attribute[0] - 1 > nearWater) {
-                                    nearWater = block.attribute[0] - 1;
-                                    watDir = dir;
-                                }
-                            }
-                        }
-                        if (light + 1 < block.lightLevel) {
-                            light = block.lightLevel - 1;
-                            lightDir = dir;
-                        }
-                        if (light2 + 1 < block.lightFBlock) {
-                            light2 = block.lightFBlock - 1;
-                        }
-                    }
+        else {
+            let transPos = new Vector(0, 0, 0);
+            let func = (par) => {
+                if (pos[par] < 0) {
+                    pos[par] = 15;
+                    transPos[par] = -1;
+                    return true;
                 }
-                else {
-                    let subCpos = this.pos.copy();
-                    let inscPos = new Vector(x, y, z);
-                    if (vec.x < 0) {
-                        subCpos.x -= 1;
-                        inscPos.x = 15;
-                    }
-                    else if (vec.x > 0) {
-                        subCpos.x += 1;
-                        inscPos.x = 0;
-                    }
-                    else if (vec.y < 0) {
-                        subCpos.y -= 1;
-                        inscPos.y = 15;
-                    }
-                    else if (vec.y > 0) {
-                        subCpos.y += 1;
-                        inscPos.y = 0;
-                    }
-                    else if (vec.z < 0) {
-                        subCpos.z -= 1;
-                        inscPos.z = 15;
-                    }
-                    else if (vec.z > 0) {
-                        subCpos.z += 1;
-                        inscPos.z = 0;
-                    }
-                    try {
-                        let block = Main.getChunkAt(subCpos.x, subCpos.z).subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
-                        if (block.id < 1) {
-                            if (block.id == -1 && dir != directions.POS_Y) {
-                                watDir = dir;
-                                waterCount++;
-                            }
-                            else if (block.id == -2) {
-                                if (dir == directions.NEG_Y) {
-                                    nearWater = 14;
-                                    watDir = dir;
-                                }
-                                else if (block.attribute[0] - 1 > nearWater) {
-                                    nearWater = block.attribute[0] - 1;
-                                    watDir = dir;
-                                }
-                            }
-                            if (light + 1 < block.lightLevel) {
-                                light = block.lightLevel - 1;
-                                lightDir = dir;
-                            }
-                            if (light2 + 1 < block.lightFBlock) {
-                                light2 = block.lightFBlock - 1;
-                            }
-                        }
-                    }
-                    catch (error) {
-                    }
+                else if (pos[par] > 15) {
+                    pos[par] = 0;
+                    transPos[par] = 1;
+                    return true;
                 }
+                return false;
             };
-            side(directions.NEG_X);
-            side(directions.POS_X);
-            side(directions.NEG_Y);
-            side(directions.POS_Y);
-            side(directions.NEG_Z);
-            side(directions.POS_Z);
-        }
-        if (waterCount > 1)
-            theBlock.id = -1;
-        else if (waterCount == 1) {
-            theBlock.id = -2;
-            if (!(theBlock.attribute instanceof Array))
-                theBlock.attribute = new Array();
-            theBlock.attribute[0] = 14;
-            theBlock.attribute[1] = watDir;
-        }
-        else if (nearWater > 0) {
-            if (!(theBlock.attribute instanceof Array))
-                theBlock.attribute = new Array();
-            if (theBlock.id != -2 && theBlock.id != -1) {
-                theBlock.id = -2;
-                theBlock.attribute[0] = 0;
+            if (func("x") || func("z")) //if block out of chunk
+             {
+                try {
+                    if (transPos.x < 0)
+                        return { block: this.chunk.neighbours["NEG_X"].subchunks[this.pos.y].getBlock(pos), sub: this.chunk.neighbours["NEG_X"].subchunks[this.pos.y], pos };
+                    if (transPos.x > 0)
+                        return { block: this.chunk.neighbours["POS_X"].subchunks[this.pos.y].getBlock(pos), sub: this.chunk.neighbours["POS_X"].subchunks[this.pos.y], pos };
+                    if (transPos.z < 0)
+                        return { block: this.chunk.neighbours["NEG_Z"].subchunks[this.pos.y].getBlock(pos), sub: this.chunk.neighbours["NEG_Z"].subchunks[this.pos.y], pos };
+                    if (transPos.z > 0)
+                        return { block: this.chunk.neighbours["POS_Z"].subchunks[this.pos.y].getBlock(pos), sub: this.chunk.neighbours["POS_Z"].subchunks[this.pos.y], pos };
+                }
+                catch (error) {
+                    // console.log("Cannot get block of next subchunk!!",transPos);
+                }
             }
-            if (theBlock.attribute[0] < nearWater) {
-                theBlock.attribute[0] = nearWater;
-                theBlock.attribute[1] = watDir;
+            else if (func("y")) {
+                try {
+                    return { block: this.chunk.subchunks[this.pos.y + transPos.y].getBlock(pos), sub: this.chunk.subchunks[this.pos.y + transPos.y], pos };
+                }
+                catch (error) {
+                    // console.log("Cannot get block of next subchunk!!",transPos.y+this.pos.y);
+                    return undefined;
+                }
             }
+            //  console.log("Cannot get block");
+            return undefined;
         }
+    }
+    /*  updateLightLevels() //Updates light levels in this subchunk
+      {
+       
+        for(let x=0;x<16; x++)
+        for(let y=0;y<16; y++)
+        for(let z=0;z<16; z++)
+        this.updateLightOneBlock(x,y,z);
+        for(let x=15;x>-1; x--)
+        for(let y=15;y>-1; y--)
+        for(let z=15;z>-1; z--)
+        this.updateLightOneBlock(x,y,z);
+      }
+      updateLightOneBlock(x:number,y:number,z:number) //Updates one block of light
+      {
+        let lightDir:number =directions.UNDEF;
+        let light =0;
+        let light2 =0;
+        let theBlock = this.blocks[x][y][z];
+        if(theBlock.id >0) return;
+        let chunk = this.chunk;
+        if(y+(this.pos.y*16)>= chunk.heightmap[x][z]+1)
+        {
+        light=15;
+        lightDir = directions.SKYLIGHT;
+      }
+        let waterCount=0;
+        let nearWater=0;
+        let watDir =0;
+        if(y+(this.pos.y*16)< chunk.heightmap[x][z]+4)
+        {
+      let side = (dir)=>
+        {
+          let vec = dirAssoc[dir];
+          if((x+vec.x >=0 && y+vec.y >=0 && z+vec.z >=0 && x+vec.x <16 && y+vec.y <16 && z+vec.z <16) )
+              {
+                
+          let block:Block = this.blocks[x+vec.x][y+vec.y][z+vec.z];
+          if(block.id==10)
+          {
+     //       console.log("heh");
+           light2 =15
+          }
+          else if(block.id<1 )
+            {
+              if( dir!=directions.NEG_Y )
+              {
+              if(block.id==-1 && dir!=directions.POS_Y)
+              {
+                watDir = dir;
+                 waterCount++;
+               }
+               else if(block.id==-2)
+               {
+                 if(dir==directions.NEG_Y)
+                 {
+                  nearWater=14
+                  watDir = dir;
+                 }
+                else if(block.attribute[0]-1>nearWater)
+                 {
+                nearWater=block.attribute[0]-1;
+                watDir = dir;
+                 }
+               }
+              }
+            if( light+1<block.lightLevel)
+              {
+              light = block.lightLevel-1;
+                lightDir =dir;
+            }
+            if( light2+1<block.lightFBlock)
+            {
+            light2 = block.lightFBlock-1;
+          }
+          }
+              }
+              else
+              {
+                let subCpos = this.pos.copy();
+                let inscPos =new Vector(x,y,z);
+                if(vec.x<0)
+                {
+                subCpos.x-=1;
+                inscPos.x= 15
+                }
+                else if(vec.x>0)
+                {
+                subCpos.x+=1;
+                inscPos.x= 0
+                }
+                else if(vec.y<0)
+                {
+                subCpos.y-=1;
+                inscPos.y= 15
+                }
+                else if(vec.y>0)
+                {
+                subCpos.y+=1;
+                inscPos.y= 0
+                }
+                else if(vec.z<0)
+                {
+                subCpos.z-=1;
+                inscPos.z= 15
+                }
+                else if(vec.z>0)
+                {
+                subCpos.z+=1;
+                inscPos.z= 0
+                }
+                try {
+                let block:Block = Main.getChunkAt(subCpos.x,subCpos.z).subchunks[subCpos.y].blocks[inscPos.x][inscPos.y][inscPos.z];
+               
+                if(block.id<1 )
+                {
+                  if(block.id==-1 && dir!=directions.POS_Y)
+              {
+                watDir = dir;
+                 waterCount++;
+               }
+               else if(block.id==-2)
+               {
+                 if(dir==directions.NEG_Y)
+                 {
+                  nearWater=14
+                  watDir = dir;
+                 }
+                else if(block.attribute[0]-1>nearWater)
+                 {
+                nearWater=block.attribute[0]-1;
+                watDir = dir;
+                 }
+               }
+                if( light+1<block.lightLevel)
+                  {
+                  light = block.lightLevel-1;
+                    lightDir =dir;
+                }
+                if( light2+1<block.lightFBlock)
+                {
+                light2 = block.lightFBlock-1;
+              }
+            }
+                }
+                catch(error)
+                {
+                }
+              }
+        };
+        side(directions.NEG_X);
+        side(directions.POS_X);
+        side(directions.NEG_Y);
+        side(directions.POS_Y);
+        side(directions.NEG_Z);
+        side(directions.POS_Z);
+      }
+      if(waterCount>1)
+      theBlock.id=-1;
+      else if(waterCount==1)
+      {
+      theBlock.id=-2;
+      if(!(theBlock.attribute instanceof Array))
+       theBlock.attribute = new Array();
+      theBlock.attribute[0]=14;
+      theBlock.attribute[1]=watDir;
+      }
+      else if(nearWater>0)
+      {
+        if(!(theBlock.attribute instanceof Array))
+        theBlock.attribute = new Array();
+        if(theBlock.id!=-2 && theBlock.id!=-1)
+        {
+        theBlock.id=-2;
+        theBlock.attribute[0]=0
+       
+        }
+        if(theBlock.attribute[0]<nearWater)
+        {
+        theBlock.attribute[0]=nearWater;
+        theBlock.attribute[1]=watDir
+      }
+      }
         theBlock.lightDir = lightDir;
         theBlock.lightLevel = light;
         theBlock.lightFBlock = light2;
-    }
+      }*/
     //DONE: update vertices only tree sides
     updateVerticesOptimized(x, z, index) {
         let indices = new Array();
