@@ -47,7 +47,7 @@ export class SubChunk {
                         this.blocks[x][y][z] = new Block(0);
                         if (ah + 1 == (y + yPos)) {
                             this.blocks[x][y][z].lightLevel = 15;
-                            this.blocks[x][y][z].lightDir = directions.SKYLIGHT;
+                            this.blocks[x][y][z].lightDir = directions.UNDEF;
                         }
                     }
                 }

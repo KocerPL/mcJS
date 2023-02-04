@@ -9,7 +9,7 @@ import { Matrix } from "./Engine/Utils/Matrix.js";
 import { Vector } from "./Engine/Utils/Vector.js";
 import { VAO } from "./Engine/VAO.js";
 import { VBO } from "./Engine/VBO.js";
-import { blocks } from "./Game/Block.js";
+import { blocks, directions } from "./Game/Block.js";
 import { Chunk } from "./Game/Chunk.js";
 import { GUI } from "./Game/GUI.js";
 import { Player } from "./Game/Player.js";
@@ -19,10 +19,12 @@ export class LightNode {
     pos;
     subchunk;
     light;
-    constructor(pos, subchunk, light) {
+    direction;
+    constructor(pos, subchunk, light, direction) {
         this.pos = pos;
         this.subchunk = subchunk;
         this.light = light;
+        this.direction = direction;
     }
 }
 export class Main {
@@ -152,21 +154,22 @@ export class Main {
             if (node.light <= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock)
                 continue;
             node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock = node.light;
+            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir = node.direction;
             if (!toUpdate.has(node.subchunk))
                 toUpdate.add(node.subchunk);
             if (node.light > 1) {
                 //Propagate
-                let checkAndPush = (pos) => {
+                let checkAndPush = (pos, direction) => {
                     let blockInfo = node.subchunk.getBlockSub(pos);
-                    if (blockInfo.block.lightFBlock < node.light - 1)
-                        this.lightQueue.push(new LightNode(blockInfo.pos, blockInfo.sub, node.light - 1));
+                    if (blockInfo.block.id == 0 && blockInfo.block.lightFBlock < node.light - 1)
+                        this.lightQueue.push(new LightNode(blockInfo.pos, blockInfo.sub, node.light - 1, direction));
                 };
-                checkAndPush(new Vector(node.pos.x - 1, node.pos.y, node.pos.z));
-                checkAndPush(new Vector(node.pos.x + 1, node.pos.y, node.pos.z));
-                checkAndPush(new Vector(node.pos.x, node.pos.y - 1, node.pos.z));
-                checkAndPush(new Vector(node.pos.x, node.pos.y + 1, node.pos.z));
-                checkAndPush(new Vector(node.pos.x, node.pos.y, node.pos.z - 1));
-                checkAndPush(new Vector(node.pos.x, node.pos.y, node.pos.z + 1));
+                checkAndPush(new Vector(node.pos.x - 1, node.pos.y, node.pos.z), directions.POS_X);
+                checkAndPush(new Vector(node.pos.x + 1, node.pos.y, node.pos.z), directions.NEG_X);
+                checkAndPush(new Vector(node.pos.x, node.pos.y - 1, node.pos.z), directions.POS_Y);
+                checkAndPush(new Vector(node.pos.x, node.pos.y + 1, node.pos.z), directions.NEG_Y);
+                checkAndPush(new Vector(node.pos.x, node.pos.y, node.pos.z - 1), directions.POS_Z);
+                checkAndPush(new Vector(node.pos.x, node.pos.y, node.pos.z + 1), directions.NEG_Z);
             }
             else {
                 //node.subchunk.update();

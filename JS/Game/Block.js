@@ -159,14 +159,14 @@ blocks[-2] =
         }
     };
 export const directions = Object.freeze({
-    SKYLIGHT: 0,
+    UNDEF: 0,
     POS_X: 1,
     NEG_X: 2,
     POS_Z: 3,
     NEG_Z: 4,
     POS_Y: 5,
     NEG_Y: 6,
-    UNDEF: 7
+    SOURCE: 7
 });
 export const dirAssoc = Object.freeze({
     1: new Vector(1, 0, 0),
