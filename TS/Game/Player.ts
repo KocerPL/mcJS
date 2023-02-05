@@ -2,7 +2,6 @@ import { Camera } from "../Engine/Camera.js";
 import { CanvaManager } from "../Engine/CanvaManager.js";
 import { EBO } from "../Engine/EBO.js";
 import { RenderSet } from "../Engine/RenderSet.js";
-import { Task } from "../Engine/Task.js";
 import { Texture } from "../Engine/Texture.js";
 import { randRange } from "../Engine/Utils/Math.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
