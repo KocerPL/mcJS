@@ -92,6 +92,16 @@ export class Main
    }
    public static run():void
    {
+      if (navigator.storage && navigator.storage.estimate) {
+         navigator.storage.estimate().then((quota)=>{
+         // quota.usage -> Number of bytes used.
+         // quota.quota -> Maximum number of bytes available.
+         const percentageUsed = (quota.usage / quota.quota) * 100;
+         console.log(`You've used ${percentageUsed}% of the available storage.`);
+         const remaining = quota.quota - quota.usage;
+         console.log(`You can write up to ${remaining} more bytes.`);
+         });
+       }
       CanvaManager.setupCanva(document.body);
     // EBO.unbind();
     // VBO.unbind();
