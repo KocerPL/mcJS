@@ -5,7 +5,7 @@ let gl = CanvaManager.gl;
 export class DefaultShader extends Shader {
     viewCenter = new Vector(0, 0, 0);
     constructor() {
-        super("/JS/Engine/Shader/default.vert", "/JS/Engine/Shader/default.frag");
+        super("./JS/Engine/Shader/default.vert", "./JS/Engine/Shader/default.frag");
     }
     loadUniforms(proj, transf, view, light) {
         this.loadMatrix("projection", proj);

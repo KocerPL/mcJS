@@ -8,7 +8,7 @@ export class DefaultShader extends Shader
     viewCenter:Vector = new Vector(0,0,0);
     constructor()
     {
-        super("/JS/Engine/Shader/default.vert","/JS/Engine/Shader/default.frag");
+        super("./JS/Engine/Shader/default.vert","./JS/Engine/Shader/default.frag");
     }
     loadUniforms(proj:Matrix,transf:Matrix,view:Matrix,light:number) {
         this.loadMatrix("projection",proj);

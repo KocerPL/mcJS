@@ -3,7 +3,7 @@ import { Shader } from "./Shader.js";
 let gl = CanvaManager.gl;
 export class AtlasShader extends Shader {
     constructor() {
-        super("/JS/Engine/Shader/atlas.vert", "/JS/Engine/Shader/atlas.frag");
+        super("./JS/Engine/Shader/atlas.vert", "./JS/Engine/Shader/atlas.frag");
     }
     loadUniforms(proj, transf, view, light) {
         this.loadMatrix("projection", proj);
