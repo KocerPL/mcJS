@@ -1,6 +1,6 @@
 import { Array3D } from "../Engine/Utils/Array3D.js";
 import { Vector } from "../Engine/Utils/Vector.js";
-import { Main } from "../Main.js";
+import { LightNode, Main } from "../Main.js";
 import { Block, blocks, dirAssoc, directions } from "./Block.js";
 import { Chunk, DIR } from "./Chunk.js";
 import { World } from "./World.js";
@@ -11,7 +11,7 @@ export class SubChunk
 {
     public mesh:Mesh= new Mesh();//Mesh that contains all data needed for rendering  
     blocks:Array<Array<Array<Block>>>= new Array3D(16,16,16);//Array of blocks
-
+    lightNodes:Array<LightNode>;
     generated:boolean=false; //Is SubChunk already generated
     inReGeneration:boolean=false; //Is subchunk in regeneration state
     lightUpdate:boolean = false; //Is subchunk updating light
@@ -26,6 +26,30 @@ export class SubChunk
       this.pos = pos;
       this.chunk = chunk;
      
+    }
+  refreshLights()
+  {
+    this.lightNodes = new Array();
+    for(let x:number=0;x<16;x++)
+    for(let y:number=0;y<16;y++)
+    for(let z:number=0;z<16;z++)
+    if(this.blocks[x][y][z].id==10)
+    {
+      this.lightNodes.push(new LightNode(new Vector(x,y,z),this,15,directions.SOURCE,new Vector(x,y,z)));
+    }
+  }
+  getLights():Array<LightNode>
+    {
+      return this.lightNodes;
+      let lights = new Array();
+      for(let x:number=0;x<16;x++)
+      for(let y:number=0;y<16;y++)
+      for(let z:number=0;z<16;z++)
+      if(this.blocks[x][y][z].id==10)
+      {
+        lights.push(new LightNode(new Vector(x,y,z),this,15,directions.SOURCE,new Vector(x,y,z)));
+      }
+      return lights;
     }
  preGenerate(heightmap) //Generation method
     {
@@ -63,6 +87,7 @@ export class SubChunk
        }
     }
     }
+    this.refreshLights()
     this.generated=true;
     }
     postGenerate(heightmap)

@@ -1,12 +1,13 @@
 import { Array3D } from "../Engine/Utils/Array3D.js";
 import { Vector } from "../Engine/Utils/Vector.js";
-import { Main } from "../Main.js";
+import { LightNode, Main } from "../Main.js";
 import { Block, blocks, directions } from "./Block.js";
 import { World } from "./World.js";
 import { Mesh } from "./Mesh.js";
 export class SubChunk {
     mesh = new Mesh(); //Mesh that contains all data needed for rendering  
     blocks = new Array3D(16, 16, 16); //Array of blocks
+    lightNodes;
     generated = false; //Is SubChunk already generated
     inReGeneration = false; //Is subchunk in regeneration state
     lightUpdate = false; //Is subchunk updating light
@@ -17,6 +18,26 @@ export class SubChunk {
         //Setting up variables
         this.pos = pos;
         this.chunk = chunk;
+    }
+    refreshLights() {
+        this.lightNodes = new Array();
+        for (let x = 0; x < 16; x++)
+            for (let y = 0; y < 16; y++)
+                for (let z = 0; z < 16; z++)
+                    if (this.blocks[x][y][z].id == 10) {
+                        this.lightNodes.push(new LightNode(new Vector(x, y, z), this, 15, directions.SOURCE, new Vector(x, y, z)));
+                    }
+    }
+    getLights() {
+        return this.lightNodes;
+        let lights = new Array();
+        for (let x = 0; x < 16; x++)
+            for (let y = 0; y < 16; y++)
+                for (let z = 0; z < 16; z++)
+                    if (this.blocks[x][y][z].id == 10) {
+                        lights.push(new LightNode(new Vector(x, y, z), this, 15, directions.SOURCE, new Vector(x, y, z)));
+                    }
+        return lights;
     }
     preGenerate(heightmap) {
         //setting position according to subchunk pos in world
@@ -51,6 +72,7 @@ export class SubChunk {
                         }
                     }
                 }
+        this.refreshLights();
         this.generated = true;
     }
     postGenerate(heightmap) {

@@ -130,20 +130,6 @@ public static height=50;
         try
         {
             let chunk = Main.getChunkAt(chunkPos.x,chunkPos.z)
-         /*   if(inChunkPos.y>=chunk.heightmap[inChunkPos.x][inChunkPos.z] )
-            {
-              //  console.log("heightmap");
-                let i=0;
-                if(type<=0)
-                {
-                    i=1;
-                while(chunk.getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).id<=0)
-                {
-                    i++;
-                }
-                }
-               chunk.heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y-i;
-            }*/
             chunk.setBlock(inChunkPos,type);
         }
         catch(error)

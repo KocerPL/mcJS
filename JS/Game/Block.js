@@ -2,6 +2,7 @@ import { Vector } from "../Engine/Utils/Vector.js";
 export class Block {
     id;
     lightFBlock = 0;
+    lPos = undefined;
     lightDir = directions.UNDEF;
     lightLevel = 1;
     attribute;

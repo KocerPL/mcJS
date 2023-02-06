@@ -25,8 +25,10 @@ export class LightNode
    subchunk:SubChunk;
    light:number;
    direction:number;
-   constructor(pos:Vector,subchunk:SubChunk,light:number,direction:number)
+   lpos:Vector;
+   constructor(pos:Vector,subchunk:SubChunk,light:number,direction:number,lightpos:Vector)
    {
+      this.lpos = lightpos;
       this.pos = pos;
       this.subchunk = subchunk;
       this.light = light;
@@ -70,7 +72,9 @@ export class Main
    //public static chunks:Array<Array<Chunk>>=new Array(8);
    public static loadedChunks:Array<Chunk> = new Array();
   private static tempChunkBuffer:Array<Chunk> = new Array();
-  public static lightQueue:Array<LightNode>= new Array();;
+  public static lightQueue:Array<LightNode>= new Array();
+  public static lightRemQueue:Array<LightNode> = new Array();
+  public static toUpdate:Set<SubChunk> = new Set();
    private static crosscords = [
       -0.02,-0.02,
       0.02,0.02,
@@ -162,33 +166,35 @@ export class Main
       this.Measure.fps = this.Measure.frames;
       this.Measure.frames = 0;
    }
-   public static loop(time:number):void
+   private static updateSubchunks()
    {
-      let test =this.lastFrame-time;
-      if(test<1000/this.FPS)
-      {
-         this.Measure.lastLimit=time;
-      this.limitChunks();
-      }
-      let toUpdate:Set<SubChunk> = new Set();
+      let concatQ:Set<Chunk> = new Set();
+      this.toUpdate.forEach((sub) =>{sub.update(); concatQ.add(sub.chunk);})
+      this.toUpdate.clear();
+      concatQ.forEach((chunk) =>{chunk.updateMesh()});
+    
+   }
+   public static processLight()
+   {
+     
       let i=0;
-      while(this.lightQueue.length>0 && i<1000)
+      while(this.lightRemQueue.length>0)
       {  
          i++;
-        //a  console.log("processing light Queue")
-       let node:LightNode =this.lightQueue.shift();
-       if(node.light<= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock) continue;
-      node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock=node.light;
-      node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir = node.direction;
-         if(!toUpdate.has(node.subchunk))
-         toUpdate.add(node.subchunk);
+        //console.log("processing light  remove Queue")
+       let node:LightNode =this.lightRemQueue.shift();
+    //   if(node.light<= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock) continue;
+      node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock=0;
+      node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir = directions.UNDEF;
+      node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lPos = undefined;
+         this.toUpdate.add(node.subchunk);
        if(node.light>1)
        {
          //Propagate
          let checkAndPush = (pos:Vector,direction:number) =>{
             let blockInfo = node.subchunk.getBlockSub(pos);
-            if(blockInfo.block.id==0 && blockInfo.block.lightFBlock<node.light-1)
-            this.lightQueue.push(new LightNode(blockInfo.pos,blockInfo.sub,node.light-1,direction));
+            if(blockInfo.block.id==0 && blockInfo.block.lightDir == direction)
+            this.lightRemQueue.push(new LightNode(blockInfo.pos,blockInfo.sub,node.light-1,direction,node.lpos));
          }
          checkAndPush(new Vector(node.pos.x-1,node.pos.y,node.pos.z),directions.POS_X);
          checkAndPush(new Vector(node.pos.x+1,node.pos.y,node.pos.z),directions.NEG_X);
@@ -203,7 +209,50 @@ export class Main
          //node.subchunk.chunk.updateMesh();
        }
       }
-      toUpdate.forEach((sub) =>{sub.update(); sub.chunk.updateMesh();})
+      while(this.lightQueue.length>0)
+      {  
+         i++;
+        //  console.log("processing light Queue")
+       let node:LightNode =this.lightQueue.shift();
+       if(node.light<= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock) continue;
+      node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock=node.light;
+      node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir = node.direction;
+      node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lPos=node.lpos;
+         if(!this.toUpdate.has(node.subchunk))
+         this.toUpdate.add(node.subchunk);
+       if(node.light>1)
+       {
+         //Propagate
+         let checkAndPush = (pos:Vector,direction:number) =>{
+            let blockInfo = node.subchunk.getBlockSub(pos);
+            
+            if(blockInfo.block.id==0 && blockInfo.block.lightFBlock<node.light-1)
+            this.lightQueue.push(new LightNode(blockInfo.pos,blockInfo.sub,node.light-1,direction,node.lpos));
+         }
+         checkAndPush(new Vector(node.pos.x-1,node.pos.y,node.pos.z),directions.POS_X);
+         checkAndPush(new Vector(node.pos.x+1,node.pos.y,node.pos.z),directions.NEG_X);
+         checkAndPush(new Vector(node.pos.x,node.pos.y-1,node.pos.z),directions.POS_Y);
+         checkAndPush(new Vector(node.pos.x,node.pos.y+1,node.pos.z),directions.NEG_Y);
+         checkAndPush(new Vector(node.pos.x,node.pos.y,node.pos.z-1),directions.POS_Z);
+         checkAndPush(new Vector(node.pos.x,node.pos.y,node.pos.z+1),directions.NEG_Z);
+       }
+       else
+       {
+         //node.subchunk.update();
+         //node.subchunk.chunk.updateMesh();
+       }
+      }
+   }
+   public static loop(time:number):void
+   {
+      let test =this.lastFrame-time;
+      if(test<1000/this.FPS)
+      {
+         this.Measure.lastLimit=time;
+      this.limitChunks();
+      }
+      
+   
       if(this.Measure.lastTime <= time-1000)
       this.resetMeasure(time);
       let delta = time-this.lastTick;
@@ -238,16 +287,8 @@ export class Main
       this.fastDelta--;
       this.fastUpdate();
       };
-      /* let testTime = Date.now();
-      if(this.Measure.fps>20)
-      while(Date.now()-testTime <20 )
-      {
-         this.executeTasks(testTime);
-         this.minChunks();
-        // this.chunksUpdate();
-      }*/
-   //  if(this.lastFrame < time-(1000/this.FPS))
-     
+      this.processLight();
+      this.updateSubchunks();
       this.render();
       this.lastFrame= time;
       requestAnimationFrame(this.loop.bind(this));

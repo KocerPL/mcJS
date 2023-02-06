@@ -4,6 +4,7 @@ export class Block
 {
     id:number;
    lightFBlock:number=0;
+   lPos:Vector = undefined;
     lightDir:number = directions.UNDEF;
     lightLevel:number=1;
     attribute:Array<number>;
