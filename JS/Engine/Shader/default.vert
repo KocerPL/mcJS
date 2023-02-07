@@ -21,7 +21,8 @@ void main()
   
 gl_Position =vec4(pos,1.0)*prepared;
  vec4 ready = vec4(pos,1.0)*transformation;
-pass_Light = max(min(light1,light),light2) /15.0;
+ float act =max(min(light1,light),light2) /15.0;
+pass_Light = act - (act/5.0);
 cdistance = length(center - ready.xyz);
  //FragPos = vec3(transformation * vec4(pos, 1.0));
  //pass_Normal = normal;

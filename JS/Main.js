@@ -167,12 +167,11 @@ export class Main {
             //   if(node.light<= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock) continue;
             node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock = 0;
             node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir = directions.UNDEF;
-            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lPos = undefined;
             this.toUpdate.add(node.subchunk);
             //Propagate
             let checkAndPush = (pos, direction) => {
                 let blockInfo = node.subchunk.getBlockSub(pos);
-                if (blockInfo.block.id == 0 && blockInfo.block.lightDir == direction)
+                if (blockInfo.block.lightDir == direction)
                     this.lightRemQueue.push(new LightNode(blockInfo.pos, blockInfo.sub, node.light - 1, direction, node.lpos));
             };
             checkAndPush(new Vector(node.pos.x - 1, node.pos.y, node.pos.z), directions.POS_X);
@@ -186,11 +185,16 @@ export class Main {
             i++;
             //  console.log("processing light Queue")
             let node = this.lightQueue.shift();
-            if (node.light <= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock)
-                continue;
-            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock = node.light;
-            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir = node.direction;
-            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lPos = node.lpos;
+            node.direction ??= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir;
+            if (node.light == undefined)
+                node.light ??= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock;
+            else {
+                if (node.light <= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock)
+                    continue;
+                node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock = node.light;
+                node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir = node.direction;
+                node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lPos = node.lpos;
+            }
             if (!this.toUpdate.has(node.subchunk))
                 this.toUpdate.add(node.subchunk);
             if (node.light > 1) {

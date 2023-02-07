@@ -37,7 +37,7 @@ export class Item extends Entity {
         }
         if (this.lifeTime < 1)
             Main.entities.splice(i, 1);
-        let ll = Main.sunLight;
+        let ll = Math.max(Main.sunLight, World.getBlock(new Vector(this.pos.x, this.pos.y, this.pos.z)).lightFBlock);
         this.rs.lightLevels = [ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll];
         this.rs.bufferArrays(this.rs.vertices, this.rs.textureCoords, this.rs.lightLevels, this.rs.indices);
     }

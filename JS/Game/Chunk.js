@@ -241,17 +241,52 @@ export class Chunk {
               lights = lights.concat(this.subchunks[yPos].getLights());
              for(let light of lights)
              {
+               if(Vector.distance(light.pos,new Vector(pos.x,y,pos.z))<16)
              Main.lightQueue.push(light);
              }*/
             this.subchunks[yPos].blocks[pos.x][y][pos.z].id = blockID;
-            Main.lightRemQueue.push(new LightNode(new Vector(pos.x, y, pos.z), this.subchunks[yPos], 15, directions.UNDEF, new Vector(pos.x, y, pos.z)));
             let pushLight = (vec, sub) => {
                 sub ??= this.subchunks[yPos];
-                let ligBlock = sub.blocks[vec.x][vec.y][vec.z];
-                if (ligBlock.id != 0)
-                    return;
-                Main.lightQueue.push(new LightNode(vec, sub, ligBlock.lightFBlock, ligBlock.lightDir, vec));
+                let maxIter = 100;
+                if (sub.blocks[vec.x][vec.y][vec.z].lightDir != directions.UNDEF) {
+                    let blockPos = new Vector(vec.x, vec.y, vec.z);
+                    let k = sub.getBlockSub(blockPos);
+                    while (k.block.lightDir != directions.SOURCE) {
+                        blockPos = k.pos;
+                        switch (k.block.lightDir) {
+                            case directions.NEG_X:
+                                blockPos.x--;
+                                break;
+                            case directions.POS_X:
+                                blockPos.x++;
+                                break;
+                            case directions.NEG_Y:
+                                blockPos.y--;
+                                break;
+                            case directions.POS_Y:
+                                blockPos.y++;
+                                break;
+                            case directions.NEG_Z:
+                                blockPos.z--;
+                                break;
+                            case directions.POS_Z:
+                                blockPos.z++;
+                                break;
+                        }
+                        if (maxIter-- < 0)
+                            break;
+                        k = k.sub.getBlockSub(blockPos);
+                        //  console.log("stuck in while!!!",blockPos);
+                    }
+                    if (maxIter >= 0) {
+                        //  console.log("Found source!!!");
+                        Main.lightRemQueue.push(new LightNode(k.pos, k.sub, 15, directions.UNDEF, k.pos));
+                        if (!(k.sub == this.subchunks[yPos] && k.pos.x == pos.x && k.pos.y == y && k.pos.z == pos.z))
+                            Main.lightQueue.push(new LightNode(k.pos, k.sub, 15, directions.SOURCE, k.pos));
+                    }
+                }
             };
+            pushLight(new Vector(pos.x, y, pos.z));
             if (pos.x > 0)
                 pushLight(new Vector(pos.x - 1, y, pos.z));
             if (pos.x < 15)
