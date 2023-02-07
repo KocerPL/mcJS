@@ -188,8 +188,6 @@ export class Main
       node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir = directions.UNDEF;
       node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lPos = undefined;
          this.toUpdate.add(node.subchunk);
-       if(node.light>1)
-       {
          //Propagate
          let checkAndPush = (pos:Vector,direction:number) =>{
             let blockInfo = node.subchunk.getBlockSub(pos);
@@ -202,12 +200,6 @@ export class Main
          checkAndPush(new Vector(node.pos.x,node.pos.y+1,node.pos.z),directions.NEG_Y);
          checkAndPush(new Vector(node.pos.x,node.pos.y,node.pos.z-1),directions.POS_Z);
          checkAndPush(new Vector(node.pos.x,node.pos.y,node.pos.z+1),directions.NEG_Z);
-       }
-       else
-       {
-         //node.subchunk.update();
-         //node.subchunk.chunk.updateMesh();
-       }
       }
       while(this.lightQueue.length>0)
       {  
