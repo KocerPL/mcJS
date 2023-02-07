@@ -266,6 +266,7 @@ constructor(x:number, z:number) {
      lights = lights.concat(this.subchunks[yPos].getLights());
     for(let light of lights)
     {
+      if(Vector.distance(light.pos,new Vector(pos.x,y,pos.z))<16)
     Main.lightQueue.push(light);
     }
     if(blockID!=0 )

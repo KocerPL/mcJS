@@ -35,4 +35,8 @@ export class Vector
     {
         return new Vector(this.x*scalar,this.y*scalar,this.z*scalar); 
     }
+    static distance(vecA:Vector,vecB:Vector):number
+    {
+        return Math.sqrt(((vecA.x+vecB.x)^2)+((vecA.y+vecB.y)^2)+((vecA.z+vecB.z)^2));
+    }
 }
