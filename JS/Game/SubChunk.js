@@ -1,6 +1,6 @@
 import { Array3D } from "../Engine/Utils/Array3D.js";
 import { Vector } from "../Engine/Utils/Vector.js";
-import { LightNode, Main } from "../Main.js";
+import { LightNode } from "../Main.js";
 import { Block, blocks, directions } from "./Block.js";
 import { World } from "./World.js";
 import { Mesh } from "./Mesh.js";
