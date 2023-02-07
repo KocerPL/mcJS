@@ -39,8 +39,8 @@ export class CanvaManager {
         // console.log((ev.x/(this.canva.width/2))-1, (ev.y/(this.canva.height/2))-1);
         this.mouse.pos.x = ((ev.x / (this.canva.width / 2)) - 1) / CanvaManager.getProportion;
         this.mouse.pos.y = -((ev.y / (this.canva.height / 2)) - 1);
-        this.mouseMovement.x = ev.movementX;
-        this.mouseMovement.y = ev.movementY;
+        this.mouseMovement.x += ev.movementX;
+        this.mouseMovement.y += ev.movementY;
     }
     static onKeyDown(ev) {
         this.keys[ev.keyCode] = true;
@@ -72,14 +72,9 @@ export class CanvaManager {
         return key ?? false;
     }
     static onResize() {
-        if (window.innerHeight > window.innerWidth) {
-            this.WIDTH = window.innerWidth;
-            this.HEIGHT = window.innerWidth * this.proportion;
-        }
-        else {
-            this.WIDTH = window.innerHeight / this.proportion;
-            this.HEIGHT = window.innerHeight;
-        }
+        this.WIDTH = window.innerWidth;
+        this.HEIGHT = window.innerHeight;
+        this.proportion = this.HEIGHT / this.WIDTH;
         this.gl.viewport(0, 0, this.WIDTH, this.HEIGHT);
         this.applyResize();
     }

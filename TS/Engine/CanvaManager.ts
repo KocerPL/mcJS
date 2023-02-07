@@ -45,8 +45,8 @@ this.scrollAmount+=(Math.round(ev.deltaY/100));
        // console.log((ev.x/(this.canva.width/2))-1, (ev.y/(this.canva.height/2))-1);
        this.mouse.pos.x = ((ev.x/(this.canva.width/2))-1)/CanvaManager.getProportion;
        this.mouse.pos.y = -((ev.y/(this.canva.height/2))-1); 
-       this.mouseMovement.x = ev.movementX;
-        this.mouseMovement.y = ev.movementY;
+       this.mouseMovement.x += ev.movementX;
+        this.mouseMovement.y += ev.movementY;
     }
     private static onKeyDown(ev)
     {
@@ -85,17 +85,9 @@ this.scrollAmount+=(Math.round(ev.deltaY/100));
     }
     private static onResize():void
     {
-        if(window.innerHeight>window.innerWidth)
-        {
             this.WIDTH = window.innerWidth;
-            this.HEIGHT = window.innerWidth*this.proportion;
-        }
-        else
-        {
-            
-            this.WIDTH = window.innerHeight/this.proportion;
             this.HEIGHT = window.innerHeight;
-        }
+            this.proportion = this.HEIGHT/this.WIDTH;
         this.gl.viewport(0,0,this.WIDTH,this.HEIGHT);
         this.applyResize();
     }

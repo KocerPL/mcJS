@@ -5,7 +5,7 @@ export class World {
     Chunks = new Array();
     static heightMap = new Array(256);
     static waterLevel = 0;
-    static height = 100;
+    static height = 50;
     static init() {
         this.genHeightMap();
         console.log(perlin);
@@ -112,18 +112,7 @@ export class World {
         let chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
         try {
             let chunk = Main.getChunkAt(chunkPos.x, chunkPos.z);
-            if (inChunkPos.y >= chunk.heightmap[inChunkPos.x][inChunkPos.z]) {
-                //  console.log("heightmap");
-                let i = 0;
-                if (type <= 0) {
-                    i = 1;
-                    while (chunk.getBlock(new Vector(inChunkPos.x, inChunkPos.y - i, inChunkPos.z)).id <= 0) {
-                        i++;
-                    }
-                }
-                chunk.heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y - i;
-            }
-            chunk.setBlock(inChunkPos, type, update);
+            chunk.setBlock(inChunkPos, type);
         }
         catch (error) {
             //  console.error(error);
@@ -340,7 +329,7 @@ export class World {
             //  if(x<0||z<0)
             //    return this.height;
             //return 1;
-            return Math.round((perlin.get(x / 128, z / 128) + 1) * 30) + this.height;
+            return Math.round((perlin.get(x / 128, z / 128) + 1) * 50) + this.height;
         }
         catch (error) { }
         return 0;

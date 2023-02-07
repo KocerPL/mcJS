@@ -2,8 +2,8 @@ import { Camera } from "../Engine/Camera.js";
 import { CanvaManager } from "../Engine/CanvaManager.js";
 import { EBO } from "../Engine/EBO.js";
 import { RenderSet } from "../Engine/RenderSet.js";
-import { Task } from "../Engine/Task.js";
 import { Texture } from "../Engine/Texture.js";
+import { randRange } from "../Engine/Utils/Math.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { VAO } from "../Engine/VAO.js";
@@ -100,6 +100,18 @@ export class Player
         this.itemsBar[i]= new invItem(0);
         for(let i=0;i<27;i++)
         this.inventory[i]= new invItem(0);
+        let i=0;
+        for(let id in blocks)
+        {
+            if(Number(id)>0)
+            {
+                this.inventory[i].id = Number(id);
+                this.inventory[i].count =100;
+                i++;
+            }
+
+           console.log(i);
+        }
         this.vao = new VAO();
         this.vbo = new VBO();
       
@@ -488,7 +500,7 @@ console.log(error);
             this.targetedBlock = block;
         }
         if((Date.now()/1000)-blocks[this.targetedBlock.id].breakTime>=this.startTime || Main.fastBreaking)
-        {  Main.entities.push(new Item(blockPos,World.getBlock(blockPos).id));
+        {  Main.entities.push(new Item(new Vector(blockPos.x+randRange(-0.2,0.2),blockPos.y,blockPos.z+randRange(-0.2,0.2)),World.getBlock(blockPos).id));
        World.setBlockNoLight(blockPos,0,true);
      
     this.targetedBlock=null;    
@@ -533,285 +545,6 @@ console.log(error);
     }
         
     }
-   /* placeBlock()//Breesenham
-    {
-        let secondPos =  this.pos.copy();
-        secondPos.y = secondPos.y+1;
-        let firstPos = new Vector(secondPos.x+(Math.sin(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)*5),secondPos.y+(Math.sin(this.camera.getPitch()*Math.PI/180)*5),secondPos.z+(5*Math.cos(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)));
-        let temp = secondPos;
-        secondPos =firstPos;
-        firstPos = temp ;
-        let ndVec = new Vector(firstPos.x-secondPos.x,firstPos.y-secondPos.y,firstPos.z-secondPos.z);
-        let dVec = new Vector(Math.abs(ndVec.x),Math.abs(ndVec.y),Math.abs(ndVec.z));
-        if(dVec.x>dVec.y && dVec.x>dVec.z)
-        {
-            //driving x axis
-            let py = (2*dVec.y) - dVec.x;
-            let pz = (2*dVec.z) - dVec.x;
-            let i=dVec.x-1;
-            let dod =new Vector(1,1,1) ;
-            while(i>0)
-            {
-            i--;
-            if(firstPos.x<secondPos.x)
-            dod.x=1;
-            else
-            dod.x=-1;
-            if(firstPos.y<secondPos.y)
-            dod.y=1;
-            else
-            dod.y=-1;
-            if(firstPos.z<secondPos.z)
-            dod.z=1;
-            else
-            dod.z=-1;
-            let lastPos= firstPos;
-            if(py<0 && pz<0)
-            {
-                firstPos = new Vector(firstPos.x+dod.x,firstPos.y,firstPos.z);
-                if(World.getBlock(firstPos).id!=0)
-                {
-               World.setBlock(lastPos,this.itemsBar[this.selectedItem] )
-               CanvaManager.mouse.right=false; 
-               return;
-                 }
-                py = py+ (2*dVec.y) ;
-                pz = pz+ (2*dVec.z) ;
-            }
-            else if(py>0 && pz<0 )
-            {
-                firstPos = new Vector(firstPos.x,firstPos.y+dod.y,firstPos.z);
-                if(World.getBlock(firstPos).id!=0)
-                {
-               World.setBlock(lastPos,this.itemsBar[this.selectedItem] )
-               CanvaManager.mouse.right=false; 
-               return;
-                 }
-                py = py+  ((2*dVec.y)-(2*dVec.x)) ;
-               pz = pz+ (2*dVec.z) ;
-            }
-            else if(py ==0 )
-            {
-                firstPos = new Vector(firstPos.x+dod.x,firstPos.y,firstPos.z+dod.z);
-                if(World.getBlock(firstPos).id!=0)
-                {
-               World.setBlock(lastPos,this.itemsBar[this.selectedItem] )
-               CanvaManager.mouse.right=false; 
-               return;
-                 }
-                 py = py+  (2*dVec.y) ;
-                 pz = pz+ ((2*dVec.z)-(2*dVec.x)); 
-            }
-            else
-            {   
-                firstPos = new Vector(firstPos.x+dod.x,firstPos.y,firstPos.z+dod.z);
-                if(World.getBlock(firstPos).id!=0)
-                {
-               World.setBlock(lastPos,this.itemsBar[this.selectedItem] )
-               CanvaManager.mouse.right=false; 
-               return;
-                 }
-                py = py+  ((2*dVec.y)-(2*dVec.x)) ;
-                pz = pz+ ((2*dVec.z)); 
-            }
-        }
-        }
-        else if(dVec.y>dVec.x && dVec.y>dVec.z)
-        {
-            //driving y axis
-            let px = (2*dVec.x) - dVec.y;
-            let pz = (2*dVec.z) - dVec.y;
-            let i=dVec.y-1;
-            let dod =new Vector(1,1,1) ;
-           
-            while(i>0)
-            {
-            i--;
-            let lastPos= firstPos;
-            if(firstPos.x<secondPos.x)
-            dod.x=1;
-            else
-            dod.x=-1;
-            if(firstPos.y<secondPos.y)
-            dod.y=1;
-            else
-            dod.y=-1;
-            if(firstPos.z<secondPos.z)
-            dod.z=1;
-            else
-            dod.z=-1;
-            if(px<0 && pz<0)
-            {
-                firstPos = new Vector(firstPos.x,firstPos.y+dod.y,firstPos.z);
-                if(World.getBlock(firstPos).id!=0)
-                {
-               World.setBlock(lastPos,this.itemsBar[this.selectedItem] )
-               CanvaManager.mouse.right=false; 
-               return;
-                 }
-                px = px+ (2*dVec.x) ;
-                pz = pz+ (2*dVec.z) ;
-            }
-            else if(px>0 && pz<0 )
-            {
-                firstPos = new Vector(firstPos.x+dod.x,firstPos.y+dod.y,firstPos.z);
-                if(World.getBlock(firstPos).id!=0)
-                {
-               World.setBlock(lastPos,this.itemsBar[this.selectedItem] )
-               CanvaManager.mouse.right=false; 
-               return;
-                 }
-                px = px+  ((2*dVec.x)-(2*dVec.y)) ;
-                pz = pz+ (2*dVec.z) ;
-            }
-            else if(px == 0 )
-            {
-                firstPos = new Vector(firstPos.x,firstPos.y+dod.y,firstPos.z+dod.z);
-                if(World.getBlock(firstPos).id!=0)
-                {
-               World.setBlock(lastPos,this.itemsBar[this.selectedItem] )
-               CanvaManager.mouse.right=false; 
-               return;
-                 }
-                 px = px+  (2*dVec.x) ;
-                 pz = pz+ ((2*dVec.z)-(2*dVec.y)); 
-            }
-            else
-            {
-                firstPos = new Vector(firstPos.x+dod.x,firstPos.y+dod.y,firstPos.z+dod.z);
-                if(World.getBlock(firstPos).id!=0)
-                {
-               World.setBlock(lastPos,this.itemsBar[this.selectedItem] )
-               CanvaManager.mouse.right=false; 
-               return;
-                 }
-                px = px+  ((2*dVec.x)-(2*dVec.y)) ;
-                pz = pz+ ((2*dVec.z)-(2*dVec.y)); 
-            }
-        }
-        }
-       else if(dVec.z>dVec.x && dVec.z>dVec.y)
-        {
-            //driving z axis
-            let px = (2*dVec.x) - dVec.z;
-            let py = (2*dVec.y) - dVec.z;
-            let i=dVec.z-1;
-            let dod =new Vector(1,1,1) ;
-           
-            while(i>0)
-            {
-            i--;
-            if(firstPos.x<secondPos.x)
-            dod.x=1;
-            else
-            dod.x=-1;
-            if(firstPos.y<secondPos.y)
-            dod.y=1;
-            else
-            dod.y=-1;
-            if(firstPos.z<secondPos.z)
-            dod.z=1;
-            else
-            dod.z=-1;
-            let lastPos = firstPos;
-            if(px<0 && py<0)
-            {
-                firstPos = new Vector(firstPos.x,firstPos.y,firstPos.z+dod.z);
-                if(World.getBlock(firstPos).id!=0)
-                {
-               World.setBlock(lastPos,this.itemsBar[this.selectedItem] )
-               CanvaManager.mouse.right=false; 
-               return;
-                 }
-                px = px+ (2*dVec.x) ;
-                py = py+ (2*dVec.y) ;
-            }
-            else if(px>0 && py<0 )
-            {
-                firstPos = new Vector(firstPos.x+dod.x,firstPos.y+dod.y,firstPos.z);
-                if(World.getBlock(firstPos).id!=0)
-                {
-               World.setBlock(lastPos,this.itemsBar[this.selectedItem] )
-               CanvaManager.mouse.right=false; 
-               return;
-                 }
-                px = px+  ((2*dVec.x)-(2*dVec.z)) ;
-                py = py+ (2*dVec.y) ;
-            }
-            else if(px == 0 )
-            {
-                firstPos = new Vector(firstPos.x,firstPos.y+dod.y,firstPos.z+dod.z);
-                if(World.getBlock(firstPos).id!=0)
-                {
-               World.setBlock(lastPos,this.itemsBar[this.selectedItem] )
-               CanvaManager.mouse.right=false; 
-               return;
-                 }
-                 px = px+  (2*dVec.x) ;
-                 py = py+ ((2*dVec.y)-(2*dVec.z)); 
-            }
-            else
-            {
-                firstPos = new Vector(firstPos.x+dod.x,firstPos.y+dod.y,firstPos.z+dod.z);
-                if(World.getBlock(firstPos).id!=0)
-                {
-               World.setBlock(lastPos,this.itemsBar[this.selectedItem] )
-               CanvaManager.mouse.right=false; 
-               return;
-                 }
-                px = px+  ((2*dVec.x)-(2*dVec.z)) ;
-                py = py+ ((2*dVec.y)-(2*dVec.z)); 
-            }
-        }
-        }
-    }
-    placeBlock2()//Kocer method
-    {
-        let firstPos =  this.pos.copy();
-        firstPos.y = firstPos.y+1;
-        let secondPos = new Vector(firstPos.x+(Math.sin(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)*5),firstPos.y+(Math.sin(this.camera.getPitch()*Math.PI/180)*5),firstPos.z+(5*Math.cos(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)));
-        secondPos= new Vector(Math.round(secondPos.x),Math.round(secondPos.y),Math.round(secondPos.z) )
-        let i=0;
-        let dod =new Vector(1,1,1);
-        while(i<5)
-        {
-            i++;
-            let ndVec = new Vector(firstPos.x-secondPos.x,firstPos.y-secondPos.y,firstPos.z-secondPos.z);
-            let dVec = new Vector(Math.abs(ndVec.x),Math.abs(ndVec.y),Math.abs(ndVec.z));
-            if(firstPos.x<secondPos.x)
-            dod.x=1;
-            else
-            dod.x=-1;
-            if(firstPos.y<secondPos.y)
-            dod.y=1;
-            else
-            dod.y=-1;
-            if(firstPos.z<secondPos.z)
-            dod.z=1;
-            else
-            dod.z=-1;
-            let lastPos = firstPos.copy();
-            if(dVec.x>=dVec.y && dVec.x>=dVec.z)
-            {
-            firstPos.x+=dod.x;
-            }
-            else if(dVec.y>=dVec.x && dVec.y>=dVec.z)
-            {
-                firstPos.y+=dod.y;
-            }
-            else if(dVec.z>=dVec.x && dVec.z>=dVec.y)
-            {
-                firstPos.z+=dod.z;
-            }
-            if(World.getBlock(firstPos).id!=0)
-            {
-           World.setBlock(lastPos,this.itemsBar[this.selectedItem] )
-           CanvaManager.mouse.right=false; 
-           return;
-             }
-        }
-  
-    }*/
     isTouching(vec:Vector,offset?:number)
     {
         offset??=0;
@@ -823,6 +556,7 @@ console.log(error);
     }
    pickupItem(item:Item)
    {
+    console.log(item.count);
     let id= item.type;
        for(let x=0;x<this.itemsBar.length;x++)
        {
@@ -833,6 +567,7 @@ console.log(error);
         }
        if(this.itemsBar[x].id ==0 ) 
        {this.itemsBar[x].id = id;
+        this.itemsBar[x].count+=item.count;
      return;
        }   
         }
@@ -845,7 +580,7 @@ console.log(error);
          }
         if(this.inventory[x].id ==0 ) 
         {this.inventory[x].id = id;
-            this.inventory[x].count+=item.count;
+            this.inventory[x].count=item.count;
       return;
         }   
          }

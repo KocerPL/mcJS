@@ -9,13 +9,28 @@ import { Matrix } from "./Engine/Utils/Matrix.js";
 import { Vector } from "./Engine/Utils/Vector.js";
 import { VAO } from "./Engine/VAO.js";
 import { VBO } from "./Engine/VBO.js";
-import { blocks } from "./Game/Block.js";
+import { blocks, directions } from "./Game/Block.js";
 import { Chunk } from "./Game/Chunk.js";
 import { GUI } from "./Game/GUI.js";
 import { Player } from "./Game/Player.js";
 import { World } from "./Game/World.js";
 let gl = CanvaManager.gl;
+export class LightNode {
+    pos;
+    subchunk;
+    light;
+    direction;
+    lpos;
+    constructor(pos, subchunk, light, direction, lightpos) {
+        this.lpos = lightpos;
+        this.pos = pos;
+        this.subchunk = subchunk;
+        this.light = light;
+        this.direction = direction;
+    }
+}
 export class Main {
+    static maxChunks = 121;
     static okok = false;
     static dispLl = false;
     static fastBreaking = true;
@@ -50,6 +65,9 @@ export class Main {
     //public static chunks:Array<Array<Chunk>>=new Array(8);
     static loadedChunks = new Array();
     static tempChunkBuffer = new Array();
+    static lightQueue = new Array();
+    static lightRemQueue = new Array();
+    static toUpdate = new Set();
     static crosscords = [
         -0.02, -0.02,
         0.02, 0.02,
@@ -69,6 +87,16 @@ export class Main {
         console.log("heh");
     }
     static run() {
+        if (navigator.storage && navigator.storage.estimate) {
+            navigator.storage.estimate().then((quota) => {
+                // quota.usage -> Number of bytes used.
+                // quota.quota -> Maximum number of bytes available.
+                const percentageUsed = (quota.usage / quota.quota) * 100;
+                console.log(`You've used ${percentageUsed}% of the available storage.`);
+                const remaining = quota.quota - quota.usage;
+                console.log(`You can write up to ${remaining} more bytes.`);
+            });
+        }
         CanvaManager.setupCanva(document.body);
         // EBO.unbind();
         // VBO.unbind();
@@ -124,7 +152,79 @@ export class Main {
         this.Measure.fps = this.Measure.frames;
         this.Measure.frames = 0;
     }
+    static updateSubchunks() {
+        let concatQ = new Set();
+        this.toUpdate.forEach((sub) => { sub.update(); concatQ.add(sub.chunk); });
+        this.toUpdate.clear();
+        concatQ.forEach((chunk) => { chunk.updateMesh(); });
+    }
+    static processLight() {
+        let i = 0;
+        while (this.lightRemQueue.length > 0) {
+            i++;
+            //console.log("processing light  remove Queue")
+            let node = this.lightRemQueue.shift();
+            //   if(node.light<= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock) continue;
+            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock = 0;
+            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir = directions.UNDEF;
+            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lPos = undefined;
+            this.toUpdate.add(node.subchunk);
+            if (node.light > 1) {
+                //Propagate
+                let checkAndPush = (pos, direction) => {
+                    let blockInfo = node.subchunk.getBlockSub(pos);
+                    if (blockInfo.block.id == 0 && blockInfo.block.lightDir == direction)
+                        this.lightRemQueue.push(new LightNode(blockInfo.pos, blockInfo.sub, node.light - 1, direction, node.lpos));
+                };
+                checkAndPush(new Vector(node.pos.x - 1, node.pos.y, node.pos.z), directions.POS_X);
+                checkAndPush(new Vector(node.pos.x + 1, node.pos.y, node.pos.z), directions.NEG_X);
+                checkAndPush(new Vector(node.pos.x, node.pos.y - 1, node.pos.z), directions.POS_Y);
+                checkAndPush(new Vector(node.pos.x, node.pos.y + 1, node.pos.z), directions.NEG_Y);
+                checkAndPush(new Vector(node.pos.x, node.pos.y, node.pos.z - 1), directions.POS_Z);
+                checkAndPush(new Vector(node.pos.x, node.pos.y, node.pos.z + 1), directions.NEG_Z);
+            }
+            else {
+                //node.subchunk.update();
+                //node.subchunk.chunk.updateMesh();
+            }
+        }
+        while (this.lightQueue.length > 0) {
+            i++;
+            //  console.log("processing light Queue")
+            let node = this.lightQueue.shift();
+            if (node.light <= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock)
+                continue;
+            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock = node.light;
+            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir = node.direction;
+            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lPos = node.lpos;
+            if (!this.toUpdate.has(node.subchunk))
+                this.toUpdate.add(node.subchunk);
+            if (node.light > 1) {
+                //Propagate
+                let checkAndPush = (pos, direction) => {
+                    let blockInfo = node.subchunk.getBlockSub(pos);
+                    if (blockInfo.block.id == 0 && blockInfo.block.lightFBlock < node.light - 1)
+                        this.lightQueue.push(new LightNode(blockInfo.pos, blockInfo.sub, node.light - 1, direction, node.lpos));
+                };
+                checkAndPush(new Vector(node.pos.x - 1, node.pos.y, node.pos.z), directions.POS_X);
+                checkAndPush(new Vector(node.pos.x + 1, node.pos.y, node.pos.z), directions.NEG_X);
+                checkAndPush(new Vector(node.pos.x, node.pos.y - 1, node.pos.z), directions.POS_Y);
+                checkAndPush(new Vector(node.pos.x, node.pos.y + 1, node.pos.z), directions.NEG_Y);
+                checkAndPush(new Vector(node.pos.x, node.pos.y, node.pos.z - 1), directions.POS_Z);
+                checkAndPush(new Vector(node.pos.x, node.pos.y, node.pos.z + 1), directions.NEG_Z);
+            }
+            else {
+                //node.subchunk.update();
+                //node.subchunk.chunk.updateMesh();
+            }
+        }
+    }
     static loop(time) {
+        let test = this.lastFrame - time;
+        if (test < 1000 / this.FPS) {
+            this.Measure.lastLimit = time;
+            this.limitChunks();
+        }
         if (this.Measure.lastTime <= time - 1000)
             this.resetMeasure(time);
         let delta = time - this.lastTick;
@@ -141,10 +241,6 @@ export class Main {
             this.update();
         }
         ;
-        if (time - this.Measure.lastLimit > 300) {
-            this.Measure.lastLimit = time;
-            this.limitChunks();
-        }
         //60 updates
         let fastDelta = time - this.lastFastTick;
         this.fastDelta += fastDelta / (2000 / this.fastTPS);
@@ -160,28 +256,11 @@ export class Main {
             this.fastUpdate();
         }
         ;
-        /* let testTime = Date.now();
-        if(this.Measure.fps>20)
-        while(Date.now()-testTime <20 )
-        {
-           this.executeTasks(testTime);
-           this.minChunks();
-          // this.chunksUpdate();
-        }*/
-        //  if(this.lastFrame < time-(1000/this.FPS))
+        this.processLight();
+        this.updateSubchunks();
         this.render();
         this.lastFrame = time;
         requestAnimationFrame(this.loop.bind(this));
-    }
-    static executeTasks(time) {
-        for (let i = this.tasks.length - 1; i >= 0; i--) {
-            if (this.tasks[i].length > 0) {
-                let task = this.tasks[i].shift();
-                task.func();
-                if (Date.now() - time > 20)
-                    return;
-            }
-        }
     }
     static fastUpdate() {
         this.player.update();
@@ -211,53 +290,65 @@ export class Main {
         let z = Math.floor(Math.round(this.player.pos.z) / 16);
         let step = 1;
         let iter = 1;
-        let howMuch = 100;
+        let howMuch = this.maxChunks;
         let loadBuffer = new Array();
         this.tempChunkBuffer = [...this.loadedChunks];
         let { chunk, isNew } = this.getORnew(x, z);
+        if (isNew)
+            chunk.preGenSubchunks();
         loadBuffer.push(chunk);
         let nextCoords = new Vector(x, 0, z);
         //Spiral chunk loading algorithm
-        let isNewAv = false;
+        let stop = false;
         while (loadBuffer.length < howMuch) {
             //x
             for (let i = 0; i < iter; i++) {
                 nextCoords.x += step;
                 let { chunk, isNew } = this.getORnew(nextCoords.x, nextCoords.z);
                 loadBuffer.push(chunk);
-                if (isNew) {
-                    isNewAv = true;
+                if (!chunk.generated) {
+                    chunk.preGenOne();
+                    stop = true;
+                    break;
+                }
+                else if (!chunk.sended) {
+                    chunk.sendNeighbours();
+                    //chunk.gatherNeighbours();
+                    chunk.sended = true;
+                    stop = true;
                     break;
                 }
             }
             //z
-            if (isNewAv)
+            if (stop)
                 break;
             for (let i = 0; i < iter; i++) {
                 nextCoords.z += step;
                 let { chunk, isNew } = this.getORnew(nextCoords.x, nextCoords.z);
-                // isNewAv = isNew;
+                // stop = isNew;
                 loadBuffer.push(chunk);
-                if (isNew) {
-                    isNewAv = true;
+                if (!chunk.generated) {
+                    chunk.preGenOne();
+                    stop = true;
+                    break;
+                }
+                else if (!chunk.sended) {
+                    chunk.sendNeighbours();
+                    // chunk.gatherNeighbours();
+                    chunk.sended = true;
+                    stop = true;
                     break;
                 }
             }
             //increase and invert step
-            if (isNewAv)
+            if (stop)
                 break;
             iter++;
             step = -step;
         }
         this.loadedChunks = loadBuffer;
-        for (let chunk of this.loadedChunks) {
-            if (!chunk.sended) {
-                chunk.sendNeighbours();
-                chunk.gatherNeighbours();
-                chunk.sended = true;
-            }
-        }
         for (let chunk of this.tempChunkBuffer) {
+            chunk.sended = false;
             for (let i = this.entities.length - 1; i >= 0; i--) {
                 let entity = this.entities[i];
                 if (chunk.pos.x * 16 < entity.pos.x && chunk.pos.z * 16 < entity.pos.z && chunk.pos.x * 16 > entity.pos.x - 16 && chunk.pos.z * 16 < entity.pos.z - 16)
@@ -370,6 +461,7 @@ export class Main {
         CanvaManager.debug.value = "Fps: " + this.Measure.fps + " Selected block: " + blocks[this.player.itemsBar[this.player.selectedItem].id].name + " Count:" + this.player.itemsBar[this.player.selectedItem].count + "\n XYZ:  X:" + this.player.pos.x + "  Y:" + this.player.pos.y + "  Z:" + this.player.pos.z;
         this.shader.use();
         this.player.camera.preRender();
+        this.shader.setFogCenter(this.player.camera.getPosition());
         CanvaManager.preRender();
         gl.clearColor(0.0, this.sunLight / 15, this.sunLight / 15, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -377,7 +469,6 @@ export class Main {
         Main.shader.loadUniforms(Main.player.camera.getProjection(), Matrix.identity(), Main.player.camera.getView(), Main.sunLight);
         for (let chunk of this.loadedChunks) {
             if (!chunk.lazy) {
-                console.log("rendering");
                 chunk.render();
                 // toRender.push(()=>{chunk.renderWater()});
             }

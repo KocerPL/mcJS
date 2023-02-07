@@ -8,13 +8,24 @@ import { Block } from "./Block.js";
 import { SubChunk } from "./SubChunk.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Mesh } from "./Mesh.js";
+import { World } from "./World.js";
+import { randRange } from "../Engine/Utils/Math.js";
 let gl = CanvaManager.gl;
+export function flipDir(dir) {
+    switch (dir) {
+        case "POS_X": return "NEG_X";
+        case "NEG_X": return "POS_X";
+        case "POS_Z": return "NEG_Z";
+        case "NEG_Z": return "POS_Z";
+    }
+}
 export class Chunk {
     subchunks = new Array(16);
-    todo = new Array();
     heightmap = new Array(16);
     neighbours = {};
     allNeighbours = false;
+    generated = false;
+    generatingIndex = 0;
     sended = false;
     lazy = false;
     pos;
@@ -47,84 +58,63 @@ export class Chunk {
         for (let i = 0; i < 16; i++) {
             this.heightmap[i] = new Array(16);
         }
-        this.preGenSubchunks();
+        // this.preGenSubchunks();
         // console.log("done constructing");
     }
-    async preGenSubchunks() {
+    preGenOne() {
+        if (this.generatingIndex >= 16)
+            return;
+        this.subchunks[this.generatingIndex] = new SubChunk(new Vector(this.pos.x, this.generatingIndex, this.pos.z), this);
+        this.subchunks[this.generatingIndex].preGenerate(this.heightmap);
+        this.generatingIndex++;
+        if (this.generatingIndex >= 16) {
+            this.generated = true;
+        }
+    }
+    preGenSubchunks() {
         for (let i = 0; i < 16; i++) {
             this.subchunks[i] = new SubChunk(new Vector(this.pos.x, i, this.pos.z), this);
             this.subchunks[i].preGenerate(this.heightmap);
         }
+        this.generated = true;
+    }
+    postGenerate() {
+        let x = randRange(0, 15) + (this.pos.x * 16);
+        let z = randRange(0, 15) + (this.pos.z * 16);
+        World.generateTree(new Vector(x, World.getHeight(x, z), z));
     }
     updateNeighbour(neigbDir, chunk) {
-        console.log("what");
-        console.log(this.pos, neigbDir);
-        if (chunk == undefined)
+        //console.log("what")
+        //console.log(this.pos,neigbDir);
+        if (chunk == undefined || this.allNeighbours)
             return;
         this.neighbours[neigbDir] = chunk;
         if (this.neighbours["NEG_X"] != undefined && this.neighbours["POS_X"] != undefined && this.neighbours["POS_Z"] != undefined && this.neighbours["NEG_Z"] != undefined) {
-            console.log("gathered all neighbours :)");
+            //console.log("gathered all neighbours :)")
             this.allNeighbours = true;
+            this.postGenerate();
             this.updateAllSubchunks();
         }
     }
-    gatherNeighbours() {
-        if (this.allNeighbours)
-            return;
+    sdNeighbour(neighbour, dir) {
         try {
-            let neighbour = Main.getChunkAt(this.pos.x - 1, this.pos.z);
-            this.updateNeighbour("NEG_X", neighbour);
-        }
-        catch (error) {
-        }
-        try {
-            let neighbour = Main.getChunkAt(this.pos.x + 1, this.pos.z);
-            this.updateNeighbour("POS_X", neighbour);
-        }
-        catch (error) {
-        }
-        try {
-            let neighbour = Main.getChunkAt(this.pos.x, this.pos.z - 1);
-            this.updateNeighbour("NEG_Z", neighbour);
-        }
-        catch (error) {
-        }
-        try {
-            let neighbour = Main.getChunkAt(this.pos.x, this.pos.z + 1);
-            this.updateNeighbour("POS_Z", neighbour);
+            neighbour.updateNeighbour(dir, this);
+            this.updateNeighbour(flipDir(dir), neighbour);
         }
         catch (error) {
         }
     }
     sendNeighbours() {
-        if (this.allNeighbours)
+        if (this.allNeighbours || !this.generated)
             return;
-        try {
-            let neighbour = Main.getChunkAt(this.pos.x - 1, this.pos.z);
-            console.log(neighbour.pos);
-            neighbour.updateNeighbour("POS_X", this);
-        }
-        catch (error) {
-            console.log("hehe");
-        }
-        try {
-            let neighbour = Main.getChunkAt(this.pos.x + 1, this.pos.z);
-            neighbour.updateNeighbour("NEG_X", this);
-        }
-        catch (error) {
-        }
-        try {
-            let neighbour = Main.getChunkAt(this.pos.x, this.pos.z - 1);
-            neighbour.updateNeighbour("POS_Z", this);
-        }
-        catch (error) {
-        }
-        try {
-            let neighbour = Main.getChunkAt(this.pos.x, this.pos.z + 1);
-            neighbour.updateNeighbour("NEG_Z", this);
-        }
-        catch (error) {
-        }
+        let neighbour = Main.getChunkAt(this.pos.x - 1, this.pos.z);
+        this.sdNeighbour(neighbour, "POS_X");
+        neighbour = Main.getChunkAt(this.pos.x + 1, this.pos.z);
+        this.sdNeighbour(neighbour, "NEG_X");
+        neighbour = Main.getChunkAt(this.pos.x, this.pos.z - 1);
+        this.sdNeighbour(neighbour, "POS_Z");
+        neighbour = Main.getChunkAt(this.pos.x, this.pos.z + 1);
+        this.sdNeighbour(neighbour, "NEG_Z");
     }
     updateMesh() {
         this.mesh.reset();
@@ -174,22 +164,17 @@ export class Chunk {
             this.subchunks[yPos].blocks[pos.x][y][pos.z].lightLevel = lightLevel;
         }
         else {
-            console.log("Subchunk is undefined");
+            //   console.log("Subchunk is undefined");
         }
     }
-    generate() {
+    updateAllSubchunks() {
+        if (!this.allNeighbours)
+            return;
         for (let i = 0; i < this.subchunks.length; i++) {
-            this.subchunks[i].preGenerate(this.heightmap);
+            this.subchunks[i].update();
         }
-        // this.lazy=false;
-    }
-    async updateAllSubchunks() {
-        for (let i = 0; i < this.subchunks.length; i++) {
-            await this.subchunks[i].update();
-        }
-        this.lazy = false;
         this.updateMesh();
-        console.log("now not lazy hehehehe");
+        // console.log("now not lazy hehehehe")
     }
     getSubchunk(y) {
         let yPos = Math.floor(Math.round(y) / 16);
@@ -197,11 +182,12 @@ export class Chunk {
             return this.subchunks[yPos];
     }
     updateSubchunkAt(y) {
+        if (!this.allNeighbours)
+            return;
         let yPos = Math.floor(Math.round(y) / 16);
-        this.subchunks[yPos].update();
-        this.updateMesh();
+        Main.toUpdate.add(this.subchunks[yPos]);
     }
-    setBlock(pos, blockID, update) {
+    setBlock(pos, blockID) {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {
             throw new Error("Incorrect cordinates");
         }
@@ -211,32 +197,75 @@ export class Chunk {
          {
             if (!(this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
                 this.subchunks[yPos].blocks[pos.x][y][pos.z] = new Block(0);
+            let lights = this.subchunks[yPos - 1].getLights();
+            lights = lights.concat(this.subchunks[yPos + 1].getLights());
+            lights = lights.concat(this.neighbours["POS_X"].subchunks[yPos + 1].getLights());
+            lights = lights.concat(this.neighbours["POS_X"].subchunks[yPos].getLights());
+            lights = lights.concat(this.neighbours["POS_X"].subchunks[yPos - 1].getLights());
+            lights = lights.concat(this.neighbours["POS_X"].neighbours["NEG_Z"].subchunks[yPos + 1].getLights());
+            lights = lights.concat(this.neighbours["POS_X"].neighbours["NEG_Z"].subchunks[yPos].getLights());
+            lights = lights.concat(this.neighbours["POS_X"].neighbours["NEG_Z"].subchunks[yPos - 1].getLights());
+            lights = lights.concat(this.neighbours["POS_X"].neighbours["POS_Z"].subchunks[yPos + 1].getLights());
+            lights = lights.concat(this.neighbours["POS_X"].neighbours["POS_Z"].subchunks[yPos].getLights());
+            lights = lights.concat(this.neighbours["POS_X"].neighbours["POS_Z"].subchunks[yPos - 1].getLights());
+            lights = lights.concat(this.neighbours["NEG_X"].neighbours["NEG_Z"].subchunks[yPos + 1].getLights());
+            lights = lights.concat(this.neighbours["NEG_X"].neighbours["NEG_Z"].subchunks[yPos].getLights());
+            lights = lights.concat(this.neighbours["NEG_X"].neighbours["NEG_Z"].subchunks[yPos - 1].getLights());
+            lights = lights.concat(this.neighbours["NEG_X"].neighbours["POS_Z"].subchunks[yPos + 1].getLights());
+            lights = lights.concat(this.neighbours["NEG_X"].neighbours["POS_Z"].subchunks[yPos].getLights());
+            lights = lights.concat(this.neighbours["NEG_X"].neighbours["POS_Z"].subchunks[yPos - 1].getLights());
+            lights = lights.concat(this.neighbours["NEG_X"].subchunks[yPos + 1].getLights());
+            lights = lights.concat(this.neighbours["NEG_X"].subchunks[yPos].getLights());
+            lights = lights.concat(this.neighbours["NEG_X"].subchunks[yPos - 1].getLights());
+            lights = lights.concat(this.neighbours["POS_Z"].subchunks[yPos + 1].getLights());
+            lights = lights.concat(this.neighbours["POS_Z"].subchunks[yPos].getLights());
+            lights = lights.concat(this.neighbours["POS_Z"].subchunks[yPos - 1].getLights());
+            lights = lights.concat(this.neighbours["NEG_Z"].subchunks[yPos + 1].getLights());
+            lights = lights.concat(this.neighbours["NEG_Z"].subchunks[yPos].getLights());
+            lights = lights.concat(this.neighbours["NEG_Z"].subchunks[yPos - 1].getLights());
+            let remlights = this.subchunks[yPos].getLights().concat(lights);
+            for (let light of remlights) {
+                //  console.log("Found light, refreshing...");
+                Main.lightRemQueue.push(light);
+            }
             this.subchunks[yPos].blocks[pos.x][y][pos.z].id = blockID;
+            this.subchunks[yPos].refreshLights();
+            lights = lights.concat(this.subchunks[yPos].getLights());
+            for (let light of lights) {
+                Main.lightQueue.push(light);
+            }
+            if (blockID != 0) {
+                this.subchunks[yPos].blocks[pos.x][y][pos.z].lightFBlock = 0;
+                this.subchunks[yPos].blocks[pos.x][y][pos.z].lightLevel = 0;
+                if (pos.y > this.heightmap[pos.x][pos.z])
+                    this.heightmap[pos.x][pos.z] = pos.y;
+            }
+            else {
+                if (pos.y == this.heightmap[pos.x][pos.z]) {
+                    while (this.getBlock(new Vector(pos.x, this.heightmap[pos.x][pos.z], pos.z)).id == 0)
+                        this.heightmap[pos.x][pos.z]--;
+                    this.heightmap[pos.x][pos.z]--;
+                }
+            }
             this.updateSubchunkAt(pos.y);
             try {
                 if (pos.x == 0) {
-                    Main.getChunkAt(this.pos.x - 1, this.pos.z).subchunks[yPos].update();
-                    Main.getChunkAt(this.pos.x - 1, this.pos.z).updateMesh();
+                    Main.toUpdate.add(Main.getChunkAt(this.pos.x - 1, this.pos.z).subchunks[yPos]);
                 }
                 else if (pos.x == 15) {
-                    Main.getChunkAt(this.pos.x + 1, this.pos.z).subchunks[yPos].update();
-                    Main.getChunkAt(this.pos.x + 1, this.pos.z).updateMesh();
+                    Main.toUpdate.add(Main.getChunkAt(this.pos.x + 1, this.pos.z).subchunks[yPos]);
                 }
                 if (y == 0) {
-                    this.subchunks[yPos - 1].update();
-                    this.updateMesh();
+                    Main.toUpdate.add(this.subchunks[yPos - 1]);
                 }
                 else if (y == 15) {
-                    this.subchunks[yPos + 1].update();
-                    this.updateMesh();
+                    Main.toUpdate.add(this.subchunks[yPos + 1]);
                 }
                 if (pos.z == 0) {
-                    Main.getChunkAt(this.pos.x, this.pos.z - 1).subchunks[yPos].update();
-                    Main.getChunkAt(this.pos.x, this.pos.z - 1).updateMesh();
+                    Main.toUpdate.add(Main.getChunkAt(this.pos.x, this.pos.z - 1).subchunks[yPos]);
                 }
                 else if (pos.z == 15) {
-                    Main.getChunkAt(this.pos.x, this.pos.z + 1).subchunks[yPos].update();
-                    Main.getChunkAt(this.pos.x, this.pos.z + 1).updateMesh();
+                    Main.toUpdate.add(Main.getChunkAt(this.pos.x, this.pos.z + 1).subchunks[yPos]);
                 }
             }
             catch (error) {

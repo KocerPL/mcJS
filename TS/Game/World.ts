@@ -1,4 +1,3 @@
-import { Task } from "../Engine/Task.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { Main } from "../Main.js";
 import { Block, directions } from "./Block.js";
@@ -9,7 +8,7 @@ export class World
     private Chunks:Array<Array<Chunk>> = new Array();
     public static heightMap:Array<Array<number>> = new Array(256);
 public static waterLevel:number = 0;
-public static height=100;
+public static height=50;
     public static init()
     {
         this.genHeightMap();
@@ -128,27 +127,10 @@ public static height=100;
        inChunkPos.z = 16-Math.abs(inChunkPos.z);
 
         let chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
-        
-      
-        
         try
         {
             let chunk = Main.getChunkAt(chunkPos.x,chunkPos.z)
-            if(inChunkPos.y>=chunk.heightmap[inChunkPos.x][inChunkPos.z] )
-            {
-              //  console.log("heightmap");
-                let i=0;
-                if(type<=0)
-                {
-                    i=1;
-                while(chunk.getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).id<=0)
-                {
-                    i++;
-                }
-                }
-               chunk.heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y-i;
-            }
-            chunk.setBlock(inChunkPos,type,update);
+            chunk.setBlock(inChunkPos,type);
         }
         catch(error)
         {
@@ -394,7 +376,7 @@ public static height=100;
           //  if(x<0||z<0)
       //    return this.height;
             //return 1;
-        return Math.round((perlin.get(x/128,z/128)+1)*30)+this.height;
+        return Math.round((perlin.get(x/128,z/128)+1)*50)+this.height;
         }
         catch(error)
         {}
