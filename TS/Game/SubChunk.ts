@@ -83,7 +83,7 @@ export class SubChunk
        if(ah+1==(y+yPos))
        {
        this.blocks[x][y][z].skyLight=15;
-       this.blocks[x][y][z].lightDir = directions.SOURCE;
+       this.blocks[x][y][z].skyLightDir = directions.SOURCE;
        }
     }
     }
@@ -100,7 +100,7 @@ export class SubChunk
   update()
     {
      // if(!this.generated) return;
-      this.clearLight();
+    //  this.clearLight();
      // this.updateLightLevels();
       this.updateVerticesIndices();
      

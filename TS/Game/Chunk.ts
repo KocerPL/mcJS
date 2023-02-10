@@ -223,8 +223,9 @@ constructor(x:number, z:number) {
       if(! (this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
       this.subchunks[yPos].blocks[pos.x][y][pos.z] =new Block(0);
     this.subchunks[yPos].blocks[pos.x][y][pos.z].id=blockID;
-    let pushLight = (vec:Vector,sub?:SubChunk)=>
+    let pushLight = (vec:Vector,lightsky?:boolean,sub?:SubChunk)=>
     {
+      lightsky??=true;
       sub??=this.subchunks[yPos];
       let maxIter = 100
       if(sub.blocks[vec.x][vec.y][vec.z].lightDir!=directions.UNDEF)
@@ -267,9 +268,9 @@ constructor(x:number, z:number) {
         }
       }
 
-      sub??=this.subchunks[yPos];
+  
     //  let maxIter = 100
-      if(sub.blocks[vec.x][vec.y][vec.z].skyLightDir!=directions.UNDEF)
+      if(lightsky && sub.blocks[vec.x][vec.y][vec.z].skyLightDir!=directions.UNDEF)
       {
       let blockPos = new Vector(vec.x,vec.y,vec.z); 
       let k =sub.getBlockSub(blockPos);
@@ -300,7 +301,7 @@ constructor(x:number, z:number) {
         
         if(maxIter>=0)
         {
-        console.log("Found source!!!");
+        console.log("Found skylight source!!!");
      
         if(!(k.sub==this.subchunks[yPos] && k.pos.x == pos.x && k.pos.y == y &&k.pos.z==pos.z))
         Main.skyLightQueue.push(new LightNode(k.pos,k.sub,15,directions.SOURCE,k.pos));
@@ -310,23 +311,7 @@ constructor(x:number, z:number) {
       }
       
     }
-   pushLight(new Vector(pos.x,y,pos.z));
-      if(pos.x>0)
-     pushLight(new Vector(pos.x-1,y,pos.z));
-     if(pos.x<15)
-     pushLight(new Vector(pos.x+1,y,pos.z));
-     if(y>0)
-     pushLight(new Vector(pos.x,y-1,pos.z));
-     if(y<15)
-     pushLight(new Vector(pos.x,y+1,pos.z));
-     if(pos.z>0)
-     pushLight(new Vector(pos.x,y,pos.z-1));
-     if(pos.z<15)
-     pushLight(new Vector(pos.x,y,pos.z+1));
-        if(blockID==10)
-        {
-          Main.lightQueue.push(new LightNode(new Vector(pos.x,y,pos.z),this.subchunks[yPos],15,directions.SOURCE,new Vector(pos.x,y,pos.z)));
-        }
+    let checkSkyLight:boolean =true;
     if(blockID!=0 )
     {
       this.subchunks[yPos].blocks[pos.x][y][pos.z].lightFBlock=0;
@@ -338,11 +323,34 @@ constructor(x:number, z:number) {
       
       if (pos.y==this.heightmap[pos.x][pos.z])
     {
-      while(this.getBlock(new Vector(pos.x,this.heightmap[pos.x][pos.z],pos.z)).id==0)
+      while(this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].id==0)
+      {
+        this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].skyLightDir=directions.SOURCE;
+        this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].skyLight=15;
     this.heightmap[pos.x][pos.z]--;
+      }
+      checkSkyLight =false;
     this.heightmap[pos.x][pos.z]--;
     }
   }
+  
+   pushLight(new Vector(pos.x,y,pos.z),checkSkyLight);
+      if(pos.x>0)
+     pushLight(new Vector(pos.x-1,y,pos.z),checkSkyLight);
+     if(pos.x<15)
+     pushLight(new Vector(pos.x+1,y,pos.z),checkSkyLight);
+     if(y>0)
+     pushLight(new Vector(pos.x,y-1,pos.z),checkSkyLight);
+     if(y<15)
+     pushLight(new Vector(pos.x,y+1,pos.z),checkSkyLight);
+     if(pos.z>0)
+     pushLight(new Vector(pos.x,y,pos.z-1),checkSkyLight);
+     if(pos.z<15)
+     pushLight(new Vector(pos.x,y,pos.z+1),checkSkyLight);
+        if(blockID==10)
+        {
+          Main.lightQueue.push(new LightNode(new Vector(pos.x,y,pos.z),this.subchunks[yPos],15,directions.SOURCE,new Vector(pos.x,y,pos.z)));
+        }
     this.updateSubchunkAt(pos.y);
     try
     {
@@ -350,32 +358,32 @@ constructor(x:number, z:number) {
     if(pos.x ==0)
     {
       Main.toUpdate.add(this.neighbours["NEG_X"].subchunks[yPos]);
-      pushLight(new Vector(15,y,pos.z),this.neighbours["NEG_X"].subchunks[yPos])
+      pushLight(new Vector(15,y,pos.z),checkSkyLight,this.neighbours["NEG_X"].subchunks[yPos])
     }
    else if(pos.x ==15)
     {
       Main.toUpdate.add( this.neighbours["POS_X"].subchunks[yPos]);
-      pushLight(new Vector(0,y,pos.z),this.neighbours["POS_X"].subchunks[yPos])
+      pushLight(new Vector(0,y,pos.z),checkSkyLight,this.neighbours["POS_X"].subchunks[yPos])
     }
     if(y ==0)
     {
       Main.toUpdate.add(this.subchunks[yPos-1]);
-      pushLight(new Vector(pos.x,15,pos.z),this.subchunks[yPos-1])
+      pushLight(new Vector(pos.x,15,pos.z),checkSkyLight,this.subchunks[yPos-1])
     }
    else if(y ==15)
     {
      Main.toUpdate.add(this.subchunks[yPos+1]);
-    pushLight(new Vector(pos.x,0,pos.z),this.subchunks[yPos+1])
+    pushLight(new Vector(pos.x,0,pos.z),checkSkyLight,this.subchunks[yPos+1])
     }
     if(pos.z ==0)
     {
       Main.toUpdate.add(this.neighbours["NEG_Z"].subchunks[yPos]);
-      pushLight(new Vector(pos.x,y,15),this.neighbours["NEG_Z"].subchunks[yPos])
+      pushLight(new Vector(pos.x,y,15),checkSkyLight,this.neighbours["NEG_Z"].subchunks[yPos])
     }
    else if(pos.z ==15)
     {
       Main.toUpdate.add(this.neighbours["POS_Z"].subchunks[yPos]);
-      pushLight(new Vector(pos.x,y,0),this.neighbours["POS_Z"].subchunks[yPos])
+      pushLight(new Vector(pos.x,y,0),checkSkyLight,this.neighbours["POS_Z"].subchunks[yPos])
     }
  
   }
@@ -390,65 +398,6 @@ constructor(x:number, z:number) {
     }
    
   }
-  setBlock2(pos:Vector, blockID) {
-    if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {
-      throw new Error("Incorrect cordinates");
-    }
-    let y = pos.y%16;
   
-    let yPos = Math.floor(Math.round(pos.y)/16);
-    console.log(yPos);
-    if(this.subchunks[yPos]!=undefined)
-    {
-    this.subchunks[yPos].blocks[pos.x][y][pos.z].id=blockID;
-    try
-    {
-      if(yPos+y>=this.heightmap[pos.x][pos.z] )
-      {
-        this.heightmap[pos.x][pos.z]=(yPos+y)-1;
-        let blockId =  this.subchunks[yPos].blocks[pos.x][y-1][pos.z].id;
-        this.subchunks[yPos].blocks[pos.x][y-1][pos.z].skyLight=15; 
-        this.subchunks[yPos].blocks[pos.x-1][y-1][pos.z].skyLight=13; 
-          this.subchunks[yPos].blocks[pos.x+1][y-1][pos.z].skyLight=13;
-          this.subchunks[yPos].blocks[pos.x][y-1][pos.z+1].skyLight=13;
-          this.subchunks[yPos].blocks[pos.x][y-1][pos.z-1].skyLight=13;   
-        let tempPos = 0;
-        while(blockId<1)
-        {
-          tempPos+=1;
-          this.heightmap[pos.x][pos.z]=(yPos+y)-tempPos;
-          blockID =    this.subchunks[yPos].blocks[pos.x][y-tempPos][pos.z].id;
-          this.subchunks[yPos].blocks[pos.x][y-tempPos][pos.z].skyLight=15; 
-          this.subchunks[yPos].blocks[pos.x-1][y-tempPos][pos.z].skyLight=13-tempPos; 
-          this.subchunks[yPos].blocks[pos.x+1][y-tempPos][pos.z].skyLight=13-tempPos;
-          this.subchunks[yPos].blocks[pos.x][y-tempPos][pos.z+1].skyLight=13-tempPos;
-          this.subchunks[yPos].blocks[pos.x][y-tempPos][pos.z-1].skyLight=13-tempPos;   
-        }
-      }
-      else
-      {
-        let light =   this.subchunks[yPos].blocks[pos.x][y][pos.z].skyLight;
-        if( this.subchunks[yPos].blocks[pos.x+1][y][pos.z].skyLight < light-1)
-        this.subchunks[yPos].blocks[pos.x+1][y][pos.z].skyLight=light-1; 
-        if( this.subchunks[yPos].blocks[pos.x-1][y][pos.z].skyLight < light-1)
-        this.subchunks[yPos].blocks[pos.x-1][y][pos.z].skyLight=light-1; 
-        if( this.subchunks[yPos].blocks[pos.x][y][pos.z-1].skyLight < light-1)
-          this.subchunks[yPos].blocks[pos.x][y][pos.z-1].skyLight=light-1;
-          if( this.subchunks[yPos].blocks[pos.x][y][pos.z+1].skyLight < light-1)
-          this.subchunks[yPos].blocks[pos.x][y][pos.z+1].skyLight=light-1;
-          if( this.subchunks[yPos].blocks[pos.x][y-1][pos.z].skyLight < light-1)
-          this.subchunks[yPos].blocks[pos.x][y-1][pos.z].skyLight=light-1;   
-          if( this.subchunks[yPos].blocks[pos.x][y+1][pos.z].skyLight < light-1)
-          this.subchunks[yPos].blocks[pos.x][y+1][pos.z].skyLight=light-1; 
-      }
-    }
-    catch(error)
-    {
-      
-    }
-    this.subchunks[yPos].update();
-    }
-    else console.log("undefined Chunk!");
-  }
 
 }

@@ -182,6 +182,7 @@ export class Main
       let i=0;
       while(this.skyLightRemQueue.length>0)
       {  
+         console.log("processing sky light rem")
          i++;
        let node:LightNode =this.skyLightRemQueue.shift();
        if(relight.get( node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z])!=undefined)
@@ -207,6 +208,7 @@ export class Main
       relight.forEach((lightnode:LightNode)=>{this.skyLightQueue.push(lightnode)});
       while(this.skyLightQueue.length>0)
       {  
+         console.log("processing sky light")
          i++;
        let node:LightNode =this.skyLightQueue.shift();
        node.direction??=node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLightDir;
@@ -307,6 +309,7 @@ export class Main
          checkAndPush(new Vector(node.pos.x,node.pos.y,node.pos.z+1),directions.NEG_Z);
        }
       }
+      this.processSkyLight();
    }
    public static loop(time:number):void
    {
