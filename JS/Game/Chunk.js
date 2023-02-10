@@ -92,7 +92,7 @@ export class Chunk {
         if (this.neighbours["NEG_X"] != undefined && this.neighbours["POS_X"] != undefined && this.neighbours["POS_Z"] != undefined && this.neighbours["NEG_Z"] != undefined) {
             //console.log("gathered all neighbours :)")
             this.allNeighbours = true;
-            // this.postGenerate();
+            this.postGenerate();
             this.updateAllSubchunks();
         }
     }

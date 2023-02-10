@@ -101,7 +101,7 @@ constructor(x:number, z:number) {
     {
       //console.log("gathered all neighbours :)")
       this.allNeighbours = true;
-     // this.postGenerate();
+      this.postGenerate();
     this.updateAllSubchunks();
     }
   }

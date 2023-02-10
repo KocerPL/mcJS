@@ -182,6 +182,7 @@ export class Main
          //Propagate
          let checkAndPush = (pos:Vector,direction:number) =>{
             let blockInfo = node.subchunk.getBlockSub(pos);
+            if(blockInfo==undefined || blockInfo.block == undefined) return;
             if( blockInfo.block.skyLightDir == direction)
             this.skyLightRemQueue.push(new LightNode(blockInfo.pos,blockInfo.sub,node.light-1,direction,node.lpos));
             else if(blockInfo.block.skyLightDir!=directions.SOURCE &&blockInfo.block.skyLightDir!=directions.UNDEF && blockInfo.block.skyLight>1) 
@@ -218,6 +219,7 @@ export class Main
          //Propagate
          let checkAndPush = (pos:Vector,direction:number) =>{
             let blockInfo = node.subchunk.getBlockSub(pos);    
+            if(blockInfo==undefined || blockInfo.block == undefined) return;
             if(blockInfo.block.id==0 && blockInfo.block.skyLight<=node.light-1)
             this.skyLightQueue.push(new LightNode(blockInfo.pos,blockInfo.sub,node.light-1,direction,node.lpos));
             else if( blockInfo.block.skyLightDir == direction)
