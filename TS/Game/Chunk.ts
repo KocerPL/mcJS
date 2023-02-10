@@ -259,7 +259,7 @@ constructor(x:number, z:number) {
         
         if(maxIter>=0)
         {
-        console.log("Found source!!!");
+       // console.log("Found source!!!");
      
         if(!(k.sub==this.subchunks[yPos] && k.pos.x == pos.x && k.pos.y == y &&k.pos.z==pos.z))
         Main.lightQueue.push(new LightNode(k.pos,k.sub,15,directions.SOURCE,k.pos));
@@ -301,7 +301,7 @@ constructor(x:number, z:number) {
         
         if(maxIter>=0)
         {
-        console.log("Found skylight source!!!");
+       // console.log("Found skylight source!!!");
      
         if(!(k.sub==this.subchunks[yPos] && k.pos.x == pos.x && k.pos.y == y &&k.pos.z==pos.z))
         Main.skyLightQueue.push(new LightNode(k.pos,k.sub,15,directions.SOURCE,k.pos));
@@ -317,7 +317,18 @@ constructor(x:number, z:number) {
       this.subchunks[yPos].blocks[pos.x][y][pos.z].lightFBlock=0;
       this.subchunks[yPos].blocks[pos.x][y][pos.z].skyLight=0;
     if(pos.y>this.heightmap[pos.x][pos.z])
-    this.heightmap[pos.x][pos.z] = pos.y;
+    {
+     // Main.skyLightRemQueue.push(new LightNode(new Vector(pos.x,this.heightmap[pos.x][pos.z]%16,pos.z),this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)],15,directions.UNDEF,new Vector(0,0,0)))
+      while(this.heightmap[pos.x][pos.z]<pos.y)
+      { 
+      
+        this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].skyLightDir=directions.UNDEF;
+        this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].skyLight=0;
+        Main.skyLightRemQueue.push(new LightNode(new Vector(pos.x,this.heightmap[pos.x][pos.z]%16,pos.z),this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)],15,directions.UNDEF,new Vector(0,0,0)))
+        this.heightmap[pos.x][pos.z]++;
+      }
+
+    }
     }
     else{
       
@@ -325,9 +336,10 @@ constructor(x:number, z:number) {
     {
       while(this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].id==0)
       {
-        this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].skyLightDir=directions.SOURCE;
-        this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].skyLight=15;
-    this.heightmap[pos.x][pos.z]--;
+   //     this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].skyLightDir=directions.SOURCE;
+     //   this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].skyLight=15;
+     Main.skyLightQueue.push(new LightNode(new Vector(pos.x,this.heightmap[pos.x][pos.z]%16,pos.z), this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)],15,directions.SOURCE));
+     this.heightmap[pos.x][pos.z]--;
       }
       checkSkyLight =false;
     this.heightmap[pos.x][pos.z]--;
@@ -354,7 +366,7 @@ constructor(x:number, z:number) {
     this.updateSubchunkAt(pos.y);
     try
     {
-      console.log("executing block update part")
+     // console.log("executing block update part")
     if(pos.x ==0)
     {
       Main.toUpdate.add(this.neighbours["NEG_X"].subchunks[yPos]);

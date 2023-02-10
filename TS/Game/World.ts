@@ -139,6 +139,19 @@ public static height=50;
             return;
         }
     }
+  public static  getHeightMap(blockPos:Vector):number
+    {
+        let chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
+      //  console.log(chunkPos);
+        try
+        {
+        return  Main.getChunkAt(chunkPos.x,chunkPos.z).heightmap[Math.round(blockPos.x%16)][Math.round(blockPos.z%16)];
+        } 
+        catch(error)
+        {
+            console.log(error);
+        }
+    }
     public static getSubchunk(blockPos:Vector)
     {
         let chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));

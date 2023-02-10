@@ -3,7 +3,7 @@ export class Block {
     id;
     lightFBlock = 0;
     lightDir = directions.UNDEF;
-    skyLight = 1;
+    skyLight = 0;
     skyLightDir = directions.UNDEF;
     attribute;
     constructor(id) {

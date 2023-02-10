@@ -5,7 +5,7 @@ export class Block
     id:number;
    lightFBlock:number=0;
     lightDir:number = directions.UNDEF;
-    skyLight:number=1;
+    skyLight:number=0;
     skyLightDir:number = directions.UNDEF;
     attribute:Array<number>;
     constructor(id)

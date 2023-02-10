@@ -119,6 +119,16 @@ export class World {
             return;
         }
     }
+    static getHeightMap(blockPos) {
+        let chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
+        //  console.log(chunkPos);
+        try {
+            return Main.getChunkAt(chunkPos.x, chunkPos.z).heightmap[Math.round(blockPos.x % 16)][Math.round(blockPos.z % 16)];
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
     static getSubchunk(blockPos) {
         let chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
         try {

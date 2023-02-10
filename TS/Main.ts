@@ -26,7 +26,7 @@ export class LightNode
    light:number;
    direction:number;
    lpos:Vector;
-   constructor(pos:Vector,subchunk:SubChunk,light:number,direction:number,lightpos:Vector)
+   constructor(pos:Vector,subchunk:SubChunk,light:number,direction:number,lightpos?:Vector)
    {
       this.lpos = lightpos;
       this.pos = pos;
@@ -98,16 +98,6 @@ export class Main
    }
    public static run():void
    {
-      if (navigator.storage && navigator.storage.estimate) {
-         navigator.storage.estimate().then((quota)=>{
-         // quota.usage -> Number of bytes used.
-         // quota.quota -> Maximum number of bytes available.
-         const percentageUsed = (quota.usage / quota.quota) * 100;
-         console.log(`You've used ${percentageUsed}% of the available storage.`);
-         const remaining = quota.quota - quota.usage;
-         console.log(`You can write up to ${remaining} more bytes.`);
-         });
-       }
       CanvaManager.setupCanva(document.body);
     // EBO.unbind();
     // VBO.unbind();
@@ -182,7 +172,6 @@ export class Main
       let i=0;
       while(this.skyLightRemQueue.length>0)
       {  
-         console.log("processing sky light rem")
          i++;
        let node:LightNode =this.skyLightRemQueue.shift();
        if(relight.get( node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z])!=undefined)
@@ -208,7 +197,6 @@ export class Main
       relight.forEach((lightnode:LightNode)=>{this.skyLightQueue.push(lightnode)});
       while(this.skyLightQueue.length>0)
       {  
-         console.log("processing sky light")
          i++;
        let node:LightNode =this.skyLightQueue.shift();
        node.direction??=node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLightDir;
@@ -580,7 +568,8 @@ export class Main
    public static render()
    {
       this.Measure.frames++;
-      CanvaManager.debug.value = "Fps: "+this.Measure.fps+" Selected block: "+ blocks[this.player.itemsBar[this.player.selectedItem].id].name +" Count:"+this.player.itemsBar[this.player.selectedItem].count+"\n XYZ:  X:"+this.player.pos.x+"  Y:"+this.player.pos.y+"  Z:"+this.player.pos.z;
+      CanvaManager.debug.value = "Fps: "+this.Measure.fps+" Selected block: "+ blocks[this.player.itemsBar[this.player.selectedItem].id].name +" Count:"+this.player.itemsBar[this.player.selectedItem].count+
+      "\n XYZ:  X:"+this.player.pos.x+"  Y:"+this.player.pos.y+"  Z:"+this.player.pos.z+"\n HM:"+World.getHeightMap(this.player.pos);
       
       this.shader.use();
       this.player.camera.preRender();

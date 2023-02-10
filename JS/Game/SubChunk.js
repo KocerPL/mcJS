@@ -66,7 +66,7 @@ export class SubChunk {
                         this.blocks[x][y][z] = new Block(-1);
                     else if (!(this.blocks[x][y][z] instanceof Block)) {
                         this.blocks[x][y][z] = new Block(0);
-                        if (ah + 1 == (y + yPos)) {
+                        if (ah + 1 <= (y + yPos)) {
                             this.blocks[x][y][z].skyLight = 15;
                             this.blocks[x][y][z].skyLightDir = directions.SOURCE;
                         }
