@@ -82,8 +82,8 @@ export class SubChunk
        this.blocks[x][y][z]=new Block(0);
        if(ah+1==(y+yPos))
        {
-       this.blocks[x][y][z].lightLevel=15;
-       this.blocks[x][y][z].lightDir = directions.UNDEF;
+       this.blocks[x][y][z].skyLight=15;
+       this.blocks[x][y][z].lightDir = directions.SOURCE;
        }
     }
     }
@@ -112,11 +112,11 @@ export class SubChunk
       {
         if(this.blocks[x][y][z].id>0) continue;
         if(this.blocks[x][y][z].id==0) airCount--;
-        this.blocks[x][y][z].lightLevel=0;
+        this.blocks[x][y][z].skyLight=0;
         if(this.blocks[x][y][z].id==-2) this.blocks[x][y][z].id =0;
         if(y+(this.pos.y*16)>=this.chunk.heightmap[x][z]+1)
         {
-          this.blocks[x][y][z].lightLevel=15;       
+          this.blocks[x][y][z].skyLight=15;       
         }
       }
    //   if(airCount<1) this.empty=true; else this.empty=false;
@@ -302,9 +302,9 @@ export class SubChunk
                }
              }
             }
-          if( light+1<block.lightLevel)
+          if( light+1<block.skyLight)
             {
-            light = block.lightLevel-1;
+            light = block.skyLight-1;
               lightDir =dir;
           }
           if( light2+1<block.lightFBlock)
@@ -370,9 +370,9 @@ export class SubChunk
               watDir = dir;
                }
              }
-              if( light+1<block.lightLevel)
+              if( light+1<block.skyLight)
                 {
-                light = block.lightLevel-1;
+                light = block.skyLight-1;
                   lightDir =dir;
               }
               if( light2+1<block.lightFBlock)
@@ -420,7 +420,7 @@ export class SubChunk
     }
     }
       theBlock.lightDir = lightDir;
-      theBlock.lightLevel = light;
+      theBlock.skyLight = light;
       theBlock.lightFBlock = light2;
     }*/
     //DONE: update vertices only tree sides
@@ -455,7 +455,7 @@ export class SubChunk
             this.mesh.vertices.push(...temp.slice(vStart,vStart+12));
             this.mesh.tCoords.push(...SubChunk.getTextureCords(testedBlock, SubChunk.flip(side)));
             this.mesh.indices.push(index+2,index+1,index,index+2,index,index+3);
-            this.mesh.lightLevels.push(block.lightLevel,block.lightLevel,block.lightLevel,block.lightLevel);
+            this.mesh.lightLevels.push(block.skyLight,block.skyLight,block.skyLight,block.skyLight);
             this.mesh.fb.push(block.lightFBlock,block.lightFBlock,block.lightFBlock,block.lightFBlock);
             index+=4;
             
@@ -468,7 +468,7 @@ export class SubChunk
             this.mesh.vertices.push(...temp.slice(vStart,vStart+12));
             this.mesh.tCoords.push(...SubChunk.getTextureCords(block, side));
             this.mesh.indices.push(index+2,index+1,index,index+2,index,index+3);
-             this.mesh.lightLevels.push(testedBlock.lightLevel,testedBlock.lightLevel,testedBlock.lightLevel,testedBlock.lightLevel);
+             this.mesh.lightLevels.push(testedBlock.skyLight,testedBlock.skyLight,testedBlock.skyLight,testedBlock.skyLight);
             this.mesh.fb.push(testedBlock.lightFBlock,testedBlock.lightFBlock,testedBlock.lightFBlock,testedBlock.lightFBlock);
              index+=4;
             

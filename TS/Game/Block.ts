@@ -4,9 +4,9 @@ export class Block
 {
     id:number;
    lightFBlock:number=0;
-   lPos:Vector = undefined;
     lightDir:number = directions.UNDEF;
-    lightLevel:number=1;
+    skyLight:number=1;
+    skyLightDir:number = directions.UNDEF;
     attribute:Array<number>;
     constructor(id)
     {

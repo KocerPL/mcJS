@@ -172,7 +172,7 @@ export class World {
             }
             else
             {
-               let lightLevel = Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).lightLevel-1;
+               let lightLevel = Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).skyLight-1;
                if(lightLevel>1)
                {
                this.lightFunc(new Vector(blockPos.x,blockPos.y-1,blockPos.z),lightLevel);
@@ -228,9 +228,9 @@ export class World {
                    while(  Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).id==0)
                    {
                        i++;
-                       Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).lightLevel=15;
+                       Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).skyLight=15;
                    }
-                   Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).lightLevel=15;
+                   Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).skyLight=15;
                    Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i+1,inChunkPos.z)).lightDir=directions.SKYLIGHT;
                    Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y-i;
                    }
@@ -245,12 +245,12 @@ export class World {
                        while(  Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).id==0)
                        {
                            i++;
-                           Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).lightLevel=0;
+                           Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).skyLight=0;
                        }
-                       Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).lightLevel=0;
+                       Main.chunks[chunkPos.x][chunkPos.z].getBlock(new Vector(inChunkPos.x,inChunkPos.y-i,inChunkPos.z)).skyLight=0;
                        Main.chunks[chunkPos.x][chunkPos.z].heightmap[inChunkPos.x][inChunkPos.z] = inChunkPos.y;
                    }
-                   this.lightPropagation(blockPos,Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).lightLevel-1,directions.UNDEF,new Array());
+                   this.lightPropagation(blockPos,Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos).skyLight-1,directions.UNDEF,new Array());
                }
            }
            catch(error)
@@ -285,15 +285,15 @@ export class World {
         let max;
         let ind = 0;
         for (let i = 0; i < arr.length; i++) {
-            if (this.getBlock(arr[i].bl).lightDir != arr[i].negDir && (max == undefined || this.getBlock(arr[i].bl).lightLevel > this.getBlock(max.bl).lightLevel)) {
+            if (this.getBlock(arr[i].bl).lightDir != arr[i].negDir && (max == undefined || this.getBlock(arr[i].bl).skyLight > this.getBlock(max.bl).skyLight)) {
                 ind = i;
                 max = { ...arr[i] };
             }
         }
         console.log(max);
-        if (max != undefined && this.getBlock(max.bl).lightLevel - 1) {
+        if (max != undefined && this.getBlock(max.bl).skyLight - 1) {
             this.getBlock(vec).lightDir = max.dir;
-            //   this.setLight( vec,this.getBlock(max.bl).lightLevel-1);
+            //   this.setLight( vec,this.getBlock(max.bl).skyLight-1);
             for (let i = 0; i < arr.length; i++) {
                 if (this.getBlock(arr[i].bl).lightDir == arr[i].negDir) {
                     this.lightGetALG(arr[i].bl);
@@ -302,7 +302,7 @@ export class World {
         }
     }
     static lightFunc(vec, lightLevel) {
-        //  if(this.getBlock(vec).lightLevel <lightLevel)
+        //  if(this.getBlock(vec).skyLight <lightLevel)
         //  this.setLight(vec,lightLevel);
     }
     static getBlock(blockPos) {

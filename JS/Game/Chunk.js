@@ -161,7 +161,7 @@ export class Chunk {
         if (this.subchunks[yPos] != undefined) {
             if (!(this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
                 this.subchunks[yPos].blocks[pos.x][y][pos.z] = new Block(0);
-            this.subchunks[yPos].blocks[pos.x][y][pos.z].lightLevel = lightLevel;
+            this.subchunks[yPos].blocks[pos.x][y][pos.z].skyLight = lightLevel;
         }
         else {
             //   console.log("Subchunk is undefined");
@@ -197,53 +197,6 @@ export class Chunk {
          {
             if (!(this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
                 this.subchunks[yPos].blocks[pos.x][y][pos.z] = new Block(0);
-            //   let  lights:Array<LightNode> = this.subchunks[yPos-1].getLights();
-            /*    lights = lights.concat(this.subchunks[yPos+1].getLights());
-              lights = lights.concat(this.neighbours["POS_X"].subchunks[yPos+1].getLights());
-              lights = lights.concat(this.neighbours["POS_X"].subchunks[yPos].getLights());
-              lights = lights.concat(this.neighbours["POS_X"].subchunks[yPos-1].getLights());
-          
-              lights = lights.concat(this.neighbours["POS_X"].neighbours["NEG_Z"].subchunks[yPos+1].getLights());
-              lights = lights.concat(this.neighbours["POS_X"].neighbours["NEG_Z"].subchunks[yPos].getLights());
-              lights = lights.concat(this.neighbours["POS_X"].neighbours["NEG_Z"].subchunks[yPos-1].getLights());
-          
-              lights = lights.concat(this.neighbours["POS_X"].neighbours["POS_Z"].subchunks[yPos+1].getLights());
-              lights = lights.concat(this.neighbours["POS_X"].neighbours["POS_Z"].subchunks[yPos].getLights());
-              lights = lights.concat(this.neighbours["POS_X"].neighbours["POS_Z"].subchunks[yPos-1].getLights());
-          
-              lights = lights.concat(this.neighbours["NEG_X"].neighbours["NEG_Z"].subchunks[yPos+1].getLights());
-              lights = lights.concat(this.neighbours["NEG_X"].neighbours["NEG_Z"].subchunks[yPos].getLights());
-              lights = lights.concat(this.neighbours["NEG_X"].neighbours["NEG_Z"].subchunks[yPos-1].getLights());
-          
-              lights = lights.concat(this.neighbours["NEG_X"].neighbours["POS_Z"].subchunks[yPos+1].getLights());
-              lights = lights.concat(this.neighbours["NEG_X"].neighbours["POS_Z"].subchunks[yPos].getLights());
-              lights = lights.concat(this.neighbours["NEG_X"].neighbours["POS_Z"].subchunks[yPos-1].getLights());
-          
-              lights = lights.concat(this.neighbours["NEG_X"].subchunks[yPos+1].getLights());
-              lights = lights.concat(this.neighbours["NEG_X"].subchunks[yPos].getLights());
-              lights = lights.concat(this.neighbours["NEG_X"].subchunks[yPos-1].getLights());
-          
-              lights = lights.concat(this.neighbours["POS_Z"].subchunks[yPos+1].getLights());
-              lights = lights.concat(this.neighbours["POS_Z"].subchunks[yPos].getLights());
-              lights = lights.concat(this.neighbours["POS_Z"].subchunks[yPos-1].getLights());
-          
-              lights = lights.concat(this.neighbours["NEG_Z"].subchunks[yPos+1].getLights());
-              lights = lights.concat(this.neighbours["NEG_Z"].subchunks[yPos].getLights());
-              lights = lights.concat(this.neighbours["NEG_Z"].subchunks[yPos-1].getLights());*/
-            /*   let remlights = this.subchunks[yPos].getLights().concat(lights);
-               for(let light of remlights)
-             {
-             //  console.log("Found light, refreshing...");
-               Main.lightRemQueue.push(light);
-             }
-          
-             this.subchunks[yPos].refreshLights();
-              lights = lights.concat(this.subchunks[yPos].getLights());
-             for(let light of lights)
-             {
-               if(Vector.distance(light.pos,new Vector(pos.x,y,pos.z))<16)
-             Main.lightQueue.push(light);
-             }*/
             this.subchunks[yPos].blocks[pos.x][y][pos.z].id = blockID;
             let pushLight = (vec, sub) => {
                 sub ??= this.subchunks[yPos];
@@ -279,10 +232,51 @@ export class Chunk {
                         //  console.log("stuck in while!!!",blockPos);
                     }
                     if (maxIter >= 0) {
-                        //  console.log("Found source!!!");
-                        Main.lightRemQueue.push(new LightNode(k.pos, k.sub, 15, directions.UNDEF, k.pos));
+                        console.log("Found source!!!");
                         if (!(k.sub == this.subchunks[yPos] && k.pos.x == pos.x && k.pos.y == y && k.pos.z == pos.z))
                             Main.lightQueue.push(new LightNode(k.pos, k.sub, 15, directions.SOURCE, k.pos));
+                        else
+                            Main.lightRemQueue.push(new LightNode(k.pos, k.sub, 15, directions.UNDEF, k.pos));
+                    }
+                }
+                sub ??= this.subchunks[yPos];
+                //  let maxIter = 100
+                if (sub.blocks[vec.x][vec.y][vec.z].skyLightDir != directions.UNDEF) {
+                    let blockPos = new Vector(vec.x, vec.y, vec.z);
+                    let k = sub.getBlockSub(blockPos);
+                    while (k.block.skyLightDir != directions.SOURCE) {
+                        blockPos = k.pos;
+                        switch (k.block.skyLightDir) {
+                            case directions.NEG_X:
+                                blockPos.x--;
+                                break;
+                            case directions.POS_X:
+                                blockPos.x++;
+                                break;
+                            case directions.NEG_Y:
+                                blockPos.y--;
+                                break;
+                            case directions.POS_Y:
+                                blockPos.y++;
+                                break;
+                            case directions.NEG_Z:
+                                blockPos.z--;
+                                break;
+                            case directions.POS_Z:
+                                blockPos.z++;
+                                break;
+                        }
+                        if (maxIter-- < 0)
+                            break;
+                        k = k.sub.getBlockSub(blockPos);
+                        //  console.log("stuck in while!!!",blockPos);
+                    }
+                    if (maxIter >= 0) {
+                        console.log("Found source!!!");
+                        if (!(k.sub == this.subchunks[yPos] && k.pos.x == pos.x && k.pos.y == y && k.pos.z == pos.z))
+                            Main.skyLightQueue.push(new LightNode(k.pos, k.sub, 15, directions.SOURCE, k.pos));
+                        else
+                            Main.skyLightRemQueue.push(new LightNode(k.pos, k.sub, 15, directions.UNDEF, k.pos));
                     }
                 }
             };
@@ -304,7 +298,7 @@ export class Chunk {
             }
             if (blockID != 0) {
                 this.subchunks[yPos].blocks[pos.x][y][pos.z].lightFBlock = 0;
-                this.subchunks[yPos].blocks[pos.x][y][pos.z].lightLevel = 0;
+                this.subchunks[yPos].blocks[pos.x][y][pos.z].skyLight = 0;
                 if (pos.y > this.heightmap[pos.x][pos.z])
                     this.heightmap[pos.x][pos.z] = pos.y;
             }
@@ -364,37 +358,37 @@ export class Chunk {
                 if (yPos + y >= this.heightmap[pos.x][pos.z]) {
                     this.heightmap[pos.x][pos.z] = (yPos + y) - 1;
                     let blockId = this.subchunks[yPos].blocks[pos.x][y - 1][pos.z].id;
-                    this.subchunks[yPos].blocks[pos.x][y - 1][pos.z].lightLevel = 15;
-                    this.subchunks[yPos].blocks[pos.x - 1][y - 1][pos.z].lightLevel = 13;
-                    this.subchunks[yPos].blocks[pos.x + 1][y - 1][pos.z].lightLevel = 13;
-                    this.subchunks[yPos].blocks[pos.x][y - 1][pos.z + 1].lightLevel = 13;
-                    this.subchunks[yPos].blocks[pos.x][y - 1][pos.z - 1].lightLevel = 13;
+                    this.subchunks[yPos].blocks[pos.x][y - 1][pos.z].skyLight = 15;
+                    this.subchunks[yPos].blocks[pos.x - 1][y - 1][pos.z].skyLight = 13;
+                    this.subchunks[yPos].blocks[pos.x + 1][y - 1][pos.z].skyLight = 13;
+                    this.subchunks[yPos].blocks[pos.x][y - 1][pos.z + 1].skyLight = 13;
+                    this.subchunks[yPos].blocks[pos.x][y - 1][pos.z - 1].skyLight = 13;
                     let tempPos = 0;
                     while (blockId < 1) {
                         tempPos += 1;
                         this.heightmap[pos.x][pos.z] = (yPos + y) - tempPos;
                         blockID = this.subchunks[yPos].blocks[pos.x][y - tempPos][pos.z].id;
-                        this.subchunks[yPos].blocks[pos.x][y - tempPos][pos.z].lightLevel = 15;
-                        this.subchunks[yPos].blocks[pos.x - 1][y - tempPos][pos.z].lightLevel = 13 - tempPos;
-                        this.subchunks[yPos].blocks[pos.x + 1][y - tempPos][pos.z].lightLevel = 13 - tempPos;
-                        this.subchunks[yPos].blocks[pos.x][y - tempPos][pos.z + 1].lightLevel = 13 - tempPos;
-                        this.subchunks[yPos].blocks[pos.x][y - tempPos][pos.z - 1].lightLevel = 13 - tempPos;
+                        this.subchunks[yPos].blocks[pos.x][y - tempPos][pos.z].skyLight = 15;
+                        this.subchunks[yPos].blocks[pos.x - 1][y - tempPos][pos.z].skyLight = 13 - tempPos;
+                        this.subchunks[yPos].blocks[pos.x + 1][y - tempPos][pos.z].skyLight = 13 - tempPos;
+                        this.subchunks[yPos].blocks[pos.x][y - tempPos][pos.z + 1].skyLight = 13 - tempPos;
+                        this.subchunks[yPos].blocks[pos.x][y - tempPos][pos.z - 1].skyLight = 13 - tempPos;
                     }
                 }
                 else {
-                    let light = this.subchunks[yPos].blocks[pos.x][y][pos.z].lightLevel;
-                    if (this.subchunks[yPos].blocks[pos.x + 1][y][pos.z].lightLevel < light - 1)
-                        this.subchunks[yPos].blocks[pos.x + 1][y][pos.z].lightLevel = light - 1;
-                    if (this.subchunks[yPos].blocks[pos.x - 1][y][pos.z].lightLevel < light - 1)
-                        this.subchunks[yPos].blocks[pos.x - 1][y][pos.z].lightLevel = light - 1;
-                    if (this.subchunks[yPos].blocks[pos.x][y][pos.z - 1].lightLevel < light - 1)
-                        this.subchunks[yPos].blocks[pos.x][y][pos.z - 1].lightLevel = light - 1;
-                    if (this.subchunks[yPos].blocks[pos.x][y][pos.z + 1].lightLevel < light - 1)
-                        this.subchunks[yPos].blocks[pos.x][y][pos.z + 1].lightLevel = light - 1;
-                    if (this.subchunks[yPos].blocks[pos.x][y - 1][pos.z].lightLevel < light - 1)
-                        this.subchunks[yPos].blocks[pos.x][y - 1][pos.z].lightLevel = light - 1;
-                    if (this.subchunks[yPos].blocks[pos.x][y + 1][pos.z].lightLevel < light - 1)
-                        this.subchunks[yPos].blocks[pos.x][y + 1][pos.z].lightLevel = light - 1;
+                    let light = this.subchunks[yPos].blocks[pos.x][y][pos.z].skyLight;
+                    if (this.subchunks[yPos].blocks[pos.x + 1][y][pos.z].skyLight < light - 1)
+                        this.subchunks[yPos].blocks[pos.x + 1][y][pos.z].skyLight = light - 1;
+                    if (this.subchunks[yPos].blocks[pos.x - 1][y][pos.z].skyLight < light - 1)
+                        this.subchunks[yPos].blocks[pos.x - 1][y][pos.z].skyLight = light - 1;
+                    if (this.subchunks[yPos].blocks[pos.x][y][pos.z - 1].skyLight < light - 1)
+                        this.subchunks[yPos].blocks[pos.x][y][pos.z - 1].skyLight = light - 1;
+                    if (this.subchunks[yPos].blocks[pos.x][y][pos.z + 1].skyLight < light - 1)
+                        this.subchunks[yPos].blocks[pos.x][y][pos.z + 1].skyLight = light - 1;
+                    if (this.subchunks[yPos].blocks[pos.x][y - 1][pos.z].skyLight < light - 1)
+                        this.subchunks[yPos].blocks[pos.x][y - 1][pos.z].skyLight = light - 1;
+                    if (this.subchunks[yPos].blocks[pos.x][y + 1][pos.z].skyLight < light - 1)
+                        this.subchunks[yPos].blocks[pos.x][y + 1][pos.z].skyLight = light - 1;
                 }
             }
             catch (error) {
