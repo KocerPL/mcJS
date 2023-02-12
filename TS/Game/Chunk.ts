@@ -30,7 +30,7 @@ export class Chunk {
   generated:boolean = false;
   generatingIndex:number =0;
   sended:boolean =false;
-  lazy:boolean =false;
+  lazy:boolean =true;
   pos:Vector;
   mesh:Mesh;
   vao:VAO;
@@ -62,6 +62,8 @@ constructor(x:number, z:number) {
     for(let i =0; i<16;i++)
     {
       this.heightmap[i] = new Array(16);
+      for(let j=0;j<16;j++)
+      this.heightmap[i][j]= World.getHeight((x*16)+i,(z*16)+j);
     }
   // this.preGenSubchunks();
     // console.log("done constructing");
@@ -70,7 +72,7 @@ constructor(x:number, z:number) {
   {
     if(this.generatingIndex>=16) return;
     this.subchunks[this.generatingIndex] = new SubChunk(new Vector(this.pos.x, this.generatingIndex, this.pos.z),this);
-    this.subchunks[this.generatingIndex].preGenerate(this.heightmap);
+    this.subchunks[this.generatingIndex].preGenerate();
     this.generatingIndex++;
     if(this.generatingIndex>=16){ 
       this.generated =true;}
@@ -79,7 +81,7 @@ constructor(x:number, z:number) {
   {
     for (let i = 0; i < 16; i++) {
       this.subchunks[i] = new SubChunk(new Vector(this.pos.x, i, this.pos.z),this);
-      this.subchunks[i].preGenerate(this.heightmap);
+      this.subchunks[i].preGenerate();
      }
      this.generated=true;
     
@@ -141,7 +143,7 @@ constructor(x:number, z:number) {
     this.ebo.bufferData(this.mesh.indices);
   }
   render() {
-    if(!this.lazy)
+    if(this.allNeighbours)
     {
     this.vao.bind();
     Main.shader.loadTransformation(this.transformation);

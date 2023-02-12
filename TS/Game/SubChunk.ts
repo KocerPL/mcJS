@@ -38,29 +38,14 @@ export class SubChunk
       this.lightNodes.push(new LightNode(new Vector(x,y,z),this,15,directions.SOURCE,new Vector(x,y,z)));
     }
   }
-  getLights():Array<LightNode>
-    {
-      return this.lightNodes;
-      let lights = new Array();
-      for(let x:number=0;x<16;x++)
-      for(let y:number=0;y<16;y++)
-      for(let z:number=0;z<16;z++)
-      if(this.blocks[x][y][z].id==10)
-      {
-        lights.push(new LightNode(new Vector(x,y,z),this,15,directions.SOURCE,new Vector(x,y,z)));
-      }
-      return lights;
-    }
- preGenerate(heightmap) //Generation method
+ preGenerate() //Generation method
     {
       //setting position according to subchunk pos in world
       let yPos =this.pos.y*16;
-      let xPos =this.pos.x*16;
-      let zPos =this.pos.z*16;
      //Iterating for each block
      for(let x =0;x<16;x++) for(let y=0;y<16;y++) for(let z=0;z<16;z++)
      {
-       let ah = World.getHeight(x+xPos,z+zPos)
+       let ah = this.chunk.heightmap[x][z];
        if(ah-3>=(y+yPos)) // if position lower than 3 blocks on heightmap
        {
         if(Math.round(Math.random()*10) ==1)  //Randomizing greenstone ores
@@ -72,7 +57,6 @@ export class SubChunk
        this.blocks[x][y][z]=new Block(1);//Setting Grass block
        else if(ah>=(y+yPos))
        {
-         heightmap[x][z] = ah;
        this.blocks[x][y][z]=new Block(2);
       }
        else if( World.waterLevel>y+yPos)
@@ -87,7 +71,6 @@ export class SubChunk
        }
     }
     }
-    this.refreshLights()
     this.generated=true;
     }
     postGenerate(heightmap)

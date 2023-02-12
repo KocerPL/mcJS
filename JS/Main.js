@@ -527,10 +527,8 @@ export class Main {
         gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.blocksGridTest);
         Main.shader.loadUniforms(Main.player.camera.getProjection(), Matrix.identity(), Main.player.camera.getView(), Main.sunLight);
         for (let chunk of this.loadedChunks) {
-            if (!chunk.lazy) {
-                chunk.render();
-                // toRender.push(()=>{chunk.renderWater()});
-            }
+            chunk.render();
+            // toRender.push(()=>{chunk.renderWater()});
         }
         for (let i = 0; i < this.entities.length; i++) {
             this.entities[i].render();
