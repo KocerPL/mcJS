@@ -9,9 +9,12 @@ float fogDistance =60.0;
 in float pass_Light;
 //uniform vec3 lightPos;
 uniform sampler2DArray tex;
-in float cdistance;// Center distance
+in vec3 pass_center;
+in vec3 pass_ready;
+float cdistance;// Center distance
 void main()
 {
+  cdistance = length(pass_center - pass_ready); // Distance from center calculation
   //  vec3 norm = normalize(pass_Normal);
 //vec3 lightDir =normalize(lightPos - FragPos);  
 //float diff = max(dot(norm, lightDir), 0.0);
