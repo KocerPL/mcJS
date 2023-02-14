@@ -171,7 +171,7 @@ export class SubChunk
             temp2.push((SubChunk.defVertices[i+1]/(4*(15/block.skyLight)))+y+(this.pos.y*16));
             temp2.push((SubChunk.defVertices[i+2]/(4*(15/block.skyLight)))+z);
         }
-      /*  if(block.skyLightDir==directions.SOURCE)
+       /*if(block.skyLightDir==directions.SOURCE)
         {
         this.mesh.vertices.push(...temp2.slice(0,12));
         this.mesh.tCoords.push(...SubChunk.getTextureCordsInd(11));

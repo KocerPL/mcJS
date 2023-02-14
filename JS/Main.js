@@ -31,7 +31,7 @@ export class LightNode {
     }
 }
 export class Main {
-    static maxChunks = 9;
+    static maxChunks = 128;
     static maxSubUpdates = 10;
     static okok = false;
     static dispLl = false;
@@ -279,11 +279,6 @@ export class Main {
         this.processSkyLight();
     }
     static loop(time) {
-        let test = this.lastFrame - time;
-        if (test < 1000 / this.FPS) {
-            this.Measure.lastLimit = time;
-            this.limitChunks();
-        }
         if (this.Measure.lastTime <= time - 1000)
             this.resetMeasure(time);
         let delta = time - this.lastTick;
@@ -320,6 +315,11 @@ export class Main {
         this.render();
         this.lastFrame = time;
         requestAnimationFrame(this.loop.bind(this));
+        let test = this.lastFrame - time;
+        if (test < 1000 / this.FPS) {
+            this.Measure.lastLimit = time;
+            this.limitChunks();
+        }
     }
     static fastUpdate() {
         this.player.update();
@@ -517,8 +517,8 @@ export class Main {
     }
     static render() {
         this.Measure.frames++;
-        CanvaManager.debug.value = "Fps: " + this.Measure.fps + " Selected block: " + blocks[this.player.itemsBar[this.player.selectedItem].id].name + " Count:" + this.player.itemsBar[this.player.selectedItem].count +
-            "\n XYZ:  X:" + this.player.pos.x + "  Y:" + this.player.pos.y + "  Z:" + this.player.pos.z + "\n HM:" + World.getHeightMap(this.player.pos) + "Fast break: " + this.fastBreaking;
+        CanvaManager.debug.innerText = "Fps: " + this.Measure.fps + " Selected block: " + blocks[this.player.itemsBar[this.player.selectedItem].id].name + " Count:" + this.player.itemsBar[this.player.selectedItem].count +
+            "\n XYZ:  X:" + (Math.floor(this.player.pos.x * 100) / 100) + "  Y:" + (Math.floor(this.player.pos.y * 100) / 100) + "  Z:" + (Math.floor(this.player.pos.z * 100) / 100) + "\n HM:" + World.getHeightMap(this.player.pos) + "\nFast break [7]: " + this.fastBreaking + "\n Sky light [4][5]:" + this.sunLight;
         this.shader.use();
         this.player.camera.preRender();
         this.shader.setFogCenter(this.player.camera.getPosition());

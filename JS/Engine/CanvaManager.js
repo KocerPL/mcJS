@@ -5,7 +5,7 @@ export class CanvaManager {
     static WIDTH = window.innerWidth;
     static rPointer = true;
     static gl = this.canva.getContext("webgl2");
-    static debug = document.createElement("output");
+    static debug = document.createElement("span");
     static proportion = 1024 / 1920;
     static keys = new Array(100);
     static mouseMovement = new Vector(0, 0, 0);

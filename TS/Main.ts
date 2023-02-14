@@ -38,7 +38,7 @@ export class LightNode
 }
 export class Main
 {
-   public static maxChunks =9;
+   public static maxChunks =128;
    public static maxSubUpdates = 10;
       public static okok = false;
    public static dispLl = false;
@@ -303,12 +303,7 @@ export class Main
    }
    public static loop(time:number):void
    {
-      let test =this.lastFrame-time;
-      if(test<1000/this.FPS)
-      {
-         this.Measure.lastLimit=time;
-      this.limitChunks();
-      }
+
       
    
       if(this.Measure.lastTime <= time-1000)
@@ -350,6 +345,12 @@ export class Main
       this.render();
       this.lastFrame= time;
       requestAnimationFrame(this.loop.bind(this));
+      let test =this.lastFrame-time;
+      if(test<1000/this.FPS)
+      {
+         this.Measure.lastLimit=time;
+      this.limitChunks();
+      }
    }
    private static fastUpdate()
    {
@@ -570,8 +571,8 @@ export class Main
    public static render()
    {
       this.Measure.frames++;
-      CanvaManager.debug.value = "Fps: "+this.Measure.fps+" Selected block: "+ blocks[this.player.itemsBar[this.player.selectedItem].id].name +" Count:"+this.player.itemsBar[this.player.selectedItem].count+
-      "\n XYZ:  X:"+this.player.pos.x+"  Y:"+this.player.pos.y+"  Z:"+this.player.pos.z+"\n HM:"+World.getHeightMap(this.player.pos)+"Fast break: "+this.fastBreaking;
+      CanvaManager.debug.innerText = "Fps: "+this.Measure.fps+" Selected block: "+ blocks[this.player.itemsBar[this.player.selectedItem].id].name +" Count:"+this.player.itemsBar[this.player.selectedItem].count+
+      "\n XYZ:  X:"+(Math.floor(this.player.pos.x*100)/100)+"  Y:"+(Math.floor(this.player.pos.y*100)/100)+"  Z:"+(Math.floor(this.player.pos.z*100)/100)+"\n HM:"+World.getHeightMap(this.player.pos)+"\nFast break [7]: "+this.fastBreaking+"\n Sky light [4][5]:"+this.sunLight;
       
       this.shader.use();
       this.player.camera.preRender();

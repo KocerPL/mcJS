@@ -312,6 +312,7 @@ constructor(x:number, z:number) {
       
     }
     let checkSkyLight:boolean =true;
+    let lightBlocks = new Array();
     if(blockID!=0 )
     {
       this.subchunks[yPos].blocks[pos.x][y][pos.z].lightFBlock=0;
@@ -325,6 +326,10 @@ constructor(x:number, z:number) {
         this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].skyLightDir=directions.UNDEF;
         this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].skyLight=0;
         Main.skyLightRemQueue.push(new LightNode(new Vector(pos.x,this.heightmap[pos.x][pos.z]%16,pos.z),this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)],15,directions.UNDEF,new Vector(0,0,0)))
+    // lightBlocks.push( this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].getBlockSub(new Vector(pos.x+1,this.heightmap[pos.x][pos.z]%16,pos.z)));
+      //lightBlocks.push( this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].getBlockSub(new Vector(pos.x-1,this.heightmap[pos.x][pos.z]%16,pos.z)));
+      //lightBlocks.push( this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].getBlockSub(new Vector(pos.x,this.heightmap[pos.x][pos.z]%16,pos.z+1)));
+      //lightBlocks.push( this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].getBlockSub(new Vector(pos.x,this.heightmap[pos.x][pos.z]%16,pos.z-1)));
         this.heightmap[pos.x][pos.z]++;
       }
 
@@ -345,6 +350,8 @@ constructor(x:number, z:number) {
     this.heightmap[pos.x][pos.z]--;
     }
   }
+  for(let k of lightBlocks)
+  pushLight(k.pos,true,k.sub);
   
    pushLight(new Vector(pos.x,y,pos.z),checkSkyLight);
       if(pos.x>0)
