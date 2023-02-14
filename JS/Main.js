@@ -31,7 +31,7 @@ export class LightNode {
     }
 }
 export class Main {
-    static maxChunks = 121;
+    static maxChunks = 9;
     static maxSubUpdates = 10;
     static okok = false;
     static dispLl = false;
