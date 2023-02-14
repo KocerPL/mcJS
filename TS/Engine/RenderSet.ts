@@ -13,7 +13,8 @@ export class RenderSet
     index:number = 0;
     vertices:Array<number> = new Array();
     textureCoords:Array<number> = new Array();
-    lightLevels:Array<number> = new Array();
+    skyLight:Array<number> = new Array();
+    blockLight:Array<number> = new Array();
     indices:Array<number> = new Array();
     count:number=0;
     constructor()
@@ -36,22 +37,23 @@ export class RenderSet
         VBO.unbind();
         EBO.unbind();
     }
-    bufferArrays(vertices:Array<number>,textureCoords:Array<number>,light:Array<number>,indices:Array<number>)
+    bufferArrays()
     {
         this.vao.bind();
-        this.vbo.bufferData(vertices);
-        this.vtc.bufferData(textureCoords);
-        this.vlo.bufferData(light);
-        this.vfb.bufferData(light);
-        this.ebo.bufferData(indices);
+        this.vbo.bufferData(this.vertices);
+        this.vtc.bufferData(this.textureCoords);
+        this.vlo.bufferData(this.skyLight);
+        this.vfb.bufferData(this.blockLight);
+        this.ebo.bufferData(this.indices);
         VAO.unbind();
-        this.count=indices.length;
+        this.count=this.indices.length;
     }
-    add(vertices:Array<number>,textureCoords:Array<number>,lightLevels:Array<number>,indices:Array<number>,index:number)
+    add(vertices:Array<number>,textureCoords:Array<number>,skyLight:Array<number>,blockLight:Array<number>,indices:Array<number>,index:number)
     {
         this.vertices = this.vertices.concat(vertices);
         this.textureCoords = this.textureCoords.concat(textureCoords);
-        this.lightLevels = this.lightLevels.concat(lightLevels);
+        this.skyLight = this.skyLight.concat(skyLight);
+        this.blockLight =this.blockLight.concat(blockLight);
         this.indices= this.indices.concat(indices);
         this.index+=index; 
     }
@@ -59,7 +61,8 @@ export class RenderSet
     {
         this.vertices = new Array();
         this.textureCoords = new Array();
-       this.lightLevels = new Array();
+       this.skyLight = new Array();
+       this.blockLight = new Array();
         this.indices = new Array();
         this.index=0;
     }

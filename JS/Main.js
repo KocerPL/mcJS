@@ -342,7 +342,7 @@ export class Main {
         if (CanvaManager.getKeyOnce(54))
             this.exportChunks();
         if (CanvaManager.getKeyOnce(55))
-            this.upload();
+            this.fastBreaking = !this.fastBreaking;
     }
     static async limitChunks() {
         let x = Math.floor(Math.round(this.player.pos.x) / 16);
@@ -518,7 +518,7 @@ export class Main {
     static render() {
         this.Measure.frames++;
         CanvaManager.debug.value = "Fps: " + this.Measure.fps + " Selected block: " + blocks[this.player.itemsBar[this.player.selectedItem].id].name + " Count:" + this.player.itemsBar[this.player.selectedItem].count +
-            "\n XYZ:  X:" + this.player.pos.x + "  Y:" + this.player.pos.y + "  Z:" + this.player.pos.z + "\n HM:" + World.getHeightMap(this.player.pos);
+            "\n XYZ:  X:" + this.player.pos.x + "  Y:" + this.player.pos.y + "  Z:" + this.player.pos.z + "\n HM:" + World.getHeightMap(this.player.pos) + "Fast break: " + this.fastBreaking;
         this.shader.use();
         this.player.camera.preRender();
         this.shader.setFogCenter(this.player.camera.getPosition());

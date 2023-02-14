@@ -3,6 +3,7 @@ import { CanvaManager } from "../Engine/CanvaManager.js";
 import { EBO } from "../Engine/EBO.js";
 import { RenderSet } from "../Engine/RenderSet.js";
 import { Texture } from "../Engine/Texture.js";
+import { randRange } from "../Engine/Utils/Math.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { VAO } from "../Engine/VAO.js";
@@ -132,7 +133,12 @@ export class Player {
                 let k = 4 * i;
                 indices = indices.concat([2 + k, 1 + k, k, 2 + k, 0 + k, 3 + k]);
             }
-            this.blockOverlay.bufferArrays(vertices, textureCoords, light, indices);
+            this.blockOverlay.blockLight = light;
+            this.blockOverlay.textureCoords = textureCoords;
+            this.blockOverlay.skyLight = light;
+            this.blockOverlay.vertices = vertices;
+            this.blockOverlay.indices = indices;
+            this.blockOverlay.bufferArrays();
         }
         else
             this.blockOverlay.count = 0;
@@ -427,7 +433,7 @@ export class Player {
                     this.targetedBlock = block;
                 }
                 if ((Date.now() / 1000) - blocks[this.targetedBlock.id].breakTime >= this.startTime || Main.fastBreaking) {
-                    let middle = blockPos.round(); // Vector.add(blockPos.round(),new Vector(randRange(-0.2,0.2),randRange(-0.2,0.2),randRange(-0.2,0.2)));
+                    let middle = Vector.add(blockPos.round(), new Vector(randRange(-0.2, 0.2), randRange(-0.2, 0.2), randRange(-0.2, 0.2)));
                     Main.entities.push(new Item(middle, World.getBlock(blockPos).id));
                     World.setBlockNoLight(blockPos, 0, true);
                     this.targetedBlock = null;

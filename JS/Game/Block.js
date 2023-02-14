@@ -84,7 +84,7 @@ export var blocks = [
             left: 6,
             right: 6
         },
-        breakTime: 10
+        breakTime: 5
     },
     {
         name: "Light blue",

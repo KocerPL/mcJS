@@ -38,9 +38,11 @@ export class Item extends Entity {
         if (this.lifeTime < 1)
             Main.entities.splice(i, 1);
         let block = World.getBlock(new Vector(this.pos.x, this.pos.y, this.pos.z));
-        let ll = Math.max(block.skyLight, block.lightFBlock);
-        this.rs.lightLevels = [ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll];
-        this.rs.bufferArrays(this.rs.vertices, this.rs.textureCoords, this.rs.lightLevels, this.rs.indices);
+        let ll = block.skyLight;
+        this.rs.skyLight = [ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll];
+        ll = block.lightFBlock;
+        this.rs.blockLight = [ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll];
+        this.rs.bufferArrays();
     }
     prepareModel() {
         this.rs.vertices = [...SubChunk.defVertices];
@@ -50,7 +52,7 @@ export class Item extends Entity {
         //     console.log(this.rs.textureCoords);
         this.rs.indices = [2, 1, 0, 2, 0, 3,
             6, 5, 4, 6, 4, 7, 10, 9, 8, 10, 8, 11, 14, 13, 12, 14, 12, 15, 18, 17, 16, 18, 16, 19, 22, 21, 20, 22, 20, 23];
-        this.rs.lightLevels = [14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14];
+        this.rs.skyLight = [14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14];
     }
     isTouching(vec, offset) {
         offset ??= 0;
@@ -85,14 +87,14 @@ export class Item extends Entity {
         gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.blocksGridTest);
         this.rs.vao.bind();
         // Main.shader.use();
-        Main.shader.loadUniforms(Main.player.camera.getProjection(), this.transformation, Main.player.camera.getView(), 15);
+        Main.shader.loadUniforms(Main.player.camera.getProjection(), this.transformation, Main.player.camera.getView(), Main.sunLight);
         //     Main.shader.use();
         gl.drawElements(gl.TRIANGLES, this.rs.count, gl.UNSIGNED_INT, 0);
         if (this.count > 1) {
             gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.blocksGridTest);
             this.rs.vao.bind();
             this.transformation = this.transformation.translate(0.3, -0.3, 0.3);
-            Main.shader.loadUniforms(Main.player.camera.getProjection(), this.transformation, Main.player.camera.getView(), 15);
+            Main.shader.loadUniforms(Main.player.camera.getProjection(), this.transformation, Main.player.camera.getView(), Main.sunLight);
             gl.drawElements(gl.TRIANGLES, this.rs.count, gl.UNSIGNED_INT, 0);
         }
     }

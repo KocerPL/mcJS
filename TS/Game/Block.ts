@@ -88,7 +88,7 @@ breakTime:2
         left:6,
         right:6
     },
-    breakTime:10
+    breakTime:5
 },
 {//7
     name:"Light blue",

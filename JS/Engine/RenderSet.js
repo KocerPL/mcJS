@@ -11,7 +11,8 @@ export class RenderSet {
     index = 0;
     vertices = new Array();
     textureCoords = new Array();
-    lightLevels = new Array();
+    skyLight = new Array();
+    blockLight = new Array();
     indices = new Array();
     count = 0;
     constructor() {
@@ -29,27 +30,29 @@ export class RenderSet {
         VBO.unbind();
         EBO.unbind();
     }
-    bufferArrays(vertices, textureCoords, light, indices) {
+    bufferArrays() {
         this.vao.bind();
-        this.vbo.bufferData(vertices);
-        this.vtc.bufferData(textureCoords);
-        this.vlo.bufferData(light);
-        this.vfb.bufferData(light);
-        this.ebo.bufferData(indices);
+        this.vbo.bufferData(this.vertices);
+        this.vtc.bufferData(this.textureCoords);
+        this.vlo.bufferData(this.skyLight);
+        this.vfb.bufferData(this.blockLight);
+        this.ebo.bufferData(this.indices);
         VAO.unbind();
-        this.count = indices.length;
+        this.count = this.indices.length;
     }
-    add(vertices, textureCoords, lightLevels, indices, index) {
+    add(vertices, textureCoords, skyLight, blockLight, indices, index) {
         this.vertices = this.vertices.concat(vertices);
         this.textureCoords = this.textureCoords.concat(textureCoords);
-        this.lightLevels = this.lightLevels.concat(lightLevels);
+        this.skyLight = this.skyLight.concat(skyLight);
+        this.blockLight = this.blockLight.concat(blockLight);
         this.indices = this.indices.concat(indices);
         this.index += index;
     }
     resetArrays() {
         this.vertices = new Array();
         this.textureCoords = new Array();
-        this.lightLevels = new Array();
+        this.skyLight = new Array();
+        this.blockLight = new Array();
         this.indices = new Array();
         this.index = 0;
     }
