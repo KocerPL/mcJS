@@ -170,12 +170,8 @@ export class Chunk {
         }
     }
     updateAllSubchunks() {
-        if (!this.allNeighbours)
-            return;
-        for (let i = 0; i < this.subchunks.length; i++) {
-            this.subchunks[i].update();
-        }
-        this.updateMesh();
+        for (let sub of this.subchunks)
+            Main.toUpdate.add(sub);
         // console.log("now not lazy hehehehe")
     }
     getSubchunk(y) {

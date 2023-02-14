@@ -500,7 +500,8 @@ console.log(error);
             this.targetedBlock = block;
         }
         if((Date.now()/1000)-blocks[this.targetedBlock.id].breakTime>=this.startTime || Main.fastBreaking)
-        {  Main.entities.push(new Item(new Vector(blockPos.x+randRange(-0.2,0.2),blockPos.y,blockPos.z+randRange(-0.2,0.2)),World.getBlock(blockPos).id));
+        { let middle =blockPos.round();// Vector.add(blockPos.round(),new Vector(randRange(-0.2,0.2),randRange(-0.2,0.2),randRange(-0.2,0.2)));
+              Main.entities.push(new Item(middle,World.getBlock(blockPos).id));
        World.setBlockNoLight(blockPos,0,true);
      
     this.targetedBlock=null;    

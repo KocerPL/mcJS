@@ -7,6 +7,7 @@ import { Shader2d } from "./Engine/Shader/Shader2d.js";
 import { Task } from "./Engine/Task.js";
 import { Texture } from "./Engine/Texture.js";
 import { Array3D } from "./Engine/Utils/Array3D.js";
+import { randRange } from "./Engine/Utils/Math.js";
 import { Matrix } from "./Engine/Utils/Matrix.js";
 import { Vector } from "./Engine/Utils/Vector.js";
 import { VAO } from "./Engine/VAO.js";
@@ -38,9 +39,10 @@ export class LightNode
 export class Main
 {
    public static maxChunks =121;
+   public static maxSubUpdates = 10;
       public static okok = false;
    public static dispLl = false;
-   public static fastBreaking=true;
+   public static fastBreaking=false;
    public static FPS:number=61;
    public static fastTPS=60;
    public static minimalStorage = new Array();
@@ -98,6 +100,7 @@ export class Main
    }
    public static run():void
    {
+    console.log("Random:", randRange(-0.2,0.2))
       CanvaManager.setupCanva(document.body);
     // EBO.unbind();
     // VBO.unbind();
@@ -139,17 +142,6 @@ export class Main
      requestAnimationFrame(this.loop.bind(this));
     
    }
-   public static addTask(task:Task,priority)
-   {
-      this.tasks[priority].push(task);
-   }
-   public static cancelTasks(caller,label:string|undefined)
-   {
-      for(let x=0;x<this.tasks.length;x++)
-      for(let y= this.tasks[x].length-1;y>-1;y--)
-      if(this.tasks[x][y].caller ==caller && this.tasks[x][y].label ==label)
-      this.tasks[x].splice(y,1);
-   }
    private static resetMeasure(time:number)
    {
       this.Measure.lastTime = time;
@@ -161,8 +153,16 @@ export class Main
    private static updateSubchunks()
    {
       let concatQ:Set<Chunk> = new Set();
-      this.toUpdate.forEach((sub) =>{sub.update(); concatQ.add(sub.chunk);})
-      this.toUpdate.clear();
+      let i=0;
+     for(let entry of this.toUpdate.entries())
+     {
+      i++;
+      if(i>this.maxSubUpdates)
+      break;
+     entry[0].update();
+     concatQ.add(entry[0].chunk);
+     this.toUpdate.delete(entry[0]);
+     }
       concatQ.forEach((chunk) =>{chunk.updateMesh()});
     
    }

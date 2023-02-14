@@ -45,7 +45,8 @@ export class Item extends Entity
    
         if(this.lifeTime<1 )
         Main.entities.splice(i,1);
-        let ll = Math.max(Main.sunLight, World.getBlock(new Vector(this.pos.x,this.pos.y ,this.pos.z)).lightFBlock);
+        let block =World.getBlock(new Vector(this.pos.x,this.pos.y ,this.pos.z));
+        let ll = Math.max(block.skyLight, block.lightFBlock);
         this.rs.lightLevels = [ll,ll,ll,ll, ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll, ll,ll,ll,ll];
         this.rs.bufferArrays(this.rs.vertices,this.rs.textureCoords,this.rs.lightLevels,this.rs.indices);
     }
@@ -95,6 +96,7 @@ export class Item extends Entity
             this.rotation=0;
         }
         this.transformation = Matrix.identity();
+      
  this.transformation=this.transformation.translate(this.pos.x,this.pos.y+(Math.abs(this.rotation-180)/360),this.pos.z);
  this.transformation=this.transformation.scale(0.3,0.3,0.3);
    this.transformation=    this.transformation.rotateY(this.rotation);

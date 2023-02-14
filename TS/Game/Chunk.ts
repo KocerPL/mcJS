@@ -191,12 +191,10 @@ constructor(x:number, z:number) {
   }
    updateAllSubchunks()
   {
-    if(!this.allNeighbours) return;
-    for (let i = 0; i < this.subchunks.length; i++) {
+         
+    for(let sub of this.subchunks)
+   Main.toUpdate.add(sub);
     
-     this.subchunks[i].update();
-    }
-    this.updateMesh();
    // console.log("now not lazy hehehehe")
   }
   getSubchunk(y)

@@ -5,6 +5,7 @@ import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Shader2d } from "./Engine/Shader/Shader2d.js";
 import { Texture } from "./Engine/Texture.js";
 import { Array3D } from "./Engine/Utils/Array3D.js";
+import { randRange } from "./Engine/Utils/Math.js";
 import { Matrix } from "./Engine/Utils/Matrix.js";
 import { Vector } from "./Engine/Utils/Vector.js";
 import { VAO } from "./Engine/VAO.js";
@@ -31,9 +32,10 @@ export class LightNode {
 }
 export class Main {
     static maxChunks = 121;
+    static maxSubUpdates = 10;
     static okok = false;
     static dispLl = false;
-    static fastBreaking = true;
+    static fastBreaking = false;
     static FPS = 61;
     static fastTPS = 60;
     static minimalStorage = new Array();
@@ -89,6 +91,7 @@ export class Main {
         console.log("heh");
     }
     static run() {
+        console.log("Random:", randRange(-0.2, 0.2));
         CanvaManager.setupCanva(document.body);
         // EBO.unbind();
         // VBO.unbind();
@@ -128,15 +131,6 @@ export class Main {
         //   this.TESTtransf = this.TESTtransf.scale(2,1,1);
         requestAnimationFrame(this.loop.bind(this));
     }
-    static addTask(task, priority) {
-        this.tasks[priority].push(task);
-    }
-    static cancelTasks(caller, label) {
-        for (let x = 0; x < this.tasks.length; x++)
-            for (let y = this.tasks[x].length - 1; y > -1; y--)
-                if (this.tasks[x][y].caller == caller && this.tasks[x][y].label == label)
-                    this.tasks[x].splice(y, 1);
-    }
     static resetMeasure(time) {
         this.Measure.lastTime = time;
         this.Measure.tps = this.Measure.ticks;
@@ -146,8 +140,15 @@ export class Main {
     }
     static updateSubchunks() {
         let concatQ = new Set();
-        this.toUpdate.forEach((sub) => { sub.update(); concatQ.add(sub.chunk); });
-        this.toUpdate.clear();
+        let i = 0;
+        for (let entry of this.toUpdate.entries()) {
+            i++;
+            if (i > this.maxSubUpdates)
+                break;
+            entry[0].update();
+            concatQ.add(entry[0].chunk);
+            this.toUpdate.delete(entry[0]);
+        }
         concatQ.forEach((chunk) => { chunk.updateMesh(); });
     }
     static processSkyLight() {

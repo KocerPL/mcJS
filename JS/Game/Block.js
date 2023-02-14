@@ -24,7 +24,7 @@ export var blocks = [
             left: 0,
             right: 0
         },
-        breakTime: 3
+        breakTime: 2
     },
     {
         name: "Grass",
@@ -36,7 +36,7 @@ export var blocks = [
             left: 1,
             right: 1
         },
-        breakTime: 3
+        breakTime: 2
     },
     {
         name: "Stone",
