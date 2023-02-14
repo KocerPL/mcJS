@@ -148,14 +148,15 @@ export class SubChunk {
                         temp2.push((SubChunk.defVertices[i + 1] / (4 * (15 / block.skyLight))) + y + (this.pos.y * 16));
                         temp2.push((SubChunk.defVertices[i + 2] / (4 * (15 / block.skyLight))) + z);
                     }
-                    if (block.skyLightDir != directions.UNDEF) {
-                        this.mesh.vertices.push(...temp2.slice(0, 12));
-                        this.mesh.tCoords.push(...SubChunk.getTextureCordsInd(11));
-                        this.mesh.indices.push(index + 2, index + 1, index, index + 2, index, index + 3);
-                        this.mesh.lightLevels.push(block.skyLight, block.skyLight, block.skyLight, block.skyLight);
-                        this.mesh.fb.push(block.lightFBlock, block.lightFBlock, block.lightFBlock, block.lightFBlock);
-                        index += 4;
-                    }
+                    /*  if(block.skyLightDir==directions.SOURCE)
+                      {
+                      this.mesh.vertices.push(...temp2.slice(0,12));
+                      this.mesh.tCoords.push(...SubChunk.getTextureCordsInd(11));
+                      this.mesh.indices.push(index+2,index+1,index,index+2,index,index+3);
+                      this.mesh.lightLevels.push(block.skyLight,block.skyLight,block.skyLight,block.skyLight);
+                      this.mesh.fb.push(block.lightFBlock,block.lightFBlock,block.lightFBlock,block.lightFBlock);
+                      index+=4;
+                      }*/
                     let side = (vec, vStart, side) => {
                         let testedBlock = this.getBlock(new Vector(vec.x + x, vec.y + y, vec.z + z));
                         if (testedBlock == undefined)

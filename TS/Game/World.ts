@@ -17,13 +17,8 @@ public static height=50;
    public static generateTree(vec:Vector)
     {
         console.log("shedule Generating tree");
-            let i;
-        for( i=vec.y+1;i<vec.y+5;i++)
-        {
-            //console.log("Generating tree")
-            this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
-
-        }
+            let i=vec.y+5;
+       
         
         for(let x=vec.x-2;x<=vec.x+2;x++)
         for(let z=vec.z-2;z<=vec.z+2;z++)
@@ -55,7 +50,12 @@ public static height=50;
         this.setBlockNoLight(new Vector(vec.x,i,vec.z+1),9);
         this.setBlockNoLight(new Vector(vec.x,i,vec.z-1),9);
         this.setBlockNoLight(new Vector(vec.x,i,vec.z),9);
-        
+        for( i=vec.y+1;i<vec.y+5;i++)
+        {
+            //console.log("Generating tree")
+            this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
+
+        }
     }
     public static genHeightMap()
     {
