@@ -1,9 +1,9 @@
-import {get,Perlin,pseudoRandom,pseudoRandomXZ} from './PerlinNoise.js';
+import {get,Perlin,PerlinN,pseudoRandom,pseudoRandomXZ} from './PerlinNoise.js';
 let canva:HTMLCanvasElement = document.createElement("canvas");
 document.body.appendChild(canva);
 let ctx:CanvasRenderingContext2D = canva.getContext("2d");
 ctx.imageSmoothingEnabled = false;
-let rand = new Perlin();
+let rand = new PerlinN();
 console.time("test");
 for(let x=0; x<canva.width;x++)
 for(let y=0; y<canva.height;y++)

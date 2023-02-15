@@ -375,10 +375,12 @@ export class Main
       }
       GUI.update();
       if(CanvaManager.getKeyOnce(54))
-      this.exportChunks();
+      this.maxChunks--;
       if(CanvaManager.getKeyOnce(55))
-      this.fastBreaking=!this.fastBreaking;
+      this.maxChunks++;
       if(CanvaManager.getKeyOnce(56))
+      this.fastBreaking=!this.fastBreaking;
+      if(CanvaManager.getKeyOnce(57))
       this.fly=!this.fly;
    }
    private static async limitChunks()
@@ -575,12 +577,12 @@ export class Main
    {
       this.Measure.frames++;
       CanvaManager.debug.innerText = "Fps: "+this.Measure.fps+" Selected block: "+ blocks[this.player.itemsBar[this.player.selectedItem].id].name +" Count:"+this.player.itemsBar[this.player.selectedItem].count+
-      "\n XYZ:  X:"+(Math.floor(this.player.pos.x*100)/100)+"  Y:"+(Math.floor(this.player.pos.y*100)/100)+"  Z:"+(Math.floor(this.player.pos.z*100)/100)+"\n HM:"+World.getHeightMap(this.player.pos)+"\nFast break [7]: "+this.fastBreaking+"\n Sky light [4][5]:"+this.sunLight
-      +"\nErosion: "+World.getErosion(this.player.pos.x,this.player.pos.z);
+      "\n XYZ:  X:"+(Math.floor(this.player.pos.x*100)/100)+"  Y:"+(Math.floor(this.player.pos.y*100)/100)+"  Z:"+(Math.floor(this.player.pos.z*100)/100)+"\n HM:"+World.getHeightMap(this.player.pos)+"\nFast break [8]: "+this.fastBreaking+" Fly[9]: "+this.fly+"\n Sky light [4][5]:"+this.sunLight
+      +"\nErosion: "+World.getErosion(this.player.pos.x,this.player.pos.z)+"\n Visible chunks[6][7]: "+this.maxChunks;
       
       this.shader.use();
       this.player.camera.preRender();
-      this.shader.setFogCenter(this.player.camera.getPosition());
+      this.shader.setFog(this.player.camera.getPosition(),Math.sqrt(this.maxChunks)*8);
       CanvaManager.preRender();
       gl.clearColor(0.0,this.sunLight/15,this.sunLight/15,1.0);
       gl.clear(gl.COLOR_BUFFER_BIT);

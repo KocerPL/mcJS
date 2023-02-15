@@ -4,6 +4,7 @@ import { Shader } from "./Shader.js";
 let gl = CanvaManager.gl;
 export class DefaultShader extends Shader {
     viewCenter = new Vector(0, 0, 0);
+    fogDistance = 90;
     constructor() {
         super("./JS/Engine/Shader/default.vert", "./JS/Engine/Shader/default.frag");
     }
@@ -12,10 +13,12 @@ export class DefaultShader extends Shader {
         this.loadMatrix("transformation", transf);
         this.loadMatrix("view", view);
         this.loadFloat("light", light);
+        this.loadFloat("fogDistance", this.fogDistance);
         this.loadVec3("center", this.viewCenter);
     }
-    setFogCenter(center) {
+    setFog(center, distance) {
         this.viewCenter = center;
+        this.fogDistance = distance;
     }
     loadTransformation(transf) {
         this.loadMatrix("transformation", transf);
