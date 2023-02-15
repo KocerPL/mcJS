@@ -331,7 +331,9 @@ export class Player {
                 this.pos = tempPos;
             if (CanvaManager.getKey(32)) {
                 //  hop=true;
-                if (World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
+                if (Main.fly)
+                    this.jump.yAcc = 0.2;
+                else if (World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
                     && World.getBlock(new Vector(Math.round(this.pos.x + 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
                     && World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
                     && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z + 0.3))).id < 1

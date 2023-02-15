@@ -35,6 +35,7 @@ export class Main {
     static maxSubUpdates = 10;
     static okok = false;
     static dispLl = false;
+    static fly = false;
     static fastBreaking = false;
     static FPS = 61;
     static fastTPS = 60;
@@ -343,6 +344,8 @@ export class Main {
             this.exportChunks();
         if (CanvaManager.getKeyOnce(55))
             this.fastBreaking = !this.fastBreaking;
+        if (CanvaManager.getKeyOnce(56))
+            this.fly = !this.fly;
     }
     static async limitChunks() {
         let x = Math.floor(Math.round(this.player.pos.x) / 16);
@@ -518,7 +521,8 @@ export class Main {
     static render() {
         this.Measure.frames++;
         CanvaManager.debug.innerText = "Fps: " + this.Measure.fps + " Selected block: " + blocks[this.player.itemsBar[this.player.selectedItem].id].name + " Count:" + this.player.itemsBar[this.player.selectedItem].count +
-            "\n XYZ:  X:" + (Math.floor(this.player.pos.x * 100) / 100) + "  Y:" + (Math.floor(this.player.pos.y * 100) / 100) + "  Z:" + (Math.floor(this.player.pos.z * 100) / 100) + "\n HM:" + World.getHeightMap(this.player.pos) + "\nFast break [7]: " + this.fastBreaking + "\n Sky light [4][5]:" + this.sunLight;
+            "\n XYZ:  X:" + (Math.floor(this.player.pos.x * 100) / 100) + "  Y:" + (Math.floor(this.player.pos.y * 100) / 100) + "  Z:" + (Math.floor(this.player.pos.z * 100) / 100) + "\n HM:" + World.getHeightMap(this.player.pos) + "\nFast break [7]: " + this.fastBreaking + "\n Sky light [4][5]:" + this.sunLight
+            + "\nErosion: " + World.getErosion(this.player.pos.x, this.player.pos.z);
         this.shader.use();
         this.player.camera.preRender();
         this.shader.setFogCenter(this.player.camera.getPosition());

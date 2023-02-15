@@ -134,6 +134,18 @@ export var blocks = [
         },
         breakTime: 5
     },
+    {
+        name: "Snow",
+        textureIndex: {
+            top: 14,
+            bottom: 14,
+            front: 14,
+            back: 14,
+            left: 14,
+            right: 14
+        },
+        breakTime: 1
+    }
 ];
 blocks[-1] =
     {

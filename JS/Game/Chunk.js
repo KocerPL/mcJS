@@ -83,7 +83,8 @@ export class Chunk {
     postGenerate() {
         let x = randRange(0, 15) + (this.pos.x * 16);
         let z = randRange(0, 15) + (this.pos.z * 16);
-        World.generateTree(new Vector(x, World.getHeight(x, z), z));
+        if (World.getHeight(x, z) < 150)
+            World.generateTree(new Vector(x, World.getHeight(x, z), z));
     }
     updateNeighbour(neigbDir, chunk) {
         //console.log("what")

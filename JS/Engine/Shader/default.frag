@@ -5,7 +5,7 @@ in vec3 pass_tc;
 out vec4 color;
 //in vec3 FragPos;
 //in vec3 pass_Normal;
-float fogDistance =60.0;
+float fogDistance =100.0;
 in float pass_Light;
 //uniform vec3 lightPos;
 uniform sampler2DArray tex;

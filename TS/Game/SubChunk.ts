@@ -34,7 +34,18 @@ export class SubChunk
      for(let x =0;x<16;x++) for(let y=0;y<16;y++) for(let z=0;z<16;z++)
      {
        let ah = this.chunk.heightmap[x][z];
-       if(ah-3>=(y+yPos)) // if position lower than 3 blocks on heightmap
+       if(ah==(y+yPos) && ah>170) 
+       {
+        if(ah>180 || Math.round(Math.random()*10) >180-ah)
+        this.blocks[x][y][z]=new Block(11);
+        else
+        {
+        this.blocks[x][y][z]=new Block(0);
+        this.blocks[x][y][z].skyLightDir = directions.SOURCE;
+        this.blocks[x][y][z].skyLight = 15;
+      }
+       }
+       else if(ah-3>=(y+yPos)|| (ah>=(y+yPos) && ah>150)) // if position lower than 3 blocks on heightmap
        {
         if(Math.round(Math.random()*10) ==1)  //Randomizing greenstone ores
          this.blocks[x][y][z]= new Block(4);

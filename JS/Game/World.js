@@ -1,11 +1,14 @@
 import { Vector } from "../Engine/Utils/Vector.js";
 import { Main } from "../Main.js";
+import { PerlinN } from "../PerlinNoise.js";
 import { directions } from "./Block.js";
+let perlin = new PerlinN();
 export class World {
     Chunks = new Array();
     static heightMap = new Array(256);
     static waterLevel = 0;
     static height = 50;
+    static erosion = new PerlinN();
     static init() {
         this.genHeightMap();
         console.log(perlin);
@@ -72,7 +75,7 @@ export class World {
                 } catch (error) {
                     
                 }*/
-                this.heightMap[x][z] = Math.round((perlin.get(x / 128, z / 128) + 1) * 30) + height;
+                this.heightMap[x][z] = Math.round((perlin.perlin2D(x / 128, z / 128) + 1) * 30) + height;
             }
         }
     }
@@ -337,9 +340,21 @@ export class World {
     static getHeight(x, z) {
         try {
             //  if(x<0||z<0)
-            //    return this.height;
+            //  return this.height;
             //return 1;
-            return Math.round((perlin.get(x / 128, z / 128) + 1) * 50) + this.height;
+            let erosion = 50;
+            let erN = this.getErosion(x, z);
+            if (erN > 0.3)
+                erosion = 50 + ((erN - 0.3) * 100);
+            return Math.round((perlin.perlin2D(x / 256, z / 256) + 1) * (erosion)) + this.height;
+        }
+        catch (error) { }
+        return 0;
+    }
+    static getErosion(x, z) {
+        try {
+            //
+            return this.erosion.get(x / 256, z / 256) + 0.2;
         }
         catch (error) { }
         return 0;
