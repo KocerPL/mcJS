@@ -80,6 +80,7 @@ export class Main
   public static skyLightRemQueue:Array<LightNode> = new Array();
   public static lightRemQueue:Array<LightNode> = new Array();
   public static toUpdate:Set<SubChunk> = new Set();
+  public static integratedServer:Worker;
    private static crosscords = [
       -0.02,-0.02,
       0.02,0.02,
@@ -101,6 +102,10 @@ export class Main
    }
    public static run():void
    {
+      
+      this.integratedServer = new Worker("./JS/Server/Main.js");
+      this.integratedServer.onmessage =(ev)=>{console.log(ev);};
+      this.integratedServer.postMessage("start");
     console.log("Random:", randRange(-0.2,0.2))
       CanvaManager.setupCanva(document.body);
     // EBO.unbind();
