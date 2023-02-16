@@ -25,4 +25,4 @@ jobs:
       - uses: stepek/tsc-action@master
       # Runs a single command using the runners shell
       - name: Run a one-line script
-        run: tsc src/.
+       # run: tsc src/.
