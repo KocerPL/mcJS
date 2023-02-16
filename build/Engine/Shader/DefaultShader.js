@@ -6,7 +6,7 @@ export class DefaultShader extends Shader {
     viewCenter = new Vector(0, 0, 0);
     fogDistance = 90;
     constructor() {
-        super("/res/shaders/default.vert", "/res/shaders/default.frag");
+        super("./res/shaders/default.vert", "./res/shaders/default.frag");
     }
     loadUniforms(proj, transf, view, light) {
         this.loadMatrix("projection", proj);

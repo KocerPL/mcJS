@@ -9,7 +9,7 @@ export class DefaultShader extends Shader
     fogDistance:number=90;
     constructor()
     {
-        super("/res/shaders/default.vert","/res/shaders/default.frag");
+        super("./res/shaders/default.vert","./res/shaders/default.frag");
     }
     loadUniforms(proj:Matrix,transf:Matrix,view:Matrix,light:number) {
         this.loadMatrix("projection",proj);
