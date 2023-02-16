@@ -1,7 +1,19 @@
+import { SubChunk } from "./WorldBuilder/SubChunk.js";
 
-this.importScripts();
+addEventListener('message', e => {
+ 
+    let sub = new SubChunk();
+    if(e.data=="start")
+    Main.run();
+});
+var settings = {
+  maxChunks:120
+}
+class Main
+{
+  static run():void
+  {
+    postMessage({type:"console",msg:"Starting server in separate thread!!"});
 
-this.onmessage = (ev)=>{
-    this.postMessage("test");
-    this.close();
+  }
 }

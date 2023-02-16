@@ -103,8 +103,10 @@ export class Main
    public static run():void
    {
       
-      this.integratedServer = new Worker("./JS/Server/Main.js");
-      this.integratedServer.onmessage =(ev)=>{console.log(ev);};
+      this.integratedServer = new Worker("./JS/Server/Main.js", {
+         type: 'module'
+       });
+      this.integratedServer.onmessage =(ev)=>{if(ev.data.type=="console") console.log(ev.data.msg);};
       this.integratedServer.postMessage("start");
     console.log("Random:", randRange(-0.2,0.2))
       CanvaManager.setupCanva(document.body);
@@ -143,8 +145,6 @@ export class Main
        this.tasks[i]=new Array();
     }
      //loading chunks
-  //  console.log(this.chunks);
- //   this.TESTtransf = this.TESTtransf.scale(2,1,1);
      requestAnimationFrame(this.loop.bind(this));
     
    }
