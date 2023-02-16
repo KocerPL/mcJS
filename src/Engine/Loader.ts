@@ -30,7 +30,6 @@ export class Loader
              gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
              gl.generateMipmap(gl.TEXTURE_2D);
-             console.log("loaded gui");
           };
           if(img.complete)
           {
@@ -83,8 +82,6 @@ export class Loader
              gl.texParameteri(gl.TEXTURE_2D_ARRAY,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
           gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
           //   gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
-             console.log("loaded gui");
-             
           };
           if(img.complete)
           {

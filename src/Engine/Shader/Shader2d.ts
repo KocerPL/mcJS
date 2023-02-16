@@ -4,7 +4,7 @@ export class Shader2d extends Shader
 {
     constructor()
     {
-        super("./JS/Engine/Shader/2d.vert","./JS/Engine/Shader/2d.frag");
+        super("/res/shaders/2d.vert","/res/shaders/2d.frag");
     }
     loadUniforms(prop,mult:number) {
         this.loadFloat("prop",prop);

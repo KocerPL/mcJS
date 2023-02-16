@@ -7,7 +7,7 @@ export class AtlasShader extends Shader
 {
     constructor()
     {
-        super("./JS/Engine/Shader/atlas.vert","./JS/Engine/Shader/atlas.frag");
+        super("/res/shaders/atlas.vert","/res/shaders/atlas.frag");
     }
     loadUniforms(proj:Matrix,transf:Matrix,view:Matrix,light:number) {
         this.loadMatrix("projection",proj);
