@@ -39,7 +39,7 @@ export class LightNode
 export class Main
 {
    public static maxChunks =128;
-   public static maxSubUpdates = 10;
+   public static maxSubUpdates = 2;
       public static okok = false;
    public static dispLl = false;
    public static fly =false;
@@ -112,7 +112,7 @@ export class Main
       chunk.subchunks[ev.data.subY] = new SubChunk(new Vector(ev.data.subX,ev.data.subY,ev.data.subZ),chunk);
       for(let x:number=0;x<16;x++)    for(let y:number=0;y<16;y++)    for(let z:number=0;z<16;z++)
       {
-         chunk.subchunks[ev.data.subY].blocks[x][y][z]=new Block(ev.data.blocks[x+(y*16)+(z*64)]);
+         chunk.subchunks[ev.data.subY].blocks[x][y][z]=new Block(ev.data.blocks[x+(y*16)+(z*256)]);
       }
    }
    public static handleChunkReady(ev)

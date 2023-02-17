@@ -12,9 +12,11 @@ export class Chunk {
             for (let y = 0; y < 16; y++)
                 for (let x = 0; x < 16; x++)
                     for (let z = 0; z < 16; z++) {
-                        let index = x + (y * 16) + (z * 64);
+                        let index = x + (y * 16) + (z * 256);
                         if (y + (i * 16) < 130)
                             this.subchunks[i].blocks[index] = 1;
+                        else if (y + (i * 16) == 130)
+                            this.subchunks[i].blocks[index] = 2;
                         else
                             this.subchunks[i].blocks[index] = 0;
                         this.subchunks[i].lightMap[index] = 0;
