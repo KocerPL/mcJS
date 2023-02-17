@@ -10,10 +10,11 @@ import { Matrix } from "./Engine/Utils/Matrix.js";
 import { Vector } from "./Engine/Utils/Vector.js";
 import { VAO } from "./Engine/VAO.js";
 import { VBO } from "./Engine/VBO.js";
-import { blocks, directions } from "./Game/Block.js";
+import { Block, blocks, directions } from "./Game/Block.js";
 import { Chunk } from "./Game/Chunk.js";
 import { GUI } from "./Game/GUI.js";
 import { Player } from "./Game/Player.js";
+import { SubChunk } from "./Game/SubChunk.js";
 import { World } from "./Game/World.js";
 let gl = CanvaManager.gl;
 export class LightNode {
@@ -92,12 +93,49 @@ export class Main {
     static heh() {
         console.log("heh");
     }
+    static handleSubchunk(ev) {
+        console.log("received subchunk");
+        let chunk = Main.getChunkAt(ev.data.subX, ev.data.subZ);
+        if (chunk == undefined) {
+            chunk = new Chunk(ev.data.subX, ev.data.subZ);
+            this.loadedChunks.push(chunk);
+        }
+        chunk.subchunks[ev.data.subY] = new SubChunk(new Vector(ev.data.subX, ev.data.subY, ev.data.subZ), chunk);
+        for (let x = 0; x < 16; x++)
+            for (let y = 0; y < 16; y++)
+                for (let z = 0; z < 16; z++) {
+                    chunk.subchunks[ev.data.subY].blocks[x][y][z] = new Block(ev.data.blocks[x + (y * 16) + (z * 64)]);
+                }
+    }
+    static handleChunkReady(ev) {
+        console.log("received chunk ready");
+        let chunk = Main.getChunkAt(ev.data.chunkX, ev.data.chunkZ);
+        chunk.sendNeighbours();
+        chunk.heightmap = new Array();
+        for (let i = 0; i < 16; i++) {
+            chunk.heightmap[i] = new Array();
+            for (let j = 0; j < 16; j++)
+                chunk.heightmap[i][j] = 10;
+        }
+        chunk.updateAllSubchunks();
+    }
     static run() {
-        this.integratedServer = new Worker("./JS/Server/Main.js", {
+        this.integratedServer = new Worker("./build/Server/Main.js", {
             type: 'module'
         });
-        this.integratedServer.onmessage = (ev) => { if (ev.data.type == "console")
-            console.log(ev.data.msg); };
+        this.integratedServer.onmessage = (ev) => {
+            console.log("received Message");
+            switch (ev.data.type) {
+                case "console":
+                    console.log(ev.data.msg);
+                    break;
+                case "subchunk":
+                    this.handleSubchunk(ev);
+                    break;
+                case "chunkReady":
+                    this.handleChunkReady(ev);
+            }
+        };
         this.integratedServer.postMessage("start");
         console.log("Random:", randRange(-0.2, 0.2));
         CanvaManager.setupCanva(document.body);
@@ -322,10 +360,11 @@ export class Main {
         this.lastFrame = time;
         requestAnimationFrame(this.loop.bind(this));
         let test = this.lastFrame - time;
-        if (test < 1000 / this.FPS) {
-            this.Measure.lastLimit = time;
-            this.limitChunks();
-        }
+        /*  if(test<1000/this.FPS)
+           {
+              this.Measure.lastLimit=time;
+           this.limitChunks();
+           }*/
     }
     static fastUpdate() {
         this.player.update();

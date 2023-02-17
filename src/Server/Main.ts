@@ -1,8 +1,8 @@
 import { SubChunk } from "./WorldBuilder/SubChunk.js";
+import { Chunk } from "./WorldBuilder/Chunk.js";
+import { Vector } from "../Engine/Utils/Vector.js";
 
 addEventListener('message', e => {
- 
-    let sub = new SubChunk();
     if(e.data=="start")
     Main.run();
 });
@@ -13,7 +13,52 @@ class Main
 {
   static run():void
   {
-    postMessage({type:"console",msg:"Starting server in separate thread!!"});
-
+    postMessage({type:"console",msg:"Starting server in separated thread!!"});
+    let step=1;
+    let iter =1;
+    let k=0;
+    let nextCoords= new Vector(0,0,0);
+    let chunk =new Chunk(new Vector(nextCoords.x,0,nextCoords.z));
+    chunk.generate();
+    for(let i=0;i<16;i++)
+    this.sendSubChunk(chunk.subchunks[i]);
+    this.sendChunkReady(new Vector(nextCoords.x,0,nextCoords.z));
+    postMessage({type:"console",msg:"Chunks ready!!"});
+    while(k<10)
+    {
+      for(let i=0;i<iter;i++)
+      {
+        nextCoords.x+=step;
+        let chunk =new Chunk(new Vector(nextCoords.x,0,nextCoords.z));
+        chunk.generate();
+        for(let i=0;i<16;i++)
+        this.sendSubChunk(chunk.subchunks[i]);
+        this.sendChunkReady(new Vector(nextCoords.x,0,nextCoords.z));
+        postMessage({type:"console",msg:"Chunks ready!!"});
+        k++;
+      }
+      for(let i=0;i<iter;i++)
+      {
+        nextCoords.z+=step;
+        let chunk =new Chunk(new Vector(nextCoords.x,0,nextCoords.z));
+        chunk.generate();
+        for(let i=0;i<16;i++)
+        this.sendSubChunk(chunk.subchunks[i]);
+        this.sendChunkReady(new Vector(nextCoords.x,0,nextCoords.z));
+        postMessage({type:"console",msg:"Chunks ready!!"});
+        k++;
+      }
+      iter++;
+      step= -step;
+  }
+  postMessage({type:"console",msg:"Ready"});
+  }
+  static sendSubChunk(subchunk:SubChunk)
+  {
+    postMessage({type:"subchunk",blocks:subchunk.blocks,subX:subchunk.pos.x,subZ:subchunk.pos.z,subY:subchunk.pos.y});
+  }
+  static sendChunkReady(pos:Vector)
+  {
+    postMessage({type:"chunkReady",chunkX:pos.x,chunkZ:pos.z});
   }
 }

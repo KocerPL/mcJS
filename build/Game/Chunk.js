@@ -24,9 +24,9 @@ export class Chunk {
     heightmap = new Array(16);
     neighbours = {};
     allNeighbours = false;
-    generated = false;
+    generated = true;
     generatingIndex = 0;
-    sended = false;
+    sended = true;
     lazy = true;
     pos;
     mesh;
@@ -55,11 +55,12 @@ export class Chunk {
         VBO.unbind();
         EBO.unbind();
         this.pos = new Vector(x, 0, z);
-        for (let i = 0; i < 16; i++) {
+        /*  for(let i =0; i<16;i++)
+          {
             this.heightmap[i] = new Array(16);
-            for (let j = 0; j < 16; j++)
-                this.heightmap[i][j] = World.getHeight((x * 16) + i, (z * 16) + j);
-        }
+            for(let j=0;j<16;j++)
+            this.heightmap[i][j]= World.getHeight((x*16)+i,(z*16)+j);
+          }*/
         // this.preGenSubchunks();
         // console.log("done constructing");
     }
