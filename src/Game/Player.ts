@@ -441,7 +441,7 @@ export class Player
         }
     } catch(error)
     {
-console.log(error);
+console.log("Update pos error",error);
     }
       
         this.camera.setPitch(this.camera.getPitch()- (CanvaManager.mouseMovement.y/10));

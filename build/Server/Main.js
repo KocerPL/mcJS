@@ -1,15 +1,20 @@
 import { Chunk } from "./WorldBuilder/Chunk.js";
 import { Vector } from "../Engine/Utils/Vector.js";
-addEventListener('message', e => {
-    if (e.data == "start")
-        Main.run();
-});
 var settings = {
     maxChunks: 120
 };
 class Main {
-    static run() {
-        postMessage({ type: "console", msg: "Starting server in separated thread!!" });
+    chunkMap = new Map();
+    run() {
+        this.updateChunks();
+    }
+    sendSubChunk(subchunk) {
+        postMessage({ type: "subchunk", blocks: subchunk.blocks, subX: subchunk.pos.x, subZ: subchunk.pos.z, subY: subchunk.pos.y });
+    }
+    sendChunkReady(pos) {
+        postMessage({ type: "chunkReady", chunkX: pos.x, chunkZ: pos.z });
+    }
+    updateChunks() {
         let step = 1;
         let iter = 1;
         let k = 0;
@@ -20,11 +25,12 @@ class Main {
             this.sendSubChunk(chunk.subchunks[i]);
         this.sendChunkReady(new Vector(nextCoords.x, 0, nextCoords.z));
         postMessage({ type: "console", msg: "Chunks ready!!" });
-        while (k < 10) {
+        while (k < settings.maxChunks) {
             for (let i = 0; i < iter; i++) {
                 nextCoords.x += step;
                 let chunk = new Chunk(new Vector(nextCoords.x, 0, nextCoords.z));
                 chunk.generate();
+                this.chunkMap.set(nextCoords.x + "," + nextCoords.z, chunk);
                 for (let i = 0; i < 16; i++)
                     this.sendSubChunk(chunk.subchunks[i]);
                 this.sendChunkReady(new Vector(nextCoords.x, 0, nextCoords.z));
@@ -35,6 +41,7 @@ class Main {
                 nextCoords.z += step;
                 let chunk = new Chunk(new Vector(nextCoords.x, 0, nextCoords.z));
                 chunk.generate();
+                this.chunkMap.set(nextCoords.x + "," + nextCoords.z, chunk);
                 for (let i = 0; i < 16; i++)
                     this.sendSubChunk(chunk.subchunks[i]);
                 this.sendChunkReady(new Vector(nextCoords.x, 0, nextCoords.z));
@@ -44,12 +51,12 @@ class Main {
             iter++;
             step = -step;
         }
-        postMessage({ type: "console", msg: "Ready" });
-    }
-    static sendSubChunk(subchunk) {
-        postMessage({ type: "subchunk", blocks: subchunk.blocks, subX: subchunk.pos.x, subZ: subchunk.pos.z, subY: subchunk.pos.y });
-    }
-    static sendChunkReady(pos) {
-        postMessage({ type: "chunkReady", chunkX: pos.x, chunkZ: pos.z });
     }
 }
+let main = new Main();
+addEventListener('message', e => {
+    if (e.data == "start") {
+        postMessage({ type: "console", msg: "Starting server in separated thread!!" });
+        main.run();
+    }
+});

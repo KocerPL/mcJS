@@ -11,7 +11,7 @@ export class SubChunk
 {
     public mesh:Mesh= new Mesh();//Mesh that contains all data needed for rendering  
     blocks:Array<Array<Array<Block>>>= new Array3D(16,16,16);//Array of blocks
-    generated:boolean=false; //Is SubChunk already generated
+    generated:boolean=true; //Is SubChunk already generated
     inReGeneration:boolean=false; //Is subchunk in regeneration state
     lightUpdate:boolean = false; //Is subchunk updating light
    // empty:boolean = true;    //Is subchunk empty

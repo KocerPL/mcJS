@@ -33,7 +33,7 @@ export class LightNode {
 }
 export class Main {
     static maxChunks = 128;
-    static maxSubUpdates = 2;
+    static maxSubUpdates = 10;
     static okok = false;
     static dispLl = false;
     static fly = false;
@@ -105,6 +105,8 @@ export class Main {
             for (let y = 0; y < 16; y++)
                 for (let z = 0; z < 16; z++) {
                     chunk.subchunks[ev.data.subY].blocks[x][y][z] = new Block(ev.data.blocks[x + (y * 16) + (z * 256)]);
+                    chunk.subchunks[ev.data.subY].blocks[x][y][z].skyLight = 15;
+                    chunk.subchunks[ev.data.subY].blocks[x][y][z].skyLightDir = directions.SOURCE;
                 }
     }
     static handleChunkReady(ev) {
