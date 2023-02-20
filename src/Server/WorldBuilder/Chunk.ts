@@ -4,6 +4,7 @@ import { SubChunk } from "./SubChunk.js";
 export class Chunk
 {
   pos:Vector = new Vector(0,0,0);
+  heightmap:Array<number> = new Array(256);
   subchunks:Array<SubChunk> = new Array(16);
   constructor(pos:Vector)
   {
@@ -26,5 +27,19 @@ export class Chunk
         this.subchunks[i].lightMap[index] = 0;
         }
     }
+    this.calcHeightmap();
+  }
+  calcHeightmap()
+  {
+    for(let i=0;i<this.subchunks.length;i++)
+    {
+       let sub =  this.subchunks[i];
+    for(let y=0;y<16;y++) for(let x=0;x<16;x++)for(let z=0;z<16;z++) 
+    {
+        let index =x+(y*16)+(z*256)
+        if(this.subchunks[i].blocks[index]>0 && this.heightmap[x][z]<y+(i*16))
+        this.heightmap[x+(z*16)]=y+(i*16);
+    }
+  }
   }
 }

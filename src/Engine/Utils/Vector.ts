@@ -1,3 +1,5 @@
+type bool = 0 | 1;
+
 export class Vector
 {
     public x;
@@ -34,6 +36,11 @@ export class Vector
     mult(scalar)
     {
         return new Vector(this.x*scalar,this.y*scalar,this.z*scalar); 
+    }
+    modulo(mod:number,mask?:{x:bool,y:bool,z:bool})
+    {
+        mask??={x:1,y:1,z:1}
+        return new Vector(mask.x?this.x%mod:this.x,mask.y?this.y%mod:this.y,mask.z?this.z%mod:this.z);
     }
     static distance(vecA:Vector,vecB:Vector):number
     {

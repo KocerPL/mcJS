@@ -13,6 +13,11 @@ class Main
   {
   this.updateChunks();
   }
+  onBlock(pos:Vector,id:number)
+  {
+    let chPos:Vector =pos.modulo(16);
+    this.getChunk(chPos).subchunks[chPos.y].blocks;
+  }
  sendSubChunk(subchunk:SubChunk)
   {
     postMessage({type:"subchunk",blocks:subchunk.blocks,subX:subchunk.pos.x,subZ:subchunk.pos.z,subY:subchunk.pos.y});
@@ -21,7 +26,10 @@ class Main
   {
     postMessage({type:"chunkReady",chunkX:pos.x,chunkZ:pos.z});
   }
-  
+  getChunk(pos:Vector)
+  {
+return this.chunkMap.get(pos.x+","+pos.z);
+  }
  updateChunks()
   {
     let step=1;
