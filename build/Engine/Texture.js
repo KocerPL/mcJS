@@ -2,7 +2,7 @@ import { Model } from "../Game/Models.js";
 import { CanvaManager } from "./CanvaManager.js";
 import { Loader } from "./Loader.js";
 let gl = CanvaManager.gl;
-export class Texture {
+class Texture {
     static SIZE = 64;
     static imageSize = 1024;
     static rowSize = 16;
@@ -14,3 +14,4 @@ export class Texture {
     static crossHair = Loader.image("./res/textures/crosshair.png");
     static skinAtlas = Loader.imageAtlasByJSON("./res/textures/skinMC.png", Model.player, 64, 64);
 }
+export { Texture };

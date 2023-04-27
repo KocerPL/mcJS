@@ -16,7 +16,7 @@ import { GUI } from "./Game/GUI.js";
 import { Player } from "./Game/Player.js";
 import { SubChunk } from "./Game/SubChunk.js";
 import { World } from "./Game/World.js";
-let gl = CanvaManager.gl;
+const gl = CanvaManager.gl;
 export class LightNode {
     pos;
     subchunk;
@@ -31,20 +31,20 @@ export class LightNode {
         this.direction = direction;
     }
 }
-export class Main {
+class Main {
     static maxChunks = 128;
-    static maxSubUpdates = 10;
+    static maxSubUpdates = 5;
     static okok = false;
     static dispLl = false;
     static fly = false;
     static fastBreaking = false;
     static FPS = 61;
     static fastTPS = 60;
-    static minimalStorage = new Array();
+    static minimalStorage = [];
     static TPS = 20;
     static sunLight = 14;
     static file = null;
-    static entities = new Array();
+    static entities = [];
     static Measure = {
         tps: 0,
         fps: 0,
@@ -53,7 +53,7 @@ export class Main {
         frames: 0,
         lastLimit: 0
     };
-    static unloadedChunks = new Array();
+    static unloadedChunks = [];
     static shader2d;
     static tasks = new Array(11);
     static lastTick = 0;
@@ -67,12 +67,13 @@ export class Main {
     static player = new Player(new Vector(0, 130, 0));
     static range = { start: 0, end: 1 };
     //public static chunks:Array<Array<Chunk>>=new Array(8);
-    static loadedChunks = new Array();
-    static tempChunkBuffer = new Array();
-    static lightQueue = new Array();
-    static skyLightQueue = new Array();
-    static skyLightRemQueue = new Array();
-    static lightRemQueue = new Array();
+    static chunkQueue = [];
+    static loadedChunks = [];
+    static tempChunkBuffer = [];
+    static lightQueue = [];
+    static skyLightQueue = [];
+    static skyLightRemQueue = [];
+    static lightRemQueue = [];
     static toUpdate = new Set();
     static integratedServer;
     static crosscords = [
@@ -111,19 +112,11 @@ export class Main {
     }
     static handleChunkReady(ev) {
         console.log("received chunk ready");
-        let chunk = Main.getChunkAt(ev.data.chunkX, ev.data.chunkZ);
-        chunk.sendNeighbours();
-        chunk.heightmap = new Array();
-        for (let i = 0; i < 16; i++) {
-            chunk.heightmap[i] = new Array();
-            for (let j = 0; j < 16; j++)
-                chunk.heightmap[i][j] = 10;
-        }
-        chunk.updateAllSubchunks();
+        this.chunkQueue.push(Main.getChunkAt(ev.data.chunkX, ev.data.chunkZ));
     }
     static run() {
         this.integratedServer = new Worker("./build/Server/Main.js", {
-            type: 'module'
+            type: "module"
         });
         this.integratedServer.onmessage = (ev) => {
             console.log("received Message");
@@ -158,13 +151,13 @@ export class Main {
         //loading crosshair 
         GUI.init();
         this.crossVAO = new VAO();
-        let vbo = new VBO();
+        const vbo = new VBO();
         vbo.bufferData(this.crosscords);
         this.crossVAO.addPtr(0, 2, 0, 0);
-        let vtc = new VBO();
+        const vtc = new VBO();
         vtc.bufferData(this.crosstcords);
         this.crossVAO.addPtr(1, 2, 0, 0);
-        let ebo = new EBO();
+        const ebo = new EBO();
         ebo.bufferData(this.crossindices);
         VAO.unbind();
         VBO.unbind();
@@ -172,7 +165,7 @@ export class Main {
         //init world
         World.init();
         for (let i = 0; i < this.tasks.length; i++) {
-            this.tasks[i] = new Array();
+            this.tasks[i] = [];
         }
         //loading chunks
         requestAnimationFrame(this.loop.bind(this));
@@ -185,9 +178,9 @@ export class Main {
         this.Measure.frames = 0;
     }
     static updateSubchunks() {
-        let concatQ = new Set();
+        const concatQ = new Set();
         let i = 0;
-        for (let entry of this.toUpdate.entries()) {
+        for (const entry of this.toUpdate.entries()) {
             i++;
             if (i > this.maxSubUpdates)
                 break;
@@ -198,19 +191,19 @@ export class Main {
         concatQ.forEach((chunk) => { chunk.updateMesh(); });
     }
     static processSkyLight() {
-        let relight = new Map();
+        const relight = new Map();
         let i = 0;
         while (this.skyLightRemQueue.length > 0) {
             i++;
-            let node = this.skyLightRemQueue.shift();
+            const node = this.skyLightRemQueue.shift();
             if (relight.get(node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z]) != undefined)
                 relight.delete(node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z]);
             node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLight = 0;
             node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLightDir = directions.UNDEF;
             this.toUpdate.add(node.subchunk);
             //Propagate
-            let checkAndPush = (pos, direction) => {
-                let blockInfo = node.subchunk.getBlockSub(pos);
+            const checkAndPush = (pos, direction) => {
+                const blockInfo = node.subchunk.getBlockSub(pos);
                 if (blockInfo == undefined || blockInfo.block == undefined)
                     return;
                 if (blockInfo.block.skyLightDir == direction)
@@ -228,7 +221,7 @@ export class Main {
         relight.forEach((lightnode) => { this.skyLightQueue.push(lightnode); });
         while (this.skyLightQueue.length > 0) {
             i++;
-            let node = this.skyLightQueue.shift();
+            const node = this.skyLightQueue.shift();
             node.direction ??= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLightDir;
             if (node.light == undefined)
                 node.light ??= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLight;
@@ -244,8 +237,8 @@ export class Main {
             }
             if (node.light > 1) {
                 //Propagate
-                let checkAndPush = (pos, direction) => {
-                    let blockInfo = node.subchunk.getBlockSub(pos);
+                const checkAndPush = (pos, direction) => {
+                    const blockInfo = node.subchunk.getBlockSub(pos);
                     if (blockInfo == undefined || blockInfo.block == undefined)
                         return;
                     if (blockInfo.block.id == 0 && blockInfo.block.skyLight <= node.light - 1)
@@ -263,19 +256,19 @@ export class Main {
         }
     }
     static processLight() {
-        let relight = new Map();
+        const relight = new Map();
         let i = 0;
         while (this.lightRemQueue.length > 0) {
             i++;
-            let node = this.lightRemQueue.shift();
+            const node = this.lightRemQueue.shift();
             if (relight.get(node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z]) != undefined)
                 relight.delete(node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z]);
             node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock = 0;
             node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir = directions.UNDEF;
             this.toUpdate.add(node.subchunk);
             //Propagate
-            let checkAndPush = (pos, direction) => {
-                let blockInfo = node.subchunk.getBlockSub(pos);
+            const checkAndPush = (pos, direction) => {
+                const blockInfo = node.subchunk.getBlockSub(pos);
                 if (blockInfo.block.lightDir == direction)
                     this.lightRemQueue.push(new LightNode(blockInfo.pos, blockInfo.sub, node.light - 1, direction, node.lpos));
                 else if (blockInfo.block.lightDir != directions.SOURCE && blockInfo.block.lightDir != directions.UNDEF && blockInfo.block.lightFBlock > 1)
@@ -291,7 +284,7 @@ export class Main {
         relight.forEach((lightnode) => { this.lightQueue.push(lightnode); });
         while (this.lightQueue.length > 0) {
             i++;
-            let node = this.lightQueue.shift();
+            const node = this.lightQueue.shift();
             node.direction ??= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir;
             if (node.light == undefined)
                 node.light ??= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock;
@@ -307,8 +300,8 @@ export class Main {
             }
             if (node.light > 1) {
                 //Propagate
-                let checkAndPush = (pos, direction) => {
-                    let blockInfo = node.subchunk.getBlockSub(pos);
+                const checkAndPush = (pos, direction) => {
+                    const blockInfo = node.subchunk.getBlockSub(pos);
                     if (blockInfo.block.id == 0 && blockInfo.block.lightFBlock <= node.light - 1)
                         this.lightQueue.push(new LightNode(blockInfo.pos, blockInfo.sub, node.light - 1, direction, node.lpos));
                     else if (blockInfo.block.lightDir == direction)
@@ -324,10 +317,22 @@ export class Main {
         }
         this.processSkyLight();
     }
+    static processChunk(chunk) {
+        chunk.sendNeighbours();
+        chunk.heightmap = [];
+        for (let i = 0; i < 16; i++) {
+            chunk.heightmap[i] = [];
+            for (let j = 0; j < 16; j++)
+                chunk.heightmap[i][j] = 10;
+        }
+        chunk.updateAllSubchunks();
+    }
     static loop(time) {
+        if (this.chunkQueue.length > 0)
+            this.processChunk(this.chunkQueue.shift());
         if (this.Measure.lastTime <= time - 1000)
             this.resetMeasure(time);
-        let delta = time - this.lastTick;
+        const delta = time - this.lastTick;
         this.delta += delta / (2000 / this.TPS);
         // console.log(this.delta);
         if (this.delta >= 1)
@@ -340,9 +345,8 @@ export class Main {
             this.delta--;
             this.update();
         }
-        ;
         //60 updates
-        let fastDelta = time - this.lastFastTick;
+        const fastDelta = time - this.lastFastTick;
         this.fastDelta += fastDelta / (2000 / this.fastTPS);
         // console.log(this.fastDelta);
         if (this.fastDelta >= 1)
@@ -355,18 +359,11 @@ export class Main {
             this.fastDelta--;
             this.fastUpdate();
         }
-        ;
         this.processLight();
         this.updateSubchunks();
         this.render();
         this.lastFrame = time;
         requestAnimationFrame(this.loop.bind(this));
-        let test = this.lastFrame - time;
-        /*  if(test<1000/this.FPS)
-           {
-              this.Measure.lastLimit=time;
-           this.limitChunks();
-           }*/
     }
     static fastUpdate() {
         this.player.update();
@@ -396,25 +393,25 @@ export class Main {
             this.fly = !this.fly;
     }
     static async limitChunks() {
-        let x = Math.floor(Math.round(this.player.pos.x) / 16);
-        let z = Math.floor(Math.round(this.player.pos.z) / 16);
+        const x = Math.floor(Math.round(this.player.pos.x) / 16);
+        const z = Math.floor(Math.round(this.player.pos.z) / 16);
         let step = 1;
         let iter = 1;
-        let howMuch = this.maxChunks;
-        let loadBuffer = new Array();
+        const howMuch = this.maxChunks;
+        const loadBuffer = [];
         this.tempChunkBuffer = [...this.loadedChunks];
-        let { chunk, isNew } = this.getORnew(x, z);
+        const { chunk, isNew } = this.getORnew(x, z);
         if (isNew)
             chunk.preGenSubchunks();
         loadBuffer.push(chunk);
-        let nextCoords = new Vector(x, 0, z);
+        const nextCoords = new Vector(x, 0, z);
         //Spiral chunk loading algorithm
         let stop = false;
         while (loadBuffer.length < howMuch) {
             //x
             for (let i = 0; i < iter; i++) {
                 nextCoords.x += step;
-                let { chunk, isNew } = this.getORnew(nextCoords.x, nextCoords.z);
+                const { chunk, isNew } = this.getORnew(nextCoords.x, nextCoords.z);
                 loadBuffer.push(chunk);
                 if (!chunk.generated) {
                     chunk.preGenOne();
@@ -434,7 +431,7 @@ export class Main {
                 break;
             for (let i = 0; i < iter; i++) {
                 nextCoords.z += step;
-                let { chunk, isNew } = this.getORnew(nextCoords.x, nextCoords.z);
+                const { chunk, isNew } = this.getORnew(nextCoords.x, nextCoords.z);
                 // stop = isNew;
                 loadBuffer.push(chunk);
                 if (!chunk.generated) {
@@ -457,10 +454,10 @@ export class Main {
             step = -step;
         }
         this.loadedChunks = loadBuffer;
-        for (let chunk of this.tempChunkBuffer) {
+        for (const chunk of this.tempChunkBuffer) {
             chunk.sended = false;
             for (let i = this.entities.length - 1; i >= 0; i--) {
-                let entity = this.entities[i];
+                const entity = this.entities[i];
                 if (chunk.pos.x * 16 < entity.pos.x && chunk.pos.z * 16 < entity.pos.z && chunk.pos.x * 16 > entity.pos.x - 16 && chunk.pos.z * 16 < entity.pos.z - 16)
                     this.entities.splice(i, 1);
             }
@@ -479,17 +476,17 @@ export class Main {
         return { chunk: new Chunk(x, z), isNew: true };
     }
     static exportChunks() {
-        let k = new Array();
+        const k = [];
         for (let x = 0; x < this.loadedChunks.length; x++) {
-            let chunk = this.loadedChunks[x];
+            const chunk = this.loadedChunks[x];
             //  console.log(chunk);
             if (chunk == undefined)
                 continue;
-            let blocks = new Array(16);
+            const blocks = new Array(16);
             for (let a = 0; a < 16; a++) {
                 if (chunk.subchunks[a] == undefined)
                     continue;
-                let c = new Array3D(16, 16, 16);
+                const c = new Array3D(16, 16, 16);
                 for (let x1 = 0; x1 < 16; x1++)
                     for (let y1 = 0; y1 < 16; y1++)
                         for (let z1 = 0; z1 < 16; z1++) {
@@ -509,15 +506,15 @@ export class Main {
         this.download(JSON.stringify(k), "world.json", "text/plain");
     }
     static minChunks() {
-        let chunk = this.unloadedChunks.splice(0, 1)[0];
+        const chunk = this.unloadedChunks.splice(0, 1)[0];
         if (chunk == undefined)
             return;
         console.log(this.unloadedChunks);
-        let blocks = new Array(16);
+        const blocks = new Array(16);
         for (let a = 0; a < 16; a++) {
             if (chunk.subchunks[a] == undefined)
                 continue;
-            let c = new Array3D(16, 16, 16);
+            const c = new Array3D(16, 16, 16);
             for (let x1 = 0; x1 < 16; x1++)
                 for (let y1 = 0; y1 < 16; y1++)
                     for (let z1 = 0; z1 < 16; z1++) {
@@ -540,18 +537,18 @@ export class Main {
         return undefined;
     }
     static download(content, fileName, contentType) {
-        var a = document.createElement("a");
-        var file = new Blob([content], { type: contentType });
+        const a = document.createElement("a");
+        const file = new Blob([content], { type: contentType });
         a.href = URL.createObjectURL(file);
         a.download = fileName;
         a.click();
     }
     static upload() {
-        var a = document.createElement("input");
+        const a = document.createElement("input");
         a.type = "file";
         a.click();
         a.oninput = (ev) => {
-            let file = a.files.item(0);
+            const file = a.files.item(0);
             //console.log(file);
             const reader = new FileReader();
             let ok;
@@ -560,8 +557,8 @@ export class Main {
                 this.file = JSON.parse(ok);
                 console.log(this.file);
             };
-            var text = reader.result;
-            let k = reader.readAsText(file);
+            const text = reader.result;
+            const k = reader.readAsText(file);
             console.log(ok);
             //JSON.parse(file);
         };
@@ -579,7 +576,7 @@ export class Main {
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.blocksGridTest);
         Main.shader.loadUniforms(Main.player.camera.getProjection(), Matrix.identity(), Main.player.camera.getView(), Main.sunLight);
-        for (let chunk of this.loadedChunks) {
+        for (const chunk of this.loadedChunks) {
             chunk.render();
             // toRender.push(()=>{chunk.renderWater()});
         }
@@ -591,4 +588,5 @@ export class Main {
         GUI.render(this.shader2d);
     }
 }
+export { Main };
 Main.run();

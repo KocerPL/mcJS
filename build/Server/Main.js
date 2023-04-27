@@ -8,13 +8,21 @@ class Main {
     run() {
         this.updateChunks();
     }
+    onBlock(pos, id) {
+        let chPos = pos.modulo(16);
+        this.getChunk(chPos).subchunks[chPos.y].blocks;
+    }
     sendSubChunk(subchunk) {
         postMessage({ type: "subchunk", blocks: subchunk.blocks, subX: subchunk.pos.x, subZ: subchunk.pos.z, subY: subchunk.pos.y });
     }
     sendChunkReady(pos) {
         postMessage({ type: "chunkReady", chunkX: pos.x, chunkZ: pos.z });
     }
+    getChunk(pos) {
+        return this.chunkMap.get(pos.x + "," + pos.z);
+    }
     updateChunks() {
+        postMessage({ type: "console", msg: "Starting server in separated thread!!" });
         let step = 1;
         let iter = 1;
         let k = 0;
@@ -56,7 +64,6 @@ class Main {
 let main = new Main();
 addEventListener('message', e => {
     if (e.data == "start") {
-        postMessage({ type: "console", msg: "Starting server in separated thread!!" });
         main.run();
     }
 });

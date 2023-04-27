@@ -22,7 +22,7 @@ export class invItem {
         this.count = 1;
     }
 }
-export class Player {
+class Player {
     //model
     camera = new Camera();
     pos;
@@ -531,3 +531,4 @@ export class Player {
         }
     }
 }
+export { Player };

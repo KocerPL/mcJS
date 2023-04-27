@@ -3,7 +3,7 @@ import { Vector } from "../Engine/Utils/Vector.js";
 import { Block, blocks, directions } from "./Block.js";
 import { World } from "./World.js";
 import { Mesh } from "./Mesh.js";
-export class SubChunk {
+class SubChunk {
     mesh = new Mesh(); //Mesh that contains all data needed for rendering  
     blocks = new Array3D(16, 16, 16); //Array of blocks
     generated = true; //Is SubChunk already generated
@@ -19,12 +19,12 @@ export class SubChunk {
     }
     preGenerate() {
         //setting position according to subchunk pos in world
-        let yPos = this.pos.y * 16;
+        const yPos = this.pos.y * 16;
         //Iterating for each block
         for (let x = 0; x < 16; x++)
             for (let y = 0; y < 16; y++)
                 for (let z = 0; z < 16; z++) {
-                    let ah = this.chunk.heightmap[x][z];
+                    const ah = this.chunk.heightmap[x][z];
                     if (ah == (y + yPos) && ah > 170) {
                         if (ah > 180 || Math.round(Math.random() * 10) > 180 - ah)
                             this.blocks[x][y][z] = new Block(11);
@@ -90,13 +90,39 @@ export class SubChunk {
         }
         return undefined;
     }
+    getBlockInside(x, y, z) {
+        return this.blocks[x][y][z];
+    }
+    getBlockWV(x, y, z) {
+        if (x > -1 && x < 16 && y > -1 && y < 16 && z > -1 && z < 16) {
+            return this.blocks[x][y][z];
+        }
+        try {
+            if (y < 0)
+                return this.chunk.subchunks[this.pos.y - 1].getBlockInside(x, y + 16, z);
+            if (y > 15)
+                return this.chunk.subchunks[this.pos.y + 1].getBlockInside(x, y - 16, z);
+            if (x < 0)
+                return this.chunk.neighbours["NEG_X"].subchunks[this.pos.y].getBlockInside(x + 16, y, z);
+            if (x > 15)
+                return this.chunk.neighbours["POS_X"].subchunks[this.pos.y].getBlockInside(x - 16, y, z);
+            if (z < 0)
+                return this.chunk.neighbours["NEG_Z"].subchunks[this.pos.y].getBlockInside(x, y, z + 16);
+            if (z > 15)
+                return this.chunk.neighbours["POS_Z"].subchunks[this.pos.y].getBlockInside(x, y, z - 16);
+        }
+        catch (error) {
+            //     console.log("Cannot get block of next subchunk!!",x,y,z);
+        }
+        return undefined;
+    }
     getBlockSub(pos) {
         if (pos.x > -1 && pos.x < 16 && pos.y > -1 && pos.y < 16 && pos.z > -1 && pos.z < 16) {
             return { block: this.blocks[pos.x][pos.y][pos.z], sub: this, pos };
         }
         else {
-            let transPos = new Vector(0, 0, 0);
-            let func = (par) => {
+            const transPos = new Vector(0, 0, 0);
+            const func = (par) => {
                 if (pos[par] < 0) {
                     pos[par] = 15;
                     transPos[par] = -1;
@@ -139,61 +165,48 @@ export class SubChunk {
         }
     }
     //DONE: update vertices only tree sides
+    updateSide(x, y, z, dx, dy, dz, vStart, side, block, index, vBuffer) {
+        const testedBlock = this.getBlockWV(dx + x, dy + y, dz + z);
+        if (testedBlock == undefined)
+            return;
+        if (block.id < 1) {
+            if (testedBlock.id > 0) {
+                this.mesh.vertices.push(...vBuffer.slice(vStart, vStart + 12));
+                this.mesh.tCoords.push(...SubChunk.getTextureCords(testedBlock, SubChunk.flip(side)));
+                this.mesh.indices.push(index + 2, index + 1, index, index + 2, index, index + 3);
+                this.mesh.lightLevels.push(block.skyLight, block.skyLight, block.skyLight, block.skyLight);
+                this.mesh.fb.push(block.lightFBlock, block.lightFBlock, block.lightFBlock, block.lightFBlock);
+                index += 4;
+            }
+        }
+        else {
+            if (testedBlock.id < 1) {
+                this.mesh.vertices.push(...vBuffer.slice(vStart, vStart + 12));
+                this.mesh.tCoords.push(...SubChunk.getTextureCords(block, side));
+                this.mesh.indices.push(index + 2, index + 1, index, index + 2, index, index + 3);
+                this.mesh.lightLevels.push(testedBlock.skyLight, testedBlock.skyLight, testedBlock.skyLight, testedBlock.skyLight);
+                this.mesh.fb.push(testedBlock.lightFBlock, testedBlock.lightFBlock, testedBlock.lightFBlock, testedBlock.lightFBlock);
+                index += 4;
+            }
+        }
+        return index;
+    }
     updateVerticesOptimized() {
         let index = 0;
         for (let x = 0; x < 16; x++)
-            for (let z = 0; z < 16; z++)
-                for (let y = 0; y < 16; y++) {
-                    let block = this.blocks[x][y][z];
-                    let temp = new Array();
+            for (let y = 0; y < 16; y++)
+                for (let z = 0; z < 16; z++) {
+                    const block = this.blocks[x][y][z];
+                    const temp = [];
+                    //20 ms for 65535
                     for (let i = 0; i < SubChunk.defVertices.length; i += 3) {
                         temp.push(SubChunk.defVertices[i] + x);
                         temp.push(SubChunk.defVertices[i + 1] + y + (this.pos.y * 16));
                         temp.push(SubChunk.defVertices[i + 2] + z);
                     }
-                    let temp2 = new Array();
-                    for (let i = 0; i < SubChunk.defVertices.length; i += 3) {
-                        temp2.push((SubChunk.defVertices[i] / (4 * (15 / block.skyLight))) + x);
-                        temp2.push((SubChunk.defVertices[i + 1] / (4 * (15 / block.skyLight))) + y + (this.pos.y * 16));
-                        temp2.push((SubChunk.defVertices[i + 2] / (4 * (15 / block.skyLight))) + z);
-                    }
-                    /*if(block.skyLightDir==directions.SOURCE)
-                     {
-                     this.mesh.vertices.push(...temp2.slice(0,12));
-                     this.mesh.tCoords.push(...SubChunk.getTextureCordsInd(11));
-                     this.mesh.indices.push(index+2,index+1,index,index+2,index,index+3);
-                     this.mesh.lightLevels.push(block.skyLight,block.skyLight,block.skyLight,block.skyLight);
-                     this.mesh.fb.push(block.lightFBlock,block.lightFBlock,block.lightFBlock,block.lightFBlock);
-                     index+=4;
-                     }*/
-                    let side = (vec, vStart, side) => {
-                        let testedBlock = this.getBlock(new Vector(vec.x + x, vec.y + y, vec.z + z));
-                        if (testedBlock == undefined)
-                            return;
-                        if (block.id < 1) {
-                            if (testedBlock.id > 0) {
-                                this.mesh.vertices.push(...temp.slice(vStart, vStart + 12));
-                                this.mesh.tCoords.push(...SubChunk.getTextureCords(testedBlock, SubChunk.flip(side)));
-                                this.mesh.indices.push(index + 2, index + 1, index, index + 2, index, index + 3);
-                                this.mesh.lightLevels.push(block.skyLight, block.skyLight, block.skyLight, block.skyLight);
-                                this.mesh.fb.push(block.lightFBlock, block.lightFBlock, block.lightFBlock, block.lightFBlock);
-                                index += 4;
-                            }
-                        }
-                        else {
-                            if (testedBlock.id < 1) {
-                                this.mesh.vertices.push(...temp.slice(vStart, vStart + 12));
-                                this.mesh.tCoords.push(...SubChunk.getTextureCords(block, side));
-                                this.mesh.indices.push(index + 2, index + 1, index, index + 2, index, index + 3);
-                                this.mesh.lightLevels.push(testedBlock.skyLight, testedBlock.skyLight, testedBlock.skyLight, testedBlock.skyLight);
-                                this.mesh.fb.push(testedBlock.lightFBlock, testedBlock.lightFBlock, testedBlock.lightFBlock, testedBlock.lightFBlock);
-                                index += 4;
-                            }
-                        }
-                    };
-                    side(new Vector(1, 0, 0), 36, "left");
-                    side(new Vector(0, -1, 0), 48, "bottom");
-                    side(new Vector(0, 0, -1), 0, "back");
+                    index = this.updateSide(x, y, z, 1, 0, 0, 36, "left", block, index, temp);
+                    index = this.updateSide(x, y, z, 0, -1, 0, 48, "bottom", block, index, temp);
+                    index = this.updateSide(x, y, z, 0, 0, -1, 0, "back", block, index, temp);
                 }
         return index;
     }
@@ -220,7 +233,6 @@ export class SubChunk {
                 }
             }
         }
-        ;
         this.generated = true;
     }
     static blockTextureCoords = Object.freeze({
@@ -244,8 +256,8 @@ export class SubChunk {
         ]
     });
     static getTextureCords(block, face) {
-        let index = blocks[block.id].textureIndex[face];
-        let temp = [
+        const index = blocks[block.id].textureIndex[face];
+        const temp = [
             0.0, 1.0, index,
             1.0, 1.0, index,
             1.0, 0.0, index,
@@ -254,7 +266,7 @@ export class SubChunk {
         return temp;
     }
     static getTextureCordsInd(index) {
-        let temp = [
+        const temp = [
             0.0, 1.0, index,
             1.0, 1.0, index,
             1.0, 0.0, index,
@@ -263,8 +275,8 @@ export class SubChunk {
         return temp;
     }
     static getTextureCords2(blockID, face) {
-        let index = blocks[blockID].textureIndex[face];
-        let temp = [
+        const index = blocks[blockID].textureIndex[face];
+        const temp = [
             0.0, 1.0, index,
             1.0, 1.0, index,
             1.0, 0.0, index,
@@ -338,3 +350,4 @@ export class SubChunk {
         0.5, 0.5, -0.5
     ];
 }
+export { SubChunk };

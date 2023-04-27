@@ -11,6 +11,7 @@ class Main
   chunkMap:Map<String,Chunk> = new Map();
   run():void
   {
+ 
   this.updateChunks();
   }
   onBlock(pos:Vector,id:number)
@@ -32,14 +33,17 @@ return this.chunkMap.get(pos.x+","+pos.z);
   }
  updateChunks()
   {
+    postMessage({type:"console",msg:"Starting server in separated thread!!"});
     let step=1;
     let iter =1;
     let k=0;
     let nextCoords= new Vector(0,0,0);
     let chunk =new Chunk(new Vector(nextCoords.x,0,nextCoords.z));
     chunk.generate();
+   
     for(let i=0;i<16;i++)
     this.sendSubChunk(chunk.subchunks[i]);
+  
     this.sendChunkReady(new Vector(nextCoords.x,0,nextCoords.z));
     postMessage({type:"console",msg:"Chunks ready!!"});
     while(k<settings.maxChunks)
@@ -78,7 +82,7 @@ addEventListener('message', e => {
   
     if(e.data=="start")
    {
-    postMessage({type:"console",msg:"Starting server in separated thread!!"});
+   
     main.run();
    }
 });

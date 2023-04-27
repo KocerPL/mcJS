@@ -1,13 +1,14 @@
 import { CanvaManager } from "../CanvaManager.js";
 import { Loader } from "../Loader.js";
-let gl = CanvaManager.gl;
+const gl = CanvaManager.gl;
 export class Shader {
+    locationCache = new Map();
     ID;
     constructor(vertFile, fragFile) {
-        let vertCode = Loader.txtFile(vertFile);
-        let fragCode = Loader.txtFile(fragFile);
-        let vert = gl.createShader(gl.VERTEX_SHADER);
-        let frag = gl.createShader(gl.FRAGMENT_SHADER);
+        const vertCode = Loader.txtFile(vertFile);
+        const fragCode = Loader.txtFile(fragFile);
+        const vert = gl.createShader(gl.VERTEX_SHADER);
+        const frag = gl.createShader(gl.FRAGMENT_SHADER);
         gl.shaderSource(vert, vertCode);
         gl.shaderSource(frag, fragCode);
         gl.compileShader(vert);
@@ -26,19 +27,24 @@ export class Shader {
         gl.useProgram(this.ID);
     }
     loadMatrix(name, matrix) {
-        let loc = gl.getUniformLocation(this.ID, name);
-        gl.uniformMatrix4fv(loc, false, matrix.toFloat32Array());
+        gl.uniformMatrix4fv(this.getLocation(name), false, matrix.toFloat32Array());
     }
     loadFloat(name, float) {
-        let loc = gl.getUniformLocation(this.ID, name);
-        gl.uniform1f(loc, float);
+        gl.uniform1f(this.getLocation(name), float);
     }
     loadVec3(name, vec) {
-        let loc = gl.getUniformLocation(this.ID, name);
-        gl.uniform3f(loc, vec.x, vec.y, vec.z);
+        gl.uniform3f(this.getLocation(name), vec.x, vec.y, vec.z);
     }
     loadVec4(name, vec) {
-        let loc = gl.getUniformLocation(this.ID, name);
-        gl.uniform4f(loc, vec.x, vec.y, vec.z, vec.w);
+        gl.uniform4f(this.getLocation(name), vec.x, vec.y, vec.z, vec.w);
+    }
+    getLocation(name) {
+        if (this.locationCache.has(name))
+            return this.locationCache.get(name);
+        else {
+            const loc = gl.getUniformLocation(this.ID, name);
+            this.locationCache.set(name, loc);
+            return loc;
+        }
     }
 }

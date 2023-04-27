@@ -2,29 +2,32 @@ import { CanvaManager } from "../CanvaManager.js";
 import { Loader } from "../Loader.js";
 import { Matrix } from "../Utils/Matrix.js";
 import { Vector } from "../Utils/Vector.js";
-let gl = CanvaManager.gl;
+const gl = CanvaManager.gl;
 export abstract class Shader
 {
+    private locationCache:Map<string,WebGLUniformLocation>= new Map();
     private ID:WebGLShader;
     constructor(vertFile:string,fragFile:string)
     {
-     let vertCode = Loader.txtFile(vertFile); 
-     let fragCode = Loader.txtFile(fragFile);
-     let vert = gl.createShader(gl.VERTEX_SHADER);
-     let frag = gl.createShader(gl.FRAGMENT_SHADER);
-     gl.shaderSource(vert,vertCode);
-     gl.shaderSource(frag,fragCode);
-     gl.compileShader(vert);
-     gl.compileShader(frag);
-     if(gl.getShaderInfoLog(vert).length>0)
-        console.log(gl.getShaderInfoLog(vert));
-    if(gl.getShaderInfoLog(frag).length>0)
-        console.log(gl.getShaderInfoLog(frag));
-     this.ID = gl.createProgram();
-     gl.attachShader(this.ID,vert);
-     gl.attachShader(this.ID,frag);
-    gl.linkProgram(this.ID);
-    gl.useProgram(this.ID);
+        const vertCode = Loader.txtFile(vertFile); 
+        const fragCode = Loader.txtFile(fragFile);
+        const vert = gl.createShader(gl.VERTEX_SHADER);
+        const frag = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(vert,vertCode);
+        gl.shaderSource(frag,fragCode);
+        gl.compileShader(vert);
+        gl.compileShader(frag);
+
+        
+        if(gl.getShaderInfoLog(vert).length>0)
+            console.log(gl.getShaderInfoLog(vert));
+        if(gl.getShaderInfoLog(frag).length>0)
+            console.log(gl.getShaderInfoLog(frag));
+        this.ID = gl.createProgram();
+        gl.attachShader(this.ID,vert);
+        gl.attachShader(this.ID,frag);
+        gl.linkProgram(this.ID);
+        gl.useProgram(this.ID);
     }
     use()
     {
@@ -33,22 +36,29 @@ export abstract class Shader
     abstract loadUniforms(...args:any);
     loadMatrix(name:string,matrix:Matrix)
     {
-        let loc = gl.getUniformLocation(this.ID,name);
-        gl.uniformMatrix4fv(loc,false,matrix.toFloat32Array());
+        gl.uniformMatrix4fv(this.getLocation(name),false,matrix.toFloat32Array());
     }
     loadFloat(name:string, float:number)
     {
-        let loc = gl.getUniformLocation(this.ID,name);
-        gl.uniform1f(loc,float);
+        gl.uniform1f(this.getLocation(name),float);
     }
     loadVec3(name:string,vec:Vector)
     {
-        let loc = gl.getUniformLocation(this.ID,name);
-        gl.uniform3f(loc,vec.x,vec.y,vec.z);
+        gl.uniform3f(this.getLocation(name),vec.x,vec.y,vec.z);
     }
     loadVec4(name:string,vec:Vector)
     {
-        let loc = gl.getUniformLocation(this.ID,name);
-        gl.uniform4f(loc,vec.x,vec.y,vec.z,vec.w);
+        gl.uniform4f(this.getLocation(name),vec.x,vec.y,vec.z,vec.w);
+    }
+    private getLocation(name:string):WebGLUniformLocation
+    {
+        if(this.locationCache.has(name))
+            return this.locationCache.get(name);
+        else
+        {
+            const loc =gl.getUniformLocation(this.ID,name);
+            this.locationCache.set(name,loc);
+            return loc;
+        }
     }
 }
