@@ -1,8 +1,8 @@
 {
 "compilerOptions": {
-  "target": "esnext",
-    "outDir":"../../build/Client",
-    "module": "esnext",
+  "target": "ESNext",
+    "outDir":"../build",
+    "module": "CommonJS",
     "lib": [
         "esnext",
         "dom"
