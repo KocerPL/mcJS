@@ -1,0 +1,11 @@
+{
+"compilerOptions": {
+  "target": "esnext",
+    "outDir":"../../build/Client",
+    "module": "esnext",
+    "lib": [
+        "esnext",
+        "dom"
+      ]
+}
+}
