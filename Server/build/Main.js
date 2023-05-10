@@ -4,6 +4,8 @@ const express = require("express");
 const http = require("http");
 const app = express();
 const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
 let pos = __dirname.length - 1;
 for (let i = 0; i < 2; pos--) {
     if (__dirname.at(pos) == "/")
@@ -12,6 +14,9 @@ for (let i = 0; i < 2; pos--) {
 const rDir = __dirname.substring(0, pos + 1);
 app.get("/", (req, res) => {
     res.sendFile(rDir + "/Client/index.html");
+});
+io.on('connection', (socket) => {
+    console.log('a user connected');
 });
 app.get("*", (req, res) => {
     //  console.log(rDir+"/Client/index.html");
