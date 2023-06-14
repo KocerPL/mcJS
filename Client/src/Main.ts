@@ -19,6 +19,7 @@ import { Player } from "./Game/Player.js";
 import { SubChunk } from "./Game/SubChunk.js";
 import { World } from "./Game/World.js";
 const gl = CanvaManager.gl;
+declare const io;
 export class LightNode
 {
     pos:Vector;
@@ -63,6 +64,7 @@ export class Main
     public static tasks:Array<Array<Task>> = new Array(11);
     private static lastTick = 0;
     private static lastFrame=0;
+    public static socket = io();
     public static shader:DefaultShader;
     public static atlasShader:AtlasShader;
     private static delta = 0;
@@ -116,6 +118,10 @@ export class Main
             chunk.subchunks[ev.data.subY].blocks[x][y][z].skyLight=15;
             chunk.subchunks[ev.data.subY].blocks[x][y][z].skyLightDir =directions.SOURCE;
         }
+        for(let i=0;i<16;i++)
+            if(!chunk.subchunks[i])
+                return;
+        this.chunkQueue.push(Main.getChunkAt(ev.data.subX,ev.data.subZ));
     }
     public static handleChunkReady(ev)
     {
@@ -124,8 +130,22 @@ export class Main
     }
     public static run():void
     {
-      
-        this.integratedServer = new Worker("./build/IntegratedServer/Main.js", {
+        this.socket.on("subchunk",(ev)=>{
+             
+            this.handleSubchunk(ev);
+        });
+        this.socket.on("playerPos",(posStr:string)=>{
+            const pos =JSON.parse(posStr);
+            this.player.pos = new Vector(pos.x,pos.y,pos.z);
+        });
+        this.socket.on("placeBlock",(data)=>{
+            World.setBlockNoLight(new Vector(data.pos.x,data.pos.y,data.pos.z),data.id);
+        });
+        for(let x=-4;x<4;x++)
+            for(let z=-4;z<4;z++)
+                for(let i=0;i<16;i++)
+                    this.socket.emit("getSubchunk",x,i,z);
+        /* this.integratedServer = new Worker("./build/IntegratedServer/Main.js", {
             type: "module"
         });
         this.integratedServer.onmessage =(ev)=>{
@@ -144,6 +164,7 @@ export class Main
             }
         };
         this.integratedServer.postMessage("start");
+        */
         console.log("Random:", randRange(-0.2,0.2));
         CanvaManager.setupCanva(document.body);
         // EBO.unbind();
@@ -210,10 +231,8 @@ export class Main
     public static processSkyLight()
     {
         const relight:Map<Block,LightNode> = new Map();
-        let i=0;
         while(this.skyLightRemQueue.length>0)
         {  
-            i++;
             const node:LightNode =this.skyLightRemQueue.shift();
             if(relight.get( node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z])!=undefined)
                 relight.delete(node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z]);
@@ -239,7 +258,6 @@ export class Main
         relight.forEach((lightnode:LightNode)=>{this.skyLightQueue.push(lightnode);});
         while(this.skyLightQueue.length>0)
         {  
-            i++;
             const node:LightNode =this.skyLightQueue.shift();
             node.direction??=node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLightDir;
             if(node.light==undefined)
@@ -278,10 +296,8 @@ export class Main
     public static processLight()
     {
         const relight:Map<Block,LightNode> = new Map();
-        let i=0;
         while(this.lightRemQueue.length>0)
         {  
-            i++;
             const node:LightNode =this.lightRemQueue.shift();
             if(relight.get( node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z])!=undefined)
                 relight.delete(node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z]);
@@ -306,7 +322,6 @@ export class Main
         relight.forEach((lightnode:LightNode)=>{this.lightQueue.push(lightnode);});
         while(this.lightQueue.length>0)
         {  
-            i++;
             const node:LightNode =this.lightQueue.shift();
             node.direction??=node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir;
             if(node.light==undefined)
@@ -451,7 +466,7 @@ export class Main
             for(let i=0;i<iter;i++)
             {
                 nextCoords.x+=step;
-                const {chunk,isNew} = this.getORnew(nextCoords.x,nextCoords.z);
+                const {chunk} = this.getORnew(nextCoords.x,nextCoords.z);
                 loadBuffer.push(chunk);
               
                 if(!chunk.generated) {chunk.preGenOne();stop =true; break; }
@@ -468,7 +483,7 @@ export class Main
             for(let i=0;i<iter;i++)
             {
                 nextCoords.z+=step;
-                const {chunk,isNew} = this.getORnew(nextCoords.x,nextCoords.z);
+                const {chunk} = this.getORnew(nextCoords.x,nextCoords.z);
                 // stop = isNew;
                 loadBuffer.push(chunk);
                 if(!chunk.generated) {chunk.preGenOne();
@@ -598,8 +613,7 @@ export class Main
         a.type="file";
    
         a.click();
-        a.oninput = (ev)=>{
-            const file =    a.files.item(0);
+        a.oninput = ()=>{
             //console.log(file);
             const reader = new FileReader();
             let ok;
@@ -608,9 +622,6 @@ export class Main
                 this.file =JSON.parse(ok);
                 console.log(this.file);
             };
-            const text = reader.result;
-   
-            const k=  reader.readAsText(file);
             console.log(ok);
             //JSON.parse(file);
     

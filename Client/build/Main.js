@@ -58,6 +58,7 @@ class Main {
     static tasks = new Array(11);
     static lastTick = 0;
     static lastFrame = 0;
+    static socket = io();
     static shader;
     static atlasShader;
     static delta = 0;
@@ -109,29 +110,50 @@ class Main {
                     chunk.subchunks[ev.data.subY].blocks[x][y][z].skyLight = 15;
                     chunk.subchunks[ev.data.subY].blocks[x][y][z].skyLightDir = directions.SOURCE;
                 }
+        for (let i = 0; i < 16; i++)
+            if (!chunk.subchunks[i])
+                return;
+        this.chunkQueue.push(Main.getChunkAt(ev.data.subX, ev.data.subZ));
     }
     static handleChunkReady(ev) {
         console.log("received chunk ready");
         this.chunkQueue.push(Main.getChunkAt(ev.data.chunkX, ev.data.chunkZ));
     }
     static run() {
-        this.integratedServer = new Worker("./build/IntegratedServer/Main.js", {
+        this.socket.on("subchunk", (ev) => {
+            this.handleSubchunk(ev);
+        });
+        this.socket.on("playerPos", (posStr) => {
+            const pos = JSON.parse(posStr);
+            this.player.pos = new Vector(pos.x, pos.y, pos.z);
+        });
+        this.socket.on("placeBlock", (data) => {
+            World.setBlockNoLight(new Vector(data.pos.x, data.pos.y, data.pos.z), data.id);
+        });
+        for (let x = -4; x < 4; x++)
+            for (let z = -4; z < 4; z++)
+                for (let i = 0; i < 16; i++)
+                    this.socket.emit("getSubchunk", x, i, z);
+        /* this.integratedServer = new Worker("./build/IntegratedServer/Main.js", {
             type: "module"
         });
-        this.integratedServer.onmessage = (ev) => {
+        this.integratedServer.onmessage =(ev)=>{
             console.log("received Message");
-            switch (ev.data.type) {
-                case "console":
-                    console.log(ev.data.msg);
-                    break;
-                case "subchunk":
-                    this.handleSubchunk(ev);
-                    break;
-                case "chunkReady":
-                    this.handleChunkReady(ev);
+            switch(ev.data.type)
+            {
+            case "console":
+                console.log(ev.data.msg);
+                break;
+            case "subchunk":
+                this.handleSubchunk(ev);
+                break;
+            case "chunkReady":
+                this.handleChunkReady(ev);
+            
             }
         };
         this.integratedServer.postMessage("start");
+        */
         console.log("Random:", randRange(-0.2, 0.2));
         CanvaManager.setupCanva(document.body);
         // EBO.unbind();
@@ -192,9 +214,7 @@ class Main {
     }
     static processSkyLight() {
         const relight = new Map();
-        let i = 0;
         while (this.skyLightRemQueue.length > 0) {
-            i++;
             const node = this.skyLightRemQueue.shift();
             if (relight.get(node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z]) != undefined)
                 relight.delete(node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z]);
@@ -220,7 +240,6 @@ class Main {
         }
         relight.forEach((lightnode) => { this.skyLightQueue.push(lightnode); });
         while (this.skyLightQueue.length > 0) {
-            i++;
             const node = this.skyLightQueue.shift();
             node.direction ??= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLightDir;
             if (node.light == undefined)
@@ -257,9 +276,7 @@ class Main {
     }
     static processLight() {
         const relight = new Map();
-        let i = 0;
         while (this.lightRemQueue.length > 0) {
-            i++;
             const node = this.lightRemQueue.shift();
             if (relight.get(node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z]) != undefined)
                 relight.delete(node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z]);
@@ -283,7 +300,6 @@ class Main {
         }
         relight.forEach((lightnode) => { this.lightQueue.push(lightnode); });
         while (this.lightQueue.length > 0) {
-            i++;
             const node = this.lightQueue.shift();
             node.direction ??= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir;
             if (node.light == undefined)
@@ -411,7 +427,7 @@ class Main {
             //x
             for (let i = 0; i < iter; i++) {
                 nextCoords.x += step;
-                const { chunk, isNew } = this.getORnew(nextCoords.x, nextCoords.z);
+                const { chunk } = this.getORnew(nextCoords.x, nextCoords.z);
                 loadBuffer.push(chunk);
                 if (!chunk.generated) {
                     chunk.preGenOne();
@@ -431,7 +447,7 @@ class Main {
                 break;
             for (let i = 0; i < iter; i++) {
                 nextCoords.z += step;
-                const { chunk, isNew } = this.getORnew(nextCoords.x, nextCoords.z);
+                const { chunk } = this.getORnew(nextCoords.x, nextCoords.z);
                 // stop = isNew;
                 loadBuffer.push(chunk);
                 if (!chunk.generated) {
@@ -547,8 +563,7 @@ class Main {
         const a = document.createElement("input");
         a.type = "file";
         a.click();
-        a.oninput = (ev) => {
-            const file = a.files.item(0);
+        a.oninput = () => {
             //console.log(file);
             const reader = new FileReader();
             let ok;
@@ -557,8 +572,6 @@ class Main {
                 this.file = JSON.parse(ok);
                 console.log(this.file);
             };
-            const text = reader.result;
-            const k = reader.readAsText(file);
             console.log(ok);
             //JSON.parse(file);
         };

@@ -13,7 +13,7 @@ export class Chunk {
             for (let y = 0; y < 16; y++)
                 for (let x = 0; x < 16; x++)
                     for (let z = 0; z < 16; z++) {
-                        let index = x + (y * 16) + (z * 256);
+                        const index = x + (y * 16) + (z * 256);
                         if (y + (i * 16) < 130)
                             this.subchunks[i].blocks[index] = 1;
                         else if (y + (i * 16) == 130)
@@ -21,21 +21,20 @@ export class Chunk {
                         else
                             this.subchunks[i].blocks[index] = 0;
                         /*   if(y%(x%3)==0)
-                           this.subchunks[i].blocks[index] = 1;
-                           else
-                           this.subchunks[i].blocks[index] = 0;
-                           this.subchunks[i].lightMap[index] = 0;*/
+                this.subchunks[i].blocks[index] = 1;
+                else
+                this.subchunks[i].blocks[index] = 0;
+                this.subchunks[i].lightMap[index] = 0;*/
                     }
         }
         this.calcHeightmap();
     }
     calcHeightmap() {
         for (let i = 0; i < this.subchunks.length; i++) {
-            let sub = this.subchunks[i];
             for (let y = 0; y < 16; y++)
                 for (let x = 0; x < 16; x++)
                     for (let z = 0; z < 16; z++) {
-                        let index = x + (y * 16) + (z * 256);
+                        const index = x + (y * 16) + (z * 256);
                         if (this.subchunks[i].blocks[index] > 0 && (this.heightmap[x + (z * 16)]) < y + (i * 16))
                             this.heightmap[x + (z * 16)] = y + (i * 16);
                     }

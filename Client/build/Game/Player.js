@@ -437,6 +437,7 @@ class Player {
                 if ((Date.now() / 1000) - blocks[this.targetedBlock.id].breakTime >= this.startTime || Main.fastBreaking) {
                     const middle = Vector.add(blockPos.round(), new Vector(randRange(-0.2, 0.2), randRange(-0.2, 0.2), randRange(-0.2, 0.2)));
                     Main.entities.push(new Item(middle, World.getBlock(blockPos).id));
+                    Main.socket.emit("placeBlock", { id: 0, pos: { x: blockPos.x, y: blockPos.y, z: blockPos.z } });
                     World.setBlockNoLight(blockPos, 0);
                     this.targetedBlock = null;
                 }
@@ -460,6 +461,7 @@ class Player {
                 blockPos = new Vector(blockPos.x + (Math.sin(this.camera.getYaw() * Math.PI / 180) * Math.cos(this.camera.getPitch() * Math.PI / 180) * dist), blockPos.y + (Math.sin(this.camera.getPitch() * Math.PI / 180) * dist), blockPos.z + (Math.cos(this.camera.getYaw() * Math.PI / 180) * Math.cos(this.camera.getPitch() * Math.PI / 180) * dist));
             }
             if (World.getBlock(lastPos).id < 1 && i < 5 && !lastPos.round().equals(new Vector(this.pos.x, this.pos.y - 0.5, this.pos.z).round()) && !lastPos.round().equals(this.pos.round()) && this.itemsBar[this.selectedItem].id != 0) {
+                Main.socket.emit("placeBlock", { id: this.itemsBar[this.selectedItem].id, pos: { x: lastPos.x, y: lastPos.y, z: lastPos.z } });
                 World.setBlockNoLight(lastPos, this.itemsBar[this.selectedItem].id);
                 this.itemsBar[this.selectedItem].count--;
                 if (this.itemsBar[this.selectedItem].count == 0)
