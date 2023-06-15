@@ -1,7 +1,5 @@
 import { Model } from "../Game/Models.js";
-import { CanvaManager } from "./CanvaManager.js";
 import { Loader } from "./Loader.js";
-let gl = CanvaManager.gl;
 class Texture {
     static SIZE = 64;
     static imageSize = 1024;

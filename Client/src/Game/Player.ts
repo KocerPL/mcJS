@@ -11,6 +11,7 @@ import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
 import { Block, blocks, dirAssoc } from "./Block.js";
 import { Item } from "./entities/Item.js";
+import { PlayerEntity } from "./entities/PlayerEntity.js";
 import { SubChunk } from "./SubChunk.js";
 import { World } from "./World.js";
 const gl = CanvaManager.gl;
@@ -29,7 +30,8 @@ export class invItem
 export class Player
 {
 //model
-
+    id:number;
+    entity:PlayerEntity;
     camera:Camera = new Camera();
     pos:Vector;
     inWater:boolean;
@@ -93,6 +95,7 @@ export class Player
     constructor(pos:Vector)
     {
         this.pos = pos;
+        this.entity = new PlayerEntity(this.pos);
         this.camera.setPosition(new Vector(pos.x,pos.y+1,pos.z));
         for(let i=0;i<9;i++)
             this.itemsBar[i]= new invItem(0);
@@ -226,10 +229,10 @@ export class Player
             array =    array.concat([2+k,1+k,k,2+k,0+k,3+k]);
         }
         this.ebo.bufferData(array);
-        VAO.unbind();
     }
     switchPerson(person:pers)
     {
+       
         if(person== this.person) return;
         this.person = person;
         this.camera.projRot = 0;
@@ -245,6 +248,7 @@ export class Player
     }
     updatePos()
     {
+        Main.socket.emit("playerMove",this.pos);
         if(this.locked) return;
         let hop =false;
         let tempPos = this.pos.copy();
@@ -596,24 +600,11 @@ export class Player
     render()
     {
      
-       
+        
         if(this.person != "First") 
         {
-            let transformation = Matrix.identity();
-            transformation =transformation.translate(this.pos.x,this.camera.getPosition().y,this.pos.z);
-            transformation = transformation.rotateY(-this.camera.getYaw());
-            transformation = transformation.rotateX(-this.camera.getPitch());
-            transformation = transformation.scale(0.4,0.4,0.4);
-            Texture.skinAtlas.bind();
-            this.vao.bind();
-
-            Main.atlasShader.use();
-            Main.atlasShader.loadUniforms(this.camera.getProjection(),transformation,this.camera.getView(),15);
-            gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,0);
-            Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.15,this.pos.z).scale(0.51,0.51,0.51).rotateY(-this.camera.getYaw()));
-            //Body
-            gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,36*4);
-            Main.shader.use();
+            this.entity.pos = this.pos;
+            this.entity.render();
         }
         if(this.blockBreakingTime>1)
         {      const   transformation = Matrix.identity();

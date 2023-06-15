@@ -4,7 +4,12 @@ export class Entity {
     transformation = Matrix.identity();
     pos;
     rs = new RenderSet();
-    constructor(pos) {
+    id;
+    constructor(pos, id) {
+        this.id = id;
         this.pos = pos.copy();
+    }
+    get ID() {
+        return this.id;
     }
 }

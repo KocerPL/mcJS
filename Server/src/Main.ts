@@ -2,7 +2,7 @@ import express = require("express");
 import http = require("http");
 const { Server } = require("socket.io");
 import fs = require('fs');
-
+let lastID=0;
 const app = express();
 const server =http.createServer(app);
 const io = new Server(server);
@@ -18,11 +18,29 @@ app.get("/",(req,res)=>{
 });
 io.on('connection', (socket) => {
     console.log('a user connected');
-   setTimeout(()=>{socket.emit('playerPos',JSON.stringify({x:0,y:200,z:0}))},2000);
+    socket.KOCEid = lastID++;
+    socket.pos = {x:0,y:200,z:0};
+   setTimeout(()=>{socket.emit('login',JSON.stringify({x:0,y:200,z:0}), socket.KOCEid);
+  // console.log(io.sockets);
+    for(let sock of  io.sockets.sockets)
+    {
+        if(sock[1]!=socket)
+        {
+            console.log(sock[1]);
+            socket.emit('spawnPlayer',sock[1].pos,sock[1].KOCEid);
+        }
+    }
+    socket.broadcast.emit('spawnPlayer',socket.pos,socket.KOCEid)
+},2000);
     socket.on('getSubchunk',(x,y,z)=>{
-        console.log("Subchunk");
+       // console.log("Subchunk");
         let data = JSON.parse(fs.readFileSync(__dirname+"/world/"+x+"."+y+"."+z+".sub").toString());
-        socket.emit('subchunk', {data:{subX:x,subY:y,subZ:z,blocks:data}})    });
+        socket.emit('subchunk', {data:{subX:x,subY:y,subZ:z,blocks:data}})    
+    });
+        socket.on("playerMove",(pos)=>{
+            socket.pos =pos;
+            socket.broadcast.emit("moveEntity",socket.KOCEid,pos);
+        });
     socket.on("placeBlock",(data)=>{
        socket.broadcast.emit("placeBlock",data);
        let inPos ={x:Math.round(Math.round(data.pos.x)%16),y:Math.round(Math.round(data.pos.y)%16),z:Math.round(Math.round(data.pos.z)%16)};

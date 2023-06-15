@@ -9,11 +9,11 @@ export class RenderSet {
     ebo;
     vfb;
     index = 0;
-    vertices = new Array();
-    textureCoords = new Array();
-    skyLight = new Array();
-    blockLight = new Array();
-    indices = new Array();
+    vertices = [];
+    textureCoords = [];
+    skyLight = [];
+    blockLight = [];
+    indices = [];
     count = 0;
     constructor() {
         this.vao = new VAO();
@@ -49,11 +49,11 @@ export class RenderSet {
         this.index += index;
     }
     resetArrays() {
-        this.vertices = new Array();
-        this.textureCoords = new Array();
-        this.skyLight = new Array();
-        this.blockLight = new Array();
-        this.indices = new Array();
+        this.vertices = [];
+        this.textureCoords = [];
+        this.skyLight = [];
+        this.blockLight = [];
+        this.indices = [];
         this.index = 0;
     }
 }

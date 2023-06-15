@@ -16,6 +16,7 @@ import { GUI } from "./Game/GUI.js";
 import { Player } from "./Game/Player.js";
 import { SubChunk } from "./Game/SubChunk.js";
 import { World } from "./Game/World.js";
+import { PlayerEntity } from "./Game/entities/PlayerEntity.js";
 const gl = CanvaManager.gl;
 export class LightNode {
     pos;
@@ -65,7 +66,7 @@ class Main {
     static crossVAO;
     static fastDelta = 0;
     static lastFastTick = 0;
-    static player = new Player(new Vector(0, 130, 0));
+    static player = new Player(new Vector(-2, 144, -7));
     static range = { start: 0, end: 1 };
     //public static chunks:Array<Array<Chunk>>=new Array(8);
     static chunkQueue = [];
@@ -95,6 +96,12 @@ class Main {
     static heh() {
         console.log("heh");
     }
+    static getEntity(id) {
+        for (const entity of this.entities) {
+            if (entity.ID == id)
+                return entity;
+        }
+    }
     static handleSubchunk(ev) {
         console.log("received subchunk");
         let chunk = Main.getChunkAt(ev.data.subX, ev.data.subZ);
@@ -123,7 +130,15 @@ class Main {
         this.socket.on("subchunk", (ev) => {
             this.handleSubchunk(ev);
         });
-        this.socket.on("playerPos", (posStr) => {
+        this.socket.on("spawnPlayer", (pos, id) => {
+            console.log("summoningPLAYER");
+            this.entities.push(new PlayerEntity(new Vector(pos.x, pos.y, pos.z), id));
+        });
+        this.socket.on("moveEntity", (id, pos) => {
+            this.getEntity(id).pos = new Vector(pos.x, pos.y, pos.z);
+        });
+        this.socket.on("login", (posStr, id) => {
+            this.player.id = id;
             const pos = JSON.parse(posStr);
             this.player.pos = new Vector(pos.x, pos.y, pos.z);
         });
@@ -579,7 +594,7 @@ class Main {
     static render() {
         this.Measure.frames++;
         CanvaManager.debug.innerText = "Fps: " + this.Measure.fps + " Selected block: " + blocks[this.player.itemsBar[this.player.selectedItem].id].name + " Count:" + this.player.itemsBar[this.player.selectedItem].count +
-            "\n XYZ:  X:" + (Math.floor(this.player.pos.x * 100) / 100) + "  Y:" + (Math.floor(this.player.pos.y * 100) / 100) + "  Z:" + (Math.floor(this.player.pos.z * 100) / 100) + "\n HM:" + World.getHeightMap(this.player.pos) + "\nFast break [8]: " + this.fastBreaking + " Fly[9]: " + this.fly + "\n Sky light [4][5]:" + this.sunLight
+            "\n XYZ:  X:" + (Math.floor(this.player.pos.x * 100) / 100) + "  Y:" + (Math.floor(this.player.pos.y * 100) / 100) + "  Z:" + (Math.floor(this.player.pos.z * 100) / 100) + "\n HM:" + "World.getHeightMap(this.player.pos)" + "\nFast break [8]: " + this.fastBreaking + " Fly[9]: " + this.fly + "\n Sky light [4][5]:" + this.sunLight
             + "\nErosion: " + World.getErosion(this.player.pos.x, this.player.pos.z) + "\n Visible chunks[6][7]: " + this.maxChunks;
         this.shader.use();
         this.player.camera.preRender();

@@ -10,13 +10,13 @@ export class RenderSet
     vlo:VBO;
     ebo:EBO;
     vfb:VBO;
-    index:number = 0;
-    vertices:Array<number> = new Array();
-    textureCoords:Array<number> = new Array();
-    skyLight:Array<number> = new Array();
-    blockLight:Array<number> = new Array();
-    indices:Array<number> = new Array();
-    count:number=0;
+    index = 0;
+    vertices:Array<number> = [];
+    textureCoords:Array<number> = [];
+    skyLight:Array<number> = [];
+    blockLight:Array<number> = [];
+    indices:Array<number> = [];
+    count=0;
     constructor()
     {
         this.vao = new VAO();
@@ -59,11 +59,11 @@ export class RenderSet
     }
     resetArrays()
     {
-        this.vertices = new Array();
-        this.textureCoords = new Array();
-       this.skyLight = new Array();
-       this.blockLight = new Array();
-        this.indices = new Array();
+        this.vertices = [];
+        this.textureCoords = [];
+        this.skyLight = [];
+        this.blockLight = [];
+        this.indices = [];
         this.index=0;
     }
 }

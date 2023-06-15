@@ -1,4 +1,4 @@
-export var Model = {
+export const Model = {
     player: [
         {
             pos: [8, 8],
@@ -14,7 +14,8 @@ export var Model = {
         },
         {
             pos: [16, 8],
-            size: [8, 8]
+            size: [8, 8],
+            reversedY: true
         },
         {
             pos: [8, 0],
