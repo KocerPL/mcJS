@@ -37,9 +37,10 @@ io.on('connection', (socket) => {
         let data = JSON.parse(fs.readFileSync(__dirname+"/world/"+x+"."+y+"."+z+".sub").toString());
         socket.emit('subchunk', {data:{subX:x,subY:y,subZ:z,blocks:data}})    
     });
-        socket.on("playerMove",(pos)=>{
+        socket.on("playerMove",(pos,rot)=>{
             socket.pos =pos;
-            socket.broadcast.emit("moveEntity",socket.KOCEid,pos);
+            socket.rot=rot;
+            socket.broadcast.emit("moveEntity",socket.KOCEid,pos,rot);
         });
     socket.on("placeBlock",(data)=>{
        socket.broadcast.emit("placeBlock",data);

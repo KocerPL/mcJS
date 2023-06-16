@@ -1,13 +1,16 @@
 import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { Texture } from "../../Engine/Texture.js";
 import { Matrix } from "../../Engine/Utils/Matrix.js";
+import { Vector } from "../../Engine/Utils/Vector.js";
 import { Main } from "../../Main.js";
 import { Entity } from "../Entity.js";
 import { SubChunk } from "../SubChunk.js";
 const gl = CanvaManager.gl;
 export class PlayerEntity extends Entity {
+    rotation;
     constructor(pos, id) {
         super(pos, id);
+        this.rotation = new Vector(0, 0, 0);
         this.rs.resetArrays();
         this.rs.vertices = [...SubChunk.defVertices, -0.5, -0.7, -0.2,
             0.5, -0.7, -0.2,
@@ -75,16 +78,16 @@ export class PlayerEntity extends Entity {
     }
     render() {
         let transformation = Matrix.identity();
-        //  transformation = transformation.rotateY(-this.camera.getYaw());
-        // transformation = transformation.rotateX(-this.camera.getPitch());
-        transformation = transformation.translate(this.pos.x, this.pos.y + 0.5, this.pos.z);
+        transformation = transformation.translate(this.pos.x, this.pos.y + 0.7, this.pos.z);
         transformation = transformation.scale(0.4, 0.4, 0.4);
+        transformation = transformation.rotateY(this.rotation.y);
+        transformation = transformation.rotateX(this.rotation.x);
         Texture.skinAtlas.bind();
         this.rs.vao.bind();
         Main.atlasShader.use();
         Main.atlasShader.loadUniforms(Main.player.camera.getProjection(), transformation, Main.player.camera.getView(), 15);
         gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_INT, 0);
-        Main.atlasShader.loadTransformation(Matrix.identity().translate(this.pos.x, this.pos.y + 0.15, this.pos.z).scale(0.51, 0.51, 0.51));
+        Main.atlasShader.loadTransformation(Matrix.identity().translate(this.pos.x, this.pos.y + 0.15, this.pos.z).scale(0.51, 0.51, 0.51).rotateY(this.rotation.y));
         //Body
         gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_INT, 36 * 4);
         Main.shader.use();

@@ -3,7 +3,7 @@ import { Main } from "../Main.js";
 import { PerlinN } from "../PerlinNoise.js";
 import { directions } from "./Block.js";
 const perlin = new PerlinN();
-export class World {
+class World {
     Chunks = [];
     static heightMap = new Array(256);
     static waterLevel = 0;
@@ -360,3 +360,4 @@ export class World {
         return 0;
     }
 }
+export { World };

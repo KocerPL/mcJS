@@ -32,7 +32,7 @@ export class LightNode {
         this.direction = direction;
     }
 }
-export class Main {
+class Main {
     static maxChunks = 128;
     static maxSubUpdates = 5;
     static okok = false;
@@ -134,8 +134,11 @@ export class Main {
             console.log("summoningPLAYER");
             this.entities.push(new PlayerEntity(new Vector(pos.x, pos.y, pos.z), id));
         });
-        this.socket.on("moveEntity", (id, pos) => {
-            this.getEntity(id).pos = new Vector(pos.x, pos.y, pos.z);
+        this.socket.on("moveEntity", (id, pos, rot) => {
+            const ent = this.getEntity(id);
+            ent.pos = new Vector(pos.x, pos.y, pos.z);
+            if (ent instanceof PlayerEntity)
+                ent.rotation = new Vector(rot.x, rot.y, rot.z);
         });
         this.socket.on("login", (posStr, id) => {
             this.player.id = id;
@@ -624,4 +627,5 @@ export class Main {
         GUI.render(this.shader2d);
     }
 }
+export { Main };
 Main.run();

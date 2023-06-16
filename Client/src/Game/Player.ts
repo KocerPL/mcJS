@@ -1,18 +1,14 @@
 import { Camera } from "../Engine/Camera.js";
 import { CanvaManager } from "../Engine/CanvaManager.js";
-import { EBO } from "../Engine/EBO.js";
 import { RenderSet } from "../Engine/RenderSet.js";
 import { Texture } from "../Engine/Texture.js";
 import { randRange } from "../Engine/Utils/Math.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Vector } from "../Engine/Utils/Vector.js";
-import { VAO } from "../Engine/VAO.js";
-import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
 import { Block, blocks, dirAssoc } from "./Block.js";
 import { Item } from "./entities/Item.js";
 import { PlayerEntity } from "./entities/PlayerEntity.js";
-import { SubChunk } from "./SubChunk.js";
 import { World } from "./World.js";
 const gl = CanvaManager.gl;
 export type pers = "First" | "Second" |"Third";
@@ -45,13 +41,9 @@ export class Player
     blockBreakingTime=0;
     selectedItem = 0;
     person:pers ="First"; 
-    vao:VAO;
-    vbo:VBO;
-    vtc:VBO;
-    vlo:VBO;
-    ebo:EBO;
     yAcc =0.01;
     mainAcc=0.1;
+    lastTime=0;
     static blVertices =[
     //przód
         -0.501,-0.501,-0.501,
@@ -113,22 +105,6 @@ export class Player
 
             console.log(i);
         }
-        this.vao = new VAO();
-        this.vbo = new VBO();
-      
-        this.vao.addPtr(0,3,0,0);
-        this.vtc = new VBO();
-       
-        this.vao.addPtr(1,2,0,0);
-        this.vlo = new VBO();
-     
-        this.vao.addPtr(2,1,0,0);
-        this.ebo = new EBO();
-      
-        VAO.unbind();
-        VBO.unbind();
-        EBO.unbind();
-        this.bufferVertexes();
     }
     update()
     {
@@ -167,69 +143,6 @@ export class Player
             this.blockOverlay.count=0;
         this.updatePos();
     }
-    bufferVertexes()
-    {
-        this.vao.bind();
-        this.vbo.bufferData([...SubChunk.defVertices, -0.5,-0.7,-0.2,
-            0.5,-0.7,-0.2,
-            0.5,0.7,-0.2,
-            -0.5,0.7,-0.2,
-            -0.5,-0.7,0.2,
-            0.5,-0.7,0.2,
-            0.5,0.7,0.2,
-            -0.5,0.7,0.2,
-            //right body
-            -0.5,-0.7,-0.2,
-            -0.5,-0.7,0.2,
-            -0.5,0.7,0.2,
-            -0.5,0.7,-0.2,
-            //left body
-            0.5,-0.7,-0.2,
-            0.5,-0.7,0.2,
-            0.5,0.7,0.2,
-            0.5,0.7,-0.2,
-            //bottom body
-            -0.5,-0.7,-0.2,
-            0.5,-0.7,-0.2,
-            0.5,-0.7,0.2,
-            -0.5,-0.7,0.2,
-            //top body
-            -0.5,0.7,-0.2,
-            0.5,0.7,-0.2,
-            0.5,0.7,0.2,
-            -0.5,0.7,0.2,
-        ]);
-        this.vlo.bufferData([14,14,14,14 ,14,14,14,14 ,14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, /*Body */ 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14]);
-        let tc = [];
-   
-        const pushFunc = (ind)=>{
-            tc=   tc.concat([
-                Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].dy,
-                Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].dy,
-                Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].y,
-                Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].y]);
-        };
-        pushFunc(1);
-        pushFunc(0);
-        pushFunc(2);
-        pushFunc(3);
-        pushFunc(5);
-        pushFunc(4);
-        pushFunc(7);
-        pushFunc(6);
-        pushFunc(9);
-        pushFunc(8);
-        pushFunc(11);
-        pushFunc(10);
-        this.vtc.bufferData(tc);
-        let array=[];
-        for(let i=0;i<12;i++)
-        {
-            const k = 4*i;
-            array =    array.concat([2+k,1+k,k,2+k,0+k,3+k]);
-        }
-        this.ebo.bufferData(array);
-    }
     switchPerson(person:pers)
     {
        
@@ -248,7 +161,15 @@ export class Player
     }
     updatePos()
     {
-        Main.socket.emit("playerMove",this.pos);
+        this.entity.rotation.y = -this.camera.getYaw();
+        this.entity.rotation.x = -this.camera.getPitch();
+        this.entity.pos = this.pos;
+        const nowTime = Date.now();
+        if(this.lastTime<nowTime-100)
+        {
+            Main.socket.emit("playerMove",this.entity.pos,this.entity.rotation);
+            this.lastTime = nowTime;
+        }
         if(this.locked) return;
         let hop =false;
         let tempPos = this.pos.copy();
@@ -598,12 +519,10 @@ export class Player
         }
     } 
     render()
-    {
-     
-        
+    {   
         if(this.person != "First") 
         {
-            this.entity.pos = this.pos;
+          
             this.entity.render();
         }
         if(this.blockBreakingTime>1)

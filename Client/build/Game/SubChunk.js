@@ -3,7 +3,7 @@ import { Vector } from "../Engine/Utils/Vector.js";
 import { Block, blocks, directions } from "./Block.js";
 import { World } from "./World.js";
 import { Mesh } from "./Mesh.js";
-export class SubChunk {
+class SubChunk {
     mesh = new Mesh(); //Mesh that contains all data needed for rendering  
     blocks = new Array3D(16, 16, 16); //Array of blocks
     generated = true; //Is SubChunk already generated
@@ -347,3 +347,4 @@ export class SubChunk {
         0.5, 0.5, -0.5
     ];
 }
+export { SubChunk };
