@@ -37,6 +37,7 @@ class Player {
     selectedItem = 0;
     person = "First";
     yAcc = 0.01;
+    legChange = 3;
     mainAcc = 0.1;
     lastTime = 0;
     static blVertices = [
@@ -308,6 +309,12 @@ class Player {
         catch (error) {
             console.log("Update pos error", error);
         }
+        if (Math.abs(this.entity.rotation.z) > 45)
+            this.legChange = -this.legChange;
+        if (CanvaManager.getKey(87) || CanvaManager.getKey(83) || CanvaManager.getKey(68) || CanvaManager.getKey(65))
+            this.entity.rotation.z += this.legChange * speed;
+        else
+            this.entity.rotation.z = 0;
         this.camera.setPitch(this.camera.getPitch() - (CanvaManager.mouseMovement.y / 10));
         this.camera.setYaw(this.camera.getYaw() + (CanvaManager.mouseMovement.x / 10));
         if (this.camera.getPitch() > 90)

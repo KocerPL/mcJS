@@ -1,3 +1,9 @@
+export enum rot2d
+{
+    D90,
+    D180,
+    D270,
+}
 export const Model=
 {
     player:[
@@ -16,11 +22,13 @@ export const Model=
         {//3 rightHead
             pos:[16,8],
             size:[8,8],
-            reversedY:true
+            rotation:rot2d.D180
         },
         {//4 topHead
             pos:[8,0],
-            size:[8,8]
+            size:[8,8],
+            rotation:rot2d.D90
+
         },
         {//5 bottomHead
             pos:[16,0],
@@ -50,9 +58,54 @@ export const Model=
             pos:[28,16],
             size:[8,4]
         },
-        {//12 left left leg
+        { // 12 front left leg
+            pos:[4,20],
+            size:[4,12]
+        },
+        { //13 back left leg
+            pos:[8,20],
+            size:[4,12]
+        },
+        {//14 left left leg
             pos:[0,20],
             size:[4,12]
+        },
+        {//15 right left leg
+            pos:[12,20],
+            size:[4,12]
+        },
+        { //16 top left leg 
+            pos:[4,16],
+            size:[4,4]
+        },
+        { //17 bottom left leg 
+            pos:[8,16],
+            size:[4,4]
+        },
+        //right leg
+        { // 18 front right leg
+            pos:[20,52],
+            size:[4,12]
+        },
+        { //19 back right leg
+            pos:[24,52],
+            size:[4,12]
+        },
+        {//20 left right leg
+            pos:[16,52],
+            size:[4,12]
+        },
+        {//21 right right leg
+            pos:[28,52],
+            size:[4,12]
+        },
+        { //22 top right leg 
+            pos:[20,48],
+            size:[4,4]
+        },
+        { //23 bottom right leg 
+            pos:[24,48],
+            size:[4,4]
         }
     ]
 };

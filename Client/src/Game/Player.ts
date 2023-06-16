@@ -42,6 +42,7 @@ export class Player
     selectedItem = 0;
     person:pers ="First"; 
     yAcc =0.01;
+    legChange= 3;
     mainAcc=0.1;
     lastTime=0;
     static blVertices =[
@@ -161,6 +162,7 @@ export class Player
     }
     updatePos()
     {
+
         this.entity.rotation.y = -this.camera.getYaw();
         this.entity.rotation.x = -this.camera.getPitch();
         this.entity.pos = this.pos;
@@ -199,6 +201,7 @@ export class Player
             {
                 tempPos.x+=Math.sin(this.camera.getYaw()*Math.PI/180)*0.1*speed;
                 tempPos.z +=Math.cos(this.camera.getYaw()*Math.PI/180)*0.1*speed;
+              
             }
             else if(CanvaManager.getKey(83))
             {
@@ -366,7 +369,12 @@ export class Player
         {
             console.log("Update pos error",error);
         }
-      
+        if(Math.abs(this.entity.rotation.z)>45)
+            this.legChange= -this.legChange;
+        if(CanvaManager.getKey(87)||CanvaManager.getKey(83)||CanvaManager.getKey(68)||CanvaManager.getKey(65))
+            this.entity.rotation.z += this.legChange*speed;
+        else 
+            this.entity.rotation.z = 0;
         this.camera.setPitch(this.camera.getPitch()- (CanvaManager.mouseMovement.y/10));
         this.camera.setYaw(this.camera.getYaw()+(CanvaManager.mouseMovement.x/10));
         if(this.camera.getPitch()>90) this.camera.setPitch(90);
