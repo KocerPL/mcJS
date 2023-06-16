@@ -7,7 +7,7 @@ import { Main } from "../Main.js";
 import { blocks } from "./Block.js";
 import { invItem } from "./Player.js";
 const gl = CanvaManager.gl;
-class GUI {
+export class GUI {
     static vao; //Vertex attrib array
     static vbo; //vertices
     static ebo; //Indices(vertex connections)
@@ -310,4 +310,3 @@ class GUI {
         return temp;
     }
 }
-export { GUI };

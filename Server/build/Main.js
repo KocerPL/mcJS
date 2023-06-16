@@ -55,6 +55,9 @@ io.on('connection', (socket) => {
         fdata[toIndex(inPos.x, inPos.y, inPos.z)] = data.id;
         fs.writeFileSync(__dirname + "/world/" + subchunkPos.x + "." + subchunkPos.y + "." + subchunkPos.z + ".sub", JSON.stringify(fdata));
     });
+    socket.on("disconnect", (reason) => {
+        socket.broadcast.emit("killEntity", socket.KOCEid);
+    });
 });
 app.get("*", (req, res) => {
     //  console.log(rDir+"/Client/index.html");

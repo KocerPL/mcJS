@@ -32,7 +32,7 @@ export class LightNode {
         this.direction = direction;
     }
 }
-class Main {
+export class Main {
     static maxChunks = 128;
     static maxSubUpdates = 5;
     static okok = false;
@@ -144,6 +144,14 @@ class Main {
         });
         this.socket.on("placeBlock", (data) => {
             World.setBlockNoLight(new Vector(data.pos.x, data.pos.y, data.pos.z), data.id);
+        });
+        this.socket.on("killEntity", (id) => {
+            for (let i = 0; i < this.entities.length; i++) {
+                if (this.entities[i].ID == id) {
+                    this.entities.splice(i, 1);
+                    break;
+                }
+            }
         });
         for (let x = -4; x < 4; x++)
             for (let z = -4; z < 4; z++)
@@ -616,5 +624,4 @@ class Main {
         GUI.render(this.shader2d);
     }
 }
-export { Main };
 Main.run();
