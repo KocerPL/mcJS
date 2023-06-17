@@ -9,10 +9,12 @@ const gl = CanvaManager.gl;
 export class PlayerEntity extends Entity
 {
     rotation:Vector;
+    bodyRot:number;
     constructor(pos:Vector,id?)
     {
         super(pos,id);
         this.rotation=new Vector(0,0,0);
+        this.bodyRot =0;
         this.rs.resetArrays();
         this.rs.vertices =[ //przód
             -0.5,-0.5,-0.5,
@@ -46,97 +48,159 @@ export class PlayerEntity extends Entity
             0.5,0.5 ,0.5,
             0.5,0.5,-0.5,
             //front body
-            -0.5,-0.7,-0.2,
-            0.5,-0.7,-0.2,
-            0.5,0.7,-0.2,
-            -0.5,0.7,-0.2,
+            -0.5,-0.7,-0.25,
+            0.5,-0.7,-0.25,
+            0.5,0.7,-0.25,
+            -0.5,0.7,-0.25,
             //back body
-            -0.5,-0.7,0.2,
-            0.5,-0.7,0.2,
-            0.5,0.7,0.2,
-            -0.5,0.7,0.2,
+            -0.5,-0.7,0.25,
+            0.5,-0.7,0.25,
+            0.5,0.7,0.25,
+            -0.5,0.7,0.25,
             //right body
-            -0.5,-0.7,-0.2,
-            -0.5,-0.7,0.2,
-            -0.5,0.7,0.2,
-            -0.5,0.7,-0.2,
+            -0.5,-0.7,-0.25,
+            -0.5,-0.7,0.25,
+            -0.5,0.7,0.25,
+            -0.5,0.7,-0.25,
             //left body
-            0.5,-0.7,-0.2,
-            0.5,-0.7,0.2,
-            0.5,0.7,0.2,
-            0.5,0.7,-0.2,
+            0.5,-0.7,-0.25,
+            0.5,-0.7,0.25,
+            0.5,0.7,0.25,
+            0.5,0.7,-0.25,
             //bottom body
-            -0.5,-0.7,-0.2,
-            0.5,-0.7,-0.2,
-            0.5,-0.7,0.2,
-            -0.5,-0.7,0.2,
+            -0.5,-0.7,-0.25,
+            0.5,-0.7,-0.25,
+            0.5,-0.7,0.25,
+            -0.5,-0.7,0.25,
             //top body
-            -0.5,0.7,-0.2,
-            0.5,0.7,-0.2,
-            0.5,0.7,0.2,
-            -0.5,0.7,0.2,
+            -0.5,0.7,-0.25,
+            0.5,0.7,-0.25,
+            0.5,0.7,0.25,
+            -0.5,0.7,0.25,
             //front leg
-            -0.25,-0.7,-0.2,
-            0.25,-0.7,-0.2,
-            0.25,0.7,-0.2,
-            -0.25,0.7,-0.2,
+            -0.25,-0.7,-0.25,
+            0.25,-0.7,-0.25,
+            0.25,0.7,-0.25,
+            -0.25,0.7,-0.25,
             //back leg
-            -0.25,-0.7,0.2,
-            0.25,-0.7,0.2,
-            0.25,0.7,0.2,
-            -0.25,0.7,0.2,
+            -0.25,-0.7,0.25,
+            0.25,-0.7,0.25,
+            0.25,0.7,0.25,
+            -0.25,0.7,0.25,
             //left leg
-            0.25,-0.7,-0.2,
-            0.25,-0.7,0.2,
-            0.25,0.7,0.2,
-            0.25,0.7,-0.2,
+            0.25,-0.7,-0.25,
+            0.25,-0.7,0.25,
+            0.25,0.7,0.25,
+            0.25,0.7,-0.25,
             //right leg
-            -0.25,-0.7,-0.2,
-            -0.25,-0.7,0.2,
-            -0.25,0.7,0.2,
-            -0.25,0.7,-0.2,
+            -0.25,-0.7,-0.25,
+            -0.25,-0.7,0.25,
+            -0.25,0.7,0.25,
+            -0.25,0.7,-0.25,
             //top leg
-            -0.25,0.7,-0.2,
-            0.25,0.7,-0.2,
-            0.25,0.7,0.2,
-            -0.25,0.7,0.2,
+            -0.25,0.7,-0.25,
+            0.25,0.7,-0.25,
+            0.25,0.7,0.25,
+            -0.25,0.7,0.25,
             //bottom leg
-            -0.25,-0.7,-0.2,
-            0.25,-0.7,-0.2,
-            0.25,-0.7,0.2,
-            -0.25,-0.7,0.2,
+            -0.25,-0.7,-0.25,
+            0.25,-0.7,-0.25,
+            0.25,-0.7,0.25,
+            -0.25,-0.7,0.25,
             //front leg
-            -0.25,-0.7,-0.2,
-            0.25,-0.7,-0.2,
-            0.25,0.7,-0.2,
-            -0.25,0.7,-0.2,
+            -0.25,-0.7,-0.25,
+            0.25,-0.7,-0.25,
+            0.25,0.7,-0.25,
+            -0.25,0.7,-0.25,
             //back leg
-            -0.25,-0.7,0.2,
-            0.25,-0.7,0.2,
-            0.25,0.7,0.2,
-            -0.25,0.7,0.2,
+            -0.25,-0.7,0.25,
+            0.25,-0.7,0.25,
+            0.25,0.7,0.25,
+            -0.25,0.7,0.25,
             //left leg
-            0.25,-0.7,-0.2,
-            0.25,-0.7,0.2,
-            0.25,0.7,0.2,
-            0.25,0.7,-0.2,
+            0.25,-0.7,-0.25,
+            0.25,-0.7,0.25,
+            0.25,0.7,0.25,
+            0.25,0.7,-0.25,
             //right leg
-            -0.25,-0.7,-0.2,
-            -0.25,-0.7,0.2,
-            -0.25,0.7,0.2,
-            -0.25,0.7,-0.2,
+            -0.25,-0.7,-0.25,
+            -0.25,-0.7,0.25,
+            -0.25,0.7,0.25,
+            -0.25,0.7,-0.25,
             //top leg
-            -0.25,0.7,-0.2,
-            0.25,0.7,-0.2,
-            0.25,0.7,0.2,
-            -0.25,0.7,0.2,
+            -0.25,0.7,-0.25,
+            0.25,0.7,-0.25,
+            0.25,0.7,0.25,
+            -0.25,0.7,0.25,
             //bottom leg
-            -0.25,-0.7,-0.2,
-            0.25,-0.7,-0.2,
-            0.25,-0.7,0.2,
-            -0.25,-0.7,0.2,
+            -0.25,-0.7,-0.25,
+            0.25,-0.7,-0.25,
+            0.25,-0.7,0.25,
+            -0.25,-0.7,0.25,
+            //arm
+            //front arm
+            -0.25,-0.7,-0.25,
+            0.25,-0.7,-0.25,
+            0.25,0.7,-0.25,
+            -0.25,0.7,-0.25,
+            //back arm
+            -0.25,-0.7,0.25,
+            0.25,-0.7,0.25,
+            0.25,0.7,0.25,
+            -0.25,0.7,0.25,
+            //left arm
+            0.25,-0.7,-0.25,
+            0.25,-0.7,0.25,
+            0.25,0.7,0.25,
+            0.25,0.7,-0.25,
+            //right arm
+            -0.25,-0.7,-0.25,
+            -0.25,-0.7,0.25,
+            -0.25,0.7,0.25,
+            -0.25,0.7,-0.25,
+            //top arm
+            -0.25,0.7,-0.25,
+            0.25,0.7,-0.25,
+            0.25,0.7,0.25,
+            -0.25,0.7,0.25,
+            //bottom arm
+            -0.25,-0.7,-0.25,
+            0.25,-0.7,-0.25,
+            0.25,-0.7,0.25,
+            -0.25,-0.7,0.25,
+            //arm
+            //front arm
+            -0.25,-0.7,-0.25,
+            0.25,-0.7,-0.25,
+            0.25,0.7,-0.25,
+            -0.25,0.7,-0.25,
+            //back arm
+            -0.25,-0.7,0.25,
+            0.25,-0.7,0.25,
+            0.25,0.7,0.25,
+            -0.25,0.7,0.25,
+            //left arm
+            0.25,-0.7,-0.25,
+            0.25,-0.7,0.25,
+            0.25,0.7,0.25,
+            0.25,0.7,-0.25,
+            //right arm
+            -0.25,-0.7,-0.25,
+            -0.25,-0.7,0.25,
+            -0.25,0.7,0.25,
+            -0.25,0.7,-0.25,
+            //top arm
+            -0.25,0.7,-0.25,
+            0.25,0.7,-0.25,
+            0.25,0.7,0.25,
+            -0.25,0.7,0.25,
+            //bottom arm
+            -0.25,-0.7,-0.25,
+            0.25,-0.7,-0.25,
+            0.25,-0.7,0.25,
+            -0.25,-0.7,0.25,
         ];
-        this.rs.skyLight  = [14,14,14,14 ,14,14,14,14 ,14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, /*Body */ 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14,14,14,14,14, 14,14,14,14];
+        this.rs.skyLight  = [14,14,14,14 ,14,14,14,14 ,14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, /*Body */ 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14,14,14,14,14, 14,14,14,14,   14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14,14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14,];
         this.rs.blockLight = this.rs.skyLight;
         let tc = [];
         const pushFunc = (ind)=>{
@@ -170,9 +234,23 @@ export class PlayerEntity extends Entity
         pushFunc(21);
         pushFunc(22);
         pushFunc(23);
+
+        pushFunc(24);
+        pushFunc(25);
+        pushFunc(26);
+        pushFunc(27);
+        pushFunc(28);
+        pushFunc(29);
+
+        pushFunc(30);
+        pushFunc(31);
+        pushFunc(32);
+        pushFunc(33);
+        pushFunc(34);
+        pushFunc(35);
         this.rs.textureCoords = tc;
         let array=[];
-        for(let i=0;i<24;i++)
+        for(let i=0;i<36;i++)
         {
             const k = 4*i;
             array =    array.concat([2+k,1+k,k,2+k,0+k,3+k]);
@@ -185,7 +263,10 @@ export class PlayerEntity extends Entity
     }
     render(): void {
         let transformation = Matrix.identity();
-     
+        if(this.bodyRot-this.rotation.y>45)
+            this.bodyRot = this.rotation.y+45;
+        if(this.bodyRot-this.rotation.y<-45)
+            this.bodyRot = this.rotation.y-45;
         transformation =transformation.translate(this.pos.x,this.pos.y+0.5,this.pos.z);
         transformation = transformation.scale(0.4,0.4,0.4);
         transformation = transformation.rotateY(this.rotation.y);
@@ -197,13 +278,17 @@ export class PlayerEntity extends Entity
         Main.atlasShader.use();
         Main.atlasShader.loadUniforms(Main.player.camera.getProjection(),transformation,Main.player.camera.getView(),15);
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,0);
-        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.15,this.pos.z).scale(0.51,0.51,0.51).rotateY(this.rotation.y));
+        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.15,this.pos.z).scale(0.51,0.51,0.51).rotateY(this.bodyRot));
         //Body
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,36*4);
-        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y-0.20,this.pos.z).rotateY(this.rotation.y).rotateX(this.rotation.z).translate(-0.125,-0.35,0).scale(0.51,0.51,0.51));
+        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y-0.20,this.pos.z).rotateY(this.bodyRot).rotateX(this.rotation.z).translate(-0.125,-0.35,0).scale(0.51,0.51,0.51));
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,72*4);
-        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y-0.20,this.pos.z).rotateY(this.rotation.y).rotateX(-this.rotation.z).translate(0.125,-0.35,0).scale(0.51,0.51,0.51));
+        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y-0.20,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).translate(0.125,-0.35,0).scale(0.51,0.51,0.51));
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,108*4);
+        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.50,this.pos.z).rotateY(this.bodyRot).rotateX(this.rotation.z).translate(0.375,-0.35,0).scale(0.51,0.51,0.51));
+        gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,144*4);
+        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.50,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).translate(-0.375,-0.35,0).scale(0.51,0.51,0.51));
+        gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,180*4);
         Main.shader.use();
     }
     

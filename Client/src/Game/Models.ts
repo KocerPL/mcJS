@@ -106,6 +106,56 @@ export const Model=
         { //23 bottom right leg 
             pos:[24,48],
             size:[4,4]
-        }
+        }, 
+        //left arm
+        { // 24 front left arm
+            pos:[44,20],
+            size:[4,12]
+        },
+        { //25 back left arm
+            pos:[48,20],
+            size:[4,12]
+        },
+        {//26 left left arm
+            pos:[40,20],
+            size:[4,12]
+        },
+        {//27 right left arm
+            pos:[52,20],
+            size:[4,12]
+        },
+        { //28 top left arm
+            pos:[44,16],
+            size:[4,4]
+        },
+        { //29 bottom left arm 
+            pos:[48,16],
+            size:[4,4]
+        },
+        //right arm
+        { // 18 front right arm
+            pos:[36,52],
+            size:[4,12]
+        },
+        { //19 back right arm
+            pos:[40,52],
+            size:[4,12]
+        },
+        {//20 left right arm
+            pos:[32,52],
+            size:[4,12]
+        },
+        {//21 right right arm
+            pos:[44,52],
+            size:[4,12]
+        },
+        { //22 top right arm
+            pos:[36,48],
+            size:[4,4]
+        },
+        { //23 bottom right arm 
+            pos:[40,48],
+            size:[4,4]
+        }, 
     ]
 };

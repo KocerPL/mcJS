@@ -37,7 +37,7 @@ class Player {
     selectedItem = 0;
     person = "First";
     yAcc = 0.01;
-    legChange = 3;
+    legChange = 6;
     mainAcc = 0.1;
     lastTime = 0;
     static blVertices = [
