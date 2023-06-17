@@ -4,7 +4,6 @@ import { Matrix } from "../../Engine/Utils/Matrix.js";
 import { Vector } from "../../Engine/Utils/Vector.js";
 import { Main } from "../../Main.js";
 import { Entity } from "../Entity.js";
-import { SubChunk } from "../SubChunk.js";
 const gl = CanvaManager.gl;
 export class PlayerEntity extends Entity
 {
