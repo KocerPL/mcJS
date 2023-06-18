@@ -266,7 +266,7 @@ export class PlayerEntity extends Entity
             this.bodyRot = this.rotation.y+45;
         if(this.bodyRot-this.rotation.y<-45)
             this.bodyRot = this.rotation.y-45;
-        transformation =transformation.translate(this.pos.x,this.pos.y+0.5,this.pos.z);
+        transformation =transformation.translate(this.pos.x,this.pos.y+0.45,this.pos.z);
         transformation = transformation.scale(0.5,0.5,0.5);
         transformation = transformation.rotateY(this.rotation.y);
         transformation = transformation.rotateX(this.rotation.x);
@@ -277,16 +277,16 @@ export class PlayerEntity extends Entity
         Main.atlasShader.use();
         Main.atlasShader.loadUniforms(Main.player.camera.getProjection(),transformation,Main.player.camera.getView(),15);
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,0);
-        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.15,this.pos.z).scale(bScale ,bScale ,bScale ).rotateY(this.bodyRot));
+        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.05,this.pos.z).scale(bScale ,bScale ,bScale ).rotateY(this.bodyRot));
         //Body
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,36*4);
-        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y-0.20,this.pos.z).rotateY(this.bodyRot).rotateX(this.rotation.z).translate(-0.125,-0.35,0).scale(bScale ,bScale ,bScale ));
+        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y-0.30,this.pos.z).rotateY(this.bodyRot).rotateX(this.rotation.z).translate(-0.125,-0.35,0).scale(bScale ,bScale ,bScale ));
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,72*4);
-        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y-0.20,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).translate(0.125,-0.35,0).scale(bScale ,bScale ,bScale ));
+        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y-0.30,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).translate(0.125,-0.35,0).scale(bScale ,bScale ,bScale ));
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,108*4);
-        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.50,this.pos.z).rotateY(this.bodyRot).rotateX(this.rotation.z).rotateZ(5).translate(0.375,-0.35,0).scale(bScale ,bScale ,bScale ));
+        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(this.rotation.z).rotateZ(5).translate(0.375,-0.35,0).scale(bScale ,bScale ,bScale ));
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,144*4);
-        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.50,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.35,0).scale(bScale ,bScale ,bScale ));
+        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.35,0).scale(bScale ,bScale ,bScale ));
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,180*4);
         Main.shader.use();
     }
