@@ -1,5 +1,3 @@
-import { Block } from "../../Game/Block.js";
-
 export class Array3D extends Array
 {
     constructor(x:number,y:number,z:number)

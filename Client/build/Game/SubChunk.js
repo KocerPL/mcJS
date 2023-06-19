@@ -9,12 +9,62 @@ class SubChunk {
     generated = true; //Is SubChunk already generated
     lightUpdate = false; //Is subchunk updating light
     // empty:boolean = true;    //Is subchunk empty
+    lightList = [];
     chunk; //parent Chunk of this subchunk
     pos; //subchunk position in world
     constructor(pos, chunk) {
         //Setting up variables
         this.pos = pos;
         this.chunk = chunk;
+        //   this.emptyLightMap();
+    }
+    emptyLightMap() {
+        for (let i = 0; i < 16; i++)
+            for (let j = 0; j < 16; j++)
+                for (let k = 0; k < 16; k++) {
+                    //      this.lightMap[i][j][k]=false;
+                    if (!this.blocks[i][j][k])
+                        this.blocks[i][j][k] = new Block(0);
+                    this.blocks[i][j][k].lightFBlock = 0;
+                    if (blocks[this.blocks[i][j][k].id].glowing)
+                        this.blocks[i][j][k].lightFBlock = blocks[this.blocks[i][j][k].id].glowing;
+                    if (this.blocks[i][j][k].id > 0)
+                        //        this.lightMap[i][j][k] =true;
+                        k;
+                }
+    }
+    lightPass(currentPass) {
+        for (let i = 0; i < 16; i++)
+            for (let j = 0; j < 16; j++)
+                for (let k = 0; k < 16; k++) {
+                    //  if(this.lightMap[i][j][k]) continue;
+                    let test = this.getBlockWV(i - 1, j, k);
+                    if (test && test.lightFBlock + 2 > this.blocks[i][j][k].lightFBlock) {
+                        this.blocks[i][j][k].lightFBlock = test.lightFBlock - 1;
+                    }
+                    test = this.getBlockWV(i + 1, j, k);
+                    if (test && test.lightFBlock + 2 > this.blocks[i][j][k].lightFBlock) {
+                        this.blocks[i][j][k].lightFBlock = test.lightFBlock - 1;
+                    }
+                    test = this.getBlockWV(i, j - 1, k);
+                    if (test && test.lightFBlock + 2 > this.blocks[i][j][k].lightFBlock) {
+                        this.blocks[i][j][k].lightFBlock = test.lightFBlock - 1;
+                    }
+                    test = this.getBlockWV(i, j + 1, k);
+                    if (test && test.lightFBlock + 2 > this.blocks[i][j][k].lightFBlock) {
+                        this.blocks[i][j][k].lightFBlock = test.lightFBlock - 1;
+                    }
+                    test = this.getBlockWV(i, j, k - 1);
+                    if (test && test.lightFBlock + 2 > this.blocks[i][j][k].lightFBlock) {
+                        this.blocks[i][j][k].lightFBlock = test.lightFBlock - 1;
+                    }
+                    test = this.getBlockWV(i, j, k + 1);
+                    if (test && test.lightFBlock + 2 > this.blocks[i][j][k].lightFBlock) {
+                        this.blocks[i][j][k].lightFBlock = test.lightFBlock - 1;
+                    }
+                    if (this.blocks[i][j][k].lightFBlock == currentPass)
+                        k; // this.lightMap[i][j][k]=true;
+                }
     }
     preGenerate() {
         //setting position according to subchunk pos in world
@@ -58,7 +108,19 @@ class SubChunk {
         this.generated = true;
     }
     //Subchunk update
+    scanLight() {
+        this.lightList = [];
+        for (let i = 0; i < 16; i++)
+            for (let j = 0; j < 16; j++)
+                for (let k = 0; k < 16; k++) {
+                    if (this.blocks[i][j][k] && blocks[this.blocks[i][j][k].id].glowing)
+                        this.lightList.push(new Vector(i, j, k));
+                }
+    }
     update() {
+        // this.chunk.updateLight();
+        this.scanLight();
+        this.chunk.preUpdate(this.pos.y);
         this.mesh.reset();
         this.updateVerticesOptimized();
         this.mesh.count = this.mesh.indices.length;

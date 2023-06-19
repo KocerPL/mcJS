@@ -10,7 +10,7 @@ export class Block {
         this.id = id;
     }
 }
-export var blocks = [
+export const blocks = [
     {
         name: "Air"
     },
@@ -132,7 +132,8 @@ export var blocks = [
             left: 11,
             right: 11
         },
-        breakTime: 5
+        breakTime: 5,
+        glowing: 15
     },
     {
         name: "Snow",

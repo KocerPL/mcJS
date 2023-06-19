@@ -3,13 +3,14 @@ import { EBO } from "../Engine/EBO.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
-import { LightNode, Main } from "../Main.js";
-import { Block, directions } from "./Block.js";
+import {  Main } from "../Main.js";
+import { Block} from "./Block.js";
 import { SubChunk } from "./SubChunk.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Mesh } from "./Mesh.js";
 import { World } from "./World.js";
 import { randRange } from "../Engine/Utils/Math.js";
+import { Lighter } from "../Lighter.js";
 const gl = CanvaManager.gl;
 export type DIR = "POS_X" | "POS_Z" | "NEG_X"  | "NEG_Z";
 export function flipDir(dir:DIR)
@@ -58,6 +59,34 @@ export class Chunk {
         EBO.unbind();
     
         this.pos = new Vector(x,0,z);
+    }
+    updateLight()
+    {
+        if(!this.allNeighbours)
+            return;
+        this.emptyLightMaps();
+        this.neighbours.NEG_X.emptyLightMaps();
+        this.neighbours.POS_X.emptyLightMaps();
+        this.neighbours.NEG_Z.emptyLightMaps();
+        this.neighbours.POS_Z.emptyLightMaps();
+        for(let i=14;i>0;i--)
+        {
+            this.neighbours.POS_X.onePassLight(i);
+            this.neighbours.NEG_X.onePassLight(i);
+            this.neighbours.POS_Z.onePassLight(i);
+            this.neighbours.NEG_Z.onePassLight(i);
+            this.onePassLight(i);
+        }
+    }
+    emptyLightMaps()
+    {
+        for(let i=0; i<16;i++)
+            this.subchunks[i].emptyLightMap();
+    }
+    onePassLight(currentPass)
+    {
+        for(let i=0; i<16;i++)
+            this.subchunks[i].lightPass(currentPass);
     }
     preGenOne()
     {
@@ -119,6 +148,13 @@ export class Chunk {
         this.sdNeighbour(neighbour,"POS_Z");
         neighbour = Main.getChunkAt(this.pos.x,this.pos.z+1);
         this.sdNeighbour(neighbour,"NEG_Z");
+    }
+    preUpdate(yPos)
+    {
+        for(const ls of this.subchunks[yPos].lightList)
+        {
+            Lighter.light(ls.x+(this.pos.x*16),ls.y+(yPos*16),ls.z+(this.pos.z*16),15);
+        }
     }
     updateMesh() {
         this.mesh.reset();
@@ -213,7 +249,9 @@ export class Chunk {
             if(! (this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
                 this.subchunks[yPos].blocks[pos.x][y][pos.z] =new Block(0);
             this.subchunks[yPos].blocks[pos.x][y][pos.z].id=blockID;
-            const pushLight = (vec:Vector,lightsky?:boolean,sub?:SubChunk)=>
+            Main.toUpdate.add(this.subchunks[yPos]);
+            
+        /*        const pushLight = (vec:Vector,lightsky?:boolean,sub?:SubChunk)=>
             {
                 lightsky??=true;
                 sub??=this.subchunks[yPos];
@@ -399,13 +437,13 @@ export class Chunk {
             catch(error)
             {
                 console.log(error);
-            }
+            }*/
         }
         else
         {
             console.log("Subchunk is undefined");
         }
-   
+        
     }
   
 
