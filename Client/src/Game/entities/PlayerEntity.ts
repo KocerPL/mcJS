@@ -9,6 +9,7 @@ export class PlayerEntity extends Entity
 {
     rotation:Vector;
     bodyRot:number;
+    nextTransitions:Array<{pos:Vector,rot:Vector}>=[];
     constructor(pos:Vector,id?)
     {
         super(pos,id);
@@ -258,9 +259,15 @@ export class PlayerEntity extends Entity
         this.rs.bufferArrays();
     }
     update(i: number): void {
-        i;
+      i;
     }
     render(): void {
+        const nTransition = this.nextTransitions.shift();
+        if(nTransition!=undefined)
+        {
+            this.pos=nTransition.pos;
+            this.rotation=nTransition.rot;
+        }
         let transformation = Matrix.identity();
         if(this.bodyRot-this.rotation.y>45)
             this.bodyRot = this.rotation.y+45;
@@ -290,5 +297,16 @@ export class PlayerEntity extends Entity
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,180*4);
         Main.shader.use();
     }
-    
+    setNextTransitions(nextPos:Vector,nextRot:Vector,count:number)
+    {
+        /*   const deltaPos = Vector.add(nextPos,this.pos.mult(-1));
+        const deltaRot = Vector.add(nextRot,this.rotation.mult(-1));
+        const OneStepPos = deltaPos.mult(1/count);
+        const OneStepRot = deltaRot.mult(1/count);
+        for(let i=1;i<count;i++)
+        {
+            this.nextTransitions.push({pos:Vector.add(this.pos,OneStepPos),rot:Vector.add(this.rotation,OneStepRot)});
+        }*/
+        this.nextTransitions.push({pos:nextPos,rot:nextRot});
+    }
 }

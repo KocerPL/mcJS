@@ -8,6 +8,7 @@ const gl = CanvaManager.gl;
 export class PlayerEntity extends Entity {
     rotation;
     bodyRot;
+    nextTransitions = [];
     constructor(pos, id) {
         super(pos, id);
         this.rotation = new Vector(0, 0, 0);
@@ -256,6 +257,11 @@ export class PlayerEntity extends Entity {
         i;
     }
     render() {
+        const nTransition = this.nextTransitions.shift();
+        if (nTransition != undefined) {
+            this.pos = nTransition.pos;
+            this.rotation = nTransition.rot;
+        }
         let transformation = Matrix.identity();
         if (this.bodyRot - this.rotation.y > 45)
             this.bodyRot = this.rotation.y + 45;
@@ -284,5 +290,16 @@ export class PlayerEntity extends Entity {
         Main.atlasShader.loadTransformation(Matrix.identity().translate(this.pos.x, this.pos.y + 0.40, this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375, -0.35, 0).scale(bScale, bScale, bScale));
         gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_INT, 180 * 4);
         Main.shader.use();
+    }
+    setNextTransitions(nextPos, nextRot, count) {
+        /*   const deltaPos = Vector.add(nextPos,this.pos.mult(-1));
+        const deltaRot = Vector.add(nextRot,this.rotation.mult(-1));
+        const OneStepPos = deltaPos.mult(1/count);
+        const OneStepRot = deltaRot.mult(1/count);
+        for(let i=1;i<count;i++)
+        {
+            this.nextTransitions.push({pos:Vector.add(this.pos,OneStepPos),rot:Vector.add(this.rotation,OneStepRot)});
+        }*/
+        this.nextTransitions.push({ pos: nextPos, rot: nextRot });
     }
 }

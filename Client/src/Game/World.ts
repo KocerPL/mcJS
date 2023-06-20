@@ -1,7 +1,8 @@
 import { Vector } from "../Engine/Utils/Vector.js";
+import { Lighter } from "../Lighter.js";
 import { Main } from "../Main.js";
 import {    PerlinN } from "../PerlinNoise.js";
-import { Block, directions } from "./Block.js";
+import { Block, blocks, directions } from "./Block.js";
 import { Chunk } from "./Chunk.js";
 import { SubChunk } from "./SubChunk.js";
 const perlin = new PerlinN();
@@ -166,6 +167,23 @@ export class World
         {
             console.log(error);
         }
+    }
+    public static placeBlock(pos:Vector,id:number)
+    {
+        const llight =  World.getBlock(pos).lightFBlock;
+        World.setBlockNoLight(pos,id);
+        Lighter.removeLight(pos.x,pos.y,pos.z,llight);
+    }
+    public static breakBlock(pos:Vector)
+    {
+        let isGlowing=false;
+        if(blocks[World.getBlock(pos).id].glowing)
+            isGlowing=true;
+        World.setBlockNoLight(pos,0);
+        if(isGlowing)
+            Lighter.removeLight(pos.x,pos.y,pos.z,15);
+        else
+            Lighter.processOneBlockLight(pos.x,pos.y,pos.z);
     }
     /*  public static setBlock(blockPos:Vector,type:number)
     {

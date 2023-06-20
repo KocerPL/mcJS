@@ -136,9 +136,10 @@ class Main {
         });
         this.socket.on("moveEntity", (id, pos, rot) => {
             const ent = this.getEntity(id);
-            ent.pos = new Vector(pos.x, pos.y, pos.z);
-            if (ent instanceof PlayerEntity)
-                ent.rotation = new Vector(rot.x, rot.y, rot.z);
+            // ent.pos =new Vector(pos.x,pos.y,pos.z);
+            if (ent instanceof PlayerEntity) {
+                ent.setNextTransitions(new Vector(pos.x, pos.y, pos.z), new Vector(rot.x, rot.y, rot.z), 3);
+            }
         });
         this.socket.on("login", (posStr, id) => {
             this.player.id = id;
@@ -146,7 +147,10 @@ class Main {
             this.player.pos = new Vector(pos.x, pos.y, pos.z);
         });
         this.socket.on("placeBlock", (data) => {
-            World.setBlockNoLight(new Vector(data.pos.x, data.pos.y, data.pos.z), data.id);
+            if (data.id != 0)
+                World.placeBlock(new Vector(data.pos.x, data.pos.y, data.pos.z), data.id);
+            else
+                World.breakBlock(new Vector(data.pos.x, data.pos.y, data.pos.z));
         });
         this.socket.on("killEntity", (id) => {
             for (let i = 0; i < this.entities.length; i++) {

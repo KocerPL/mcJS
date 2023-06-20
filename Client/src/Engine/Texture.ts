@@ -12,7 +12,7 @@ export class Texture
     static GUItest = Loader.imageArray("./res/textures/GUI.png",3,9);
     static crossHair = Loader.image("./res/textures/crosshair.png");
   
-    static skinAtlas =  Loader.imageAtlasByJSON("./res/textures/skinMC.png",Model.player,64,64);
+    static skinAtlas =  Loader.imageAtlasByJSON(Math.random()>0.5?"./res/textures/skinMC.png":"https://i.imgur.com/PNJXVA3.png",Model.player,64,64);
 
   
     
