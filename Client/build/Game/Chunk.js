@@ -175,6 +175,20 @@ export class Chunk {
         }
         throw new Error("Undefined subchunk! ");
     }
+    getBlockSub(pos) {
+        if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 15 || pos.y > 256 || pos.z > 15) {
+            throw new Error("Incorrect cordinates: x:" + pos.x + " y:" + pos.y + " z:" + pos.z);
+        }
+        const y = pos.y % 16;
+        const yPos = Math.floor(pos.y / 16);
+        if (this.subchunks[yPos] != undefined) {
+            if (!(this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
+                this.subchunks[yPos].blocks[pos.x][y][pos.z] = new Block(0);
+            //  console.log(this.subchunks[yPos].blocks[pos.x][y][pos.z]);
+            return { block: this.subchunks[yPos].blocks[pos.x][y][pos.z], sub: this.subchunks[yPos] };
+        }
+        throw new Error("Undefined subchunk! ");
+    }
     setLight(pos, lightLevel) {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {
             throw new Error("Incorrect cordinates");
@@ -218,196 +232,30 @@ export class Chunk {
                 this.subchunks[yPos].blocks[pos.x][y][pos.z] = new Block(0);
             this.subchunks[yPos].blocks[pos.x][y][pos.z].id = blockID;
             Main.toUpdate.add(this.subchunks[yPos]);
-            /*        const pushLight = (vec:Vector,lightsky?:boolean,sub?:SubChunk)=>
-                {
-                    lightsky??=true;
-                    sub??=this.subchunks[yPos];
-                    let maxIter = 100;
-                    if(sub.blocks[vec.x][vec.y][vec.z].lightDir!=directions.UNDEF)
-                    {
-                        let blockPos = new Vector(vec.x,vec.y,vec.z);
-                        let k =sub.getBlockSub(blockPos);
-                        while(k.block.lightDir!=directions.SOURCE)
-                        {
-                            blockPos = k.pos;
-                            switch(k.block.lightDir)
-                            {
-                            case directions.NEG_X:
-                                blockPos.x--;
-                                break;
-                            case directions.POS_X:
-                                blockPos.x++;break;
-                            case directions.NEG_Y:
-                                blockPos.y--;break;
-                            case directions.POS_Y:
-                                blockPos.y++;break;
-                            case directions.NEG_Z:
-                                blockPos.z--;break;
-                            case directions.POS_Z:
-                                blockPos.z++;break;
-                            }
-                            if(maxIter--<0) break;
-              
-                            k=k.sub.getBlockSub(blockPos);
-                            //  console.log("stuck in while!!!",blockPos);
-                        }
-            
-                        if(maxIter>=0)
-                        {
-                            // console.log("Found source!!!");
-         
-                            if(!(k.sub==this.subchunks[yPos] && k.pos.x == pos.x && k.pos.y == y &&k.pos.z==pos.z))
-                                Main.lightQueue.push(new LightNode(k.pos,k.sub,15,directions.SOURCE,k.pos));
-                            else
-                                Main.lightRemQueue.push(new LightNode(k.pos,k.sub,15,directions.UNDEF,k.pos));
-                        }
-                    }
-    
-      
-                    //  let maxIter = 100
-                    if(lightsky && sub.blocks[vec.x][vec.y][vec.z].skyLightDir!=directions.UNDEF)
-                    {
-                        let blockPos = new Vector(vec.x,vec.y,vec.z);
-                        let k =sub.getBlockSub(blockPos);
-                        while(k.block.skyLightDir!=directions.SOURCE)
-                        {
-                            blockPos = k.pos;
-                            switch(k.block.skyLightDir)
-                            {
-                            case directions.NEG_X:
-                                blockPos.x--;
-                                break;
-                            case directions.POS_X:
-                                blockPos.x++;break;
-                            case directions.NEG_Y:
-                                blockPos.y--;break;
-                            case directions.POS_Y:
-                                blockPos.y++;break;
-                            case directions.NEG_Z:
-                                blockPos.z--;break;
-                            case directions.POS_Z:
-                                blockPos.z++;break;
-                            }
-                            if(maxIter--<0) break;
-              
-                            k=k.sub.getBlockSub(blockPos);
-                            //  console.log("stuck in while!!!",blockPos);
-                        }
-            
-                        if(maxIter>=0)
-                        {
-                            // console.log("Found skylight source!!!");
-         
-                            if(!(k.sub==this.subchunks[yPos] && k.pos.x == pos.x && k.pos.y == y &&k.pos.z==pos.z))
-                                Main.skyLightQueue.push(new LightNode(k.pos,k.sub,15,directions.SOURCE,k.pos));
-                            else
-                                Main.skyLightRemQueue.push(new LightNode(k.pos,k.sub,15,directions.UNDEF,k.pos));
-                        }
-                    }
-          
-                };
-                let checkSkyLight =true;
-                const lightBlocks = [];
-                if(blockID!=0 )
-                {
-                    this.subchunks[yPos].blocks[pos.x][y][pos.z].lightFBlock=0;
-                    this.subchunks[yPos].blocks[pos.x][y][pos.z].skyLight=0;
-                    if(pos.y>this.heightmap[pos.x][pos.z])
-                    {
-                        // Main.skyLightRemQueue.push(new LightNode(new Vector(pos.x,this.heightmap[pos.x][pos.z]%16,pos.z),this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)],15,directions.UNDEF,new Vector(0,0,0)))
-                        while(this.heightmap[pos.x][pos.z]<pos.y)
-                        {
-          
-                            this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].skyLightDir=directions.UNDEF;
-                            this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].skyLight=0;
-                            Main.skyLightRemQueue.push(new LightNode(new Vector(pos.x,this.heightmap[pos.x][pos.z]%16,pos.z),this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)],15,directions.UNDEF,new Vector(0,0,0)));
-                            // lightBlocks.push( this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].getBlockSub(new Vector(pos.x+1,this.heightmap[pos.x][pos.z]%16,pos.z)));
-                            //lightBlocks.push( this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].getBlockSub(new Vector(pos.x-1,this.heightmap[pos.x][pos.z]%16,pos.z)));
-                            //lightBlocks.push( this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].getBlockSub(new Vector(pos.x,this.heightmap[pos.x][pos.z]%16,pos.z+1)));
-                            //lightBlocks.push( this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].getBlockSub(new Vector(pos.x,this.heightmap[pos.x][pos.z]%16,pos.z-1)));
-                            this.heightmap[pos.x][pos.z]++;
-                        }
-    
-                    }
+            try {
+                // console.log("executing block update part")
+                if (pos.x == 0) {
+                    Main.toUpdate.add(this.neighbours["NEG_X"].subchunks[yPos]);
                 }
-                else{
-          
-                    if (pos.y==this.heightmap[pos.x][pos.z])
-                    {
-                        while(this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].id==0)
-                        {
-                            //     this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].skyLightDir=directions.SOURCE;
-                            //   this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)].blocks[pos.x][this.heightmap[pos.x][pos.z]%16][pos.z].skyLight=15;
-                            Main.skyLightQueue.push(new LightNode(new Vector(pos.x,this.heightmap[pos.x][pos.z]%16,pos.z), this.subchunks[Math.floor(this.heightmap[pos.x][pos.z]/16)],15,directions.SOURCE));
-                            this.heightmap[pos.x][pos.z]--;
-                        }
-                        checkSkyLight =false;
-                        this.heightmap[pos.x][pos.z]--;
-                    }
+                else if (pos.x == 15) {
+                    Main.toUpdate.add(this.neighbours["POS_X"].subchunks[yPos]);
                 }
-                for(const k of lightBlocks)
-                    pushLight(k.pos,true,k.sub);
-      
-                pushLight(new Vector(pos.x,y,pos.z),checkSkyLight);
-                if(pos.x>0)
-                    pushLight(new Vector(pos.x-1,y,pos.z),checkSkyLight);
-                if(pos.x<15)
-                    pushLight(new Vector(pos.x+1,y,pos.z),checkSkyLight);
-                if(y>0)
-                    pushLight(new Vector(pos.x,y-1,pos.z),checkSkyLight);
-                if(y<15)
-                    pushLight(new Vector(pos.x,y+1,pos.z),checkSkyLight);
-                if(pos.z>0)
-                    pushLight(new Vector(pos.x,y,pos.z-1),checkSkyLight);
-                if(pos.z<15)
-                    pushLight(new Vector(pos.x,y,pos.z+1),checkSkyLight);
-                if(blockID==10)
-                {
-                    Main.lightQueue.push(new LightNode(new Vector(pos.x,y,pos.z),this.subchunks[yPos],15,directions.SOURCE,new Vector(pos.x,y,pos.z)));
+                if (y == 0) {
+                    Main.toUpdate.add(this.subchunks[yPos - 1]);
                 }
-                this.updateSubchunkAt(pos.y);
-                try
-                {
-                    // console.log("executing block update part")
-                    if(pos.x ==0)
-                    {
-                        Main.toUpdate.add(this.neighbours["NEG_X"].subchunks[yPos]);
-                        pushLight(new Vector(15,y,pos.z),checkSkyLight,this.neighbours["NEG_X"].subchunks[yPos]);
-                    }
-                    else if(pos.x ==15)
-                    {
-                        Main.toUpdate.add( this.neighbours["POS_X"].subchunks[yPos]);
-                        pushLight(new Vector(0,y,pos.z),checkSkyLight,this.neighbours["POS_X"].subchunks[yPos]);
-                    }
-                    if(y ==0)
-                    {
-                        Main.toUpdate.add(this.subchunks[yPos-1]);
-                        pushLight(new Vector(pos.x,15,pos.z),checkSkyLight,this.subchunks[yPos-1]);
-                    }
-                    else if(y ==15)
-                    {
-                        Main.toUpdate.add(this.subchunks[yPos+1]);
-                        pushLight(new Vector(pos.x,0,pos.z),checkSkyLight,this.subchunks[yPos+1]);
-                    }
-                    if(pos.z ==0)
-                    {
-                        Main.toUpdate.add(this.neighbours["NEG_Z"].subchunks[yPos]);
-                        pushLight(new Vector(pos.x,y,15),checkSkyLight,this.neighbours["NEG_Z"].subchunks[yPos]);
-                    }
-                    else if(pos.z ==15)
-                    {
-                        Main.toUpdate.add(this.neighbours["POS_Z"].subchunks[yPos]);
-                        pushLight(new Vector(pos.x,y,0),checkSkyLight,this.neighbours["POS_Z"].subchunks[yPos]);
-                    }
-     
+                else if (y == 15) {
+                    Main.toUpdate.add(this.subchunks[yPos + 1]);
                 }
-                catch(error)
-                {
-                    console.log(error);
-                }*/
-        }
-        else {
-            console.log("Subchunk is undefined");
+                if (pos.z == 0) {
+                    Main.toUpdate.add(this.neighbours["NEG_Z"].subchunks[yPos]);
+                }
+                else if (pos.z == 15) {
+                    Main.toUpdate.add(this.neighbours["POS_Z"].subchunks[yPos]);
+                }
+            }
+            catch (error) {
+                console.log(error);
+            }
         }
     }
 }

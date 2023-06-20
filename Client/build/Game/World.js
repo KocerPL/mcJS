@@ -50,7 +50,6 @@ class World {
     }
     static genHeightMap() {
         const height = 100;
-        const height2 = 20;
         for (let x = 0; x < 256; x++) {
             // if(x%4)
             //   height+= Math.round(Math.random()*2)-1;
@@ -275,7 +274,7 @@ class World {
         console.log("lightning...", lightLevel);
         if (lightLevel <= 0 || blockList.includes(this.getBlock(vec)) || (direction != directions.UNDEF && direction == this.getBlock(vec).lightDir))
             return;
-        this.lightFunc(vec, lightLevel);
+        this.lightFunc();
         this.getBlock(vec).lightDir = direction;
         blockList.push(this.getBlock(vec));
         if (this.getBlock(vec).id < 1) {
@@ -296,10 +295,8 @@ class World {
             { bl: new Vector(vec.x, vec.y + 1, vec.z), dir: directions.POS_Y, negDir: directions.NEG_Y },
         ];
         let max;
-        let ind = 0;
         for (let i = 0; i < arr.length; i++) {
             if (this.getBlock(arr[i].bl).lightDir != arr[i].negDir && (max == undefined || this.getBlock(arr[i].bl).skyLight > this.getBlock(max.bl).skyLight)) {
-                ind = i;
                 max = { ...arr[i] };
             }
         }
@@ -314,7 +311,7 @@ class World {
             }
         }
     }
-    static lightFunc(vec, lightLevel) {
+    static lightFunc() {
         //  if(this.getBlock(vec).skyLight <lightLevel)
         //  this.setLight(vec,lightLevel);
     }
@@ -330,6 +327,25 @@ class World {
         const chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
         try {
             return Main.getChunkAt(chunkPos.x, chunkPos.z).getBlock(inChunkPos);
+        }
+        catch (error) {
+            console.log(inChunkPos);
+            // console.log(Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos));
+            console.error(error);
+        }
+    }
+    static getBlockAndSub(blockPos) {
+        let inChunkPos = new Vector(Math.round(blockPos.x) % 16, Math.round(blockPos.y), Math.round(blockPos.z) % 16);
+        if (inChunkPos.x < 0)
+            inChunkPos.x = 16 - Math.abs(inChunkPos.x);
+        if (inChunkPos.z < 0)
+            inChunkPos.z = 16 - Math.abs(inChunkPos.z);
+        if (inChunkPos.x < 0 || inChunkPos.z < 0) {
+            inChunkPos = inChunkPos.abs();
+        }
+        const chunkPos = new Vector(Math.floor(Math.round(blockPos.x) / 16), Math.round(blockPos.y), Math.floor(Math.round(blockPos.z) / 16));
+        try {
+            return Main.getChunkAt(chunkPos.x, chunkPos.z).getBlockSub(inChunkPos);
         }
         catch (error) {
             console.log(inChunkPos);
