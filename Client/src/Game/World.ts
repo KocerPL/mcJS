@@ -145,13 +145,18 @@ export class World
     public static  getHeightMap(blockPos:Vector):number
     {
         const chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
-        //  console.log(chunkPos);
+        const inChunkPos = new Vector(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);
+        if(inChunkPos.x<0)
+            inChunkPos.x = 16-Math.abs(inChunkPos.x);
+        if(inChunkPos.z<0)
+            inChunkPos.z = 16-Math.abs(inChunkPos.z);
         try
         {
-            return  Main.getChunkAt(chunkPos.x,chunkPos.z).heightmap[Math.round(blockPos.x%16)][Math.round(blockPos.z%16)];
+            return  Main.getChunkAt(chunkPos.x,chunkPos.z).heightmap[inChunkPos.x][inChunkPos.z];
         } 
         catch(error)
         {
+            console.log(Math.round(blockPos.x%16),Math.round(blockPos.z%16));
             console.log(error);
         }
     }

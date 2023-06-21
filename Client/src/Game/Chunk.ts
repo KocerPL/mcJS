@@ -57,7 +57,15 @@ export class Chunk {
         VAO.unbind();
         VBO.unbind();
         EBO.unbind();
-    
+        
+        for(let i=0;i<this.heightmap.length;i++)
+        {
+            this.heightmap[i]=[];
+            for(let j=0;j<this.heightmap.length;j++)
+            {
+                this.heightmap[i][j]=0;
+            }
+        }
         this.pos = new Vector(x,0,z);
     }
     updateLight()
@@ -151,6 +159,16 @@ export class Chunk {
     }
     preUpdate(yPos)
     {
+        for(let x=0;x<=15;x++)
+            for(let z=0;z<=15;z++)
+                for(let y=255;y>0;y--) 
+                {
+                    if(this.getBlock(new Vector(x,y,z)).id>0)
+                    {
+                        this.heightmap[x][z] = y;
+                        break;
+                    }
+                }   
         for(const ls of this.subchunks[yPos].lightList)
         {
             Lighter.light(ls.x+(this.pos.x*16),ls.y+(yPos*16),ls.z+(this.pos.z*16),15);
