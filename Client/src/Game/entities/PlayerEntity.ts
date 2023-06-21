@@ -259,7 +259,7 @@ export class PlayerEntity extends Entity
         this.rs.bufferArrays();
     }
     update(i: number): void {
-      i;
+        i;
     }
     render(): void {
         const nTransition = this.nextTransitions.shift();

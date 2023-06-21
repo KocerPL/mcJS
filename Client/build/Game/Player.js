@@ -6,7 +6,7 @@ import { randRange } from "../Engine/Utils/Math.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { Main } from "../Main.js";
-import { Block, blocks, dirAssoc } from "./Block.js";
+import { Block, blocks } from "./Block.js";
 import { Item } from "./entities/Item.js";
 import { PlayerEntity } from "./entities/PlayerEntity.js";
 import { World } from "./World.js";
@@ -155,7 +155,7 @@ class Player {
         if (this.locked)
             return;
         let hop = false;
-        let tempPos = this.pos.copy();
+        const tempPos = this.pos.copy();
         if (this.jump.yAcc > 0) {
             this.jump.yAcc -= 0.015;
             tempPos.y += this.jump.yAcc;
@@ -191,6 +191,8 @@ class Player {
                 tempPos.z -= Math.cos((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
             }
             let block = World.getBlock(this.camera.getPosition());
+            if (!block)
+                return;
             if (block.id < 0) {
                 this.inWater = true;
             }
@@ -198,14 +200,15 @@ class Player {
                 this.inWater = false;
             block = World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 0.5), Math.round(tempPos.z)));
             const block2 = World.getBlock(this.camera.getPosition());
-            if (block.id == -2) {
+            /*if(block.id==-2 )
+            {
                 const vec = dirAssoc[block.attribute[1]];
-                tempPos = Vector.add(tempPos, vec.mult(-(0.1 * (block.attribute[0] / 15))));
-            }
-            else if (block2.id == -2) {
+                tempPos = Vector.add(tempPos,vec.mult(-(0.1* (block.attribute[0]/15))));
+            } else if(block2.id==-2)
+            {
                 const vec = dirAssoc[block2.attribute[1]];
-                tempPos = Vector.add(tempPos, vec.mult(-(0.05 * (block2.attribute[0] / 15))));
-            }
+                tempPos = Vector.add(tempPos,vec.mult(-(0.05* (block2.attribute[0]/15))));
+            }*/
             let down = false;
             if (World.getBlock(new Vector(Math.round(tempPos.x - 0.3), Math.round(tempPos.y - 0.5), Math.round(tempPos.z))).id < 1
                 && World.getBlock(new Vector(Math.round(tempPos.x + 0.3), Math.round(tempPos.y - 0.5), Math.round(tempPos.z))).id < 1) {

@@ -2,10 +2,7 @@ import { Vector } from "../Engine/Utils/Vector.js";
 export class Block {
     id;
     lightFBlock = 0;
-    lightDir = directions.UNDEF;
     skyLight = 0;
-    skyLightDir = directions.UNDEF;
-    attribute;
     constructor(id) {
         this.id = id;
     }

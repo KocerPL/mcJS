@@ -5,9 +5,8 @@ import { Texture } from "../Engine/Texture.js";
 import { randRange } from "../Engine/Utils/Math.js";
 import { Matrix } from "../Engine/Utils/Matrix.js";
 import { Vector } from "../Engine/Utils/Vector.js";
-import { Lighter } from "../Lighter.js";
 import { Main } from "../Main.js";
-import { Block, blocks, dirAssoc } from "./Block.js";
+import { Block, blocks } from "./Block.js";
 import { Item } from "./entities/Item.js";
 import { PlayerEntity } from "./entities/PlayerEntity.js";
 import { World } from "./World.js";
@@ -105,7 +104,6 @@ export class Player
                 i++;
             }
 
-            console.log(i);
         }
     }
     update()
@@ -175,7 +173,7 @@ export class Player
         }
         if(this.locked) return;
         let hop =false;
-        let tempPos = this.pos.copy();
+        const tempPos = this.pos.copy();
         if(this.jump.yAcc>0)
         {
             this.jump.yAcc-=0.015;
@@ -194,7 +192,6 @@ export class Player
                 this.itemsBar[this.selectedItem].count--;
                 if( this.itemsBar[this.selectedItem].count<1)
                     this.itemsBar[this.selectedItem].id=0;
-                console.log("heh");
             }
             if(CanvaManager.getKey(16))
                 speed=2;
@@ -223,6 +220,8 @@ export class Player
             
             }
             let block =World.getBlock(this.camera.getPosition());
+            if(!block)
+                return;
             if(block.id <0)
             {
                 this.inWater =true;
@@ -232,7 +231,7 @@ export class Player
                 this.inWater=false;
             block =World.getBlock(new Vector(Math.round(tempPos.x),Math.round(tempPos.y-0.5),Math.round(tempPos.z)));
             const block2 = World.getBlock(this.camera.getPosition());
-            if(block.id==-2 )
+            /*if(block.id==-2 )
             {
                 const vec = dirAssoc[block.attribute[1]];
                 tempPos = Vector.add(tempPos,vec.mult(-(0.1* (block.attribute[0]/15))));
@@ -240,7 +239,7 @@ export class Player
             {
                 const vec = dirAssoc[block2.attribute[1]];
                 tempPos = Vector.add(tempPos,vec.mult(-(0.05* (block2.attribute[0]/15))));
-            }
+            }*/
             let down = false;
             if( World.getBlock( new Vector(Math.round(tempPos.x-0.3),Math.round(tempPos.y-0.5),Math.round(tempPos.z)) ).id <1 
         && World.getBlock( new Vector(Math.round(tempPos.x+0.3),Math.round(tempPos.y-0.5),Math.round(tempPos.z)) ).id <1)
@@ -407,7 +406,6 @@ export class Player
         else if(CanvaManager.getKey(51))
         {
             this.switchPerson("Third");
-            console.log(Main.tasks);
         }
     }
     mine()
@@ -479,7 +477,6 @@ export class Player
                     this.itemsBar[this.selectedItem].id=0;
                 CanvaManager.mouse.right=false;
               
-                console.log("placed block!! at: ",lastPos);
             }
         }
         catch(error)
@@ -499,7 +496,6 @@ export class Player
     }
     pickupItem(item:Item)
     {
-        console.log(item.count);
         const id= item.type;
         for(let x=0;x<this.itemsBar.length;x++)
         {

@@ -26,7 +26,7 @@ function hasNode(x:number,y:number,z:number,list:Array<LightNode>)
     }
     return false;
 }
-export class Lighter
+export class SkyLighter
 {
     static light(x:number,y:number,z:number,light:number)
     {
@@ -45,42 +45,42 @@ export class Lighter
             if(!firstNode &&    World.getBlock(new Vector(x,y,z)).id>0) continue;
             firstNode=false;
             const d = World.getBlockAndSub(new Vector(x,y,z));
-            d.block.lightFBlock = curLightNode.light;
+            d.block.skyLight = curLightNode.light;
             Main.toUpdate.add(d.sub);
 
             let test=  World.getBlock(new Vector(x+1,y,z));
-            if(test.lightFBlock+2<curLightNode.light && !hasNode(x+1,y,z,list))
+            if(test && test.skyLight+2<curLightNode.light && !hasNode(x+1,y,z,list))
             {
                 list.push(new LightNode(x+1,y,z,light-1));
             }
             
             test=  World.getBlock(new Vector(x-1,y,z));
-            if(test.lightFBlock+2<curLightNode.light && !hasNode(x-1,y,z,list))
+            if(test &&test.skyLight+2<curLightNode.light && !hasNode(x-1,y,z,list))
             {
                 list.push(new LightNode(x-1,y,z,light-1));
             }
 
 
             test=  World.getBlock(new Vector(x,y+1,z));
-            if(test.lightFBlock+2<curLightNode.light && !hasNode(x,y+1,z,list))
+            if(test &&test.skyLight+2<curLightNode.light && !hasNode(x,y+1,z,list))
             {
                 list.push(new LightNode(x,y+1,z,light-1));
             }
             
             test=  World.getBlock(new Vector(x,y-1,z));
-            if(test.lightFBlock+2<curLightNode.light && !hasNode(x,y-1,z,list))
+            if(test &&test.skyLight+2<curLightNode.light && !hasNode(x,y-1,z,list))
             {
                 list.push(new LightNode(x,y-1,z,light-1));
             }
             
             test=  World.getBlock(new Vector(x,y,z+1));
-            if(test.lightFBlock+2<curLightNode.light && !hasNode(x,y,z+1,list))
+            if(test &&test.skyLight+2<curLightNode.light && !hasNode(x,y,z+1,list))
             {
                 list.push(new LightNode(x,y,z+1,light-1));
             }
             
             test=  World.getBlock(new Vector(x,y,z-1));
-            if(test.lightFBlock+2<curLightNode.light && !hasNode(x,y,z-1,list))
+            if(test &&test.skyLight+2<curLightNode.light && !hasNode(x,y,z-1,list))
             {
                 list.push(new LightNode(x,y,z-1,light-1));
             }
@@ -107,42 +107,42 @@ export class Lighter
            
             const d = World.getBlockAndSub(new Vector(x,y,z));
         
-            d.block.lightFBlock = 0;
+            d.block.skyLight = 0;
             Main.toUpdate.add(d.sub);
 
             let test=  World.getBlock(new Vector(x+1,y,z));
-            if(test.lightFBlock+2<curLightNode.light && !hasNode(x+1,y,z,list))
+            if(test &&test.skyLight+2<curLightNode.light && !hasNode(x+1,y,z,list))
             {
                 list.push(new LightNode(x+1,y,z,light-1));
             }
             
             test=  World.getBlock(new Vector(x-1,y,z));
-            if(test.lightFBlock+2<curLightNode.light && !hasNode(x-1,y,z,list))
+            if(test &&test.skyLight+2<curLightNode.light && !hasNode(x-1,y,z,list))
             {
                 list.push(new LightNode(x-1,y,z,light-1));
             }
 
 
             test=  World.getBlock(new Vector(x,y+1,z));
-            if(test.lightFBlock+2<curLightNode.light && !hasNode(x,y+1,z,list))
+            if(test &&test.skyLight+2<curLightNode.light && !hasNode(x,y+1,z,list))
             {
                 list.push(new LightNode(x,y+1,z,light-1));
             }
             
             test=  World.getBlock(new Vector(x,y-1,z));
-            if(test.lightFBlock+2<curLightNode.light && !hasNode(x,y-1,z,list))
+            if(test &&test.skyLight+2<curLightNode.light && !hasNode(x,y-1,z,list))
             {
                 list.push(new LightNode(x,y-1,z,light-1));
             }
             
             test=  World.getBlock(new Vector(x,y,z+1));
-            if(test.lightFBlock+2<curLightNode.light && !hasNode(x,y,z+1,list))
+            if(test &&test.skyLight+2<curLightNode.light && !hasNode(x,y,z+1,list))
             {
                 list.push(new LightNode(x,y,z+1,light-1));
             }
             
             test=  World.getBlock(new Vector(x,y,z-1));
-            if(test.lightFBlock+2<curLightNode.light && !hasNode(x,y,z-1,list))
+            if(test &&test.skyLight+2<curLightNode.light && !hasNode(x,y,z-1,list))
             {
                 list.push(new LightNode(x,y,z-1,light-1));
             }
@@ -159,30 +159,30 @@ export class Lighter
        
         let light =0;
         let test = World.getBlock(new Vector(x+1,y,z));
-        if(test.lightFBlock>light+1)
-            light= test.lightFBlock-1;
+        if(test.skyLight>light+1)
+            light= test.skyLight-1;
         test = World.getBlock(new Vector(x-1,y,z));
-        if(test.lightFBlock>light+1)
-            light= test.lightFBlock-1;
+        if(test.skyLight>light+1)
+            light= test.skyLight-1;
         test = World.getBlock(new Vector(x,y+1,z));
-        if(test.lightFBlock>light+1)
-            light= test.lightFBlock-1;
+        if(test.skyLight>light+1)
+            light= test.skyLight-1;
 
         test = World.getBlock(new Vector(x,y-1,z));
-        if(test.lightFBlock>light+1)
-            light= test.lightFBlock-1;
+        if(test.skyLight>light+1)
+            light= test.skyLight-1;
         
         test = World.getBlock(new Vector(x,y+1,z));
-        if(test.lightFBlock>light+1)
-            light= test.lightFBlock-1;
+        if(test.skyLight>light+1)
+            light= test.skyLight-1;
         
         test = World.getBlock(new Vector(x,y,z-1));
-        if(test.lightFBlock>light+1)
-            light= test.lightFBlock-1;
+        if(test.skyLight>light+1)
+            light= test.skyLight-1;
 
         test = World.getBlock(new Vector(x,y,z+1));
-        if(test.lightFBlock>light+1)
-            light= test.lightFBlock-1;
+        if(test.skyLight>light+1)
+            light= test.skyLight-1;
         this.light(x,y,z,light);
 
     }

@@ -1,6 +1,6 @@
 import { Array3D } from "../Engine/Utils/Array3D.js";
 import { Vector } from "../Engine/Utils/Vector.js";
-import { Block, blocks,  directions } from "./Block.js";
+import { Block, blocks } from "./Block.js";
 import { Chunk } from "./Chunk.js";
 import { World } from "./World.js";
 import { Mesh } from "./Mesh.js";
@@ -106,7 +106,6 @@ export class SubChunk
                 else
                 {
                     this.blocks[x][y][z]=new Block(0);
-                    this.blocks[x][y][z].skyLightDir = directions.SOURCE;
                     this.blocks[x][y][z].skyLight = 15;
                 }
             }
@@ -131,7 +130,6 @@ export class SubChunk
                 if(ah+1<=(y+yPos))
                 {
                     this.blocks[x][y][z].skyLight=15;
-                    this.blocks[x][y][z].skyLightDir = directions.SOURCE;
                 }
             }
         }

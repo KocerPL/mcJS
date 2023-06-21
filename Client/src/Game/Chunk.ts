@@ -11,6 +11,7 @@ import { Mesh } from "./Mesh.js";
 import { World } from "./World.js";
 import { randRange } from "../Engine/Utils/Math.js";
 import { Lighter } from "../Lighter.js";
+import { SkyLighter } from "../SkyLighter.js";
 const gl = CanvaManager.gl;
 export type DIR = "POS_X" | "POS_Z" | "NEG_X"  | "NEG_Z";
 export function flipDir(dir:DIR)
@@ -63,7 +64,7 @@ export class Chunk {
             this.heightmap[i]=[];
             for(let j=0;j<this.heightmap.length;j++)
             {
-                this.heightmap[i][j]=0;
+                this.heightmap[i][j]=255;
             }
         }
         this.pos = new Vector(x,0,z);
@@ -159,16 +160,51 @@ export class Chunk {
     }
     preUpdate(yPos)
     {
+        const lastHeightMap = this.heightmap;
+        this.heightmap =new Array(16);
+        for(let i=0;i<this.heightmap.length;i++)
+        {
+            this.heightmap[i]=[];
+            for(let j=0;j<this.heightmap.length;j++)
+            {
+                this.heightmap[i][j]=0;
+            }
+        }
         for(let x=0;x<=15;x++)
             for(let z=0;z<=15;z++)
                 for(let y=255;y>0;y--) 
                 {
-                    if(this.getBlock(new Vector(x,y,z)).id>0)
+                    const block =this.getBlock(new Vector(x,y,z));
+                    if(block.id>0)
                     {
                         this.heightmap[x][z] = y;
                         break;
                     }
-                }   
+                }
+        const queue = [];
+        for(let x=0;x<16;x++)
+            for(let z=0;z<16;z++)
+            {
+                if(this.heightmap[x][z]>lastHeightMap[x][z])
+                {
+                    for(let i=lastHeightMap[x][z]+1;i<=this.heightmap[x][z];i++)
+                    {
+                        SkyLighter.removeLight((this.pos.x*16)+x , i ,(this.pos.z*16)+z ,15);
+                    }
+                }
+                else if(this.heightmap[x][z]<lastHeightMap[x][z])
+                {
+                    for(let i=this.heightmap[x][z]+1;i<=lastHeightMap[x][z];i++)
+                    {
+                        this.getBlock(new Vector(x,i,z)).skyLight=15;
+                        queue.push([(this.pos.x*16)+x , i ,(this.pos.z*16)+z ]);
+                    }
+                }
+            }
+        for(const k of queue)
+        {
+            SkyLighter.light(k[0],k[1],k[2],15);
+        }
         for(const ls of this.subchunks[yPos].lightList)
         {
             Lighter.light(ls.x+(this.pos.x*16),ls.y+(yPos*16),ls.z+(this.pos.z*16),15);
@@ -313,7 +349,7 @@ export class Chunk {
                     Main.toUpdate.add(this.neighbours["POS_Z"].subchunks[yPos]);
                     
                 }
- 
+      
             }
             catch(error)
             {

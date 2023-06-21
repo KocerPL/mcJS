@@ -125,7 +125,6 @@ export class Main
         {
             chunk.subchunks[ev.data.subY].blocks[x][y][z]=new Block(ev.data.blocks[x+(y*16)+(z*256)]);
             chunk.subchunks[ev.data.subY].blocks[x][y][z].skyLight=15;
-            chunk.subchunks[ev.data.subY].blocks[x][y][z].skyLightDir =directions.SOURCE;
         }
         for(let i=0;i<16;i++)
             if(!chunk.subchunks[i])
@@ -201,7 +200,6 @@ export class Main
         };
         this.integratedServer.postMessage("start");
         */
-        console.log("Random:", randRange(-0.2,0.2));
         CanvaManager.setupCanva(document.body);
         // EBO.unbind();
         // VBO.unbind();
@@ -264,135 +262,6 @@ export class Main
         concatQ.forEach((chunk) =>{chunk.updateMesh();});
     
     }
-    public static processSkyLight()
-    {
-        const relight:Map<Block,LightNode> = new Map();
-        while(this.skyLightRemQueue.length>0)
-        {  
-            const node:LightNode =this.skyLightRemQueue.shift();
-            if(relight.get( node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z])!=undefined)
-                relight.delete(node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z]);
-            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLight=0;
-            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLightDir = directions.UNDEF;
-            this.toUpdate.add(node.subchunk);
-            //Propagate
-            const checkAndPush = (pos:Vector,direction:number) =>{
-                const blockInfo = node.subchunk.getBlockSub(pos);
-                if(blockInfo==undefined || blockInfo.block == undefined) return;
-                if( blockInfo.block.skyLightDir == direction)
-                    this.skyLightRemQueue.push(new LightNode(blockInfo.pos,blockInfo.sub,node.light-1,direction,node.lpos));
-                else if(blockInfo.block.skyLightDir!=directions.SOURCE &&blockInfo.block.skyLightDir!=directions.UNDEF && blockInfo.block.skyLight>1) 
-                    relight.set(blockInfo.block,new LightNode(blockInfo.pos,blockInfo.sub,blockInfo.block.skyLight,blockInfo.block.skyLightDir,node.lpos));// this.lightQueue.push(new LightNode(blockInfo.pos,blockInfo.sub,blockInfo.block.lightFBlock,blockInfo.block.lightDir,node.lpos));
-            };
-            checkAndPush(new Vector(node.pos.x-1,node.pos.y,node.pos.z),directions.POS_X);
-            checkAndPush(new Vector(node.pos.x+1,node.pos.y,node.pos.z),directions.NEG_X);
-            checkAndPush(new Vector(node.pos.x,node.pos.y-1,node.pos.z),directions.POS_Y);
-            checkAndPush(new Vector(node.pos.x,node.pos.y+1,node.pos.z),directions.NEG_Y);
-            checkAndPush(new Vector(node.pos.x,node.pos.y,node.pos.z-1),directions.POS_Z);
-            checkAndPush(new Vector(node.pos.x,node.pos.y,node.pos.z+1),directions.NEG_Z);
-        }
-        relight.forEach((lightnode:LightNode)=>{this.skyLightQueue.push(lightnode);});
-        while(this.skyLightQueue.length>0)
-        {  
-            const node:LightNode =this.skyLightQueue.shift();
-            node.direction??=node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLightDir;
-            if(node.light==undefined)
-                node.light??=node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLight;
-            else  {
-                if(node.direction!=  node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLightDir && node.light<= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLight) continue;
-        
-                if( node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLight!=node.light ||
-            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLightDir!= node.direction)
-                {   
-                    node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLight=node.light;
-                    node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].skyLightDir = node.direction;
-                    this.toUpdate.add(node.subchunk);
-                }
-            }
-            if(node.light>1)
-            {
-                //Propagate
-                const checkAndPush = (pos:Vector,direction:number) =>{
-                    const blockInfo = node.subchunk.getBlockSub(pos);    
-                    if(blockInfo==undefined || blockInfo.block == undefined) return;
-                    if(blockInfo.block.id==0 && blockInfo.block.skyLight<=node.light-1)
-                        this.skyLightQueue.push(new LightNode(blockInfo.pos,blockInfo.sub,node.light-1,direction,node.lpos));
-                    else if( blockInfo.block.skyLightDir == direction)
-                        this.skyLightRemQueue.push(new LightNode(blockInfo.pos,blockInfo.sub,node.light-1,direction,node.lpos));
-                };
-                checkAndPush(new Vector(node.pos.x-1,node.pos.y,node.pos.z),directions.POS_X);
-                checkAndPush(new Vector(node.pos.x+1,node.pos.y,node.pos.z),directions.NEG_X);
-                checkAndPush(new Vector(node.pos.x,node.pos.y-1,node.pos.z),directions.POS_Y);
-                checkAndPush(new Vector(node.pos.x,node.pos.y+1,node.pos.z),directions.NEG_Y);
-                checkAndPush(new Vector(node.pos.x,node.pos.y,node.pos.z-1),directions.POS_Z);
-                checkAndPush(new Vector(node.pos.x,node.pos.y,node.pos.z+1),directions.NEG_Z);
-            }
-        }
-    }
-    public static processLight()
-    {
-        const relight:Map<Block,LightNode> = new Map();
-        while(this.lightRemQueue.length>0)
-        {  
-            const node:LightNode =this.lightRemQueue.shift();
-            if(relight.get( node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z])!=undefined)
-                relight.delete(node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z]);
-            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock=0;
-            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir = directions.UNDEF;
-            this.toUpdate.add(node.subchunk);
-            //Propagate
-            const checkAndPush = (pos:Vector,direction:number) =>{
-                const blockInfo = node.subchunk.getBlockSub(pos);
-                if( blockInfo.block.lightDir == direction)
-                    this.lightRemQueue.push(new LightNode(blockInfo.pos,blockInfo.sub,node.light-1,direction,node.lpos));
-                else if(blockInfo.block.lightDir!=directions.SOURCE &&blockInfo.block.lightDir!=directions.UNDEF && blockInfo.block.lightFBlock>1) 
-                    relight.set(blockInfo.block,new LightNode(blockInfo.pos,blockInfo.sub,blockInfo.block.lightFBlock,blockInfo.block.lightDir,node.lpos));// this.lightQueue.push(new LightNode(blockInfo.pos,blockInfo.sub,blockInfo.block.lightFBlock,blockInfo.block.lightDir,node.lpos));
-            };
-            checkAndPush(new Vector(node.pos.x-1,node.pos.y,node.pos.z),directions.POS_X);
-            checkAndPush(new Vector(node.pos.x+1,node.pos.y,node.pos.z),directions.NEG_X);
-            checkAndPush(new Vector(node.pos.x,node.pos.y-1,node.pos.z),directions.POS_Y);
-            checkAndPush(new Vector(node.pos.x,node.pos.y+1,node.pos.z),directions.NEG_Y);
-            checkAndPush(new Vector(node.pos.x,node.pos.y,node.pos.z-1),directions.POS_Z);
-            checkAndPush(new Vector(node.pos.x,node.pos.y,node.pos.z+1),directions.NEG_Z);
-        }
-        relight.forEach((lightnode:LightNode)=>{this.lightQueue.push(lightnode);});
-        while(this.lightQueue.length>0)
-        {  
-            const node:LightNode =this.lightQueue.shift();
-            node.direction??=node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir;
-            if(node.light==undefined)
-                node.light??=node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock;
-            else  {
-                if(node.direction!=  node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir && node.light<= node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock) continue;
-        
-                if( node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock!=node.light ||
-            node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir != node.direction)
-                {   
-                    node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightFBlock=node.light;
-                    node.subchunk.blocks[node.pos.x][node.pos.y][node.pos.z].lightDir = node.direction;
-                    this.toUpdate.add(node.subchunk);
-                }
-            }
-            if(node.light>1)
-            {
-                //Propagate
-                const checkAndPush = (pos:Vector,direction:number) =>{
-                    const blockInfo = node.subchunk.getBlockSub(pos);    
-                    if(blockInfo.block.id==0 && blockInfo.block.lightFBlock<=node.light-1)
-                        this.lightQueue.push(new LightNode(blockInfo.pos,blockInfo.sub,node.light-1,direction,node.lpos));
-                    else if( blockInfo.block.lightDir == direction)
-                        this.lightRemQueue.push(new LightNode(blockInfo.pos,blockInfo.sub,node.light-1,direction,node.lpos));
-                };
-                checkAndPush(new Vector(node.pos.x-1,node.pos.y,node.pos.z),directions.POS_X);
-                checkAndPush(new Vector(node.pos.x+1,node.pos.y,node.pos.z),directions.NEG_X);
-                checkAndPush(new Vector(node.pos.x,node.pos.y-1,node.pos.z),directions.POS_Y);
-                checkAndPush(new Vector(node.pos.x,node.pos.y+1,node.pos.z),directions.NEG_Y);
-                checkAndPush(new Vector(node.pos.x,node.pos.y,node.pos.z-1),directions.POS_Z);
-                checkAndPush(new Vector(node.pos.x,node.pos.y,node.pos.z+1),directions.NEG_Z);
-            }
-        }
-        this.processSkyLight();
-    }
     public static processChunk(chunk:Chunk)
     {
         chunk.sendNeighbours();
@@ -443,7 +312,6 @@ export class Main
             this.fastDelta--;
             this.fastUpdate();
         }
-        this.processLight();
         this.updateSubchunks();
         this.render();
         this.lastFrame= time;
