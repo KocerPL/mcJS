@@ -64,8 +64,9 @@ io.on('connection', (socket) => {
   });
 app.get("*",(req,res)=>{
     //  console.log(rDir+"/Client/index.html");
-    if(req.path.includes("favicon.ico"))
+    if(req.path.includes("favicon"))
     {
+        console.log("FAVICON");
         res.sendFile(rDir+"/Client/res/favicon.ico");
         return;
     }
