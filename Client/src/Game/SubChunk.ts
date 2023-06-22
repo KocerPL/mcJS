@@ -13,6 +13,7 @@ export class SubChunk
     generated=true; //Is SubChunk already generated
     lightUpdate = false; //Is subchunk updating light
     // empty:boolean = true;    //Is subchunk empty
+    fPass=true;
     lightList:Array<Vector> =[];
     chunk:Chunk; //parent Chunk of this subchunk
     pos:Vector;//subchunk position in world

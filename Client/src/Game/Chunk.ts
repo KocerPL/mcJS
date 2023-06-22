@@ -167,7 +167,7 @@ export class Chunk {
             this.heightmap[i]=[];
             for(let j=0;j<this.heightmap.length;j++)
             {
-                this.heightmap[i][j]=0;
+                this.heightmap[i][j]=255;
             }
         }
         for(let x=0;x<=15;x++)
@@ -185,11 +185,13 @@ export class Chunk {
         for(let x=0;x<16;x++)
             for(let z=0;z<16;z++)
             {
-                if(this.heightmap[x][z]>lastHeightMap[x][z])
+                if( this.heightmap[x][z]>lastHeightMap[x][z])
                 {
-                    for(let i=lastHeightMap[x][z]+1;i<=this.heightmap[x][z];i++)
+                    console.log(this.heightmap[x][z],lastHeightMap[x][z],"WHAT");
+                    for(let i=lastHeightMap[x][z]+1;i<this.heightmap[x][z];i++)
                     {
                         SkyLighter.removeLight((this.pos.x*16)+x , i ,(this.pos.z*16)+z ,15);
+                   
                     }
                 }
                 else if(this.heightmap[x][z]<lastHeightMap[x][z])
@@ -209,6 +211,7 @@ export class Chunk {
         {
             Lighter.light(ls.x+(this.pos.x*16),ls.y+(yPos*16),ls.z+(this.pos.z*16),15);
         }
+        this.subchunks[yPos].fPass=false;
     }
     updateMesh() {
         this.mesh.reset();
@@ -286,9 +289,8 @@ export class Chunk {
     }
     updateAllSubchunks()
     {
-         
-        for(const sub of this.subchunks)
-            Main.toUpdate.add(sub);
+        for(let i=15;i>=0;i--)
+            Main.toUpdate.add(this.subchunks[i]);
     
         // console.log("now not lazy hehehehe")
     }

@@ -13,9 +13,11 @@ for(let i=0;i<2;pos--)
         i++;
 }
 const rDir = __dirname.substring(0,pos+1);
+
 app.get("/",(req,res)=>{
     res.sendFile(rDir+"/Client/index.html");
 });
+
 io.on('connection', (socket) => {
     console.log('a user connected');
     socket.KOCEid = lastID++;
@@ -62,9 +64,13 @@ io.on('connection', (socket) => {
   });
 app.get("*",(req,res)=>{
     //  console.log(rDir+"/Client/index.html");
+    if(req.path.includes("favicon.ico"))
+    {
+        res.sendFile(rDir+"/Client/res/favicon.ico");
+        return;
+    }
     res.sendFile(rDir+"/Client"+req.path);
 });
-
 server.listen(3000,()=>{
     console.log("listening on 3000");
 });

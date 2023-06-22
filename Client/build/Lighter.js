@@ -43,27 +43,27 @@ export class Lighter {
             d.block.lightFBlock = curLightNode.light;
             Main.toUpdate.add(d.sub);
             let test = World.getBlock(new Vector(x + 1, y, z));
-            if (test.lightFBlock + 2 < curLightNode.light && !hasNode(x + 1, y, z, list)) {
+            if (test.lightFBlock + 1 < curLightNode.light && !hasNode(x + 1, y, z, list)) {
                 list.push(new LightNode(x + 1, y, z, light - 1));
             }
             test = World.getBlock(new Vector(x - 1, y, z));
-            if (test.lightFBlock + 2 < curLightNode.light && !hasNode(x - 1, y, z, list)) {
+            if (test.lightFBlock + 1 < curLightNode.light && !hasNode(x - 1, y, z, list)) {
                 list.push(new LightNode(x - 1, y, z, light - 1));
             }
             test = World.getBlock(new Vector(x, y + 1, z));
-            if (test.lightFBlock + 2 < curLightNode.light && !hasNode(x, y + 1, z, list)) {
+            if (test.lightFBlock + 1 < curLightNode.light && !hasNode(x, y + 1, z, list)) {
                 list.push(new LightNode(x, y + 1, z, light - 1));
             }
             test = World.getBlock(new Vector(x, y - 1, z));
-            if (test.lightFBlock + 2 < curLightNode.light && !hasNode(x, y - 1, z, list)) {
+            if (test.lightFBlock + 1 < curLightNode.light && !hasNode(x, y - 1, z, list)) {
                 list.push(new LightNode(x, y - 1, z, light - 1));
             }
             test = World.getBlock(new Vector(x, y, z + 1));
-            if (test.lightFBlock + 2 < curLightNode.light && !hasNode(x, y, z + 1, list)) {
+            if (test.lightFBlock + 1 < curLightNode.light && !hasNode(x, y, z + 1, list)) {
                 list.push(new LightNode(x, y, z + 1, light - 1));
             }
             test = World.getBlock(new Vector(x, y, z - 1));
-            if (test.lightFBlock + 2 < curLightNode.light && !hasNode(x, y, z - 1, list)) {
+            if (test.lightFBlock + 1 < curLightNode.light && !hasNode(x, y, z - 1, list)) {
                 list.push(new LightNode(x, y, z - 1, light - 1));
             }
         }
@@ -87,27 +87,27 @@ export class Lighter {
             d.block.lightFBlock = 0;
             Main.toUpdate.add(d.sub);
             let test = World.getBlock(new Vector(x + 1, y, z));
-            if (test.lightFBlock + 2 < curLightNode.light && !hasNode(x + 1, y, z, list)) {
+            if (test.lightFBlock + 1 < curLightNode.light && !hasNode(x + 1, y, z, list)) {
                 list.push(new LightNode(x + 1, y, z, light - 1));
             }
             test = World.getBlock(new Vector(x - 1, y, z));
-            if (test.lightFBlock + 2 < curLightNode.light && !hasNode(x - 1, y, z, list)) {
+            if (test.lightFBlock + 1 < curLightNode.light && !hasNode(x - 1, y, z, list)) {
                 list.push(new LightNode(x - 1, y, z, light - 1));
             }
             test = World.getBlock(new Vector(x, y + 1, z));
-            if (test.lightFBlock + 2 < curLightNode.light && !hasNode(x, y + 1, z, list)) {
+            if (test.lightFBlock + 1 < curLightNode.light && !hasNode(x, y + 1, z, list)) {
                 list.push(new LightNode(x, y + 1, z, light - 1));
             }
             test = World.getBlock(new Vector(x, y - 1, z));
-            if (test.lightFBlock + 2 < curLightNode.light && !hasNode(x, y - 1, z, list)) {
+            if (test.lightFBlock + 1 < curLightNode.light && !hasNode(x, y - 1, z, list)) {
                 list.push(new LightNode(x, y - 1, z, light - 1));
             }
             test = World.getBlock(new Vector(x, y, z + 1));
-            if (test.lightFBlock + 2 < curLightNode.light && !hasNode(x, y, z + 1, list)) {
+            if (test.lightFBlock + 1 < curLightNode.light && !hasNode(x, y, z + 1, list)) {
                 list.push(new LightNode(x, y, z + 1, light - 1));
             }
             test = World.getBlock(new Vector(x, y, z - 1));
-            if (test.lightFBlock + 2 < curLightNode.light && !hasNode(x, y, z - 1, list)) {
+            if (test.lightFBlock + 1 < curLightNode.light && !hasNode(x, y, z - 1, list)) {
                 list.push(new LightNode(x, y, z - 1, light - 1));
             }
         }

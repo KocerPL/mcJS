@@ -270,7 +270,7 @@ export class Main
         {
             chunk.heightmap[i]=[];
             for(let j=0 ; j<16;j++)
-                chunk.heightmap[i][j]=10;
+                chunk.heightmap[i][j]=0;
         }
         chunk.updateAllSubchunks();
     }

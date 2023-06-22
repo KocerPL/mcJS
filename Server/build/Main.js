@@ -62,6 +62,10 @@ io.on('connection', (socket) => {
 });
 app.get("*", (req, res) => {
     //  console.log(rDir+"/Client/index.html");
+    if (req.path.includes("/favicon.ico")) {
+        res.sendFile(rDir + "/Client/res/favicon.ico");
+        return;
+    }
     res.sendFile(rDir + "/Client" + req.path);
 });
 server.listen(3000, () => {
