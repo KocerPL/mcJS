@@ -5,7 +5,6 @@ import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Shader2d } from "./Engine/Shader/Shader2d.js";
 import { Texture } from "./Engine/Texture.js";
 import { Array3D } from "./Engine/Utils/Array3D.js";
-import { randRange } from "./Engine/Utils/Math.js";
 import { Matrix } from "./Engine/Utils/Matrix.js";
 import { Vector } from "./Engine/Utils/Vector.js";
 import { VAO } from "./Engine/VAO.js";
@@ -161,7 +160,7 @@ class Main {
         });
         for (let x = -4; x < 4; x++)
             for (let z = -4; z < 4; z++)
-                for (let i = 0; i < 16; i++)
+                for (let i = 15; i >= 0; i--)
                     this.socket.emit("getSubchunk", x, i, z);
         /* this.integratedServer = new Worker("./build/IntegratedServer/Main.js", {
             type: "module"
@@ -183,7 +182,6 @@ class Main {
         };
         this.integratedServer.postMessage("start");
         */
-        console.log("Random:", randRange(-0.2, 0.2));
         CanvaManager.setupCanva(document.body);
         // EBO.unbind();
         // VBO.unbind();

@@ -178,7 +178,7 @@ export class Main
         });
         for(let x=-4;x<4;x++)
             for(let z=-4;z<4;z++)
-                for(let i=0;i<16;i++)
+                for(let i=15;i>=0;i--)
                     this.socket.emit("getSubchunk",x,i,z);
         /* this.integratedServer = new Worker("./build/IntegratedServer/Main.js", {
             type: "module"

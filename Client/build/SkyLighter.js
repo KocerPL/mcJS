@@ -111,7 +111,7 @@ export class SkyLighter {
                 list.push(new LightNode(x, y, z - 1, light - 1));
             }
         }
-        for (let i = 0; list.length > i; i++) {
+        for (let i = list.length - 1; i >= 0; i--) {
             if (World.getBlock(list[i].toVector()).id <= 0)
                 this.processOneBlockLight(list[i].x, list[i].y, list[i].z);
         }

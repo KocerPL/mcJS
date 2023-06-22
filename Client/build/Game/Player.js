@@ -93,7 +93,6 @@ class Player {
                 this.inventory[i].count = 100;
                 i++;
             }
-            console.log(i);
         }
     }
     update() {
@@ -170,7 +169,6 @@ class Player {
                 this.itemsBar[this.selectedItem].count--;
                 if (this.itemsBar[this.selectedItem].count < 1)
                     this.itemsBar[this.selectedItem].id = 0;
-                console.log("heh");
             }
             if (CanvaManager.getKey(16))
                 speed = 2;
@@ -349,7 +347,6 @@ class Player {
         }
         else if (CanvaManager.getKey(51)) {
             this.switchPerson("Third");
-            console.log(Main.tasks);
         }
     }
     mine() {
@@ -407,7 +404,6 @@ class Player {
                 if (this.itemsBar[this.selectedItem].count == 0)
                     this.itemsBar[this.selectedItem].id = 0;
                 CanvaManager.mouse.right = false;
-                console.log("placed block!! at: ", lastPos);
             }
         }
         catch (error) {
@@ -422,7 +418,6 @@ class Player {
         return false;
     }
     pickupItem(item) {
-        console.log(item.count);
         const id = item.type;
         for (let x = 0; x < this.itemsBar.length; x++) {
             if (this.itemsBar[x].id == id && this.itemsBar[x].count < 65) {
