@@ -41,6 +41,7 @@ export class Chunk {
     vlo:VBO;
     vfb:VBO;
     ebo:EBO;
+    lightQueue:Array<Array<number>>=[];
     transformation = Matrix.identity();
     constructor(x:number, z:number) {
         this.transformation= this.transformation.translate(x*16,0,z*16);
@@ -187,8 +188,7 @@ export class Chunk {
             {
                 if( this.heightmap[x][z]>lastHeightMap[x][z])
                 {
-                    console.log(this.heightmap[x][z],lastHeightMap[x][z],"WHAT");
-                    for(let i=lastHeightMap[x][z]+1;i<this.heightmap[x][z];i++)
+                    for(let i=lastHeightMap[x][z]+1;i<=this.heightmap[x][z];i++)
                     {
                         SkyLighter.removeLight((this.pos.x*16)+x , i ,(this.pos.z*16)+z ,15);
                    
@@ -203,6 +203,11 @@ export class Chunk {
                     }
                 }
             }
+        for(const k of this.lightQueue)
+        {
+            SkyLighter.light(k[0],k[1],k[2],15);
+        }
+        this.lightQueue.length =0;
         for(const k of queue)
         {
             SkyLighter.light(k[0],k[1],k[2],15);
@@ -307,6 +312,45 @@ export class Chunk {
 
         Main.toUpdate.add(this.subchunks[yPos]);
   
+    }
+    prepareLight()
+    {
+        const queue = [];
+        const lastHeightMap = this.heightmap;
+        this.heightmap =new Array(16);
+        for(let i=0;i<this.heightmap.length;i++)
+        {
+            this.heightmap[i]=[];
+            for(let j=0;j<this.heightmap.length;j++)
+            {
+                this.heightmap[i][j]=255;
+            }
+        }
+        for(let x=0;x<=15;x++)
+            for(let z=0;z<=15;z++)
+                for(let y=255;y>0;y--) 
+                {
+                    const block =this.getBlock(new Vector(x,y,z));
+                    if(block.id>0)
+                    {
+                        this.heightmap[x][z] = y;
+                        break;
+                    }
+                }
+        for(let x=0;x<16;x++)
+            for(let z=0;z<16;z++)
+            {
+                if(this.heightmap[x][z]<lastHeightMap[x][z])
+                {
+                    for(let i=this.heightmap[x][z]+1;i<=lastHeightMap[x][z];i++)
+                    {
+                        this.getBlock(new Vector(x,i,z)).skyLight=15;
+                        queue.push([(this.pos.x*16)+x , i ,(this.pos.z*16)+z ]);
+                    }
+                }
+            }
+        this.lightQueue=  this.lightQueue.concat(queue);
+        
     }
     setBlock(pos:Vector,blockID:number)
     {

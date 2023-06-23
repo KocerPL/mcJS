@@ -28,7 +28,7 @@ io.on('connection', (socket) => {
     {
         if(sock[1]!=socket)
         {
-            console.log(sock[1]);
+           // console.log(sock[1]);
             socket.emit('spawnPlayer',sock[1].pos,sock[1].KOCEid);
         }
     }

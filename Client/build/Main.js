@@ -113,7 +113,7 @@ class Main {
             for (let y = 0; y < 16; y++)
                 for (let z = 0; z < 16; z++) {
                     chunk.subchunks[ev.data.subY].blocks[x][y][z] = new Block(ev.data.blocks[x + (y * 16) + (z * 256)]);
-                    chunk.subchunks[ev.data.subY].blocks[x][y][z].skyLight = 15;
+                    chunk.subchunks[ev.data.subY].blocks[x][y][z].skyLight = 0;
                 }
         for (let i = 0; i < 16; i++)
             if (!chunk.subchunks[i])
@@ -240,14 +240,16 @@ class Main {
         concatQ.forEach((chunk) => { chunk.updateMesh(); });
     }
     static processChunk(chunk) {
+        chunk.prepareLight();
         chunk.sendNeighbours();
-        chunk.heightmap = [];
-        for (let i = 0; i < 16; i++) {
-            chunk.heightmap[i] = [];
-            for (let j = 0; j < 16; j++)
-                chunk.heightmap[i][j] = 0;
-        }
-        chunk.updateAllSubchunks();
+        //   chunk.heightmap = [];
+        // for(let i=0 ; i<16;i++)
+        //{
+        //  chunk.heightmap[i]=[];
+        // for(let j=0 ; j<16;j++)
+        //   chunk.heightmap[i][j]=0;
+        // }
+        //  chunk.updateAllSubchunks();
     }
     static loop(time) {
         if (this.chunkQueue.length > 0)
