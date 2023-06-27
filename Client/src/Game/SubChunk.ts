@@ -25,26 +25,7 @@ export class SubChunk
         this.chunk = chunk;
         //   this.emptyLightMap();
     }
-    emptyLightMap()
-    {
-      
-        for(let i=0;i<16;i++)
-            for(let j=0;j<16;j++)
-                for(let k=0;k<16;k++)
-                {
-                    //      this.lightMap[i][j][k]=false;
-                    if(!this.blocks[i][j][k])
-                        this.blocks[i][j][k]= new Block(0);
-                    this.blocks[i][j][k].lightFBlock=0;
-                    if(blocks[this.blocks[i][j][k].id].glowing)
-                        this.blocks[i][j][k].lightFBlock = blocks[this.blocks[i][j][k].id].glowing;
-                    if(this.blocks[i][j][k].id>0)
-                    //        this.lightMap[i][j][k] =true;
-                        k;    
-                    
-                }
-    }
-    lightPass(currentPass)
+    lightPass()
     {
         for(let i=0;i<16;i++)
             for(let j=0;j<16;j++)
@@ -88,8 +69,6 @@ export class SubChunk
                         this.blocks[i][j][k].lightFBlock= test.lightFBlock-1;
                     
                     }
-                    if(this.blocks[i][j][k].lightFBlock== currentPass)
-                        k;    // this.lightMap[i][j][k]=true;
                 }
     }
     preGenerate() //Generation method
@@ -204,6 +183,48 @@ export class SubChunk
         }
         return undefined;
     }
+    isBlock(x:number,y:number,z:number):boolean
+    {
+        if(x>-1 && x<16 && y>-1 && y<16 && z >-1 && z<16)
+        {
+            return this.blocks[x][y][z].id>0;
+        }
+        try 
+        {
+            if(y<0) return this.chunk.subchunks[this.pos.y-1].getBlockInside(x,y+16,z).id>0;
+            if(y>15) return this.chunk.subchunks[this.pos.y+1].getBlockInside(x,y-16,z).id>0;
+            if(x<0) return this.chunk.neighbours["NEG_X"].subchunks[this.pos.y].getBlockInside(x+16,y,z).id>0;
+            if(x>15) return this.chunk.neighbours["POS_X"].subchunks[this.pos.y].getBlockInside(x-16,y,z).id>0;
+            if(z<0) return this.chunk.neighbours["NEG_Z"].subchunks[this.pos.y].getBlockInside(x,y,z+16).id>0;
+            if(z>15) return this.chunk.neighbours["POS_Z"].subchunks[this.pos.y].getBlockInside(x,y,z-16).id>0;
+        }
+        catch(error)
+        {
+        //     console.log("Cannot get block of next subchunk!!",x,y,z);
+        }
+        return undefined;
+    }
+    getBlockID(x,y,z):number
+    {
+        if(x>-1 && x<16 && y>-1 && y<16 && z >-1 && z<16)
+        {
+            return this.blocks[x][y][z].id;
+        }
+        try 
+        {
+            if(y<0) return this.chunk.subchunks[this.pos.y-1].getBlockID(x,y+16,z);
+            if(y>15) return this.chunk.subchunks[this.pos.y+1].getBlockID(x,y-16,z);
+            if(x<0) return this.chunk.neighbours["NEG_X"].subchunks[this.pos.y].getBlockID(x+16,y,z);
+            if(x>15) return this.chunk.neighbours["POS_X"].subchunks[this.pos.y].getBlockID(x-16,y,z);
+            if(z<0) return this.chunk.neighbours["NEG_Z"].subchunks[this.pos.y].getBlockID(x,y,z+16);
+            if(z>15) return this.chunk.neighbours["POS_Z"].subchunks[this.pos.y].getBlockID(x,y,z-16);
+        }
+        catch(error)
+        {
+        //     console.log("Cannot get block of next subchunk!!",x,y,z);
+        }
+        return undefined;
+    }
     getBlockSub(pos:Vector):{block:Block,sub:SubChunk,pos:Vector} // gets block at position relative to subchunk position
     {
         if(pos.x>-1 && pos.x<16 && pos.y>-1 && pos.y<16 && pos.z >-1 && pos.z<16)
@@ -262,8 +283,14 @@ export class SubChunk
             return undefined;
         }
     }
+    vertexAO(side1:boolean, side2:boolean, corner:number):number {
+        if(!side1 && !side2) {
+            return corner;
+        }
+        return  corner-(side1?1:0 + (side2?1:0));
+    }
     //DONE: update vertices only tree sides
-    updateSide(x,y,z,dx,dy,dz,vStart,side:SIDE,block,index,vBuffer)
+    updateSide(x,y,z,dx,dy,dz,vStart,side:SIDE,block:Block,index,vBuffer)
     {
         const testedBlock = this.getBlockWV(dx+x,dy+y,dz+z);
         if(testedBlock==undefined) return;
@@ -273,9 +300,31 @@ export class SubChunk
             if(testedBlock.id>0)
             {
                 this.mesh.vertices.push(...vBuffer.slice(vStart,vStart+12));
-                this.mesh.tCoords.push(...SubChunk.getTextureCords(testedBlock, SubChunk.flip(side)));
+                this.mesh.tCoords.push(...SubChunk.getTextureCords(testedBlock.id, SubChunk.flip(side)));
                 this.mesh.indices.push(index+2,index+1,index,index+2,index,index+3);
-                this.mesh.lightLevels.push(block.skyLight,block.skyLight,block.skyLight,block.skyLight);
+                if( dy==-1)
+                {
+                    this.mesh.lightLevels.push(this.vertexAO(this.isBlock(x-1,y,z),this.isBlock(x,y,z-1),block.skyLight),
+                        this.vertexAO(this.isBlock(x-1,y,z),this.isBlock(x,y,z+1),block.skyLight),
+                        this.vertexAO(this.isBlock(x+1,y,z),this.isBlock(x,y,z+1),block.skyLight),
+                        this.vertexAO(this.isBlock(x+1,y,z),this.isBlock(x,y,z-1),block.skyLight));
+                }
+                else if(dx==1)
+                {
+                    this.mesh.lightLevels.push(this.vertexAO(this.isBlock(x,y-1,z),this.isBlock(x,y,z-1),block.skyLight),
+                        this.vertexAO(this.isBlock(x,y-1,z),this.isBlock(x,y,z+1),block.skyLight),
+                        this.vertexAO(this.isBlock(x,y+1,z),this.isBlock(x,y,z+1),block.skyLight),
+                        this.vertexAO(this.isBlock(x,y+1,z),this.isBlock(x,y,z-1),block.skyLight));
+                }
+                else if(dz==-1)
+                {
+                    this.mesh.lightLevels.push(this.vertexAO(this.isBlock(x,y-1,z),this.isBlock(x-1,y,z),block.skyLight),
+                        this.vertexAO(this.isBlock(x,y-1,z),this.isBlock(x+1,y,z),block.skyLight),
+                        this.vertexAO(this.isBlock(x,y+1,z),this.isBlock(x+1,y,z),block.skyLight),
+                        this.vertexAO(this.isBlock(x,y+1,z),this.isBlock(x-1,y,z),block.skyLight));
+                }
+                else
+                    this.mesh.lightLevels.push(block.skyLight,block.skyLight,block.skyLight,block.skyLight);
                 this.mesh.fb.push(block.lightFBlock,block.lightFBlock,block.lightFBlock,block.lightFBlock);
                 index+=4;
       
@@ -286,9 +335,31 @@ export class SubChunk
             if(testedBlock.id<1)
             {  
                 this.mesh.vertices.push(...vBuffer.slice(vStart,vStart+12));
-                this.mesh.tCoords.push(...SubChunk.getTextureCords(block, side));
+                this.mesh.tCoords.push(...SubChunk.getTextureCords(block.id, side));
                 this.mesh.indices.push(index+2,index+1,index,index+2,index,index+3);
-                this.mesh.lightLevels.push(testedBlock.skyLight,testedBlock.skyLight,testedBlock.skyLight,testedBlock.skyLight);
+                if( dy==-1)
+                {
+                    this.mesh.lightLevels.push(this.vertexAO(this.isBlock(x-1,y-1,z),this.isBlock(x,y-1,z-1),testedBlock.skyLight),
+                        this.vertexAO(this.isBlock(x-1,y-1,z),this.isBlock(x,y-1,z+1),testedBlock.skyLight),
+                        this.vertexAO(this.isBlock(x+1,y-1,z),this.isBlock(x,y-1,z+1),testedBlock.skyLight),
+                        this.vertexAO(this.isBlock(x+1,y-1,z),this.isBlock(x,y-1,z-1),testedBlock.skyLight));
+                }
+                else if(dx==1)
+                {
+                    this.mesh.lightLevels.push(this.vertexAO(this.isBlock(x+1,y-1,z),this.isBlock(x+1,y,z-1),testedBlock.skyLight),
+                        this.vertexAO(this.isBlock(x+1,y-1,z),this.isBlock(x+1,y,z+1),testedBlock.skyLight),
+                        this.vertexAO(this.isBlock(x+1,y+1,z),this.isBlock(x+1,y,z+1),testedBlock.skyLight),
+                        this.vertexAO(this.isBlock(x+1,y+1,z),this.isBlock(x+1,y,z-1),testedBlock.skyLight));
+                }
+                else if(dz==-1)
+                {
+                    this.mesh.lightLevels.push(this.vertexAO(this.isBlock(x,y-1,z-1),this.isBlock(x-1,y,z-1),testedBlock.skyLight),
+                        this.vertexAO(this.isBlock(x,y-1,z-1),this.isBlock(x+1,y,z-1),testedBlock.skyLight),
+                        this.vertexAO(this.isBlock(x,y+1,z-1),this.isBlock(x+1,y,z-1),testedBlock.skyLight), 
+                        this.vertexAO(this.isBlock(x,y+1,z-1),this.isBlock(x-1,y,z-1),testedBlock.skyLight));
+                }
+                else
+                    this.mesh.lightLevels.push(testedBlock.skyLight,testedBlock.skyLight,testedBlock.skyLight,testedBlock.skyLight);
                 this.mesh.fb.push(testedBlock.lightFBlock,testedBlock.lightFBlock,testedBlock.lightFBlock,testedBlock.lightFBlock);
                 index+=4;
       
@@ -369,8 +440,8 @@ export class SubChunk
             2.01, 0.0,
         ]
     });
-    static getTextureCords(block,face) {
-        const index = blocks[block.id].textureIndex[face];
+    static getTextureCords(id:number,face) {
+        const index = blocks[id].textureIndex[face];
         const temp =   [
             0.0, 1.0, index,
             1.0, 1.0, index,

@@ -64,30 +64,6 @@ export class Chunk {
         }
         this.pos = new Vector(x, 0, z);
     }
-    updateLight() {
-        if (!this.allNeighbours)
-            return;
-        this.emptyLightMaps();
-        this.neighbours.NEG_X.emptyLightMaps();
-        this.neighbours.POS_X.emptyLightMaps();
-        this.neighbours.NEG_Z.emptyLightMaps();
-        this.neighbours.POS_Z.emptyLightMaps();
-        for (let i = 14; i > 0; i--) {
-            this.neighbours.POS_X.onePassLight(i);
-            this.neighbours.NEG_X.onePassLight(i);
-            this.neighbours.POS_Z.onePassLight(i);
-            this.neighbours.NEG_Z.onePassLight(i);
-            this.onePassLight(i);
-        }
-    }
-    emptyLightMaps() {
-        for (let i = 0; i < 16; i++)
-            this.subchunks[i].emptyLightMap();
-    }
-    onePassLight(currentPass) {
-        for (let i = 0; i < 16; i++)
-            this.subchunks[i].lightPass(currentPass);
-    }
     preGenOne() {
         if (this.generatingIndex >= 16)
             return;
