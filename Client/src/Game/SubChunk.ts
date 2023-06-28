@@ -283,11 +283,11 @@ export class SubChunk
             return undefined;
         }
     }
-    vertexAO(side1:boolean, side2:boolean, corner:boolean,light:number):number {
+    vertexAO(side1:boolean, side2:boolean, corner:boolean):number {
         if(side1 && side2) {
-            return 0;
+            return 0.40;
         }
-        return  light*((3-(side1?1:0 +(corner?1:0)+ (side2?1:0)))/3);
+        return  (5-((side1?1:0) +(corner?1:0)+ (side2?1:0)))/5;
     }
     //DONE: update vertices only tree sides
     updateSide(x:number,y:number,z:number,dx:number,dy:number,dz:number,vStart:number,side:SIDE,block:Block,index:number,vBuffer:Array<number>)
@@ -304,28 +304,32 @@ export class SubChunk
                 this.mesh.indices.push(index+2,index+1,index,index+2,index,index+3);
                 if( dy==1)
                 {
-                    this.mesh.lightLevels.push(this.vertexAO(this.isBlock(x-1,y,z),this.isBlock(x,y,z-1),this.isBlock(x-1,y,z-1),block.skyLight),
-                        this.vertexAO(this.isBlock(x-1,y,z),this.isBlock(x,y,z+1),this.isBlock(x-1,y,z+1),block.skyLight),
-                        this.vertexAO(this.isBlock(x+1,y,z),this.isBlock(x,y,z+1),this.isBlock(x+1,y,z+1),block.skyLight),
-                        this.vertexAO(this.isBlock(x+1,y,z),this.isBlock(x,y,z-1),this.isBlock(x+1,y,z-1),block.skyLight));
+                    const o1 =this.vertexAO(this.isBlock(x-1,y,z),this.isBlock(x,y,z-1),this.isBlock(x-1,y,z-1));
+                    const o2 = this.vertexAO(this.isBlock(x-1,y,z),this.isBlock(x,y,z+1),this.isBlock(x-1,y,z+1));
+                    const o3 =this.vertexAO(this.isBlock(x+1,y,z),this.isBlock(x,y,z+1),this.isBlock(x+1,y,z+1));
+                    const o4 = this.vertexAO(this.isBlock(x+1,y,z),this.isBlock(x,y,z-1),this.isBlock(x+1,y,z-1));
+                    this.mesh.lightLevels.push(o1*block.skyLight,o2*block.skyLight,o3*block.skyLight,o4*block.skyLight);
+                    this.mesh.fb.push(block.lightFBlock*o1,block.lightFBlock*o2,block.lightFBlock*o3,block.lightFBlock*o4);
                 }
                 else if(dx==1)
                 {
-                    this.mesh.lightLevels.push(this.vertexAO(this.isBlock(x,y-1,z),this.isBlock(x,y,z-1),this.isBlock(x,y-1,z-1),block.skyLight),
-                        this.vertexAO(this.isBlock(x,y-1,z),this.isBlock(x,y,z+1),this.isBlock(x,y-1,z+1),block.skyLight),
-                        this.vertexAO(this.isBlock(x,y+1,z),this.isBlock(x,y,z+1),this.isBlock(x,y+1,z+1),block.skyLight),
-                        this.vertexAO(this.isBlock(x,y+1,z),this.isBlock(x,y,z-1),this.isBlock(x,y+1,z-1),block.skyLight));
+                    const o1 =this.vertexAO(this.isBlock(x,y-1,z),this.isBlock(x,y,z-1),this.isBlock(x,y-1,z-1));
+                    const o2 =  this.vertexAO(this.isBlock(x,y-1,z),this.isBlock(x,y,z+1),this.isBlock(x,y-1,z+1));
+                    const o3 =  this.vertexAO(this.isBlock(x,y+1,z),this.isBlock(x,y,z+1),this.isBlock(x,y+1,z+1));
+                    const o4 = this.vertexAO(this.isBlock(x,y+1,z),this.isBlock(x,y,z-1),this.isBlock(x,y+1,z-1));
+                    this.mesh.lightLevels.push(o1*block.skyLight,o2*block.skyLight,o3*block.skyLight,o4*block.skyLight);
+                    this.mesh.fb.push(block.lightFBlock*o1,block.lightFBlock*o2,block.lightFBlock*o3,block.lightFBlock*o4);
                 }
                 else if(dz==1)
                 {
-                    this.mesh.lightLevels.push(this.vertexAO(this.isBlock(x-1,y,z),this.isBlock(x,y-1,z),this.isBlock(x-1,y-1,z),block.skyLight),
-                        this.vertexAO(this.isBlock(x+1,y,z),this.isBlock(x,y-1,z),this.isBlock(x+1,y-1,z),block.skyLight),
-                        this.vertexAO(this.isBlock(x+1,y,z),this.isBlock(x,y+1,z),this.isBlock(x+1,y+1,z),block.skyLight),
-                        this.vertexAO(this.isBlock(x-1,y,z),this.isBlock(x,y+1,z),this.isBlock(x-1,y+1,z),block.skyLight));
+                    const o1 =this.vertexAO(this.isBlock(x-1,y,z),this.isBlock(x,y-1,z),this.isBlock(x-1,y-1,z));
+                    const o2 = this.vertexAO(this.isBlock(x+1,y,z),this.isBlock(x,y-1,z),this.isBlock(x+1,y-1,z));
+                    const o3 =  this.vertexAO(this.isBlock(x+1,y,z),this.isBlock(x,y+1,z),this.isBlock(x+1,y+1,z));
+                    const o4 =  this.vertexAO(this.isBlock(x-1,y,z),this.isBlock(x,y+1,z),this.isBlock(x-1,y+1,z));
+                    this.mesh.lightLevels.push(o1*block.skyLight,o2*block.skyLight,o3*block.skyLight,o4*block.skyLight);
+                    this.mesh.fb.push(block.lightFBlock*o1,block.lightFBlock*o2,block.lightFBlock*o3,block.lightFBlock*o4);
                 }
-                else
-                    this.mesh.lightLevels.push(0,0,0,0);
-                this.mesh.fb.push(block.lightFBlock,block.lightFBlock,block.lightFBlock,block.lightFBlock);
+               
                 index+=4;
       
             }   
@@ -339,28 +343,32 @@ export class SubChunk
                 this.mesh.indices.push(index+2,index+1,index,index+2,index,index+3);
                 if( dy==1)
                 {
-                    this.mesh.lightLevels.push(this.vertexAO(this.isBlock(x-1,y+1,z),this.isBlock(x,y+1,z-1),this.isBlock(x-1,y+1,z-1),testedBlock.skyLight),
-                        this.vertexAO(this.isBlock(x-1,y+1,z),this.isBlock(x,y+1,z+1),this.isBlock(x-1,y+1,z+1),testedBlock.skyLight),
-                        this.vertexAO(this.isBlock(x+1,y+1,z),this.isBlock(x,y+1,z+1),this.isBlock(x+1,y+1,z+1),testedBlock.skyLight),
-                        this.vertexAO(this.isBlock(x+1,y+1,z),this.isBlock(x,y+1,z-1),this.isBlock(x+1,y+1,z-1),testedBlock.skyLight));
+                    const o1 = this.vertexAO(this.isBlock(x-1,y+1,z),this.isBlock(x,y+1,z-1),this.isBlock(x-1,y+1,z-1));
+                    const o2 = this.vertexAO(this.isBlock(x-1,y+1,z),this.isBlock(x,y+1,z+1),this.isBlock(x-1,y+1,z+1));
+                    const o3 = this.vertexAO(this.isBlock(x+1,y+1,z),this.isBlock(x,y+1,z+1),this.isBlock(x+1,y+1,z+1));
+                    const o4 = this.vertexAO(this.isBlock(x+1,y+1,z),this.isBlock(x,y+1,z-1),this.isBlock(x+1,y+1,z-1));
+                    this.mesh.lightLevels.push(testedBlock.skyLight*o1,testedBlock.skyLight*o2,testedBlock.skyLight*o3,testedBlock.skyLight*o4);
+                    this.mesh.fb.push(testedBlock.lightFBlock*o1,testedBlock.lightFBlock*o2,testedBlock.lightFBlock*o3,testedBlock.lightFBlock*o4);
                 }
                 else if(dx==1)
                 {
-                    this.mesh.lightLevels.push(this.vertexAO(this.isBlock(x+1,y-1,z),this.isBlock(x+1,y,z-1),this.isBlock(x+1,y-1,z-1),testedBlock.skyLight),
-                        this.vertexAO(this.isBlock(x+1,y-1,z),this.isBlock(x+1,y,z+1),this.isBlock(x+1,y-1,z+1),testedBlock.skyLight),
-                        this.vertexAO(this.isBlock(x+1,y+1,z),this.isBlock(x+1,y,z+1),this.isBlock(x+1,y+1,z+1),testedBlock.skyLight),
-                        this.vertexAO(this.isBlock(x+1,y+1,z),this.isBlock(x+1,y,z-1),this.isBlock(x+1,y+1,z-1),testedBlock.skyLight));
+                    const o1 = this.vertexAO(this.isBlock(x+1,y-1,z),this.isBlock(x+1,y,z-1),this.isBlock(x+1,y-1,z-1));
+                    const o2 = this.vertexAO(this.isBlock(x+1,y-1,z),this.isBlock(x+1,y,z+1),this.isBlock(x+1,y-1,z+1));
+                    const o3 = this.vertexAO(this.isBlock(x+1,y+1,z),this.isBlock(x+1,y,z+1),this.isBlock(x+1,y+1,z+1));
+                    const o4 = this.vertexAO(this.isBlock(x+1,y+1,z),this.isBlock(x+1,y,z-1),this.isBlock(x+1,y+1,z-1));
+                    this.mesh.lightLevels.push(testedBlock.skyLight*o1,testedBlock.skyLight*o2,testedBlock.skyLight*o3,testedBlock.skyLight*o4);
+                    this.mesh.fb.push(testedBlock.lightFBlock*o1,testedBlock.lightFBlock*o2,testedBlock.lightFBlock*o3,testedBlock.lightFBlock*o4);
+                        
                 }
-                else if(dz==1)
+                else if(dz==1) //fine
                 {
-                    this.mesh.lightLevels.push(this.vertexAO(this.isBlock(x,y-1,z+1),this.isBlock(x-1,y,z+1),this.isBlock(x-1,y-1,z+1),testedBlock.skyLight),
-                        this.vertexAO(this.isBlock(x,y-1,z+1),this.isBlock(x+1,y,z+1),this.isBlock(x+1,y-1,z+1),testedBlock.skyLight),
-                        this.vertexAO(this.isBlock(x,y+1,z+1),this.isBlock(x+1,y,z+1),this.isBlock(x+1,y+1,z+1),testedBlock.skyLight), 
-                        this.vertexAO(this.isBlock(x,y+1,z+1),this.isBlock(x-1,y,z+1),this.isBlock(x-1,y+1,z+1),testedBlock.skyLight));
+                    const o1 = this.vertexAO(this.isBlock(x,y-1,z+1),this.isBlock(x-1,y,z+1),this.isBlock(x-1,y-1,z+1));
+                    const o2 =this.vertexAO(this.isBlock(x,y-1,z+1),this.isBlock(x+1,y,z+1),this.isBlock(x+1,y-1,z+1));
+                    const o3 =  this.vertexAO(this.isBlock(x,y+1,z+1),this.isBlock(x+1,y,z+1),this.isBlock(x+1,y+1,z+1));
+                    const o4 =   this.vertexAO(this.isBlock(x,y+1,z+1),this.isBlock(x-1,y,z+1),this.isBlock(x-1,y+1,z+1));
+                    this.mesh.lightLevels.push(testedBlock.skyLight*o1,testedBlock.skyLight*o2,testedBlock.skyLight*o3,testedBlock.skyLight*o4);
+                    this.mesh.fb.push(testedBlock.lightFBlock*o1,testedBlock.lightFBlock*o2,testedBlock.lightFBlock*o3,testedBlock.lightFBlock*o4);
                 }
-                else
-                    this.mesh.lightLevels.push(0,0,0,0);
-                this.mesh.fb.push(testedBlock.lightFBlock,testedBlock.lightFBlock,testedBlock.lightFBlock,testedBlock.lightFBlock);
                 index+=4;
       
             }

@@ -42,6 +42,7 @@ export class Lighter
             z=curLightNode.z;
             y=curLightNode.y;
             light=curLightNode.light;
+         
             if(!firstNode &&    World.getBlock(new Vector(x,y,z)).id>0) continue;
             firstNode=false;
             const d = World.getBlockAndSub(new Vector(x,y,z));
