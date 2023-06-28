@@ -224,7 +224,7 @@ class GUI {
         }
         for (let i = 0; i < 9; i++) {
             //   console.log(indices);
-            if (Main.player.itemsBar[i].id != 0) {
+            if (Main.player.itemsBar[i] && Main.player.itemsBar[i].id != 0) {
                 this.vArray = this.vArray.concat(slCoords);
                 this.tArray = this.tArray.concat(this.crosstcords);
                 this.iArray = this.iArray.concat(indices);

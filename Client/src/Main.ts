@@ -265,15 +265,6 @@ export class Main
     {
         chunk.prepareLight();
         chunk.sendNeighbours();
-      
-        //   chunk.heightmap = [];
-        // for(let i=0 ; i<16;i++)
-        //{
-        //  chunk.heightmap[i]=[];
-        // for(let j=0 ; j<16;j++)
-        //   chunk.heightmap[i][j]=0;
-        // }
-        //  chunk.updateAllSubchunks();
     }
     public static loop(time:number):void
     {
@@ -545,7 +536,7 @@ export class Main
         this.player.camera.preRender();
         this.shader.setFog(this.player.camera.getPosition(),Math.sqrt(this.maxChunks)*8);
         CanvaManager.preRender();
-        gl.clearColor(0.0,this.sunLight/15,this.sunLight/15,1.0);
+        gl.clearColor(0.43*(this.sunLight/15) ,0.69 *(this.sunLight/15),(this.sunLight/15),1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
    
         gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);

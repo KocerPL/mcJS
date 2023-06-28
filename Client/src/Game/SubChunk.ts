@@ -285,7 +285,7 @@ export class SubChunk
     }
     vertexAO(side1:boolean, side2:boolean, corner:boolean):number {
         if(side1 && side2) {
-            return 0.40;
+            return 0.4;
         }
         return  (5-((side1?1:0) +(corner?1:0)+ (side2?1:0)))/5;
     }

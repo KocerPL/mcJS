@@ -42,12 +42,13 @@ export class Lighter
             z=curLightNode.z;
             y=curLightNode.y;
             light=curLightNode.light;
-         
-            if(!firstNode &&    World.getBlock(new Vector(x,y,z)).id>0) continue;
-            firstNode=false;
             const d = World.getBlockAndSub(new Vector(x,y,z));
-            d.block.lightFBlock = curLightNode.light;
             Main.toUpdate.add(d.sub);
+            if(!firstNode &&   d.block.id>0) continue;
+            firstNode=false;
+           
+            d.block.lightFBlock = curLightNode.light;
+          
 
             let test=  World.getBlock(new Vector(x+1,y,z));
             if(test.lightFBlock+1<curLightNode.light && !hasNode(x+1,y,z,list))
@@ -103,13 +104,15 @@ export class Lighter
             z=curLightNode.z;
             y=curLightNode.y;
             light=curLightNode.light;
-            if(!firstNode &&    World.getBlock(new Vector(x,y,z)).id>0) continue;
+            const d = World.getBlockAndSub(new Vector(x,y,z));
+            Main.toUpdate.add(d.sub);
+            if(!firstNode &&    d.block.id>0) continue;
             firstNode=false;
            
-            const d = World.getBlockAndSub(new Vector(x,y,z));
+           
         
             d.block.lightFBlock = 0;
-            Main.toUpdate.add(d.sub);
+           
 
             let test=  World.getBlock(new Vector(x+1,y,z));
             if(test.lightFBlock+1<curLightNode.light && !hasNode(x+1,y,z,list))

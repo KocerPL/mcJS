@@ -100,7 +100,7 @@ export class Player
             if(Number(id)>0)
             {
                 this.inventory[i].id = Number(id);
-                this.inventory[i].count =100;
+                this.inventory[i].count =64;
                 i++;
             }
 
@@ -171,7 +171,7 @@ export class Player
             Main.socket.emit("playerMove",this.entity.pos,this.entity.rotation);
             this.lastTime = nowTime;
         }
-        if(this.locked) return;
+        //if(this.locked) return;
         let hop =false;
         const tempPos = this.pos.copy();
         if(this.jump.yAcc>0)
@@ -375,6 +375,8 @@ export class Player
             this.entity.rotation.z += this.legChange*speed;
         else 
             this.entity.rotation.z = 0;
+        this.camera.setPosition(new Vector(this.pos.x,this.pos.y+0.7,this.pos.z));
+        if(this.locked) return;
         this.camera.setPitch(this.camera.getPitch()- (CanvaManager.mouseMovement.y/10));
         this.camera.setYaw(this.camera.getYaw()+(CanvaManager.mouseMovement.x/10));
         if(this.camera.getPitch()>90) this.camera.setPitch(90);
@@ -394,7 +396,7 @@ export class Player
         }
         if(CanvaManager.mouse.left) this.mine(); else this.blockBreakingTime=0;
         if(CanvaManager.mouse.right) this.place();
-        this.camera.setPosition(new Vector(this.pos.x,this.pos.y+0.7,this.pos.z));
+       
         if(CanvaManager.getKey(49))
         {
             this.switchPerson("First");
@@ -499,7 +501,7 @@ export class Player
         const id= item.type;
         for(let x=0;x<this.itemsBar.length;x++)
         {
-            if(this.itemsBar[x].id==id && this.itemsBar[x].count<65)
+            if(this.itemsBar[x].id==id && this.itemsBar[x].count<64)
             {
                 this.itemsBar[x].count+=item.count;
                 return;
@@ -512,7 +514,7 @@ export class Player
         }
         for(let x=0;x<this.inventory.length;x++)
         {
-            if(this.inventory[x].id==id && this.inventory[x].count<65)
+            if(this.inventory[x].id==id && this.inventory[x].count<64)
             {
                 this.inventory[x].count+=item.count;
                 return;

@@ -160,7 +160,7 @@ export class Chunk {
             {
                 if( this.heightmap[x][z]>lastHeightMap[x][z])
                 {
-                    for(let i=lastHeightMap[x][z]+1;i<=this.heightmap[x][z];i++)
+                    for(let i=lastHeightMap[x][z]+1 ;i<=this.heightmap[x][z];i++)
                     {
                         SkyLighter.removeLight((this.pos.x*16)+x , i ,(this.pos.z*16)+z ,15);
                    
@@ -168,7 +168,7 @@ export class Chunk {
                 }
                 else if(this.heightmap[x][z]<lastHeightMap[x][z])
                 {
-                    for(let i=this.heightmap[x][z]+1;i<=lastHeightMap[x][z];i++)
+                    for(let i=this.heightmap[x][z]+1 ;i<=lastHeightMap[x][z];i++)
                     {
                         this.getBlock(new Vector(x,i,z)).skyLight=15;
                         queue.push([(this.pos.x*16)+x , i ,(this.pos.z*16)+z ]);

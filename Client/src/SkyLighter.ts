@@ -92,7 +92,7 @@ export class SkyLighter
 
         const list:Array<LightNode> = [];
         let firstNode=true;
-        list.push(new LightNode(x,y,z,light+2));
+        list.push(new LightNode(x,y,z,light+1));
         for(let i=0; list.length>i;i++)
         {
         

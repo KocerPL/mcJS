@@ -71,7 +71,7 @@ export class SkyLighter {
     static removeLight(x, y, z, light) {
         const list = [];
         let firstNode = true;
-        list.push(new LightNode(x, y, z, light + 2));
+        list.push(new LightNode(x, y, z, light + 1));
         for (let i = 0; list.length > i; i++) {
             const curLightNode = list[i];
             if (curLightNode.light <= 0)

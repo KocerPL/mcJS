@@ -269,7 +269,7 @@ export class GUI
         {
        
             //   console.log(indices);
-            if(Main.player.itemsBar[i].id!=0)
+            if(Main.player.itemsBar[i] && Main.player.itemsBar[i].id!=0)
             {
                 this.vArray= this.vArray.concat( slCoords);
                 this.tArray= this.tArray.concat(this.crosstcords);
