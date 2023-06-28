@@ -67,7 +67,7 @@ class CanvaManager {
         return this.keys[keycode] ?? false;
     }
     static getKeyOnce(keycode) {
-        let key = this.keys[keycode];
+        const key = this.keys[keycode];
         this.keys[keycode] = false;
         return key ?? false;
     }

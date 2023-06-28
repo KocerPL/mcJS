@@ -9,11 +9,11 @@ export class CanvaManager
     public static gl:WebGL2RenderingContext =this.canva.getContext("webgl2");
     public static debug:HTMLSpanElement = document.createElement("span"); 
     private static proportion:number  = 1024/1920;
-    private static keys:Array<Boolean> = new Array(100);
+    private static keys:Array<boolean> = new Array(100);
     public static mouseMovement = new Vector(0,0,0);
     public static mouse = {left:false,right:false,pos: new Vector(0,0,0)};
     public static scrollAmount =0;
-   public static setupCanva(location:Node,proportion?:number) : HTMLCanvasElement
+    public static setupCanva(location:Node,proportion?:number) : HTMLCanvasElement
     {
         this.proportion = proportion ?? this.proportion;
 
@@ -29,23 +29,23 @@ export class CanvaManager
         window.addEventListener("mousemove",this.onMouseMove.bind(this),false);
         window.addEventListener("mousedown",this.onMouseDown.bind(this),false);
         window.addEventListener("mouseup",this.onMouseUp.bind(this),false);
-        window.addEventListener("wheel",this.onScroll.bind(this),false)
-        this.canva.addEventListener("click",()=>{ if(this.rPointer) this.canva.requestPointerLock()},false);
+        window.addEventListener("wheel",this.onScroll.bind(this),false);
+        this.canva.addEventListener("click",()=>{ if(this.rPointer) this.canva.requestPointerLock();},false);
    
-    this.onResize();
+        this.onResize();
         return this.canva;
     }
     static onScroll(ev:WheelEvent)
     {
-this.scrollAmount+=(Math.round(ev.deltaY/100));
-     //   console.log(ev);
+        this.scrollAmount+=(Math.round(ev.deltaY/100));
+        //   console.log(ev);
     }
     static onMouseMove(ev: MouseEvent) 
     {
-       // console.log((ev.x/(this.canva.width/2))-1, (ev.y/(this.canva.height/2))-1);
-       this.mouse.pos.x = ((ev.x/(this.canva.width/2))-1)/CanvaManager.getProportion;
-       this.mouse.pos.y = -((ev.y/(this.canva.height/2))-1); 
-       this.mouseMovement.x += ev.movementX;
+        // console.log((ev.x/(this.canva.width/2))-1, (ev.y/(this.canva.height/2))-1);
+        this.mouse.pos.x = ((ev.x/(this.canva.width/2))-1)/CanvaManager.getProportion;
+        this.mouse.pos.y = -((ev.y/(this.canva.height/2))-1); 
+        this.mouseMovement.x += ev.movementX;
         this.mouseMovement.y += ev.movementY;
     }
     private static onKeyDown(ev)
@@ -59,18 +59,18 @@ this.scrollAmount+=(Math.round(ev.deltaY/100));
     private static onMouseDown(ev:MouseEvent)
     {
         if(ev.button == 0)
-        this.mouse.left =true;
+            this.mouse.left =true;
         else if(ev.button ==2)
-        this.mouse.right = true
+            this.mouse.right = true;
         ev.preventDefault();
     }
     private static onMouseUp(ev:MouseEvent)
     {
         //console.log(ev)
         if(ev.button == 0)
-        this.mouse.left =false;
+            this.mouse.left =false;
         else if(ev.button ==2)
-        this.mouse.right = false
+            this.mouse.right = false;
         ev.preventDefault();
     }
     public static getKey(keycode:number)
@@ -79,22 +79,22 @@ this.scrollAmount+=(Math.round(ev.deltaY/100));
     }
     public static getKeyOnce(keycode:number)
     {
-        let key = this.keys[keycode];
+        const key = this.keys[keycode];
         this.keys[keycode] =false;
         return key ?? false;
     }
     private static onResize():void
     {
-            this.WIDTH = window.innerWidth;
-            this.HEIGHT = window.innerHeight;
-            this.proportion = this.HEIGHT/this.WIDTH;
+        this.WIDTH = window.innerWidth;
+        this.HEIGHT = window.innerHeight;
+        this.proportion = this.HEIGHT/this.WIDTH;
         this.gl.viewport(0,0,this.WIDTH,this.HEIGHT);
         this.applyResize();
     }
     public static preRender()
     {
         CanvaManager.mouseMovement.x=0;
-      CanvaManager.mouseMovement.y=0;
+        CanvaManager.mouseMovement.y=0;
 
     }
     private static applyResize():void

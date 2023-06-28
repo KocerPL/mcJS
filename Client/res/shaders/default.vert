@@ -25,7 +25,7 @@ void main()
 gl_Position =vec4(pos,1.0)*prepared; // calculating position of vertex
  vec4 ready = vec4(pos,1.0)*transformation; // Calculating matrix for fog
  float act =max(min(skylight,light),blocklight) /15.0; //Calculating light level
-pass_Light = act - (act/5.0); //Calculating final light
+pass_Light = act; //- (act/5.0); //Calculating final light
 pass_center = center;
 pass_ready = ready.xyz;
  //FragPos = vec3(transformation * vec4(pos, 1.0));
