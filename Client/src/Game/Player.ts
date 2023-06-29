@@ -185,40 +185,43 @@ export class Player
         let speed=1;
         try
         {
-            if(CanvaManager.getKeyOnce(81))
+            if(!this.locked)
             {
+                if(CanvaManager.getKeyOnce(81))
+                {
                
-                Main.entities.push(new Item(this.camera.getPosition().copy(),this.itemsBar[this.selectedItem].id));
-                this.itemsBar[this.selectedItem].count--;
-                if( this.itemsBar[this.selectedItem].count<1)
-                    this.itemsBar[this.selectedItem].id=0;
-            }
-            if(CanvaManager.getKey(16))
-                speed=2;
-            if(CanvaManager.getKey(87))
-            {
-                tempPos.x+=Math.sin(this.camera.getYaw()*Math.PI/180)*0.1*speed;
-                tempPos.z +=Math.cos(this.camera.getYaw()*Math.PI/180)*0.1*speed;
+                    Main.entities.push(new Item(this.camera.getPosition().copy(),this.itemsBar[this.selectedItem].id));
+                    this.itemsBar[this.selectedItem].count--;
+                    if( this.itemsBar[this.selectedItem].count<1)
+                        this.itemsBar[this.selectedItem].id=0;
+                }
+                if(CanvaManager.getKey(16))
+                    speed=2;
+                if(CanvaManager.getKey(87))
+                {
+                    tempPos.x+=Math.sin(this.camera.getYaw()*Math.PI/180)*0.1*speed;
+                    tempPos.z +=Math.cos(this.camera.getYaw()*Math.PI/180)*0.1*speed;
               
-            }
-            else if(CanvaManager.getKey(83))
-            {
-                tempPos.x-=Math.sin(this.camera.getYaw()*Math.PI/180)*0.1;
-                tempPos.z-=Math.cos(this.camera.getYaw()*Math.PI/180)*0.1;
-            }
-            if(CanvaManager.getKey(68))
-            {
-                tempPos.x+=Math.sin((this.camera.getYaw()+90)*Math.PI/180)*0.1;
-                tempPos.z+=Math.cos((this.camera.getYaw()+90)*Math.PI/180)*0.1;
-            }
-            else if(CanvaManager.getKey(65))
-            {
+                }
+                else if(CanvaManager.getKey(83))
+                {
+                    tempPos.x-=Math.sin(this.camera.getYaw()*Math.PI/180)*0.1;
+                    tempPos.z-=Math.cos(this.camera.getYaw()*Math.PI/180)*0.1;
+                }
+                if(CanvaManager.getKey(68))
+                {
+                    tempPos.x+=Math.sin((this.camera.getYaw()+90)*Math.PI/180)*0.1;
+                    tempPos.z+=Math.cos((this.camera.getYaw()+90)*Math.PI/180)*0.1;
+                }
+                else if(CanvaManager.getKey(65))
+                {
            
 
-                tempPos.x-=Math.sin((this.camera.getYaw()+90)*Math.PI/180)*0.1;
-                tempPos.z-=Math.cos((this.camera.getYaw()+90)*Math.PI/180)*0.1;
+                    tempPos.x-=Math.sin((this.camera.getYaw()+90)*Math.PI/180)*0.1;
+                    tempPos.z-=Math.cos((this.camera.getYaw()+90)*Math.PI/180)*0.1;
             
-            }
+                }
+            }   
             let block =World.getBlock(this.camera.getPosition());
             if(!block)
                 return;

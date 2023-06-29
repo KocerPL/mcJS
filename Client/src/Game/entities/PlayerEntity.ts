@@ -299,14 +299,14 @@ export class PlayerEntity extends Entity
     }
     setNextTransitions(nextPos:Vector,nextRot:Vector,count:number)
     {
-        /*   const deltaPos = Vector.add(nextPos,this.pos.mult(-1));
-        const deltaRot = Vector.add(nextRot,this.rotation.mult(-1));
+        const deltaPos = Vector.add(nextPos,this.nextTransitions.length>0?this.nextTransitions[-1].pos.mult(-1):this.pos.mult(-1));
+        const deltaRot = Vector.add(nextRot,this.nextTransitions.length>0?this.nextTransitions[-1].rot.mult(-1):this.rotation.mult(-1));
         const OneStepPos = deltaPos.mult(1/count);
         const OneStepRot = deltaRot.mult(1/count);
         for(let i=1;i<count;i++)
         {
             this.nextTransitions.push({pos:Vector.add(this.pos,OneStepPos),rot:Vector.add(this.rotation,OneStepRot)});
-        }*/
+        }
         this.nextTransitions.push({pos:nextPos,rot:nextRot});
     }
 }
