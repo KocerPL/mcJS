@@ -252,7 +252,7 @@ export class GUI
         indices = this.squareIndices.slice(0,this.squareIndices.length);
        
        
-        if(Main.player.inWater)
+        /*  if(Main.player.inWater)
         {
         //console.log("underwater")
        
@@ -264,7 +264,7 @@ export class GUI
             {
                 indices[a] = indices[a]+4;
             }
-        } 
+        }*/ 
         for(let i=0;i<9;i++)
         {
        

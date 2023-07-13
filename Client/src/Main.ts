@@ -525,12 +525,16 @@ export class Main
         };
 
     }
-    public static render()
+    public static renderDebug()
     {
-        this.Measure.frames++;
         CanvaManager.debug.innerText = "Fps: "+this.Measure.fps+" Selected block: "+ blocks[this.player.itemsBar[this.player.selectedItem].id].name +" Count:"+this.player.itemsBar[this.player.selectedItem].count+
       "\n XYZ:  X:"+(Math.floor(this.player.pos.x*100)/100)+"  Y:"+(Math.floor(this.player.pos.y*100)/100)+"  Z:"+(Math.floor(this.player.pos.z*100)/100)+"\nFast break [8]: "+this.fastBreaking+" Fly[9]: "+this.fly+"\n Sky light [4][5]:"+this.sunLight
      +"\n Visible chunks[6][7]: "+this.maxChunks+"\n    Heightmap:"+World.getHeightMap(this.player.pos);
+    }
+    public static render()
+    {
+        this.Measure.frames++;
+  
       
         this.shader.use();
         this.player.camera.preRender();
@@ -546,7 +550,7 @@ export class Main
         {
         
             chunk.render();   
-            // toRender.push(()=>{chunk.renderWater()});
+        
         } 
         for(let i=0;i<this.entities.length;i++)
         {

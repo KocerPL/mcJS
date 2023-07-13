@@ -25,7 +25,6 @@ class Player {
     entity;
     camera = new Camera();
     pos;
-    inWater;
     itemsBar = new Array(9);
     inventory = new Array(27);
     locked = false;
@@ -142,9 +141,64 @@ class Player {
         else
             this.camera.offset = 0;
     }
+    isInBlock(pos) {
+        if (World.getBlock(new Vector(pos.x + 0.33, pos.y - 1, pos.z + 0.33)).id > 0)
+            return true;
+        if (World.getBlock(new Vector(pos.x - 0.33, pos.y - 1, pos.z + 0.33)).id > 0)
+            return true;
+        if (World.getBlock(new Vector(pos.x - 0.33, pos.y - 1, pos.z - 0.33)).id > 0)
+            return true;
+        if (World.getBlock(new Vector(pos.x + 0.33, pos.y - 1, pos.z - 0.33)).id > 0)
+            return true;
+        if (World.getBlock(new Vector(pos.x + 0.33, pos.y + 0.75, pos.z + 0.33)).id > 0)
+            return true;
+        if (World.getBlock(new Vector(pos.x - 0.33, pos.y + 0.75, pos.z + 0.33)).id > 0)
+            return true;
+        if (World.getBlock(new Vector(pos.x - 0.33, pos.y + 0.75, pos.z - 0.33)).id > 0)
+            return true;
+        if (World.getBlock(new Vector(pos.x + 0.33, pos.y + 0.75, pos.z - 0.33)).id > 0)
+            return true;
+        return false;
+    }
+    norm(n) {
+        if (n > 0)
+            return 1;
+        if (n < 0)
+            return -1;
+        return 0;
+    }
+    isBlockInWay(pos) {
+        const delta = Vector.add(pos, this.pos.mult(-1));
+        if (this.isInBlock(Vector.add(new Vector(delta.x, delta.y, delta.z), this.pos)))
+            return true;
+        if (Math.abs(delta.x) >= Math.abs(delta.y) && Math.abs(delta.x) >= Math.abs(delta.z)) {
+            if (this.norm(delta.x) != 0)
+                for (let x = 0; Math.abs(x) < Math.abs(delta.x); x += (this.norm(delta.x) * 0.66)) {
+                    const percent = x / delta.x;
+                    if (this.isInBlock(Vector.add(new Vector(x, delta.y * percent, delta.z * percent), this.pos)))
+                        return true;
+                }
+        }
+        else if (Math.abs(delta.y) > Math.abs(delta.x) && Math.abs(delta.y) > Math.abs(delta.z)) {
+            if (this.norm(delta.y) != 0)
+                for (let y = 0; Math.abs(y) < Math.abs(delta.y); y += (this.norm(delta.y) * 0.66)) {
+                    const percent = y / delta.y;
+                    if (this.isInBlock(Vector.add(new Vector(delta.x * percent, y, delta.z * percent), this.pos)))
+                        return true;
+                }
+        }
+        else if (Math.abs(delta.z) > Math.abs(delta.y) && Math.abs(delta.z) > Math.abs(delta.x)) {
+            if (this.norm(delta.z) != 0)
+                for (let z = 0; Math.abs(z) < Math.abs(delta.z); z += (this.norm(delta.z) * 0.66)) {
+                    const percent = z / delta.z;
+                    if (this.isInBlock(Vector.add(new Vector(delta.x * percent, delta.y * percent, z), this.pos)))
+                        return true;
+                }
+        }
+        return false;
+    }
     updatePos() {
         this.entity.rotation.y = -this.camera.getYaw();
-        this.entity.rotation.x = -this.camera.getPitch();
         this.entity.pos = this.pos;
         const nowTime = Date.now();
         if (this.lastTime < nowTime - 100) {
@@ -189,79 +243,33 @@ class Player {
                     tempPos.z -= Math.cos((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
                 }
             }
-            let block = World.getBlock(this.camera.getPosition());
-            if (!block)
-                return;
-            if (block.id < 0) {
-                this.inWater = true;
-            }
-            else
-                this.inWater = false;
-            block = World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 0.5), Math.round(tempPos.z)));
-            const block2 = World.getBlock(this.camera.getPosition());
-            /*if(block.id==-2 )
-            {
-                const vec = dirAssoc[block.attribute[1]];
-                tempPos = Vector.add(tempPos,vec.mult(-(0.1* (block.attribute[0]/15))));
-            } else if(block2.id==-2)
-            {
-                const vec = dirAssoc[block2.attribute[1]];
-                tempPos = Vector.add(tempPos,vec.mult(-(0.05* (block2.attribute[0]/15))));
-            }*/
-            let down = false;
-            if (World.getBlock(new Vector(Math.round(tempPos.x - 0.3), Math.round(tempPos.y - 0.5), Math.round(tempPos.z))).id < 1
-                && World.getBlock(new Vector(Math.round(tempPos.x + 0.3), Math.round(tempPos.y - 0.5), Math.round(tempPos.z))).id < 1) {
-                //  down=false;
-            }
-            else {
-                tempPos.x = this.pos.x;
-                down = true;
-            }
-            if (World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 0.5), Math.round(tempPos.z + 0.3))).id < 1
-                && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 0.5), Math.round(tempPos.z - 0.3))).id < 1) {
-                // down=false;
-            }
-            else {
-                down = true;
-                tempPos.z = this.pos.z;
-            }
-            if (!(World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
-                && World.getBlock(new Vector(Math.round(this.pos.x + 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
-                && World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
-                && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z + 0.3))).id < 1
-                && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z - 0.3))).id < 1)) {
-                tempPos.y = this.pos.y;
-                this.jump.yAcc = 0;
-            }
-            if (World.getBlock(new Vector(Math.round(tempPos.x - 0.3), Math.round(tempPos.y + 0.5), Math.round(tempPos.z))).id > 0
-                || World.getBlock(new Vector(Math.round(tempPos.x + 0.3), Math.round(tempPos.y + 0.5), Math.round(tempPos.z))).id > 0)
-                tempPos.x = this.pos.x;
-            if (World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y + 0.5), Math.round(tempPos.z + 0.3))).id > 0
-                || World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y + 0.5), Math.round(tempPos.z - 0.3))).id > 0)
-                tempPos.z = this.pos.z;
-            if (World.getBlock(new Vector(Math.round(tempPos.x - 0.3), Math.round(tempPos.y + 0.5), Math.round(tempPos.z))).id < 1
-                && World.getBlock(new Vector(Math.round(tempPos.x + 0.3), Math.round(tempPos.y + 0.5), Math.round(tempPos.z))).id < 1
-                && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y + 0.5), Math.round(tempPos.z + 0.3))).id < 1
-                && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y + 0.5), Math.round(tempPos.z - 0.3))).id < 1) {
-                if (World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
-                    && World.getBlock(new Vector(Math.round(this.pos.x + 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
-                    && World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
-                    && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z + 0.3))).id < 1
-                    && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z - 0.3))).id < 1) {
-                    if (down && this.jump.yAcc <= 0 && World.getBlock(new Vector(Math.round(tempPos.x), Math.round(tempPos.y - 1.5), Math.round(tempPos.z))).id > 0) {
-                        this.jump.yAcc = 0.2;
-                    }
-                }
-            }
-            if (!(World.getBlock(new Vector(Math.round(tempPos.x + 0.3), Math.round(tempPos.y + 0.5), Math.round(tempPos.z + 0.3))).id > 0 ||
-                World.getBlock(new Vector(Math.round(tempPos.x - 0.3), Math.round(tempPos.y + 0.5), Math.round(tempPos.z + 0.3))).id > 0 ||
-                World.getBlock(new Vector(Math.round(tempPos.x - 0.3), Math.round(tempPos.y + 0.5), Math.round(tempPos.z - 0.3))).id > 0 ||
-                World.getBlock(new Vector(Math.round(tempPos.x + 0.3), Math.round(tempPos.y + 0.5), Math.round(tempPos.z - 0.3))).id > 0 ||
-                World.getBlock(new Vector(Math.round(tempPos.x + 0.3), Math.round(tempPos.y - 0.5), Math.round(tempPos.z + 0.3))).id > 0 ||
-                World.getBlock(new Vector(Math.round(tempPos.x - 0.3), Math.round(tempPos.y - 0.5), Math.round(tempPos.z + 0.3))).id > 0 ||
-                World.getBlock(new Vector(Math.round(tempPos.x - 0.3), Math.round(tempPos.y - 0.5), Math.round(tempPos.z - 0.3))).id > 0 ||
-                World.getBlock(new Vector(Math.round(tempPos.x + 0.3), Math.round(tempPos.y - 0.5), Math.round(tempPos.z - 0.3))).id > 0))
+            if (World.getBlock(new Vector(tempPos.x, tempPos.y - 1, tempPos.z)).id <= 0)
+                this.yAcc += 0.01;
+            tempPos.y -= this.yAcc;
+            if (!this.isBlockInWay(tempPos))
                 this.pos = tempPos;
+            else if (!this.isBlockInWay(new Vector(tempPos.x, this.pos.y, tempPos.z))) {
+                this.pos = new Vector(tempPos.x, this.pos.y, tempPos.z);
+                this.yAcc = 0;
+            }
+            else if (!this.isBlockInWay(new Vector(tempPos.x, tempPos.y, this.pos.z))) {
+                this.pos = new Vector(tempPos.x, tempPos.y, this.pos.z);
+            }
+            else if (!this.isBlockInWay(new Vector(this.pos.x, tempPos.y, tempPos.z))) {
+                this.pos = new Vector(this.pos.x, tempPos.y, tempPos.z);
+            }
+            else if (!this.isBlockInWay(new Vector(this.pos.x, this.pos.y, tempPos.z))) {
+                this.yAcc = 0;
+                this.pos = new Vector(this.pos.x, this.pos.y, tempPos.z);
+                this.yAcc = 0;
+            }
+            else if (!this.isBlockInWay(new Vector(this.pos.x, tempPos.y, this.pos.z))) {
+                this.pos = new Vector(this.pos.x, tempPos.y, this.pos.z);
+            }
+            else if (!this.isBlockInWay(new Vector(tempPos.x, this.pos.y, this.pos.z))) {
+                this.yAcc = 0;
+                this.pos = new Vector(tempPos.x, this.pos.y, this.pos.z);
+            }
             if (CanvaManager.getKey(32)) {
                 //  hop=true;
                 if (Main.fly)
@@ -271,11 +279,7 @@ class Player {
                     && World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y + 1.5), Math.round(this.pos.z))).id < 1
                     && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z + 0.3))).id < 1
                     && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y + 1.5), Math.round(this.pos.z - 0.3))).id < 1) {
-                    if (this.inWater) {
-                        hop = true;
-                        this.jump.yAcc = 0.05;
-                    }
-                    else if (this.jump.yAcc <= 0 && (World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id > 0 ||
+                    if (this.jump.yAcc <= 0 && (World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id > 0 ||
                         World.getBlock(new Vector(Math.round(this.pos.x + 0.3), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id > 0
                         || World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id > 0
                         || World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z + 0.3))).id > 0
@@ -286,27 +290,6 @@ class Player {
             /*  else if(CanvaManager.getKey(16) && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z)) ).id<1)
         this.pos.y-=0.1;
         */
-            if (!hop) {
-                const subc = World.getSubchunk(this.pos);
-                // console.log(subc);
-                if (subc != undefined && subc.generated) {
-                    const block = World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z)));
-                    if (block.id < 1 && World.getBlock(new Vector(Math.round(this.pos.x + 0.3), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id < 1
-                        && World.getBlock(new Vector(Math.round(this.pos.x - 0.3), Math.round(this.pos.y - 1.5), Math.round(this.pos.z))).id < 1
-                        && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z + 0.3))).id < 1
-                        && World.getBlock(new Vector(Math.round(this.pos.x), Math.round(this.pos.y - 1.5), Math.round(this.pos.z - 0.3))).id < 1) {
-                        if (this.inWater)
-                            this.yAcc += 0.001;
-                        else
-                            this.yAcc += 0.015;
-                        this.pos.y -= this.yAcc;
-                    }
-                    else if (this.pos.y != (Math.round(this.pos.y - 1.5)) + 1.5) {
-                        this.pos.y += (((Math.round(this.pos.y - 1.5)) + 1.5) - this.pos.y) / 2;
-                        this.yAcc = 0;
-                    }
-                }
-            }
         }
         catch (error) {
             console.log("Update pos error", error);

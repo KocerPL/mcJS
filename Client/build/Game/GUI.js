@@ -212,16 +212,19 @@ class GUI {
         slCoords2 = [];
         slCoords2 = slCoords2.concat(slCoords);
         indices = this.squareIndices.slice(0, this.squareIndices.length);
-        if (Main.player.inWater) {
-            //console.log("underwater")
-            this.vArray = this.vArray.concat([-1 / CanvaManager.getProportion, -1, 1 / CanvaManager.getProportion, 1, -1 / CanvaManager.getProportion, 1, 1 / CanvaManager.getProportion, -1]);
-            this.tArray = this.tArray.concat(this.crosstcords);
-            this.iArray = this.iArray.concat(indices);
-            this.indArray = this.indArray.concat([12, 12, 12, 12]);
-            for (let a = 0; a < indices.length; a++) {
-                indices[a] = indices[a] + 4;
+        /*  if(Main.player.inWater)
+        {
+        //console.log("underwater")
+       
+            this.vArray= this.vArray.concat([-1/CanvaManager.getProportion ,-1, 1/CanvaManager.getProportion,1, -1/CanvaManager.getProportion,1, 1/CanvaManager.getProportion,-1]);
+            this.tArray= this.tArray.concat(this.crosstcords);
+            this.iArray =this.iArray.concat(indices);
+            this.indArray = this.indArray.concat([12,12,12,12]);
+            for(let a=0;a<indices.length;a++)
+            {
+                indices[a] = indices[a]+4;
             }
-        }
+        }*/
         for (let i = 0; i < 9; i++) {
             //   console.log(indices);
             if (Main.player.itemsBar[i] && Main.player.itemsBar[i].id != 0) {
