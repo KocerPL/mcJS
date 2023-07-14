@@ -203,9 +203,9 @@ export class Main
         // EBO.unbind();
         // VBO.unbind();
         gl.enable(gl.DEPTH_TEST);
-        gl.depthFunc(gl.LEQUAL);
-        // gl.enable(gl.CULL_FACE);
-        // gl.cullFace(gl.BACK);
+        gl.depthFunc(gl.LESS);
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
         //Transparency requires blending 
         gl.enable (gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -311,6 +311,10 @@ export class Main
     }
     private static fastUpdate()
     {
+        for(let i=0;i<this.entities.length;i++)
+        {
+            this.entities[i].update(i);
+        }
         this.player.update();
     }
     public static update()
@@ -325,10 +329,7 @@ export class Main
         // this.count++;
         // if(this.count>this.test.indices.length)
         //this.count=3;
-        for(let i=0;i<this.entities.length;i++)
-        {
-            this.entities[i].update(i);
-        }
+      
         GUI.update();
         if(CanvaManager.getKeyOnce(54))
             this.maxChunks--;
@@ -535,7 +536,7 @@ export class Main
     {
         this.Measure.frames++;
   
-      
+        this.renderDebug();
         this.shader.use();
         this.player.camera.preRender();
         this.shader.setFog(this.player.camera.getPosition(),Math.sqrt(this.maxChunks)*8);

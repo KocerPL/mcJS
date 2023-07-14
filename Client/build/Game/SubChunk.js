@@ -264,7 +264,7 @@ class SubChunk {
             return;
         if (block.id < 1) {
             if (testedBlock.id > 0) {
-                this.mesh.vertices.push(...vBuffer.slice(vStart, vStart + 12));
+                this.mesh.vertices.push(...vBuffer.slice(vStart - 12, vStart));
                 this.mesh.tCoords.push(...SubChunk.getTextureCords(testedBlock.id, SubChunk.flip(side)));
                 this.mesh.indices.push(index + 2, index + 1, index, index + 2, index, index + 3);
                 if (dy == 1) {
@@ -272,8 +272,8 @@ class SubChunk {
                     const o2 = this.vertexAO(this.isBlock(x - 1, y, z), this.isBlock(x, y, z + 1), this.isBlock(x - 1, y, z + 1));
                     const o3 = this.vertexAO(this.isBlock(x + 1, y, z), this.isBlock(x, y, z + 1), this.isBlock(x + 1, y, z + 1));
                     const o4 = this.vertexAO(this.isBlock(x + 1, y, z), this.isBlock(x, y, z - 1), this.isBlock(x + 1, y, z - 1));
-                    this.mesh.lightLevels.push(o1 * block.skyLight, o2 * block.skyLight, o3 * block.skyLight, o4 * block.skyLight);
-                    this.mesh.fb.push(block.lightFBlock * o1, block.lightFBlock * o2, block.lightFBlock * o3, block.lightFBlock * o4);
+                    this.mesh.lightLevels.push(o1 * block.skyLight, o4 * block.skyLight, o3 * block.skyLight, o2 * block.skyLight);
+                    this.mesh.fb.push(block.lightFBlock * o1, block.lightFBlock * o4, block.lightFBlock * o3, block.lightFBlock * o2);
                 }
                 else if (dx == 1) {
                     const o1 = this.vertexAO(this.isBlock(x, y - 1, z), this.isBlock(x, y, z - 1), this.isBlock(x, y - 1, z - 1));
@@ -288,8 +288,8 @@ class SubChunk {
                     const o2 = this.vertexAO(this.isBlock(x + 1, y, z), this.isBlock(x, y - 1, z), this.isBlock(x + 1, y - 1, z));
                     const o3 = this.vertexAO(this.isBlock(x + 1, y, z), this.isBlock(x, y + 1, z), this.isBlock(x + 1, y + 1, z));
                     const o4 = this.vertexAO(this.isBlock(x - 1, y, z), this.isBlock(x, y + 1, z), this.isBlock(x - 1, y + 1, z));
-                    this.mesh.lightLevels.push(o1 * block.skyLight, o2 * block.skyLight, o3 * block.skyLight, o4 * block.skyLight);
-                    this.mesh.fb.push(block.lightFBlock * o1, block.lightFBlock * o2, block.lightFBlock * o3, block.lightFBlock * o4);
+                    this.mesh.lightLevels.push(o1 * block.skyLight, o4 * block.skyLight, o3 * block.skyLight, o2 * block.skyLight);
+                    this.mesh.fb.push(block.lightFBlock * o1, block.lightFBlock * o4, block.lightFBlock * o3, block.lightFBlock * o2);
                 }
                 index += 4;
             }
@@ -312,8 +312,8 @@ class SubChunk {
                     const o2 = this.vertexAO(this.isBlock(x + 1, y - 1, z), this.isBlock(x + 1, y, z + 1), this.isBlock(x + 1, y - 1, z + 1));
                     const o3 = this.vertexAO(this.isBlock(x + 1, y + 1, z), this.isBlock(x + 1, y, z + 1), this.isBlock(x + 1, y + 1, z + 1));
                     const o4 = this.vertexAO(this.isBlock(x + 1, y + 1, z), this.isBlock(x + 1, y, z - 1), this.isBlock(x + 1, y + 1, z - 1));
-                    this.mesh.lightLevels.push(testedBlock.skyLight * o1, testedBlock.skyLight * o2, testedBlock.skyLight * o3, testedBlock.skyLight * o4);
-                    this.mesh.fb.push(testedBlock.lightFBlock * o1, testedBlock.lightFBlock * o2, testedBlock.lightFBlock * o3, testedBlock.lightFBlock * o4);
+                    this.mesh.lightLevels.push(testedBlock.skyLight * o1, testedBlock.skyLight * o4, testedBlock.skyLight * o3, testedBlock.skyLight * o2);
+                    this.mesh.fb.push(testedBlock.lightFBlock * o1, testedBlock.lightFBlock * o4, testedBlock.lightFBlock * o3, testedBlock.lightFBlock * o2);
                 }
                 else if (dz == 1) //fine
                  {
@@ -457,30 +457,30 @@ class SubChunk {
     ];
     static defVertices = [
         //przód
-        -0.5, -0.5, -0.5,
-        0.5, -0.5, -0.5,
-        0.5, 0.5, -0.5,
-        -0.5, 0.5, -0.5,
+        -0.5, -0.5, 0.5,
+        -0.5, 0.5, 0.5,
+        0.5, 0.5, 0.5,
+        0.5, -0.5, 0.5,
         //tył
         -0.5, -0.5, 0.5,
         0.5, -0.5, 0.5,
         0.5, 0.5, 0.5,
         -0.5, 0.5, 0.5,
         //lewo
-        -0.5, -0.5, -0.5,
-        -0.5, -0.5, 0.5,
-        -0.5, 0.5, 0.5,
-        -0.5, 0.5, -0.5,
-        //prawo
         0.5, -0.5, -0.5,
         0.5, -0.5, 0.5,
         0.5, 0.5, 0.5,
         0.5, 0.5, -0.5,
-        //dół
-        -0.5, -0.5, -0.5,
-        -0.5, -0.5, 0.5,
-        0.5, -0.5, 0.5,
+        //prawo
         0.5, -0.5, -0.5,
+        0.5, 0.5, -0.5,
+        0.5, 0.5, 0.5,
+        0.5, -0.5, 0.5,
+        //dół
+        -0.5, 0.5, -0.5,
+        0.5, 0.5, -0.5,
+        0.5, 0.5, 0.5,
+        -0.5, 0.5, 0.5,
         //góra
         -0.5, 0.5, -0.5,
         -0.5, 0.5, 0.5,

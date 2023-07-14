@@ -21,5 +21,6 @@ void main()
 //vec3 diffuse = diff *vec3(0.1,0.1,0.1);
 vec3 ambient = vec3(0.3+(pass_Light*0.7),0.3+(pass_Light*0.7),0.3+(pass_Light*0.7));
 vec4 texOk =  texture(tex,pass_tc);
-    color=vec4(ambient,clamp((-cdistance+fogDistance)/10.0 ,0.0,1.0))*texOk;
+float fog = clamp((-cdistance+fogDistance)/10.0 ,0.0,1.0);
+    color=vec4(ambient,1.0)*texOk*fog;
 }
