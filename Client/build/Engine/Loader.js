@@ -1,4 +1,3 @@
-import { rot2d } from "../Game/Models.js";
 import { CanvaManager } from "./CanvaManager.js";
 import { Vector } from "./Utils/Vector.js";
 const gl = CanvaManager.gl;
@@ -125,24 +124,13 @@ export class Loader {
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.activeTexture(gl.TEXTURE0);
         for (let x = 0; x < json.length; x++) {
-            switch (json[x].rotation) {
-                case rot2d.D180:
-                    if (json[x].rotation == rot2d.D180)
-                        coords.push({
-                            dx: json[x].pos[0] / imgSizeX,
-                            y: json[x].pos[1] / imgSizeY,
-                            x: (json[x].pos[0] + json[x].size[0]) / imgSizeX,
-                            dy: (json[x].pos[1] + json[x].size[1]) / imgSizeY,
-                        });
-                    break;
-                default:
-                    coords.push({
-                        x: json[x].pos[0] / imgSizeX,
-                        y: json[x].pos[1] / imgSizeY,
-                        dx: (json[x].pos[0] + json[x].size[0]) / imgSizeX,
-                        dy: (json[x].pos[1] + json[x].size[1]) / imgSizeY,
-                    });
-            }
+            coords.push({
+                x: json[x].pos[0] / imgSizeX,
+                y: json[x].pos[1] / imgSizeY,
+                dx: (json[x].pos[0] + json[x].size[0]) / imgSizeX,
+                dy: (json[x].pos[1] + json[x].size[1]) / imgSizeY,
+                rotation: json[x].rotation
+            });
         }
         img.onload = () => {
             gl.bindTexture(gl.TEXTURE_2D, texture);

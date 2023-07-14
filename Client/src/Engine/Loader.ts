@@ -151,31 +151,19 @@ export class Loader
         //loading image ^
         //Buffering image
         const texture = gl.createTexture();
-        const coords = [];
+        const coords:Array<{x:number,dx:number,y:number,dy:number,rotation:rot2d }> = [];
         gl.bindTexture(gl.TEXTURE_2D,texture);
         gl.activeTexture(gl.TEXTURE0);
         for(let x=0; x<json.length; x++)
         {
-            switch(json[x].rotation)
-            {
-            case rot2d.D180:
-                if(json[x].rotation == rot2d.D180)
-                    coords.push({
-                        dx:json[x].pos[0]/imgSizeX,
-                        y:json[x].pos[1]/imgSizeY,
-                        x:(json[x].pos[0] +json[x].size[0])/imgSizeX,
-                        dy:(json[x].pos[1] +json[x].size[1])/imgSizeY,
-                    });
-                break;
-            default:
-                coords.push({
-                    x:json[x].pos[0]/imgSizeX,
-                    y:json[x].pos[1]/imgSizeY,
-                    dx:(json[x].pos[0] +json[x].size[0])/imgSizeX,
-                    dy:(json[x].pos[1] +json[x].size[1])/imgSizeY,
-                });
+            coords.push({
+                x:json[x].pos[0]/imgSizeX,
+                y:json[x].pos[1]/imgSizeY,
+                dx:(json[x].pos[0] +json[x].size[0])/imgSizeX,
+                dy:(json[x].pos[1] +json[x].size[1])/imgSizeY,
+                rotation:json[x].rotation
+            });
             
-            }
         }
         img.onload = ()=>{
             gl.bindTexture(gl.TEXTURE_2D,texture);  
@@ -207,11 +195,10 @@ export class Texture2
     x:number;
     y:number;
     dx:number;
-    coords:Array<{x:number,dx:number,y:number,dy:number }>;
+    coords:Array<{x:number,dx:number,y:number,dy:number,rotation:rot2d }>;
     dy:number;
-    
     ID:WebGLTexture;
-    constructor(coords:Array<{x:number,dx:number,y:number,dy:number }>, textureID:WebGLTexture)
+    constructor(coords:Array<{x:number,dx:number,y:number,dy:number,rotation:rot2d }>, textureID:WebGLTexture)
     {  
         this.ID=textureID;
         this.coords =coords;

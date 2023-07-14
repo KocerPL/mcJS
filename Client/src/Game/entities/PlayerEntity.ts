@@ -4,6 +4,7 @@ import { Matrix } from "../../Engine/Utils/Matrix.js";
 import { Vector } from "../../Engine/Utils/Vector.js";
 import { Main } from "../../Main.js";
 import { Entity } from "../Entity.js";
+import { rot2d } from "../Models.js";
 const gl = CanvaManager.gl;
 export class PlayerEntity extends Entity
 {
@@ -28,9 +29,9 @@ export class PlayerEntity extends Entity
             -0.5,0.5,0.5,
             //lewo
             -0.5,-0.5,-0.5,
-            -0.5,-0.5,0.5,
-            -0.5,0.5 ,0.5,
             -0.5,0.5,-0.5,
+            -0.5,0.5 ,0.5,
+            -0.5,-0.5,0.5,        
             //prawo
             0.5,-0.5,-0.5,
             0.5,-0.5,0.5,
@@ -64,9 +65,9 @@ export class PlayerEntity extends Entity
             -0.5,0.7,-0.25,
             //left body
             0.5,-0.7,-0.25,
-            0.5,-0.7,0.25,
-            0.5,0.7,0.25,
             0.5,0.7,-0.25,
+            0.5,0.7,0.25,
+            0.5,-0.7,0.25,
             //bottom body
             -0.5,-0.7,-0.25,
             0.5,-0.7,-0.25,
@@ -89,9 +90,9 @@ export class PlayerEntity extends Entity
             -0.25,0.7,0.25,
             //left leg
             0.25,-0.7,-0.25,
-            0.25,-0.7,0.25,
-            0.25,0.7,0.25,
             0.25,0.7,-0.25,
+            0.25,0.7,0.25,
+            0.25,-0.7,0.25,
             //right leg
             -0.25,-0.7,-0.25,
             -0.25,-0.7,0.25,
@@ -119,9 +120,9 @@ export class PlayerEntity extends Entity
             -0.25,0.7,0.25,
             //left leg
             0.25,-0.7,-0.25,
-            0.25,-0.7,0.25,
-            0.25,0.7,0.25,
             0.25,0.7,-0.25,
+            0.25,0.7,0.25,
+            0.25,-0.7,0.25, 
             //right leg
             -0.25,-0.7,-0.25,
             -0.25,-0.7,0.25,
@@ -150,9 +151,9 @@ export class PlayerEntity extends Entity
             -0.25,0.7,0.25,
             //left arm
             0.25,-0.7,-0.25,
-            0.25,-0.7,0.25,
-            0.25,0.7,0.25,
             0.25,0.7,-0.25,
+            0.25,0.7,0.25,
+            0.25,-0.7,0.25,
             //right arm
             -0.25,-0.7,-0.25,
             -0.25,-0.7,0.25,
@@ -181,9 +182,9 @@ export class PlayerEntity extends Entity
             -0.25,0.7,0.25,
             //left arm
             0.25,-0.7,-0.25,
-            0.25,-0.7,0.25,
-            0.25,0.7,0.25,
             0.25,0.7,-0.25,
+            0.25,0.7,0.25,
+            0.25,-0.7,0.25,
             //right arm
             -0.25,-0.7,-0.25,
             -0.25,-0.7,0.25,
@@ -204,11 +205,32 @@ export class PlayerEntity extends Entity
         this.rs.blockLight = this.rs.skyLight;
         let tc = [];
         const pushFunc = (ind)=>{
-            tc=   tc.concat([
-                Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].dy,0,
-                Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].dy,0,
-                Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].y,0,
-                Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].y,0]);
+            console.log("rotation: ",Texture.skinAtlas.coords[ind].rotation);
+            if(Texture.skinAtlas.coords[ind].rotation == undefined)
+                tc=   tc.concat([
+                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].dy,0,
+                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].dy,0,
+                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].y,0,
+                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].y,0]);
+            else if(Texture.skinAtlas.coords[ind].rotation==rot2d.D90)
+            {
+                console.log("rev90");
+                tc=   tc.concat([
+                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].dy,0,
+                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].y,0,
+                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].y,0,
+                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].dy,0]);
+            }
+            else if(Texture.skinAtlas.coords[ind].rotation==rot2d.D180)
+            {
+                tc=   tc.concat([
+                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].y,0,
+                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].dy,0,
+                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].dy,0,
+                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].y,0
+                ] );
+            }
+
         };
         pushFunc(1);
         pushFunc(0);

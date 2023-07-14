@@ -12,7 +12,8 @@ export const Model = {
         },
         {
             pos: [24, 8],
-            size: [8, 8]
+            size: [8, 8],
+            rotation: rot2d.D90
         },
         {
             pos: [0, 8],
@@ -38,11 +39,13 @@ export const Model = {
         },
         {
             pos: [28, 20],
-            size: [8, 12]
+            size: [8, 12],
+            rotation: rot2d.D90
         },
         {
             pos: [16, 20],
-            size: [4, 12]
+            size: [4, 12],
+            rotation: rot2d.D90
         },
         {
             pos: [36, 20],
@@ -57,16 +60,18 @@ export const Model = {
             size: [8, 4]
         },
         {
+            pos: [8, 20],
+            size: [4, 12],
+            rotation: rot2d.D90
+        },
+        {
             pos: [4, 20],
             size: [4, 12]
         },
         {
-            pos: [8, 20],
-            size: [4, 12]
-        },
-        {
             pos: [0, 20],
-            size: [4, 12]
+            size: [4, 12],
+            rotation: rot2d.D90
         },
         {
             pos: [12, 20],
@@ -82,16 +87,18 @@ export const Model = {
         },
         //right leg
         {
+            pos: [24, 52],
+            size: [4, 12],
+            rotation: rot2d.D90
+        },
+        {
             pos: [20, 52],
             size: [4, 12]
         },
         {
-            pos: [24, 52],
-            size: [4, 12]
-        },
-        {
             pos: [16, 52],
-            size: [4, 12]
+            size: [4, 12],
+            rotation: rot2d.D90
         },
         {
             pos: [28, 52],
@@ -107,16 +114,18 @@ export const Model = {
         },
         //left arm
         {
+            pos: [48, 20],
+            size: [4, 12],
+            rotation: rot2d.D90
+        },
+        {
             pos: [44, 20],
             size: [4, 12]
         },
         {
-            pos: [48, 20],
-            size: [4, 12]
-        },
-        {
             pos: [40, 20],
-            size: [4, 12]
+            size: [4, 12],
+            rotation: rot2d.D90
         },
         {
             pos: [52, 20],
@@ -132,16 +141,18 @@ export const Model = {
         },
         //right arm
         {
+            pos: [40, 52],
+            size: [4, 12],
+            rotation: rot2d.D90
+        },
+        {
             pos: [36, 52],
             size: [4, 12]
         },
         {
-            pos: [40, 52],
-            size: [4, 12]
-        },
-        {
             pos: [32, 52],
-            size: [4, 12]
+            size: [4, 12],
+            rotation: rot2d.D90
         },
         {
             pos: [44, 52],

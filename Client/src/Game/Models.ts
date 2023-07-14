@@ -13,7 +13,8 @@ export const Model=
         },
         {//1 back Head
             pos:[24,8],
-            size:[8,8]
+            size:[8,8],
+            rotation:rot2d.D90
         },
         {//2 leftHead
             pos:[0,8],
@@ -40,11 +41,13 @@ export const Model=
         },
         {//7 back Body
             pos:[28,20],
-            size:[8,12]
+            size:[8,12],
+            rotation:rot2d.D90
         },
         {//8 left Body
             pos:[16,20],
-            size:[4,12]
+            size:[4,12],
+            rotation:rot2d.D90
         },
         {//9 right Body
             pos:[36,20],
@@ -58,17 +61,19 @@ export const Model=
             pos:[28,16],
             size:[8,4]
         },
-        { // 12 front left leg
+        { //12 back left leg
+            pos:[8,20],
+            size:[4,12],
+            rotation:rot2d.D90
+        },
+        { // 13 front left leg
             pos:[4,20],
             size:[4,12]
-        },
-        { //13 back left leg
-            pos:[8,20],
-            size:[4,12]
-        },
+        },  
         {//14 left left leg
             pos:[0,20],
-            size:[4,12]
+            size:[4,12],
+            rotation:rot2d.D90
         },
         {//15 right left leg
             pos:[12,20],
@@ -83,17 +88,20 @@ export const Model=
             size:[4,4]
         },
         //right leg
-        { // 18 front right leg
+        { //18 back right leg
+            pos:[24,52],
+            size:[4,12],
+            rotation:rot2d.D90
+        },
+        { // 19 front right leg
             pos:[20,52],
             size:[4,12]
         },
-        { //19 back right leg
-            pos:[24,52],
-            size:[4,12]
-        },
+       
         {//20 left right leg
             pos:[16,52],
-            size:[4,12]
+            size:[4,12],
+            rotation:rot2d.D90
         },
         {//21 right right leg
             pos:[28,52],
@@ -108,17 +116,20 @@ export const Model=
             size:[4,4]
         }, 
         //left arm
-        { // 24 front left arm
+        { //24 back left arm
+            pos:[48,20],
+            size:[4,12],
+            rotation:rot2d.D90
+        },
+        { // 25 front left arm
             pos:[44,20],
             size:[4,12]
         },
-        { //25 back left arm
-            pos:[48,20],
-            size:[4,12]
-        },
+       
         {//26 left left arm
             pos:[40,20],
-            size:[4,12]
+            size:[4,12],
+            rotation:rot2d.D90
         },
         {//27 right left arm
             pos:[52,20],
@@ -133,17 +144,20 @@ export const Model=
             size:[4,4]
         },
         //right arm
-        { // 18 front right arm
+        { //18 back right arm
+            pos:[40,52],
+            size:[4,12],
+            rotation:rot2d.D90
+        },
+        { // 19 front right arm
             pos:[36,52],
             size:[4,12]
         },
-        { //19 back right arm
-            pos:[40,52],
-            size:[4,12]
-        },
+       
         {//20 left right arm
             pos:[32,52],
-            size:[4,12]
+            size:[4,12],
+            rotation:rot2d.D90
         },
         {//21 right right arm
             pos:[44,52],

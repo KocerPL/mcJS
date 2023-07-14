@@ -331,11 +331,12 @@ class SubChunk {
     }
     updateVerticesOptimized() {
         let index = 0;
+        let block;
+        const temp = [];
         for (let x = 0; x < 16; x++)
             for (let y = 0; y < 16; y++)
                 for (let z = 0; z < 16; z++) {
-                    const block = this.blocks[x][y][z];
-                    const temp = [];
+                    block = this.blocks[x][y][z];
                     //20 ms for 65535
                     for (let i = 0; i < SubChunk.defVertices.length; i += 3) {
                         temp.push(SubChunk.defVertices[i] + x);
@@ -345,6 +346,7 @@ class SubChunk {
                     index = this.updateSide(x, y, z, 1, 0, 0, 36, "left", block, index, temp);
                     index = this.updateSide(x, y, z, 0, 1, 0, 60, "top", block, index, temp);
                     index = this.updateSide(x, y, z, 0, 0, 1, 12, "front", block, index, temp);
+                    temp.length = 0;
                 }
         return index;
     }
