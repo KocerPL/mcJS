@@ -1,5 +1,6 @@
 import { Model, rot2d } from "../Game/Models.js";
 import { CanvaManager } from "./CanvaManager.js";
+import { RenderSet } from "./RenderSet.js";
 import { Vector } from "./Utils/Vector.js";
 
 const gl = CanvaManager.gl;
@@ -188,6 +189,48 @@ export class Loader
         const textureHolder = new Texture2(coords,texture);
 
         return textureHolder;
+    }
+    public static loadObj(path:string):RenderSet
+    {
+        const text =  this.txtFile(path);
+        const rs:RenderSet = new RenderSet();
+        let i=0;
+        while(i<text.length)
+        {
+            let fp:number;
+            let num:number;
+            if(text[i]=="\n")
+            {
+                i++;
+                switch(text[i])
+                {
+                case "v":
+                    i++;
+                    switch(text[i])
+                    {
+                    case " ":
+                        for(let k=0;k<3;k++)
+                        {
+                            i++;
+                            fp= i;
+                            while(text[i]!=" " && text[i]!="\n")
+                            {
+                                i++;
+                            }
+                            num =  Number.parseFloat(text.slice(fp,i));
+                            rs.vertices.push(num);
+                        }
+                        break;
+                    }
+                    break;
+                }
+            }
+            else 
+                i++;
+           
+        }
+        console.log(rs.vertices);
+        return rs;
     }
 }
 export class Texture2

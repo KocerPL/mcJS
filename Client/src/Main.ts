@@ -1,5 +1,6 @@
 import { CanvaManager } from "./Engine/CanvaManager.js";
 import { EBO } from "./Engine/EBO.js";
+import { Loader } from "./Engine/Loader.js";
 import { AtlasShader } from "./Engine/Shader/AtlasShader.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Shader2d } from "./Engine/Shader/Shader2d.js";
@@ -179,6 +180,8 @@ export class Main
             for(let z=-4;z<4;z++)
                 for(let i=15;i>=0;i--)
                     this.socket.emit("getSubchunk",x,i,z);
+        const rs = Loader.loadObj("./res/models/hammer.obj");
+        rs;
         /* this.integratedServer = new Worker("./build/IntegratedServer/Main.js", {
             type: "module"
         });
