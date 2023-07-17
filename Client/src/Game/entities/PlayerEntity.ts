@@ -318,12 +318,20 @@ export class PlayerEntity extends Entity
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,108*4);
         Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(this.rotation.z).rotateZ(5).translate(0.375,-0.35,0).scale(bScale ,bScale ,bScale ));
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,144*4);
-        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.35,0).scale(bScale ,bScale ,bScale ));
+        const mat = Matrix.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.35,0).scale(bScale ,bScale ,bScale );
+        Main.atlasShader.loadTransformation(mat);
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,180*4);
-        this.rsHammer.vao.bind();
-        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+2,this.pos.z).scale(0.2,0.2,0.2));
-        gl.drawElements(gl.TRIANGLES,this.rsHammer.count,gl.UNSIGNED_INT,0);
+        this.renderHandItem();
         Main.shader.use();
+    }
+    renderHandItem()
+    {
+        const bScale = 0.5;
+        const mat = Matrix.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.35,0).scale(bScale ,bScale ,bScale );
+        this.rsHammer.vao.bind();
+        gl.bindTexture(gl.TEXTURE_2D,Texture.hammer);
+        Main.atlasShader.loadTransformation( mat.translate(0.0,-0.3,1).rotateX(90).rotateY(90).scale(0.2,0.2,0.2));
+        gl.drawElements(gl.TRIANGLES,this.rsHammer.count,gl.UNSIGNED_INT,0);
     }
     setNextTransitions(nextPos:Vector,nextRot:Vector,count:number)
     {

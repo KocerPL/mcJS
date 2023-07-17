@@ -206,11 +206,11 @@ export class Main
         // VBO.unbind();
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LESS);
-        //  gl.enable(gl.CULL_FACE);
-        //  gl.cullFace(gl.BACK);
+        //gl.enable(gl.CULL_FACE);
+        //gl.cullFace(gl.BACK);
         //Transparency requires blending 
-        //  gl.enable (gl.BLEND);
-        //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.enable (gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         //Shader for world
         this.shader = new DefaultShader();
         this.atlasShader = new AtlasShader();

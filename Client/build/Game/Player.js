@@ -432,6 +432,8 @@ class Player {
         if (this.person != "First") {
             this.entity.render();
         }
+        else
+            this.entity.renderHandItem();
         if (this.blockBreakingTime > 1) {
             const transformation = Matrix.identity();
             this.blockOverlay.vao.bind();

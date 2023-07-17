@@ -152,6 +152,7 @@ export class Loader {
     static loadObj(path) {
         const text = this.txtFile(path);
         const rs = new RenderSet();
+        const textureCoords = [];
         let i = 0;
         while (i < text.length) {
             let fp;
@@ -173,6 +174,16 @@ export class Loader {
                                     rs.vertices.push(num);
                                 }
                                 break;
+                            case "t":
+                                for (let k = 0; k < 2; k++) {
+                                    i++;
+                                    fp = i;
+                                    while (text[i] != " " && text[i] != "\n") {
+                                        i++;
+                                    }
+                                    num = Number.parseFloat(text.slice(fp, i));
+                                    textureCoords.push(num);
+                                }
                         }
                         break;
                     case "f":
@@ -185,6 +196,13 @@ export class Loader {
                             }
                             num = Number.parseFloat(text.slice(fp, i));
                             rs.indices.push(num - 1);
+                            i++;
+                            fp = i;
+                            while (text[i] != "/") {
+                                i++;
+                            }
+                            num = Number.parseFloat(text.slice(fp, i));
+                            rs.textureCoords.push(textureCoords[(num - 1) * 2], textureCoords[((num - 1) * 2) + 1], 0);
                             while (text[i] != " " && text[i] != "\n") {
                                 i++;
                             }
@@ -198,7 +216,7 @@ export class Loader {
         for (let i = 0; i < rs.vertices.length; i++) {
             rs.skyLight.push(15);
             rs.blockLight.push(15);
-            rs.textureCoords.push(0);
+            //rs.textureCoords.push(0);
         }
         rs.bufferArrays();
         return rs;
