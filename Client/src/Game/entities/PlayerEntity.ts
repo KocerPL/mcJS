@@ -5,12 +5,15 @@ import { Vector } from "../../Engine/Utils/Vector.js";
 import { Main } from "../../Main.js";
 import { Entity } from "../Entity.js";
 import { rot2d } from "../Models.js";
+import { Loader } from "../../Engine/Loader.js";
 const gl = CanvaManager.gl;
 export class PlayerEntity extends Entity
 {
     rotation:Vector;
     bodyRot:number;
     nextTransitions:Array<{pos:Vector,rot:Vector}>=[];
+    rsHammer = Loader.loadObj("./res/models/hammer.obj");
+    
     constructor(pos:Vector,id?)
     {
         super(pos,id);
@@ -317,6 +320,9 @@ export class PlayerEntity extends Entity
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,144*4);
         Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.35,0).scale(bScale ,bScale ,bScale ));
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,180*4);
+        this.rsHammer.vao.bind();
+        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+2,this.pos.z).scale(0.2,0.2,0.2));
+        gl.drawElements(gl.TRIANGLES,this.rsHammer.count,gl.UNSIGNED_INT,0);
         Main.shader.use();
     }
     setNextTransitions(nextPos:Vector,nextRot:Vector,count:number)

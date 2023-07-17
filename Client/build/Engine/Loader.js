@@ -161,14 +161,33 @@ export class Loader {
                 switch (text[i]) {
                     case "v":
                         i++;
+                        switch (text[i]) {
+                            case " ":
+                                for (let k = 0; k < 3; k++) {
+                                    i++;
+                                    fp = i;
+                                    while (text[i] != " " && text[i] != "\n") {
+                                        i++;
+                                    }
+                                    num = Number.parseFloat(text.slice(fp, i));
+                                    rs.vertices.push(num);
+                                }
+                                break;
+                        }
+                        break;
+                    case "f":
+                        i++;
                         for (let k = 0; k < 3; k++) {
                             i++;
                             fp = i;
-                            while (text[i] != " " && text[i] != "\n") {
+                            while (text[i] != "/") {
                                 i++;
                             }
                             num = Number.parseFloat(text.slice(fp, i));
-                            rs.vertices.push(num);
+                            rs.indices.push(num - 1);
+                            while (text[i] != " " && text[i] != "\n") {
+                                i++;
+                            }
                         }
                         break;
                 }
@@ -176,7 +195,12 @@ export class Loader {
             else
                 i++;
         }
-        console.log(rs.vertices);
+        for (let i = 0; i < rs.vertices.length; i++) {
+            rs.skyLight.push(15);
+            rs.blockLight.push(15);
+            rs.textureCoords.push(0);
+        }
+        rs.bufferArrays();
         return rs;
     }
 }

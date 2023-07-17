@@ -223,13 +223,37 @@ export class Loader
                         break;
                     }
                     break;
+                case "f":
+                    i++;
+                    for(let k=0;k<3;k++)
+                    {
+                        i++;
+                        fp = i;
+                        while(text[i]!="/")
+                        {
+                            i++;
+                        }
+                        num =  Number.parseFloat(text.slice(fp,i));
+                        rs.indices.push(num-1);
+                        while(text[i]!=" " && text[i]!="\n")
+                        {
+                            i++;
+                        }
+                    }
+                    break;
                 }
             }
             else 
                 i++;
            
         }
-        console.log(rs.vertices);
+        for(let i=0;i<rs.vertices.length;i++)
+        {
+            rs.skyLight.push(15);
+            rs.blockLight.push(15);
+            rs.textureCoords.push(0);
+        }
+        rs.bufferArrays();
         return rs;
     }
 }

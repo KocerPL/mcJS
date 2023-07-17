@@ -1,6 +1,5 @@
 import { CanvaManager } from "./Engine/CanvaManager.js";
 import { EBO } from "./Engine/EBO.js";
-import { Loader } from "./Engine/Loader.js";
 import { AtlasShader } from "./Engine/Shader/AtlasShader.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Shader2d } from "./Engine/Shader/Shader2d.js";
@@ -163,8 +162,6 @@ class Main {
             for (let z = -4; z < 4; z++)
                 for (let i = 15; i >= 0; i--)
                     this.socket.emit("getSubchunk", x, i, z);
-        const rs = Loader.loadObj("./res/models/hammer.obj");
-        rs;
         /* this.integratedServer = new Worker("./build/IntegratedServer/Main.js", {
             type: "module"
         });
@@ -190,11 +187,11 @@ class Main {
         // VBO.unbind();
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LESS);
-        gl.enable(gl.CULL_FACE);
-        gl.cullFace(gl.BACK);
+        //  gl.enable(gl.CULL_FACE);
+        //  gl.cullFace(gl.BACK);
         //Transparency requires blending 
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        //  gl.enable (gl.BLEND);
+        //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         //Shader for world
         this.shader = new DefaultShader();
         this.atlasShader = new AtlasShader();
