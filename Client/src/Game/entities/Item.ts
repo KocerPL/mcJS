@@ -1,6 +1,6 @@
 import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { Texture } from "../../Engine/Texture.js";
-import { Matrix } from "../../Engine/Utils/Matrix.js";
+import { Matrix4 } from "../../Engine/Utils/Matrix4.js";
 import { Vector } from "../../Engine/Utils/Vector.js";
 import { Main } from "../../Main.js";
 import { Entity } from "../Entity.js";
@@ -17,7 +17,7 @@ export class Item extends Entity
     yAcc=0;
     constructor(pos:Vector,type:number)
     {
-        super(pos);
+        super(pos,Main.atlasShader);
       
         this.type = type;
         this.prepareModel();
@@ -97,7 +97,7 @@ export class Item extends Entity
         {
             this.rotation=0;
         }
-        this.transformation = Matrix.identity();
+        this.transformation = Matrix4.identity();
       
         this.transformation=this.transformation.translate(this.pos.x,this.pos.y+(Math.abs(this.rotation-180)/360),this.pos.z);
         this.transformation=this.transformation.scale(0.3,0.3,0.3);

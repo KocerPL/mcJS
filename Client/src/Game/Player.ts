@@ -3,7 +3,7 @@ import { CanvaManager } from "../Engine/CanvaManager.js";
 import { RenderSet } from "../Engine/RenderSet.js";
 import { Texture } from "../Engine/Texture.js";
 import { randRange } from "../Engine/Utils/Math.js";
-import { Matrix } from "../Engine/Utils/Matrix.js";
+import { Matrix4 } from "../Engine/Utils/Matrix4.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { Main } from "../Main.js";
 import { Block, blocks } from "./Block.js";
@@ -16,7 +16,7 @@ export class invItem
 {
     id:number;
     count:number;
-
+    nn:null;
     constructor(id)
     {
         this.id=id;
@@ -36,7 +36,7 @@ export class Player
     targetedBlock=null;
     startTime=0;
     tbPos = new Vector(0,0,0);
-    blockOverlay:RenderSet = new RenderSet();
+    blockOverlay:RenderSet;
     blockBreakingTime=0;
     selectedItem = 0;
     person:pers ="First"; 
@@ -86,6 +86,7 @@ export class Player
     };
     constructor(pos:Vector)
     {
+        this.blockOverlay = new RenderSet(Main.atlasShader);
         this.pos = pos;
         this.entity = new PlayerEntity(this.pos);
         this.camera.setPosition(new Vector(pos.x,pos.y+1,pos.z));
@@ -521,7 +522,7 @@ export class Player
         else
             this.entity.renderHandItem();
         if(this.blockBreakingTime>1)
-        {      const   transformation = Matrix.identity();
+        {      const   transformation = Matrix4.identity();
             this.blockOverlay.vao.bind();
             gl.bindTexture(gl.TEXTURE_2D_ARRAY ,Texture.blockOverlay);
             Main.shader.loadUniforms(this.camera.getProjection(),transformation,this.camera.getView(),15);

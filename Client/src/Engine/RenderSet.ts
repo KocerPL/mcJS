@@ -1,4 +1,5 @@
 import { EBO } from "./EBO.js";
+import { Shader, dimensions } from "./Shader/Shader.js";
 import { VAO } from "./VAO.js";
 import { VBO } from "./VBO.js";
 
@@ -17,17 +18,18 @@ export class RenderSet
     blockLight:Array<number> = [];
     indices:Array<number> = [];
     count=0;
-    constructor()
+    shader:Shader;
+    constructor(shader:Shader)
     {
+        this.shader =shader;
         this.vao = new VAO();
         this.vbo = new VBO();
-      
-        this.vao.addPtr(0,3,0,0);
+        const dCount = shader.getDim()== dimensions._3d ? 3:2;
+        this.vao.addPtr(0,dCount ? 3:2,0,0);
         this.vtc = new VBO();
        
-        this.vao.addPtr(1,3,0,0);
+        this.vao.addPtr(1,dCount,0,0);
         this.vlo = new VBO();
-     
         this.vao.addPtr(2,1,0,0);
         this.vfb = new VBO();
         this.vao.addPtr(3,1,0,0);

@@ -1,6 +1,4 @@
-import { CanvaManager } from "../CanvaManager.js";
 import { Shader } from "./Shader.js";
-let gl = CanvaManager.gl;
 export class AtlasShader extends Shader {
     constructor() {
         super("./res/shaders/atlas.vert", "./res/shaders/atlas.frag");

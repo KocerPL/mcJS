@@ -1,10 +1,17 @@
 import { CanvaManager } from "../CanvaManager.js";
 import { Loader } from "../Loader.js";
 const gl = CanvaManager.gl;
-export class Shader {
+export var dimensions;
+(function (dimensions) {
+    dimensions[dimensions["_2d"] = 0] = "_2d";
+    dimensions[dimensions["_3d"] = 1] = "_3d";
+})(dimensions || (dimensions = {}));
+class Shader {
+    dimensions;
     locationCache = new Map();
     ID;
     constructor(vertFile, fragFile) {
+        this.dimensions = dimensions._3d;
         const vertCode = Loader.txtFile(vertFile);
         const fragCode = Loader.txtFile(fragFile);
         const vert = gl.createShader(gl.VERTEX_SHADER);
@@ -24,7 +31,10 @@ export class Shader {
         gl.useProgram(this.ID);
     }
     use() {
+        if (Shader.current == this)
+            return;
         gl.useProgram(this.ID);
+        Shader.current = this;
     }
     loadMatrix(name, matrix) {
         gl.uniformMatrix4fv(this.getLocation(name), false, matrix.toFloat32Array());
@@ -47,4 +57,9 @@ export class Shader {
             return loc;
         }
     }
+    getDim() {
+        return this.dimensions;
+    }
+    static current = null;
 }
+export { Shader };

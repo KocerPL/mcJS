@@ -1,14 +1,21 @@
 import { CanvaManager } from "../CanvaManager.js";
 import { Loader } from "../Loader.js";
-import { Matrix } from "../Utils/Matrix.js";
+import { Matrix4 } from "../Utils/Matrix4.js";
 import { Vector } from "../Utils/Vector.js";
 const gl = CanvaManager.gl;
+export enum dimensions 
+{
+    _2d,
+    _3d
+}
 export abstract class Shader
 {
+    protected dimensions;
     private locationCache:Map<string,WebGLUniformLocation>= new Map();
     private ID:WebGLShader;
     constructor(vertFile:string,fragFile:string)
     {
+        this.dimensions =dimensions._3d;
         const vertCode = Loader.txtFile(vertFile); 
         const fragCode = Loader.txtFile(fragFile);
         const vert = gl.createShader(gl.VERTEX_SHADER);
@@ -31,10 +38,12 @@ export abstract class Shader
     }
     use()
     {
+        if(Shader.current ==this) return;
         gl.useProgram(this.ID);
+        Shader.current = this;
     }
     abstract loadUniforms(...args:any);
-    loadMatrix(name:string,matrix:Matrix)
+    loadMatrix(name:string,matrix:Matrix4)
     {
         gl.uniformMatrix4fv(this.getLocation(name),false,matrix.toFloat32Array());
     }
@@ -61,4 +70,9 @@ export abstract class Shader
             return loc;
         }
     }
+    public getDim():dimensions
+    {
+        return this.dimensions;
+    }
+    public static current:Shader=null; 
 }

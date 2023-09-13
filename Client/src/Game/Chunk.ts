@@ -6,7 +6,7 @@ import { VBO } from "../Engine/VBO.js";
 import {  Main } from "../Main.js";
 import { Block} from "./Block.js";
 import { SubChunk } from "./SubChunk.js";
-import { Matrix } from "../Engine/Utils/Matrix.js";
+import { Matrix4 } from "../Engine/Utils/Matrix4.js";
 import { Mesh } from "./Mesh.js";
 import { World } from "./World.js";
 import { randRange } from "../Engine/Utils/Math.js";
@@ -42,7 +42,7 @@ export class Chunk {
     vfb:VBO;
     ebo:EBO;
     lightQueue:Array<Array<number>>=[];
-    transformation = Matrix.identity();
+    transformation = Matrix4.identity();
     constructor(x:number, z:number) {
         this.transformation= this.transformation.translate(x*16,0,z*16);
         this.mesh = new Mesh();

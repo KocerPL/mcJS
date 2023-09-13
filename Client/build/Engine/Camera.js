@@ -1,11 +1,10 @@
 import { CanvaManager } from "./CanvaManager.js";
-import { Matrix } from "./Utils/Matrix.js";
+import { Matrix4 } from "./Utils/Matrix4.js";
 import { Vector } from "./Utils/Vector.js";
 export class Camera {
-    projection = Matrix.projection(70, 1, 100, CanvaManager.getHeight / CanvaManager.getWidth);
-    ;
+    projection = Matrix4.projection(70, 1, 100, CanvaManager.getHeight / CanvaManager.getWidth);
     pos = new Vector(0, 10, -20);
-    view = Matrix.viewFPS(this.pos, 0, 0);
+    view = Matrix4.viewFPS(this.pos, 0, 0);
     yaw = 0;
     pitch = 0;
     fov = 70;
@@ -18,14 +17,14 @@ export class Camera {
     }
     updateProjection() {
         this.aspect = CanvaManager.getHeight / CanvaManager.getWidth;
-        this.projection = Matrix.projection(this.fov, this.near, this.far, this.aspect);
+        this.projection = Matrix4.projection(this.fov, this.near, this.far, this.aspect);
         this.projection = this.projection.rotateX(this.projRot);
         this.projection = this.projection.rotateZ(this.projRot);
         this.projection = this.projection.translate(0, 0, this.offset);
     }
     preRender() {
         this.updatePos();
-        this.view = Matrix.viewFPS(this.pos, this.yaw, this.pitch);
+        this.view = Matrix4.viewFPS(this.pos, this.yaw, this.pitch);
         this.updateProjection();
     }
     getYaw() {

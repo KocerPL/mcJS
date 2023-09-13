@@ -1,11 +1,12 @@
 import { RenderSet } from "../Engine/RenderSet.js";
-import { Matrix } from "../Engine/Utils/Matrix.js";
+import { Matrix4 } from "../Engine/Utils/Matrix4.js";
 export class Entity {
-    transformation = Matrix.identity();
+    transformation = Matrix4.identity();
     pos;
-    rs = new RenderSet();
+    rs;
     id;
-    constructor(pos, id) {
+    constructor(pos, shad, id) {
+        this.rs = new RenderSet(shad);
         this.id = id;
         this.pos = pos.copy();
     }

@@ -1,36 +1,18 @@
 import { CanvaManager } from "./Engine/CanvaManager.js";
-import { EBO } from "./Engine/EBO.js";
 import { AtlasShader } from "./Engine/Shader/AtlasShader.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Shader2d } from "./Engine/Shader/Shader2d.js";
 import { Texture } from "./Engine/Texture.js";
 import { Array3D } from "./Engine/Utils/Array3D.js";
-import { Matrix } from "./Engine/Utils/Matrix.js";
+import { Matrix4 } from "./Engine/Utils/Matrix4.js";
 import { Vector } from "./Engine/Utils/Vector.js";
-import { VAO } from "./Engine/VAO.js";
-import { VBO } from "./Engine/VBO.js";
 import { Block, blocks } from "./Game/Block.js";
 import { Chunk } from "./Game/Chunk.js";
-import { GUI } from "./Game/GUI.js";
 import { Player } from "./Game/Player.js";
 import { SubChunk } from "./Game/SubChunk.js";
 import { World } from "./Game/World.js";
 import { PlayerEntity } from "./Game/entities/PlayerEntity.js";
 const gl = CanvaManager.gl;
-export class LightNode {
-    pos;
-    subchunk;
-    light;
-    direction;
-    lpos;
-    constructor(pos, subchunk, light, direction, lightpos) {
-        this.lpos = lightpos;
-        this.pos = pos;
-        this.subchunk = subchunk;
-        this.light = light;
-        this.direction = direction;
-    }
-}
 class Main {
     static maxChunks = 128;
     static maxSubUpdates = 5;
@@ -43,7 +25,6 @@ class Main {
     static minimalStorage = [];
     static TPS = 20;
     static sunLight = 14;
-    static file = null;
     static entities = [];
     static Measure = {
         tps: 0,
@@ -62,36 +43,15 @@ class Main {
     static shader;
     static atlasShader;
     static delta = 0;
-    static crossVAO;
     static fastDelta = 0;
     static lastFastTick = 0;
-    static player = new Player(new Vector(-2, 144, -7));
+    static player;
     static range = { start: 0, end: 1 };
     //public static chunks:Array<Array<Chunk>>=new Array(8);
     static chunkQueue = [];
     static loadedChunks = [];
-    static tempChunkBuffer = [];
-    static lightQueue = [];
-    static skyLightQueue = [];
-    static skyLightRemQueue = [];
-    static lightRemQueue = [];
     static toUpdate = new Set();
     static integratedServer;
-    static crosscords = [
-        -0.02, -0.02,
-        0.02, 0.02,
-        -0.02, 0.02,
-        0.02, -0.02
-    ];
-    static crosstcords = [
-        0, 0,
-        9, 9,
-        0, 9,
-        9, 0
-    ];
-    static crossindices = [
-        0, 1, 2, 3, 1, 0
-    ];
     static heh() {
         console.log("heh");
     }
@@ -125,6 +85,12 @@ class Main {
         this.chunkQueue.push(Main.getChunkAt(ev.data.chunkX, ev.data.chunkZ));
     }
     static run() {
+        this.shader = new DefaultShader();
+        this.atlasShader = new AtlasShader();
+        console.log(this.atlasShader);
+        //shader for GUI(2d)
+        this.shader2d = new Shader2d();
+        this.player = new Player(new Vector(-2, 144, -7));
         this.socket.on("subchunk", (ev) => {
             this.handleSubchunk(ev);
         });
@@ -183,8 +149,6 @@ class Main {
         this.integratedServer.postMessage("start");
         */
         CanvaManager.setupCanva(document.body);
-        // EBO.unbind();
-        // VBO.unbind();
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LESS);
         //gl.enable(gl.CULL_FACE);
@@ -192,25 +156,6 @@ class Main {
         //Transparency requires blending 
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-        //Shader for world
-        this.shader = new DefaultShader();
-        this.atlasShader = new AtlasShader();
-        //shader for GUI(2d)
-        this.shader2d = new Shader2d();
-        //loading crosshair 
-        GUI.init();
-        this.crossVAO = new VAO();
-        const vbo = new VBO();
-        vbo.bufferData(this.crosscords);
-        this.crossVAO.addPtr(0, 2, 0, 0);
-        const vtc = new VBO();
-        vtc.bufferData(this.crosstcords);
-        this.crossVAO.addPtr(1, 2, 0, 0);
-        const ebo = new EBO();
-        ebo.bufferData(this.crossindices);
-        VAO.unbind();
-        VBO.unbind();
-        EBO.unbind();
         //init world
         World.init();
         for (let i = 0; i < this.tasks.length; i++) {
@@ -219,30 +164,7 @@ class Main {
         //loading chunks
         requestAnimationFrame(this.loop.bind(this));
     }
-    static resetMeasure(time) {
-        this.Measure.lastTime = time;
-        this.Measure.tps = this.Measure.ticks;
-        this.Measure.ticks = 0;
-        this.Measure.fps = this.Measure.frames;
-        this.Measure.frames = 0;
-    }
-    static updateSubchunks() {
-        const concatQ = new Set();
-        let i = 0;
-        for (const entry of this.toUpdate.entries()) {
-            i++;
-            if (i > this.maxSubUpdates)
-                break;
-            entry[0].update();
-            concatQ.add(entry[0].chunk);
-            this.toUpdate.delete(entry[0]);
-        }
-        concatQ.forEach((chunk) => { chunk.updateMesh(); });
-    }
-    static processChunk(chunk) {
-        chunk.prepareLight();
-        chunk.sendNeighbours();
-    }
+    ////MAIN LOOP\\\\
     static loop(time) {
         if (this.chunkQueue.length > 0)
             this.processChunk(this.chunkQueue.shift());
@@ -280,6 +202,30 @@ class Main {
         this.lastFrame = time;
         requestAnimationFrame(this.loop.bind(this));
     }
+    static resetMeasure(time) {
+        this.Measure.lastTime = time;
+        this.Measure.tps = this.Measure.ticks;
+        this.Measure.ticks = 0;
+        this.Measure.fps = this.Measure.frames;
+        this.Measure.frames = 0;
+    }
+    static updateSubchunks() {
+        const concatQ = new Set();
+        let i = 0;
+        for (const entry of this.toUpdate.entries()) {
+            i++;
+            if (i > this.maxSubUpdates)
+                break;
+            entry[0].update();
+            concatQ.add(entry[0].chunk);
+            this.toUpdate.delete(entry[0]);
+        }
+        concatQ.forEach((chunk) => { chunk.updateMesh(); });
+    }
+    static processChunk(chunk) {
+        chunk.prepareLight();
+        chunk.sendNeighbours();
+    }
     static fastUpdate() {
         for (let i = 0; i < this.entities.length; i++) {
             this.entities[i].update(i);
@@ -297,7 +243,6 @@ class Main {
         // this.count++;
         // if(this.count>this.test.indices.length)
         //this.count=3;
-        GUI.update();
         if (CanvaManager.getKeyOnce(54))
             this.maxChunks--;
         if (CanvaManager.getKeyOnce(55))
@@ -306,119 +251,6 @@ class Main {
             this.fastBreaking = !this.fastBreaking;
         if (CanvaManager.getKeyOnce(57))
             this.fly = !this.fly;
-    }
-    static async limitChunks() {
-        const x = Math.floor(Math.round(this.player.pos.x) / 16);
-        const z = Math.floor(Math.round(this.player.pos.z) / 16);
-        let step = 1;
-        let iter = 1;
-        const howMuch = this.maxChunks;
-        const loadBuffer = [];
-        this.tempChunkBuffer = [...this.loadedChunks];
-        const { chunk, isNew } = this.getORnew(x, z);
-        if (isNew)
-            chunk.preGenSubchunks();
-        loadBuffer.push(chunk);
-        const nextCoords = new Vector(x, 0, z);
-        //Spiral chunk loading algorithm
-        let stop = false;
-        while (loadBuffer.length < howMuch) {
-            //x
-            for (let i = 0; i < iter; i++) {
-                nextCoords.x += step;
-                const { chunk } = this.getORnew(nextCoords.x, nextCoords.z);
-                loadBuffer.push(chunk);
-                if (!chunk.generated) {
-                    chunk.preGenOne();
-                    stop = true;
-                    break;
-                }
-                else if (!chunk.sended) {
-                    chunk.sendNeighbours();
-                    //chunk.gatherNeighbours();
-                    chunk.sended = true;
-                    stop = true;
-                    break;
-                }
-            }
-            //z
-            if (stop)
-                break;
-            for (let i = 0; i < iter; i++) {
-                nextCoords.z += step;
-                const { chunk } = this.getORnew(nextCoords.x, nextCoords.z);
-                // stop = isNew;
-                loadBuffer.push(chunk);
-                if (!chunk.generated) {
-                    chunk.preGenOne();
-                    stop = true;
-                    break;
-                }
-                else if (!chunk.sended) {
-                    chunk.sendNeighbours();
-                    // chunk.gatherNeighbours();
-                    chunk.sended = true;
-                    stop = true;
-                    break;
-                }
-            }
-            //increase and invert step
-            if (stop)
-                break;
-            iter++;
-            step = -step;
-        }
-        this.loadedChunks = loadBuffer;
-        for (const chunk of this.tempChunkBuffer) {
-            chunk.sended = false;
-            for (let i = this.entities.length - 1; i >= 0; i--) {
-                const entity = this.entities[i];
-                if (chunk.pos.x * 16 < entity.pos.x && chunk.pos.z * 16 < entity.pos.z && chunk.pos.x * 16 > entity.pos.x - 16 && chunk.pos.z * 16 < entity.pos.z - 16)
-                    this.entities.splice(i, 1);
-            }
-        }
-        this.unloadedChunks = this.unloadedChunks.concat([...this.tempChunkBuffer]);
-    }
-    static getORnew(x, z) {
-        for (let l = 0; l < this.tempChunkBuffer.length; l++)
-            if (this.tempChunkBuffer[l].pos.x == x && this.tempChunkBuffer[l].pos.z == z) {
-                return { chunk: [...this.tempChunkBuffer.splice(l, 1)][0], isNew: false };
-            }
-        for (let l = 0; l < this.unloadedChunks.length; l++)
-            if (this.unloadedChunks[l].pos.x == x && this.unloadedChunks[l].pos.z == z) {
-                return { chunk: [...this.unloadedChunks.splice(l, 1)][0], isNew: false };
-            }
-        return { chunk: new Chunk(x, z), isNew: true };
-    }
-    static exportChunks() {
-        const k = [];
-        for (let x = 0; x < this.loadedChunks.length; x++) {
-            const chunk = this.loadedChunks[x];
-            //  console.log(chunk);
-            if (chunk == undefined)
-                continue;
-            const blocks = new Array(16);
-            for (let a = 0; a < 16; a++) {
-                if (chunk.subchunks[a] == undefined)
-                    continue;
-                const c = new Array3D(16, 16, 16);
-                for (let x1 = 0; x1 < 16; x1++)
-                    for (let y1 = 0; y1 < 16; y1++)
-                        for (let z1 = 0; z1 < 16; z1++) {
-                            if (chunk.subchunks[a].blocks[x1][y1][z1] == undefined || chunk.subchunks[a].blocks[x1][y1][z1] == null)
-                                c[x1][y1][z1] = 0;
-                            else
-                                c[x1][y1][z1] = chunk.subchunks[a].blocks[x1][y1][z1].id;
-                        }
-                blocks[a] = c;
-            }
-            k.push({
-                pos: [chunk.pos.x, chunk.pos.z],
-                blocks: blocks
-            });
-        }
-        k.push({ pPos: [this.player.pos.x, this.player.pos.y, this.player.pos.z] });
-        this.download(JSON.stringify(k), "world.json", "text/plain");
     }
     static minChunks() {
         const chunk = this.unloadedChunks.splice(0, 1)[0];
@@ -451,30 +283,6 @@ class Main {
                 return this.loadedChunks[i];
         return undefined;
     }
-    static download(content, fileName, contentType) {
-        const a = document.createElement("a");
-        const file = new Blob([content], { type: contentType });
-        a.href = URL.createObjectURL(file);
-        a.download = fileName;
-        a.click();
-    }
-    static upload() {
-        const a = document.createElement("input");
-        a.type = "file";
-        a.click();
-        a.oninput = () => {
-            //console.log(file);
-            const reader = new FileReader();
-            let ok;
-            reader.onload = (okok) => {
-                ok = okok.target.result;
-                this.file = JSON.parse(ok);
-                console.log(this.file);
-            };
-            console.log(ok);
-            //JSON.parse(file);
-        };
-    }
     static renderDebug() {
         CanvaManager.debug.innerText = "Fps: " + this.Measure.fps + " Selected block: " + blocks[this.player.itemsBar[this.player.selectedItem].id].name + " Count:" + this.player.itemsBar[this.player.selectedItem].count +
             "\n XYZ:  X:" + (Math.floor(this.player.pos.x * 100) / 100) + "  Y:" + (Math.floor(this.player.pos.y * 100) / 100) + "  Z:" + (Math.floor(this.player.pos.z * 100) / 100) + "\nFast break [8]: " + this.fastBreaking + " Fly[9]: " + this.fly + "\n Sky light [4][5]:" + this.sunLight
@@ -490,7 +298,7 @@ class Main {
         gl.clearColor(0.43 * (this.sunLight / 15), 0.69 * (this.sunLight / 15), (this.sunLight / 15), 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.blocksGridTest);
-        Main.shader.loadUniforms(Main.player.camera.getProjection(), Matrix.identity(), Main.player.camera.getView(), Main.sunLight);
+        Main.shader.loadUniforms(Main.player.camera.getProjection(), Matrix4.identity(), Main.player.camera.getView(), Main.sunLight);
         for (const chunk of this.loadedChunks) {
             chunk.render();
         }
@@ -499,7 +307,6 @@ class Main {
         }
         //render crosshair
         this.player.render();
-        GUI.render(this.shader2d);
     }
 }
 export { Main };

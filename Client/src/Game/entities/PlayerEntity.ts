@@ -1,6 +1,6 @@
 import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { Texture } from "../../Engine/Texture.js";
-import { Matrix } from "../../Engine/Utils/Matrix.js";
+import { Matrix4 } from "../../Engine/Utils/Matrix4.js";
 import { Vector } from "../../Engine/Utils/Vector.js";
 import { Main } from "../../Main.js";
 import { Entity } from "../Entity.js";
@@ -16,7 +16,7 @@ export class PlayerEntity extends Entity
     
     constructor(pos:Vector,id?)
     {
-        super(pos,id);
+        super(pos,Main.atlasShader,id);
         this.rotation=new Vector(0,0,0);
         this.bodyRot =0;
         this.rs.resetArrays();
@@ -293,7 +293,7 @@ export class PlayerEntity extends Entity
             this.pos=nTransition.pos;
             this.rotation=nTransition.rot;
         }
-        let transformation = Matrix.identity();
+        let transformation = Matrix4.identity();
         if(this.bodyRot-this.rotation.y>45)
             this.bodyRot = this.rotation.y+45;
         if(this.bodyRot-this.rotation.y<-45)
@@ -309,16 +309,16 @@ export class PlayerEntity extends Entity
         Main.atlasShader.use();
         Main.atlasShader.loadUniforms(Main.player.camera.getProjection(),transformation,Main.player.camera.getView(),15);
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,0);
-        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.05,this.pos.z).scale(bScale ,bScale ,bScale ).rotateY(this.bodyRot));
+        Main.atlasShader.loadTransformation( Matrix4.identity().translate(this.pos.x,this.pos.y+0.05,this.pos.z).scale(bScale ,bScale ,bScale ).rotateY(this.bodyRot));
         //Body
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,36*4);
-        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y-0.30,this.pos.z).rotateY(this.bodyRot).rotateX(this.rotation.z).translate(-0.125,-0.35,0).scale(bScale ,bScale ,bScale ));
+        Main.atlasShader.loadTransformation( Matrix4.identity().translate(this.pos.x,this.pos.y-0.30,this.pos.z).rotateY(this.bodyRot).rotateX(this.rotation.z).translate(-0.125,-0.35,0).scale(bScale ,bScale ,bScale ));
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,72*4);
-        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y-0.30,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).translate(0.125,-0.35,0).scale(bScale ,bScale ,bScale ));
+        Main.atlasShader.loadTransformation( Matrix4.identity().translate(this.pos.x,this.pos.y-0.30,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).translate(0.125,-0.35,0).scale(bScale ,bScale ,bScale ));
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,108*4);
-        Main.atlasShader.loadTransformation( Matrix.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(this.rotation.z).rotateZ(5).translate(0.375,-0.35,0).scale(bScale ,bScale ,bScale ));
+        Main.atlasShader.loadTransformation( Matrix4.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(this.rotation.z).rotateZ(5).translate(0.375,-0.35,0).scale(bScale ,bScale ,bScale ));
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,144*4);
-        const mat = Matrix.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.35,0).scale(bScale ,bScale ,bScale );
+        const mat = Matrix4.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.35,0).scale(bScale ,bScale ,bScale );
         Main.atlasShader.loadTransformation(mat);
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,180*4);
         this.renderHandItem();
@@ -327,7 +327,7 @@ export class PlayerEntity extends Entity
     renderHandItem()
     {
         const bScale = 0.5;
-        const mat = Matrix.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.35,0).scale(bScale ,bScale ,bScale );
+        const mat = Matrix4.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.35,0).scale(bScale ,bScale ,bScale );
         this.rsHammer.vao.bind();
         gl.bindTexture(gl.TEXTURE_2D,Texture.hammer);
         Main.atlasShader.loadTransformation( mat.translate(0.0,-0.3,1).rotateX(90).rotateY(90).scale(0.2,0.2,0.2));

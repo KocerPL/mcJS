@@ -2,7 +2,7 @@ import { Model, rot2d } from "../Game/Models.js";
 import { CanvaManager } from "./CanvaManager.js";
 import { RenderSet } from "./RenderSet.js";
 import { Vector } from "./Utils/Vector.js";
-
+import {Main} from "../Main.js";
 const gl = CanvaManager.gl;
 export class Loader
 {
@@ -57,7 +57,7 @@ export class Loader
             const testCanv = document.createElement("canvas");
             testCanv.width=img.width;
             testCanv.height=img.height;
-            const ctx =testCanv.getContext("2d");
+            const ctx =testCanv.getContext("2d",{willReadFrequently:true});
             ctx.clearRect(0,0,img.width,img.height);
             ctx.drawImage(img,0,0,img.width,img.height);
             // 
@@ -109,7 +109,7 @@ export class Loader
             const testCanv = document.createElement("canvas");
             testCanv.width=img.width;
             testCanv.height=img.height;
-            const ctx =testCanv.getContext("2d");
+            const ctx =testCanv.getContext("2d",{willReadFrequently:true});
             ctx.clearRect(0,0,img.width,img.height);
             ctx.drawImage(img,0,0,img.width,img.height);
             gl.bindTexture(gl.TEXTURE_2D_ARRAY,texture);  
@@ -193,7 +193,7 @@ export class Loader
     public static loadObj(path:string):RenderSet
     {
         const text =  this.txtFile(path);
-        const rs:RenderSet = new RenderSet();
+        const rs:RenderSet = new RenderSet(Main.atlasShader);
         const textureCoords:Array<number> = [];
         let i=0;
         while(i<text.length)
