@@ -107,7 +107,7 @@ export class Loader {
             gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            //   gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+            gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
             console.log("loaded json");
         };
         if (img.complete) {

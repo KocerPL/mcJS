@@ -1,14 +1,12 @@
-import { Matrix4 } from "../../Engine/Utils/Matrix4.js";
+import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 
 
 export interface GuiComponent
 {
     visible:boolean;
     changed:boolean;
-    transformation:Matrix4;
+    transformation:Matrix3;
     vertices:Array<number>;
     textureCoords:Array<number>;
-    skyLight:Array<number>;
-    blockLight:Array<number>;
     indices:Array<number>;
 }

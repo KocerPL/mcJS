@@ -19,6 +19,7 @@ import { Player } from "./Game/Player.js";
 import { SubChunk } from "./Game/SubChunk.js";
 import { World } from "./Game/World.js";
 import { PlayerEntity } from "./Game/entities/PlayerEntity.js";
+import { Inventory } from "./Game/gui/Inventory.js";
 const gl = CanvaManager.gl;
 declare const io;
 export class Main
@@ -35,6 +36,7 @@ export class Main
     public static TPS=20;
     public static sunLight=14;
     public static entities:Array<Entity> = [];
+    public static gui:GUI;
     public static Measure = {
         tps:0,
         fps:0,
@@ -105,6 +107,8 @@ export class Main
         console.log(this.atlasShader);
         //shader for GUI(2d)
         this.shader2d = new Shader2d();
+        this.gui = new GUI(this.shader2d);
+        this.gui.add(new Inventory())
         this.player = new Player(new Vector(-2,144,-7));
         this.socket.on("subchunk",(ev)=>{
              
@@ -360,6 +364,7 @@ export class Main
         }
         //render crosshair
         this.player.render();
+        this.gui.render();
     }
 }
 Main.run();

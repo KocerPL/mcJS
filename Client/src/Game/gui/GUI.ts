@@ -8,10 +8,8 @@ export class GUI
 {
     components:GuiComponent[]=[];
     renderSet:RenderSet;
-    shader:Shader2d;
     constructor(shader:Shader2d)
     {
-        this.shader= shader;
         this.renderSet=new RenderSet(shader);
     }
     render()
@@ -21,7 +19,10 @@ export class GUI
             if(comp.visible && comp.changed)
                 this.refresh();
         }
-        this.shader.use();
+        this.renderSet.shader.use();
+        this.renderSet.vao.bind();
+        gl.drawElements(gl.TRIANGLES,this.renderSet.count,gl.UNSIGNED_INT,0);
+        console.log("Rendering");
     }
     add(component:GuiComponent)
     {
@@ -29,6 +30,7 @@ export class GUI
     }
     refresh()
     {
+        this.renderSet.resetArrays();
         for(const comp of this.components)
         {
             comp.changed=false;
@@ -37,5 +39,6 @@ export class GUI
             this.renderSet.indices.push(...comp.indices);
             this.renderSet.textureCoords.push(...comp.textureCoords);
         }
+        this.renderSet.bufferArrays();
     }
 }

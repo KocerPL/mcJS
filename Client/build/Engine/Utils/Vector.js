@@ -25,7 +25,7 @@ export class Vector {
         return new Vector(Math.round(this.x), Math.round(this.y), Math.round(this.z));
     }
     mult(scalar) {
-        return new Vector(this.x * scalar, this.y * scalar, this.z * scalar);
+        return new Vector(this.x * scalar, this.y * scalar, this.z * scalar, this.w * scalar);
     }
     modulo(mod, mask) {
         mask ??= { x: 1, y: 1, z: 1 };

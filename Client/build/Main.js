@@ -8,10 +8,12 @@ import { Matrix4 } from "./Engine/Utils/Matrix4.js";
 import { Vector } from "./Engine/Utils/Vector.js";
 import { Block, blocks } from "./Game/Block.js";
 import { Chunk } from "./Game/Chunk.js";
+import { GUI } from "./Game/gui/GUI.js";
 import { Player } from "./Game/Player.js";
 import { SubChunk } from "./Game/SubChunk.js";
 import { World } from "./Game/World.js";
 import { PlayerEntity } from "./Game/entities/PlayerEntity.js";
+import { Inventory } from "./Game/gui/Inventory.js";
 const gl = CanvaManager.gl;
 class Main {
     static maxChunks = 128;
@@ -26,6 +28,7 @@ class Main {
     static TPS = 20;
     static sunLight = 14;
     static entities = [];
+    static gui;
     static Measure = {
         tps: 0,
         fps: 0,
@@ -90,6 +93,8 @@ class Main {
         console.log(this.atlasShader);
         //shader for GUI(2d)
         this.shader2d = new Shader2d();
+        this.gui = new GUI(this.shader2d);
+        this.gui.add(new Inventory());
         this.player = new Player(new Vector(-2, 144, -7));
         this.socket.on("subchunk", (ev) => {
             this.handleSubchunk(ev);
@@ -307,6 +312,7 @@ class Main {
         }
         //render crosshair
         this.player.render();
+        this.gui.render();
     }
 }
 export { Main };

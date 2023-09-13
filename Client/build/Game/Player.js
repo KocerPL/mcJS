@@ -294,7 +294,7 @@ class Player {
         */
         }
         catch (error) {
-            console.log("Update pos error", error);
+            // console.log("Update pos error",error);
         }
         if (Math.abs(this.entity.rotation.z) > 45)
             this.legChange = -this.legChange;

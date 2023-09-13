@@ -35,7 +35,7 @@ export class Vector
     }
     mult(scalar)
     {
-        return new Vector(this.x*scalar,this.y*scalar,this.z*scalar); 
+        return new Vector(this.x*scalar,this.y*scalar,this.z*scalar,this.w*scalar); 
     }
     modulo(mod:number,mask?:{x:bool,y:bool,z:bool})
     {

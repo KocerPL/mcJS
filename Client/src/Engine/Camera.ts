@@ -25,7 +25,6 @@ export class Camera
     }
     public preRender()
     {
-        this.updatePos();
         this.view = Matrix4.viewFPS(this.pos,this.yaw,this.pitch);
         this.updateProjection();
     }

@@ -13,8 +13,6 @@ export class Camera {
     aspect = CanvaManager.getHeight / CanvaManager.getWidth;
     offset = 0;
     projRot = 0;
-    constructor() {
-    }
     updateProjection() {
         this.aspect = CanvaManager.getHeight / CanvaManager.getWidth;
         this.projection = Matrix4.projection(this.fov, this.near, this.far, this.aspect);
@@ -23,7 +21,6 @@ export class Camera {
         this.projection = this.projection.translate(0, 0, this.offset);
     }
     preRender() {
-        this.updatePos();
         this.view = Matrix4.viewFPS(this.pos, this.yaw, this.pitch);
         this.updateProjection();
     }
@@ -50,7 +47,5 @@ export class Camera {
     }
     getProjection() {
         return this.projection;
-    }
-    updatePos() {
     }
 }

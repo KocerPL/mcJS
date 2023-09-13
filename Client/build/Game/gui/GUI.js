@@ -4,9 +4,7 @@ const gl = CanvaManager.gl;
 export class GUI {
     components = [];
     renderSet;
-    shader;
     constructor(shader) {
-        this.shader = shader;
         this.renderSet = new RenderSet(shader);
     }
     render() {
@@ -14,12 +12,16 @@ export class GUI {
             if (comp.visible && comp.changed)
                 this.refresh();
         }
-        this.shader.use();
+        this.renderSet.shader.use();
+        this.renderSet.vao.bind();
+        gl.drawElements(gl.TRIANGLES, this.renderSet.count, gl.UNSIGNED_INT, 0);
+        console.log("Rendering");
     }
     add(component) {
         this.components.push(component);
     }
     refresh() {
+        this.renderSet.resetArrays();
         for (const comp of this.components) {
             comp.changed = false;
             if (!comp.visible)
@@ -28,5 +30,6 @@ export class GUI {
             this.renderSet.indices.push(...comp.indices);
             this.renderSet.textureCoords.push(...comp.textureCoords);
         }
+        this.renderSet.bufferArrays();
     }
 }

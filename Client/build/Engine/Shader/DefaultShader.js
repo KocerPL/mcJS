@@ -1,7 +1,5 @@
-import { CanvaManager } from "../CanvaManager.js";
 import { Vector } from "../Utils/Vector.js";
 import { Shader } from "./Shader.js";
-let gl = CanvaManager.gl;
 export class DefaultShader extends Shader {
     viewCenter = new Vector(0, 0, 0);
     fogDistance = 90;
