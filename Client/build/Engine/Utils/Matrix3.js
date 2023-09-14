@@ -38,11 +38,11 @@ export class Matrix3 {
         transl._data[5] = y;
         return this.multiplyMat(transl);
     }
-    scale(x, y, z) {
+    scale(x, y) {
         const scale = new Matrix3;
         scale._data = [x, 0, 0,
             0, y, 0,
-            0, 0, z];
+            0, 0, 1];
         return this.multiplyMat(scale);
     }
     dot(a1, a2, a3, b1, b2, b3) {

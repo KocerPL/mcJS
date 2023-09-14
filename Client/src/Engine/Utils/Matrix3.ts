@@ -47,12 +47,12 @@ export class Matrix3
             transl._data[5]=y;
             return this.multiplyMat(transl);
     }
-    public scale(x,y,z)
+    public scale(x,y)
     {
         const scale = new Matrix3;
         scale._data =[x,0,0,
             0,y,0
-            ,0,0,z];
+            ,0,0,1];
         return this.multiplyMat(scale);
     }
     private dot(a1:number,a2:number,a3:number,b1:number,b2:number,b3:number)

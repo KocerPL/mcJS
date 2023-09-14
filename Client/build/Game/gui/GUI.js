@@ -29,15 +29,15 @@ export class GUI {
             comp.changed = false;
             if (!comp.getVisible)
                 continue;
-            this.renderSet.vertices.push(...comp.vertices);
+            this.renderSet.vertices.push(...comp.rArrays.vertices);
             let highest = 0;
-            for (let i = 0; i < comp.indices.length; i++) {
-                if (comp.indices[i] + index > highest)
-                    highest = comp.indices[i] + index;
-                this.renderSet.indices.push(comp.indices[i] + index);
+            for (let i = 0; i < comp.rArrays.indices.length; i++) {
+                if (comp.rArrays.indices[i] + index > highest)
+                    highest = comp.rArrays.indices[i] + index;
+                this.renderSet.indices.push(comp.rArrays.indices[i] + index);
             }
             index = highest + 1;
-            this.renderSet.textureCoords.push(...comp.textureCoords);
+            this.renderSet.textureCoords.push(...comp.rArrays.textureCoords);
         }
         console.log(this.renderSet.indices);
         console.log(this.renderSet.vertices);

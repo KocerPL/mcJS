@@ -1,23 +1,18 @@
 import { EBO } from "./EBO.js";
+import { RenderArrays } from "./RenderArrays.js";
 import { dimensions } from "./Shader/Shader.js";
 import { VAO } from "./VAO.js";
 import { VBO } from "./VBO.js";
-export class RenderSet {
+export class RenderSet extends RenderArrays {
     vao;
     vbo;
     vtc;
     vlo;
     ebo;
     vfb;
-    index = 0;
-    vertices = [];
-    textureCoords = [];
-    skyLight = [];
-    blockLight = [];
-    indices = [];
-    count = 0;
     shader;
     constructor(shader) {
+        super();
         this.shader = shader;
         this.vao = new VAO();
         this.vbo = new VBO();

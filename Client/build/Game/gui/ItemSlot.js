@@ -1,26 +1,18 @@
+import { GuiComponent } from "./GuiComponent.js";
 import { Texture } from "../../Engine/Texture.js";
 import { BoundingBox } from "../../Engine/Utils/BoundingBox.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { Vector3 } from "../../Engine/Utils/Vector3.js";
-import { GuiComponent } from "./GuiComponent.js";
-export class Inventory extends GuiComponent {
-    constructor() {
+export class ItemSlot extends GuiComponent {
+    constructor(x, y) {
         super();
-        this.boundingBox = new BoundingBox(-0.02, -0.02, 0.02, 0.02);
         this.visible = true;
-        this.transformation = Matrix3.identity();
-        let coords = Texture.GUI.coords;
-        this.rArrays.textureCoords = [
-            coords[0].dx, coords[0].y,
-            coords[0].x, coords[0].dy,
-            coords[0].dx, coords[0].dy,
-            coords[0].x, coords[0].y
-        ];
-        this.rArrays.indices = [0, 1, 2, 1, 0, 3];
+        this.boundingBox = new BoundingBox(-0.05, -0.05, 0.05, 0.05);
+        this.transformation = Matrix3.identity().translate(x, y);
         this.update();
     }
     update() {
-        let set = this.boundingBox.getRenderStuff(Texture.GUI.coords[0]);
+        let set = this.boundingBox.getRenderStuff(Texture.GUI.coords[1]);
         this.rArrays.vertices = [];
         this.rArrays.indices = set.indices;
         this.rArrays.textureCoords = set.textureCoords;
