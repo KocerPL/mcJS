@@ -14,6 +14,7 @@ import { SubChunk } from "./Game/SubChunk.js";
 import { World } from "./Game/World.js";
 import { PlayerEntity } from "./Game/entities/PlayerEntity.js";
 import { Inventory } from "./Game/gui/Inventory.js";
+import { ItemBar } from "./Game/gui/ItemBar.js";
 const gl = CanvaManager.gl;
 class Main {
     static maxChunks = 128;
@@ -48,6 +49,7 @@ class Main {
     static delta = 0;
     static fastDelta = 0;
     static lastFastTick = 0;
+    static inv;
     static player;
     static range = { start: 0, end: 1 };
     //public static chunks:Array<Array<Chunk>>=new Array(8);
@@ -94,7 +96,9 @@ class Main {
         //shader for GUI(2d)
         this.shader2d = new Shader2d();
         this.gui = new GUI(this.shader2d);
-        this.gui.add(new Inventory());
+        this.inv = new Inventory();
+        this.gui.add(this.inv);
+        this.gui.add(new ItemBar());
         this.player = new Player(new Vector(-2, 144, -7));
         this.socket.on("subchunk", (ev) => {
             this.handleSubchunk(ev);
@@ -114,6 +118,9 @@ class Main {
             this.player.id = id;
             const pos = JSON.parse(posStr);
             this.player.pos = new Vector(pos.x, pos.y, pos.z);
+        });
+        this.socket.io.on("reconnect", () => {
+            location.reload();
         });
         this.socket.on("placeBlock", (data) => {
             if (data.id != 0)
@@ -238,6 +245,11 @@ class Main {
         this.player.update();
     }
     static update() {
+        if (CanvaManager.getKeyOnce(86)) {
+            this.inv.setVisible = !this.inv.getVisible;
+            console.log("VVVVV");
+        }
+        ;
         if (CanvaManager.getKeyOnce(71))
             console.log(World.getSubchunk(this.player.pos));
         if (CanvaManager.getKey(52) && this.sunLight < 16)

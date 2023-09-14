@@ -1,5 +1,6 @@
 import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { RenderSet } from "../../Engine/RenderSet.js";
+import { Texture } from "../../Engine/Texture.js";
 const gl = CanvaManager.gl;
 export class GUI {
     components = [];
@@ -9,27 +10,39 @@ export class GUI {
     }
     render() {
         for (const comp of this.components) {
-            if (comp.visible && comp.changed)
+            if (comp.changed)
                 this.refresh();
         }
+        Texture.GUI.bind();
         this.renderSet.shader.use();
         this.renderSet.vao.bind();
+        this.renderSet.shader.loadUniforms(CanvaManager.getProportion);
         gl.drawElements(gl.TRIANGLES, this.renderSet.count, gl.UNSIGNED_INT, 0);
-        console.log("Rendering");
     }
     add(component) {
         this.components.push(component);
     }
     refresh() {
+        let index = 0;
         this.renderSet.resetArrays();
         for (const comp of this.components) {
             comp.changed = false;
-            if (!comp.visible)
+            if (!comp.getVisible)
                 continue;
             this.renderSet.vertices.push(...comp.vertices);
-            this.renderSet.indices.push(...comp.indices);
+            let highest = 0;
+            for (let i = 0; i < comp.indices.length; i++) {
+                if (comp.indices[i] + index > highest)
+                    highest = comp.indices[i] + index;
+                this.renderSet.indices.push(comp.indices[i] + index);
+            }
+            index = highest + 1;
             this.renderSet.textureCoords.push(...comp.textureCoords);
         }
+        console.log(this.renderSet.indices);
+        console.log(this.renderSet.vertices);
+        console.log(this.renderSet.textureCoords);
         this.renderSet.bufferArrays();
+        console.log(this.renderSet.count);
     }
 }

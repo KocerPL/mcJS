@@ -39,6 +39,22 @@ export class Matrix3
         outVec = col1.add(col2).add(col3);
         return outVec;
     }
+    public translate(x,y)
+    {
+        
+            const transl = Matrix3.identity();
+            transl._data[2] = x;
+            transl._data[5]=y;
+            return this.multiplyMat(transl);
+    }
+    public scale(x,y,z)
+    {
+        const scale = new Matrix3;
+        scale._data =[x,0,0,
+            0,y,0
+            ,0,0,z];
+        return this.multiplyMat(scale);
+    }
     private dot(a1:number,a2:number,a3:number,b1:number,b2:number,b3:number)
     {
         return (a1*b1)+(a2*b2)+(a3*b3);

@@ -25,7 +25,7 @@ export class RenderSet
         this.vao = new VAO();
         this.vbo = new VBO();
         const dCount = shader.getDim()== dimensions._3d ? 3:2;
-        this.vao.addPtr(0,dCount ? 3:2,0,0);
+        this.vao.addPtr(0,dCount,0,0);
         this.vtc = new VBO();
        
         this.vao.addPtr(1,dCount,0,0);

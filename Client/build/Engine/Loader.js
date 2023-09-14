@@ -222,6 +222,12 @@ export class Loader {
         rs.bufferArrays();
         return rs;
     }
+    static json(path) {
+        const req = new XMLHttpRequest;
+        req.open("GET", path, false);
+        req.send(null);
+        return JSON.parse(req.responseText);
+    }
 }
 export class Texture2 {
     x;

@@ -220,6 +220,7 @@ class Player {
         let speed = 1;
         try {
             if (!this.locked) {
+                let yRot = -this.entity.bodyRot;
                 if (CanvaManager.getKeyOnce(81)) {
                     Main.entities.push(new Item(this.camera.getPosition().copy(), this.itemsBar[this.selectedItem].id));
                     this.itemsBar[this.selectedItem].count--;
@@ -229,20 +230,24 @@ class Player {
                 if (CanvaManager.getKey(16))
                     speed = 2;
                 if (CanvaManager.getKey(87)) {
-                    tempPos.x += Math.sin(this.camera.getYaw() * Math.PI / 180) * 0.1 * speed;
-                    tempPos.z += Math.cos(this.camera.getYaw() * Math.PI / 180) * 0.1 * speed;
+                    this.entity.bodyRot = this.entity.rotation.y;
+                    yRot = -this.entity.bodyRot;
+                    tempPos.x += Math.sin(yRot * Math.PI / 180) * 0.1 * speed;
+                    tempPos.z += Math.cos(yRot * Math.PI / 180) * 0.1 * speed;
                 }
                 else if (CanvaManager.getKey(83)) {
-                    tempPos.x -= Math.sin(this.camera.getYaw() * Math.PI / 180) * 0.1;
-                    tempPos.z -= Math.cos(this.camera.getYaw() * Math.PI / 180) * 0.1;
+                    this.entity.bodyRot = this.entity.rotation.y;
+                    yRot = -this.entity.bodyRot;
+                    tempPos.x -= Math.sin(yRot * Math.PI / 180) * 0.1;
+                    tempPos.z -= Math.cos(yRot * Math.PI / 180) * 0.1;
                 }
                 if (CanvaManager.getKey(68)) {
-                    tempPos.x += Math.sin((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
-                    tempPos.z += Math.cos((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
+                    tempPos.x += Math.sin((yRot + 90) * Math.PI / 180) * 0.1;
+                    tempPos.z += Math.cos((yRot + 90) * Math.PI / 180) * 0.1;
                 }
                 else if (CanvaManager.getKey(65)) {
-                    tempPos.x -= Math.sin((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
-                    tempPos.z -= Math.cos((this.camera.getYaw() + 90) * Math.PI / 180) * 0.1;
+                    tempPos.x -= Math.sin((yRot + 90) * Math.PI / 180) * 0.1;
+                    tempPos.z -= Math.cos((yRot + 90) * Math.PI / 180) * 0.1;
                 }
             }
             if (World.getBlock(new Vector(tempPos.x, tempPos.y - 1, tempPos.z)).id <= 0)
@@ -439,6 +444,7 @@ class Player {
         if (this.blockBreakingTime > 1) {
             const transformation = Matrix4.identity();
             this.blockOverlay.vao.bind();
+            Main.shader.use();
             gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.blockOverlay);
             Main.shader.loadUniforms(this.camera.getProjection(), transformation, this.camera.getView(), 15);
             gl.drawElements(gl.TRIANGLES, this.blockOverlay.count, gl.UNSIGNED_INT, 0);

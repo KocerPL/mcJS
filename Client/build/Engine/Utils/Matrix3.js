@@ -32,6 +32,19 @@ export class Matrix3 {
         outVec = col1.add(col2).add(col3);
         return outVec;
     }
+    translate(x, y) {
+        const transl = Matrix3.identity();
+        transl._data[2] = x;
+        transl._data[5] = y;
+        return this.multiplyMat(transl);
+    }
+    scale(x, y, z) {
+        const scale = new Matrix3;
+        scale._data = [x, 0, 0,
+            0, y, 0,
+            0, 0, z];
+        return this.multiplyMat(scale);
+    }
     dot(a1, a2, a3, b1, b2, b3) {
         return (a1 * b1) + (a2 * b2) + (a3 * b3);
     }

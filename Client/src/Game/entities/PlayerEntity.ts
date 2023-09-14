@@ -323,7 +323,7 @@ export class PlayerEntity extends Entity
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,108*4);
         Main.atlasShader.loadTransformation( Matrix4.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(this.rotation.z).rotateZ(5).translate(0.375,-0.35,0).scale(bScale ,bScale ,bScale ));
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,144*4);
-        const mat = Matrix4.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.rotation.y).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.35,0).scale(bScale ,bScale ,bScale );
+        const mat = Matrix4.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.35,0).scale(bScale ,bScale ,bScale );
         Main.atlasShader.loadTransformation(mat);
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,180*4);
         this.renderHandItem();
@@ -334,7 +334,7 @@ export class PlayerEntity extends Entity
         this.updatePos();
         const bScale = 0.1;
         Main.atlasShader.use();
-        const mat = Matrix4.identity().translate(this.pos.x,this.pos.y+0.45,this.pos.z).rotateY(this.rotation.y).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.55,0.5).rotateY(90).rotateZ(-90).scale(bScale ,bScale ,bScale );
+        const mat = Matrix4.identity().translate(this.pos.x,this.pos.y+0.45,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.55,0.5).rotateY(90).rotateZ(-90).scale(bScale ,bScale ,bScale );
         this.rsHammer.vao.bind();
         gl.bindTexture(gl.TEXTURE_2D,Texture.hammer);
         Main.atlasShader.loadUniforms(Main.player.camera.getProjection(),mat,Main.player.camera.getView(),15);

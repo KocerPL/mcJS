@@ -7,9 +7,8 @@ export class Shader2d extends Shader
         super("./res/shaders/2d.vert","./res/shaders/2d.frag");
         this.dimensions = dimensions._2d;
     }
-    loadUniforms(prop,mult:number) {
+    loadUniforms(prop:number) {
         this.loadFloat("prop",prop);
-        this.loadFloat("mult",mult);
         return;
     }
 }

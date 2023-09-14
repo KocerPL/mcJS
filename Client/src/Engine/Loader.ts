@@ -277,6 +277,15 @@ export class Loader
         rs.bufferArrays();
         return rs;
     }
+   public static json(path:string)
+    {
+        
+        const req = new  XMLHttpRequest;
+        req.open("GET", path, false);
+        req.send(null);
+        return JSON.parse(req.responseText);
+        
+    }
 }
 export class Texture2
 {
