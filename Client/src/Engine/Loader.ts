@@ -129,7 +129,7 @@ export class Loader
             gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D_ARRAY,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-             gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+            gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
             console.log("loaded json");
            
         };
@@ -158,10 +158,10 @@ export class Loader
         for(let x=0; x<json.length; x++)
         {
             coords.push({
-                x:json[x].pos[0]/imgSizeX,
-                y:json[x].pos[1]/imgSizeY,
-                dx:(json[x].pos[0] +json[x].size[0])/imgSizeX,
-                dy:(json[x].pos[1] +json[x].size[1])/imgSizeY,
+                x:(json[x].pos[0]+0.1)/imgSizeX,
+                y:(json[x].pos[1]+0.1)/imgSizeY,
+                dx:((json[x].pos[0] +json[x].size[0])-0.1)/imgSizeX,
+                dy:((json[x].pos[1] +json[x].size[1])-0.1)/imgSizeY,
                 rotation:json[x].rotation
             });
             
@@ -277,7 +277,7 @@ export class Loader
         rs.bufferArrays();
         return rs;
     }
-   public static json(path:string)
+    public static json(path:string)
     {
         
         const req = new  XMLHttpRequest;

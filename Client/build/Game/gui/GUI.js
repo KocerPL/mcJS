@@ -45,4 +45,14 @@ export class GUI {
         this.renderSet.bufferArrays();
         console.log(this.renderSet.count);
     }
+    get(id) {
+        for (const comp of this.components)
+            if (comp.id == id)
+                return comp;
+            else {
+                const test = comp.get(id);
+                if (test)
+                    return test;
+            }
+    }
 }

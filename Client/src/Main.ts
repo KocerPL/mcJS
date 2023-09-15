@@ -110,10 +110,10 @@ export class Main
         //shader for GUI(2d)
         this.shader2d = new Shader2d();
         this.gui = new GUI(this.shader2d);
-        this.inv = new Inventory();
+        this.inv = new Inventory("Inventory");
        
         this.gui.add(this.inv);
-        this.gui.add(new ItemBar());
+        this.gui.add(new ItemBar("ItemBar"));
         this.player = new Player(new Vector(-2,144,-7));
         this.socket.on("subchunk",(ev)=>{
              
@@ -283,7 +283,7 @@ export class Main
     }
     public static update()
     {
-        if(CanvaManager.getKeyOnce(86)) {this.inv.setVisible =!this.inv.getVisible; console.log("VVVVV")};
+        if(CanvaManager.getKeyOnce(86)) {this.inv.setVisible =!this.inv.getVisible; console.log("VVVVV");}
         if(CanvaManager.getKeyOnce(71)) 
             console.log(World.getSubchunk(this.player.pos));
         if(CanvaManager.getKey(52)&&this.sunLight<16)

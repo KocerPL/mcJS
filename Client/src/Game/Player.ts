@@ -2,13 +2,14 @@ import { Camera } from "../Engine/Camera.js";
 import { CanvaManager } from "../Engine/CanvaManager.js";
 import { RenderSet } from "../Engine/RenderSet.js";
 import { Texture } from "../Engine/Texture.js";
-import { randRange } from "../Engine/Utils/Math.js";
+import { clamp, randRange } from "../Engine/Utils/Math.js";
 import { Matrix4 } from "../Engine/Utils/Matrix4.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { Main } from "../Main.js";
 import { Block, blocks } from "./Block.js";
 import { Item } from "./entities/Item.js";
 import { PlayerEntity } from "./entities/PlayerEntity.js";
+import { ItemBar } from "./gui/ItemBar.js";
 import { World } from "./World.js";
 const gl = CanvaManager.gl;
 export type pers = "First" | "Second" |"Third";
@@ -44,6 +45,7 @@ export class Player
     legChange= 6;
     mainAcc=0.1;
     lastTime=0;
+    lastScroll=0;
     static blVertices =[
     //przód
         -0.501,-0.501,-0.501,
@@ -86,6 +88,7 @@ export class Player
     };
     constructor(pos:Vector)
     {
+      
         this.blockOverlay = new RenderSet(Main.atlasShader);
         this.pos = pos;
         this.entity = new PlayerEntity(this.pos);
@@ -108,6 +111,25 @@ export class Player
     }
     update()
     {
+        if(this.lastScroll!=CanvaManager.scrollAmount)
+        {
+            if(Math.abs(this.lastScroll - CanvaManager.scrollAmount)>1) 
+            {
+            const ib =   Main.gui.get("ItemBar");
+            
+            if(ib instanceof ItemBar)
+            {
+                if(CanvaManager.scrollAmount> this.lastScroll)
+                    ib.currentSlot ++;
+                else
+                    ib.currentSlot--;
+                ib.currentSlot = clamp(ib.currentSlot,0,8);
+                ib.updateSlot();
+                ib.updateComponents();
+            }
+            this.lastScroll = CanvaManager.scrollAmount;
+            }
+        }
         if(this.targetedBlock instanceof Block)
         {
             let vertices =[];
@@ -357,7 +379,7 @@ export class Player
            
         } catch(error)
         {
-           // console.log("Update pos error",error);
+        // console.log("Update pos error",error);
         }
         if(Math.abs(this.entity.rotation.z)>45)
             this.legChange= -this.legChange;

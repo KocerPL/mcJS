@@ -44,7 +44,7 @@ export class GUI
             for(let i=0;i<comp.rArrays.indices.length;i++)
             {
                 if(comp.rArrays.indices[i]+index>highest) highest = comp.rArrays.indices[i]+index;
-            this.renderSet.indices.push(comp.rArrays.indices[i]+index);
+                this.renderSet.indices.push(comp.rArrays.indices[i]+index);
             }
             index = highest+1;
             this.renderSet.textureCoords.push(...comp.rArrays.textureCoords);
@@ -54,5 +54,15 @@ export class GUI
         console.log(this.renderSet.textureCoords);
         this.renderSet.bufferArrays();
         console.log(this.renderSet.count);
+    }
+    get(id:string):GuiComponent|null
+    {
+        for(const comp of this.components)
+            if(comp.id==id) return comp; else 
+            {
+                const test = comp.get(id);
+                if(test)
+                    return test;
+            }
     }
 }
