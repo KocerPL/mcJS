@@ -59,4 +59,7 @@ export class Matrix3
     {
         return (a1*b1)+(a2*b2)+(a3*b3);
     }
+    public toFloat32Array(): Float32Array {
+        return new Float32Array( this._data );
+    }
 }

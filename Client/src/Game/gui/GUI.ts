@@ -3,6 +3,7 @@ import { Texture2 } from "../../Engine/Loader.js";
 import { RenderSet } from "../../Engine/RenderSet.js";
 import { Shader2d } from "../../Engine/Shader/Shader2d.js";
 import { Texture } from "../../Engine/Texture.js";
+import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { GuiComponent } from "./GuiComponent.js";
 const gl =CanvaManager.gl;
 
@@ -16,20 +17,21 @@ export class GUI
     }
     render()
     {
-        for(const comp of this.components)
-        {
-            if( comp.changed)
-                this.refresh();
-        }
         Texture.GUI.bind();
         this.renderSet.shader.use();
         this.renderSet.vao.bind();
-        this.renderSet.shader.loadUniforms(CanvaManager.getProportion);
-        gl.drawElements(gl.TRIANGLES,this.renderSet.count,gl.UNSIGNED_INT,0);
+        this.renderSet.shader.loadUniforms(CanvaManager.getProportion,Matrix3.identity());
+        for(const comp of this.components)
+        {
+           comp.render(this.renderSet.shader,Matrix3.identity());
+        }
+      
+     //   gl.drawElements(gl.TRIANGLES,this.renderSet.count,gl.UNSIGNED_INT,0);
     }
     add(component:GuiComponent)
     {
         this.components.push(component);
+        this.refresh();
     }
     refresh()
     {
@@ -37,10 +39,11 @@ export class GUI
         this.renderSet.resetArrays();
         for(const comp of this.components)
         {
-            comp.changed=false;
             if(!comp.getVisible) continue;
-            this.renderSet.vertices.push(...comp.rArrays.vertices);
+           
             let highest = 0;
+            comp.updateComponents(this.renderSet.indices.length);
+            this.renderSet.vertices.push(...comp.rArrays.vertices);
             for(let i=0;i<comp.rArrays.indices.length;i++)
             {
                 if(comp.rArrays.indices[i]+index>highest) highest = comp.rArrays.indices[i]+index;
@@ -49,11 +52,8 @@ export class GUI
             index = highest+1;
             this.renderSet.textureCoords.push(...comp.rArrays.textureCoords);
         }
-        console.log(this.renderSet.indices);
-        console.log(this.renderSet.vertices);
-        console.log(this.renderSet.textureCoords);
         this.renderSet.bufferArrays();
-        console.log(this.renderSet.count);
+        console.log(this.renderSet.vertices);
     }
     get(id:string):GuiComponent|null
     {

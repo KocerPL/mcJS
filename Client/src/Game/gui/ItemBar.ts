@@ -13,11 +13,10 @@ export class ItemBar extends GuiComponent
     {
         super(id);
         this.visible =true;
-        this.renderMe = true;
+        this.renderMe = false;
         this.boundingBox = new BoundingBox(-0.7,-0.05,0.7,0.05);
         this.transformation = Matrix3.identity().translate(0,-0.95);
-        this.tcoords = Texture.GUI.coords[1];
-        this.rArrays.indices = [0,1,2,1,0,3];
+        this.tcoords = Texture.GUI.coords[3];
         this.add(this.slot);
         this.add(new ItemSlot(0.4,0,"slot_1"));
         this.add(new ItemSlot(0.3,0,"slot_2"));
@@ -29,15 +28,9 @@ export class ItemBar extends GuiComponent
         this.add(new ItemSlot(-0.3,0,"slot_8"));
         this.add(new ItemSlot(-0.4,0,"slot_9"));
        
-        this.update();
     }
     updateSlot()
     {
         this.slot.changePos(-0.4+(0.1*this.currentSlot),0);
-    }
-    update()
-    {
-        this.updateComponents();
-      
     }
 }

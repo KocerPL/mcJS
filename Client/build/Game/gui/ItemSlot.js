@@ -9,7 +9,6 @@ export class ItemSlot extends GuiComponent {
         this.boundingBox = new BoundingBox(-0.05, -0.05, 0.05, 0.05);
         this.transformation = Matrix3.identity().translate(x, y);
         this.tcoords = Texture.GUI.coords[1];
-        this.updateComponents();
     }
     update() {
         // const set = this.boundingBox.getRenderStuff(Texture.GUI.coords[1]);

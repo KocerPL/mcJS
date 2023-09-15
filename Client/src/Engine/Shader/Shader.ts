@@ -1,5 +1,6 @@
 import { CanvaManager } from "../CanvaManager.js";
 import { Loader } from "../Loader.js";
+import { Matrix3 } from "../Utils/Matrix3.js";
 import { Matrix4 } from "../Utils/Matrix4.js";
 import { Vector } from "../Utils/Vector.js";
 const gl = CanvaManager.gl;
@@ -46,6 +47,10 @@ export abstract class Shader
     loadMatrix(name:string,matrix:Matrix4)
     {
         gl.uniformMatrix4fv(this.getLocation(name),false,matrix.toFloat32Array());
+    }
+    loadMatrix3(name:string,matrix:Matrix3)
+    {
+        gl.uniformMatrix3fv(this.getLocation(name),false,matrix.toFloat32Array());
     }
     loadFloat(name:string, float:number)
     {

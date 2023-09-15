@@ -99,19 +99,17 @@ class Player {
         }
     }
     update() {
-        if (this.lastScroll != CanvaManager.scrollAmount) {
-            if (Math.abs(this.lastScroll - CanvaManager.scrollAmount) > 1) {
+        if (0 != CanvaManager.scrollAmount) {
+            if (Math.abs(CanvaManager.scrollAmount) > 0.1) {
                 const ib = Main.gui.get("ItemBar");
                 if (ib instanceof ItemBar) {
-                    if (CanvaManager.scrollAmount > this.lastScroll)
+                    if (CanvaManager.scrollAmount > 0)
                         ib.currentSlot++;
                     else
                         ib.currentSlot--;
                     ib.currentSlot = clamp(ib.currentSlot, 0, 8);
                     ib.updateSlot();
-                    ib.updateComponents();
                 }
-                this.lastScroll = CanvaManager.scrollAmount;
             }
         }
         if (this.targetedBlock instanceof Block) {

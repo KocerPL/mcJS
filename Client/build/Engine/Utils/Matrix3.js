@@ -48,4 +48,7 @@ export class Matrix3 {
     dot(a1, a2, a3, b1, b2, b3) {
         return (a1 * b1) + (a2 * b2) + (a3 * b3);
     }
+    toFloat32Array() {
+        return new Float32Array(this._data);
+    }
 }

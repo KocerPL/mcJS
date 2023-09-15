@@ -39,6 +39,9 @@ class Shader {
     loadMatrix(name, matrix) {
         gl.uniformMatrix4fv(this.getLocation(name), false, matrix.toFloat32Array());
     }
+    loadMatrix3(name, matrix) {
+        gl.uniformMatrix3fv(this.getLocation(name), false, matrix.toFloat32Array());
+    }
     loadFloat(name, float) {
         gl.uniform1f(this.getLocation(name), float);
     }

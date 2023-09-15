@@ -1,5 +1,7 @@
+import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { RenderArrays } from "../../Engine/RenderArrays.js";
 import { Vector3 } from "../../Engine/Utils/Vector3.js";
+const gl = CanvaManager.gl;
 export class GuiComponent {
     boundingBox;
     components = [];
@@ -8,6 +10,8 @@ export class GuiComponent {
     rArrays = new RenderArrays();
     changed = true;
     id;
+    vStart = 0;
+    vEnd = 0;
     parent = null;
     transformation;
     tcoords;
@@ -21,16 +25,17 @@ export class GuiComponent {
     get getVisible() {
         return this.visible;
     }
-    updateComponents() {
+    updateComponents(vStart) {
         let index = 0;
         this.rArrays.resetArrays();
         for (const comp of this.components) {
             comp.changed = false;
             if (!comp.getVisible)
                 continue;
+            comp.updateComponents(vStart + this.rArrays.indices.length);
             for (let i = 0; i < comp.rArrays.vertices.length; i += 2) {
-                const result = this.transformation.multiplyVec(new Vector3(comp.rArrays.vertices[i], comp.rArrays.vertices[i + 1], 1));
-                this.rArrays.vertices.push(result.x, result.y);
+                //const result:Vector3 = this.transformation.multiplyVec(new Vector3(comp.rArrays.vertices[i],comp.rArrays.vertices[i+1],1)); 
+                this.rArrays.vertices.push(comp.rArrays.vertices[i], comp.rArrays.vertices[i + 1]);
             }
             let highest = 0;
             for (let i = 0; i < comp.rArrays.indices.length; i++) {
@@ -43,9 +48,10 @@ export class GuiComponent {
         }
         if (this.renderMe) {
             const set = this.boundingBox.getRenderStuff(this.tcoords);
+            this.vStart = vStart + this.rArrays.indices.length;
             for (let i = 0; i < set.vertices.length; i += 2) {
                 const result = this.transformation.multiplyVec(new Vector3(set.vertices[i], set.vertices[i + 1], 1));
-                this.rArrays.vertices.push(result.x, result.y);
+                this.rArrays.vertices.push(set.vertices[i], set.vertices[i + 1]);
             }
             let highest = 0;
             for (let i = 0; i < set.indices.length; i++) {
@@ -53,18 +59,13 @@ export class GuiComponent {
                     highest = set.indices[i] + index;
                 this.rArrays.indices.push(set.indices[i] + index);
             }
+            this.vEnd = vStart + this.rArrays.indices.length;
             index = highest + 1;
             this.rArrays.textureCoords.push(...set.textureCoords);
         }
-        this.changed = true;
-        if (this.parent)
-            this.parent.refresh();
+        console.log(this.id, "=", this.vStart, "|||", this.vEnd);
     }
     refresh() {
-        for (const comp of this.components) {
-            if (comp.changed)
-                this.updateComponents();
-        }
     }
     add(component) {
         this.components.push(component);
@@ -79,5 +80,13 @@ export class GuiComponent {
                 if (test)
                     return test;
             }
+    }
+    render(shader, transf) {
+        let mat = transf.multiplyMat(this.transformation); //.multiplyMat(transf);
+        shader.loadMatrix3("transformation", mat);
+        for (const comp of this.components)
+            comp.render(shader, mat);
+        if (this.renderMe)
+            gl.drawElements(gl.TRIANGLES, this.vEnd - this.vStart, gl.UNSIGNED_INT, this.vStart * 4);
     }
 }

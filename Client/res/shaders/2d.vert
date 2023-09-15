@@ -3,9 +3,11 @@ precision highp float;
 layout(location = 0) in vec2 pos;
 layout(location=1) in vec2 tCoords;
 out vec2 pass_tc;
+uniform mat3 transformation;
 uniform float prop;
 void main()
 {
-gl_Position = vec4(pos.x*prop, pos.y,-1.0,1.0);
+vec3 result =vec3(pos.x, pos.y,1.0)*transformation;
+gl_Position = vec4(result.x*prop,result.y,-1.0,1.0);
 pass_tc = vec2(tCoords.x,tCoords.y);
 }
