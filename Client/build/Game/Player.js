@@ -10,6 +10,7 @@ import { Block, blocks } from "./Block.js";
 import { Item } from "./entities/Item.js";
 import { PlayerEntity } from "./entities/PlayerEntity.js";
 import { ItemBar } from "./gui/ItemBar.js";
+import { ItemHolder } from "./gui/ItemHolder.js";
 import { World } from "./World.js";
 const gl = CanvaManager.gl;
 export class invItem {
@@ -108,7 +109,9 @@ class Player {
                     else
                         ib.currentSlot--;
                     ib.currentSlot = clamp(ib.currentSlot, 0, 8);
+                    this.selectedItem = ib.currentSlot;
                     ib.updateSlot();
+                    CanvaManager.scrollAmount = 0;
                 }
             }
         }
@@ -331,16 +334,6 @@ class Player {
             this.camera.setPitch(90);
         if (this.camera.getPitch() < -90)
             this.camera.setPitch(-90);
-        if (CanvaManager.scrollAmount != 0) {
-            this.selectedItem += CanvaManager.scrollAmount;
-            CanvaManager.scrollAmount = 0;
-            while (this.selectedItem > 8) {
-                this.selectedItem -= 9;
-            }
-            while (this.selectedItem < 0) {
-                this.selectedItem += 9;
-            }
-        }
         if (CanvaManager.mouse.left)
             this.mine();
         else
@@ -433,6 +426,10 @@ class Player {
                 return;
             }
             if (this.itemsBar[x].id == 0) {
+                console.log(x);
+                let hold = Main.gui.get("slot_" + (x + 1) + "_holder");
+                if (hold instanceof ItemHolder)
+                    hold.change(id);
                 this.itemsBar[x].id = id;
                 this.itemsBar[x].count += item.count;
                 return;
@@ -460,7 +457,7 @@ class Player {
             const transformation = Matrix4.identity();
             this.blockOverlay.vao.bind();
             Main.shader.use();
-            gl.bindTexture(gl.TEXTURE_2D_ARRAY, Texture.blockOverlay);
+            gl.bindTexture(gl.TEXTURE_2D, Texture.blockOverlay);
             Main.shader.loadUniforms(this.camera.getProjection(), transformation, this.camera.getView(), 15);
             gl.drawElements(gl.TRIANGLES, this.blockOverlay.count, gl.UNSIGNED_INT, 0);
         }

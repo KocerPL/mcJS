@@ -127,10 +127,10 @@ export class Loader {
         gl.activeTexture(gl.TEXTURE0);
         for (let x = 0; x < json.length; x++) {
             coords.push({
-                x: (json[x].pos[0] + 0.5) / imgSizeX,
-                y: (json[x].pos[1] + 0.5) / imgSizeY,
-                dx: ((json[x].pos[0] + json[x].size[0]) - 0.5) / imgSizeX,
-                dy: ((json[x].pos[1] + json[x].size[1]) - 0.5) / imgSizeY,
+                x: (json[x].pos[0] + 0.1) / imgSizeX,
+                y: (json[x].pos[1] + 0.1) / imgSizeY,
+                dx: ((json[x].pos[0] + json[x].size[0]) - 0.1) / imgSizeX,
+                dy: ((json[x].pos[1] + json[x].size[1]) - 0.1) / imgSizeY,
                 rotation: json[x].rotation
             });
         }

@@ -5,5 +5,8 @@ out vec4 color;
 uniform sampler2D tex;
 void main()
 {
-    color=texture(tex ,pass_tc);
+    vec4 texColor = texture(tex ,pass_tc);
+     if(texColor.a < 0.1)
+        discard;
+    color=texColor;
 }

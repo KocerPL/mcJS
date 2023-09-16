@@ -18,7 +18,7 @@ export class GUI {
         Texture.GUI.bind();
         this.renderSet.shader.use();
         this.renderSet.vao.bind();
-        this.renderSet.shader.loadUniforms(CanvaManager.getProportion, Matrix3.identity());
+        this.renderSet.shader.loadUniforms(CanvaManager.getProportion, -1, Matrix3.identity());
         for (const comp of this.components) {
             comp.render(this.renderSet.shader, Matrix3.identity());
         }
@@ -26,7 +26,7 @@ export class GUI {
     }
     add(component) {
         this.components.push(component);
-        component.gui = this;
+        component.attachGUI(this);
         this.needsRefresh();
     }
     needsRefresh() {

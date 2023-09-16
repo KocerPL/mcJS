@@ -3,6 +3,7 @@ import { Texture } from "../../Engine/Texture.js";
 import { Sprite } from "../../Engine/Utils/Sprite.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { Vector3 } from "../../Engine/Utils/Vector3.js";
+import { ItemHolder } from "./ItemHolder.js";
 export class ItemSlot extends GuiComponent
 {
     constructor(x:number,y:number,id:string)
@@ -12,6 +13,7 @@ export class ItemSlot extends GuiComponent
         this.sprite = new Sprite(-0.05,-0.05,0.05,0.05);
         this.transformation = Matrix3.identity().translate(x,y);
         this.tcoords = Texture.GUI.coords[1];
+        this.add(new ItemHolder(this.id+"_holder",0.03));
     }
     update()
     {

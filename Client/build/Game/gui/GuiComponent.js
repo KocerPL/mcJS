@@ -86,11 +86,19 @@ export class GuiComponent {
             }
     }
     render(shader, transf) {
-        Texture.GUI.bind();
         let mat = transf.multiplyMat(this.transformation); //.multiplyMat(transf);
-        shader.loadMatrix3("transformation", mat);
         for (const comp of this.components)
             comp.render(shader, mat);
+        this.renderItself(shader, mat);
+    }
+    attachGUI(gui) {
+        this.gui = gui;
+        for (let comp of this.components)
+            comp.attachGUI(gui);
+    }
+    renderItself(shader, mat) {
+        Texture.GUI.bind();
+        shader.loadMatrix3("transformation", mat);
         if (this.renderMe)
             gl.drawElements(gl.TRIANGLES, this.vEnd - this.vStart, gl.UNSIGNED_INT, this.vStart * 4);
     }

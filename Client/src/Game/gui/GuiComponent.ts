@@ -103,12 +103,24 @@ export abstract class GuiComponent
     }
     render(shader:Shader,transf:Matrix3)
     {
-        Texture.GUI.bind();
+       
         let mat = transf.multiplyMat(this.transformation);//.multiplyMat(transf);
-           shader.loadMatrix3("transformation",mat);
         for(const comp of this.components)
         comp.render(shader,mat);
-    if(this.renderMe)
+        this.renderItself(shader,mat);
+      
+    }
+    attachGUI(gui:GUI)
+    {
+        this.gui = gui;
+        for(let comp of this.components)
+        comp.attachGUI(gui);
+    }
+    renderItself(shader:Shader,mat:Matrix3)
+    {
+        Texture.GUI.bind();  
+        shader.loadMatrix3("transformation",mat);
+        if(this.renderMe)
         gl.drawElements(gl.TRIANGLES,this.vEnd-this.vStart,gl.UNSIGNED_INT,this.vStart*4);
     }
 }

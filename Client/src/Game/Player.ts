@@ -10,6 +10,7 @@ import { Block, blocks } from "./Block.js";
 import { Item } from "./entities/Item.js";
 import { PlayerEntity } from "./entities/PlayerEntity.js";
 import { ItemBar } from "./gui/ItemBar.js";
+import { ItemHolder } from "./gui/ItemHolder.js";
 import { World } from "./World.js";
 const gl = CanvaManager.gl;
 export type pers = "First" | "Second" |"Third";
@@ -124,7 +125,9 @@ export class Player
                 else
                     ib.currentSlot--;
                 ib.currentSlot = clamp(ib.currentSlot,0,8);
+                this.selectedItem = ib.currentSlot;
                 ib.updateSlot();
+                CanvaManager.scrollAmount=0;
             }
             }
         }
@@ -391,19 +394,6 @@ export class Player
         this.camera.setYaw(this.camera.getYaw()+(CanvaManager.mouseMovement.x/10));
         if(this.camera.getPitch()>90) this.camera.setPitch(90);
         if(this.camera.getPitch()<-90) this.camera.setPitch(-90);
-        if(CanvaManager.scrollAmount!=0)
-        {
-            this.selectedItem += CanvaManager.scrollAmount;
-            CanvaManager.scrollAmount=0;
-            while(this.selectedItem>8)
-            {
-                this.selectedItem-=9;
-            }
-            while(this.selectedItem<0)
-            {
-                this.selectedItem+=9;
-            }
-        }
         if(CanvaManager.mouse.left) this.mine(); else this.blockBreakingTime=0;
         if(CanvaManager.mouse.right) this.place();
        
@@ -517,7 +507,12 @@ export class Player
                 return;
             }
             if(this.itemsBar[x].id ==0 ) 
-            {this.itemsBar[x].id = id;
+            {
+                console.log(x);
+              let hold =  Main.gui.get("slot_"+(x+1)+"_holder");
+              if(hold instanceof ItemHolder)
+               hold.change(id);
+                this.itemsBar[x].id = id;
                 this.itemsBar[x].count+=item.count;
                 return;
             }   

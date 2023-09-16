@@ -16,4 +16,13 @@ export class RenderArrays
         this.indices = [];
         this.index=0;
     }
+    addArr(rArrays:RenderArrays,offset:number):void
+    {
+        this.vertices = this.vertices.concat(rArrays.vertices);
+        this.textureCoords = this.textureCoords.concat(rArrays.textureCoords);
+        for(let indice of rArrays.indices)
+        {
+            this.indices.push(indice+offset);
+        }
+    }
 }
