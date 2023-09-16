@@ -19,7 +19,7 @@ export class RenderSet extends RenderArrays {
         const dCount = shader.getDim() == dimensions._3d ? 3 : 2;
         this.vao.addPtr(0, dCount, 0, 0);
         this.vtc = new VBO();
-        this.vao.addPtr(1, dCount, 0, 0);
+        this.vao.addPtr(1, 2, 0, 0);
         this.vlo = new VBO();
         this.vao.addPtr(2, 1, 0, 0);
         this.vfb = new VBO();
