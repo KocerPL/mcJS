@@ -3,7 +3,7 @@ import { Shader } from "../../Engine/Shader/Shader.js";
 import { Texture } from "../../Engine/Texture.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { Sprite } from "../../Engine/Utils/Sprite.js";
-import { Block, blocks } from "../Block.js";
+import { blocks ,Side} from "../Block.js";
 import { GuiComponent } from "./GuiComponent.js";
 const gl =CanvaManager.gl;
 export class ItemHolder extends GuiComponent
@@ -19,7 +19,7 @@ export class ItemHolder extends GuiComponent
     }
     change(blockID:number)
     {
-      this.tcoords=    Texture.blockAtlas.coords[blocks[blockID].textureIndex.top];
+      this.tcoords=    Texture.blockAtlas.coords[blocks[blockID].textureIndex[Side.front]];
       this.gui.needsRefresh();
     }
     renderItself(shader: Shader, mat: Matrix3): void {

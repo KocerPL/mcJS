@@ -3,6 +3,7 @@ import { Texture } from "../../Engine/Texture.js";
 import { Matrix4 } from "../../Engine/Utils/Matrix4.js";
 import { Vector } from "../../Engine/Utils/Vector.js";
 import { Main } from "../../Main.js";
+import { Side } from "../Block.js";
 import { Entity } from "../Entity.js";
 import { SubChunk } from "../SubChunk.js";
 import { World } from "../World.js";
@@ -55,9 +56,9 @@ export class Item extends Entity
     prepareModel()
     {
         this.rs.vertices = [...SubChunk.defVertices];
-        this.rs.textureCoords =[...SubChunk.getTextureCords2(this.type,"front"),...SubChunk.getTextureCords2(this.type,"back"),
-            ...SubChunk.getTextureCords2(this.type,"left"),...SubChunk.getTextureCords2(this.type,"right"),
-            ...SubChunk.getTextureCords2(this.type,"bottom"),...SubChunk.getTextureCords2(this.type,"top")];
+        this.rs.textureCoords =[...SubChunk.getTextureCords(this.type,Side.front),...SubChunk.getTextureCords(this.type,Side.back),
+            ...SubChunk.getTextureCords(this.type,Side.left),...SubChunk.getTextureCords(this.type,Side.right),
+            ...SubChunk.getTextureCords(this.type,Side.bottom),...SubChunk.getTextureCords(this.type,Side.top)];
         //     console.log(this.rs.textureCoords);
         this.rs.indices = [2,1,0,2,0,3
             ,6,5,4,6,4,7, 10,9,8,10,8,11, 14,13,12,14,12,15, 18,17,16,18,16,19, 22,21,20,22,20,23];

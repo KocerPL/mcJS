@@ -1,12 +1,10 @@
 import { Array3D } from "../Engine/Utils/Array3D.js";
 import { Vector } from "../Engine/Utils/Vector.js";
-import { Block, blocks } from "./Block.js";
+import { Block, blocks,Side } from "./Block.js";
 import { Chunk } from "./Chunk.js";
 import { World } from "./World.js";
 import { Mesh } from "./Mesh.js";
 import { Texture } from "../Engine/Texture.js";
-type SIDE = "left"| "right" | "bottom" | "top" | "back" | "front";
-
 export class SubChunk
 {
     public mesh:Mesh= new Mesh();//Mesh that contains all data needed for rendering  
@@ -291,7 +289,7 @@ export class SubChunk
         return  (5-((side1?1:0) +(corner?1:0)+ (side2?1:0)))/5;
     }
     //DONE: update vertices only tree sides
-    updateSide(x:number,y:number,z:number,dx:number,dy:number,dz:number,vStart:number,side:SIDE,block:Block,index:number,vBuffer:Array<number>)
+    updateSide(x:number,y:number,z:number,dx:number,dy:number,dz:number,vStart:number,side:Side,block:Block,index:number,vBuffer:Array<number>)
     {
         const testedBlock = this.getBlockWV(dx+x,dy+y,dz+z);
         if(testedBlock==undefined) return;
@@ -392,9 +390,9 @@ export class SubChunk
                 temp.push(SubChunk.defVertices[i+1]+y+(this.pos.y*16));
                 temp.push(SubChunk.defVertices[i+2]+z);
             }
-            index= this.updateSide(x,y,z,1,0,0,36,"left",block,index,temp);
-            index= this.updateSide(x,y,z,0,1,0,60,"top",block,index,temp);
-            index = this.updateSide(x,y,z,0,0,1,12,"front",block,index,temp);
+            index= this.updateSide(x,y,z,1,0,0,36,Side.left,block,index,temp);
+            index= this.updateSide(x,y,z,0,1,0,60,Side.top,block,index,temp);
+            index = this.updateSide(x,y,z,0,0,1,12,Side.front,block,index,temp);
             temp.length=0;
 
         }
@@ -402,20 +400,23 @@ export class SubChunk
         
     }
 
-    static flip(side:SIDE):SIDE
+    static flip(side:Side):Side
     {
-        if(side=="back")
-            return "front";
-        else if(side=="bottom")
-            return "top";
-        else if(side=="left")
-            return "right";
-        else if(side=="front")
-            return "back";
-        else if(side=="top")
-            return "bottom";
-        else if(side=="right")
-            return "left"; 
+        switch(side)
+        {
+            case Side.back:
+                return Side.front;
+            case Side.front:
+                return Side.back;
+            case Side.top:
+                return Side.bottom;
+            case Side.bottom:
+                return Side.top;
+            case Side.left:
+                return Side.right;
+            case Side.right:
+                return Side.left;
+        }
     }
 
     //Generates full subchunk of air
@@ -455,25 +456,20 @@ export class SubChunk
     static getTextureCords(id:number,face) {
         const index = blocks[id].textureIndex[face];
         const uvs = Texture.blockAtlas.coords[index];
-        const temp =   [
+        if(face == Side.front || face == Side.right || face == Side.bottom)
+        return [
             uvs.x, uvs.dy,
             uvs.dx, uvs.dy,
             uvs.dx, uvs.y,
             uvs.x, uvs.y,
         ];
-        return temp;
+        else return [ uvs.x, uvs.dy,
+            uvs.x, uvs.y,
+            uvs.dx, uvs.y,
+            uvs.dx, uvs.dy,];
     }
     static getTextureCordsInd(index) {
-        const temp =   [
-            0.0, 1.0, index,
-            1.0, 1.0, index,
-            1.0, 0.0,index,
-            0.0, 0.0,index
-        ];
-        return temp;
-    }
-    static getTextureCords2(blockID,face) {
-        const index = blocks[blockID].textureIndex[face];
+        
         const temp =   [
             0.0, 1.0, index,
             1.0, 1.0, index,

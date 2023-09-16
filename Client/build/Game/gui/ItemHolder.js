@@ -2,7 +2,7 @@ import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { Texture } from "../../Engine/Texture.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { Sprite } from "../../Engine/Utils/Sprite.js";
-import { blocks } from "../Block.js";
+import { blocks, Side } from "../Block.js";
 import { GuiComponent } from "./GuiComponent.js";
 const gl = CanvaManager.gl;
 export class ItemHolder extends GuiComponent {
@@ -14,7 +14,7 @@ export class ItemHolder extends GuiComponent {
         this.transformation = Matrix3.identity();
     }
     change(blockID) {
-        this.tcoords = Texture.blockAtlas.coords[blocks[blockID].textureIndex.top];
+        this.tcoords = Texture.blockAtlas.coords[blocks[blockID].textureIndex[Side.front]];
         this.gui.needsRefresh();
     }
     renderItself(shader, mat) {
