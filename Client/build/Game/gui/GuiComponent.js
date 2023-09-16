@@ -1,13 +1,14 @@
 import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { RenderArrays } from "../../Engine/RenderArrays.js";
+import { Texture } from "../../Engine/Texture.js";
 import { Vector3 } from "../../Engine/Utils/Vector3.js";
 const gl = CanvaManager.gl;
 export class GuiComponent {
-    boundingBox;
+    sprite;
     components = [];
     renderMe = true;
     visible;
-    rArrays = new RenderArrays();
+    gui;
     changed = true;
     id;
     vStart = 0;
@@ -27,48 +28,51 @@ export class GuiComponent {
     }
     updateComponents(vStart) {
         let index = 0;
-        this.rArrays.resetArrays();
+        let rArrays = new RenderArrays();
+        rArrays.resetArrays();
         for (const comp of this.components) {
             comp.changed = false;
             if (!comp.getVisible)
                 continue;
-            comp.updateComponents(vStart + this.rArrays.indices.length);
-            for (let i = 0; i < comp.rArrays.vertices.length; i += 2) {
-                //const result:Vector3 = this.transformation.multiplyVec(new Vector3(comp.rArrays.vertices[i],comp.rArrays.vertices[i+1],1)); 
-                this.rArrays.vertices.push(comp.rArrays.vertices[i], comp.rArrays.vertices[i + 1]);
+            let subRArrays = comp.updateComponents(vStart + rArrays.indices.length);
+            for (let i = 0; i < subRArrays.vertices.length; i += 2) {
+                //const result:Vector3 = this.transformation.multiplyVec(new Vector3(subRArrays.vertices[i],subRArrays.vertices[i+1],1)); 
+                rArrays.vertices.push(subRArrays.vertices[i], subRArrays.vertices[i + 1]);
             }
             let highest = 0;
-            for (let i = 0; i < comp.rArrays.indices.length; i++) {
-                if (comp.rArrays.indices[i] + index > highest)
-                    highest = comp.rArrays.indices[i] + index;
-                this.rArrays.indices.push(comp.rArrays.indices[i] + index);
+            for (let i = 0; i < subRArrays.indices.length; i++) {
+                if (subRArrays.indices[i] + index > highest)
+                    highest = subRArrays.indices[i] + index;
+                rArrays.indices.push(subRArrays.indices[i] + index);
             }
             index = highest + 1;
-            this.rArrays.textureCoords.push(...comp.rArrays.textureCoords);
+            rArrays.textureCoords.push(...subRArrays.textureCoords);
         }
         if (this.renderMe) {
-            const set = this.boundingBox.getRenderStuff(this.tcoords);
-            this.vStart = vStart + this.rArrays.indices.length;
+            const set = this.sprite.getRenderArrays(this.tcoords);
+            this.vStart = vStart + rArrays.indices.length;
             for (let i = 0; i < set.vertices.length; i += 2) {
                 const result = this.transformation.multiplyVec(new Vector3(set.vertices[i], set.vertices[i + 1], 1));
-                this.rArrays.vertices.push(set.vertices[i], set.vertices[i + 1]);
+                rArrays.vertices.push(set.vertices[i], set.vertices[i + 1]);
             }
             let highest = 0;
             for (let i = 0; i < set.indices.length; i++) {
                 if (set.indices[i] + index > highest)
                     highest = set.indices[i] + index;
-                this.rArrays.indices.push(set.indices[i] + index);
+                rArrays.indices.push(set.indices[i] + index);
             }
-            this.vEnd = vStart + this.rArrays.indices.length;
+            this.vEnd = vStart + rArrays.indices.length;
             index = highest + 1;
-            this.rArrays.textureCoords.push(...set.textureCoords);
+            rArrays.textureCoords.push(...set.textureCoords);
         }
         console.log(this.id, "=", this.vStart, "|||", this.vEnd);
-    }
-    refresh() {
+        return rArrays;
     }
     add(component) {
         this.components.push(component);
+        component.gui = this.gui;
+        if (this.gui)
+            this.gui.needsRefresh();
         component.parent = this;
     }
     get(id) {
@@ -82,6 +86,7 @@ export class GuiComponent {
             }
     }
     render(shader, transf) {
+        Texture.GUI.bind();
         let mat = transf.multiplyMat(this.transformation); //.multiplyMat(transf);
         shader.loadMatrix3("transformation", mat);
         for (const comp of this.components)

@@ -6,10 +6,15 @@ const gl = CanvaManager.gl;
 export class GUI {
     components = [];
     renderSet;
+    needRefresh = false;
     constructor(shader) {
         this.renderSet = new RenderSet(shader);
     }
     render() {
+        if (this.needRefresh) {
+            this.refresh();
+            this.needRefresh = false;
+        }
         Texture.GUI.bind();
         this.renderSet.shader.use();
         this.renderSet.vao.bind();
@@ -21,7 +26,11 @@ export class GUI {
     }
     add(component) {
         this.components.push(component);
-        this.refresh();
+        component.gui = this;
+        this.needsRefresh();
+    }
+    needsRefresh() {
+        this.needRefresh = true;
     }
     refresh() {
         let index = 0;
@@ -30,15 +39,15 @@ export class GUI {
             if (!comp.getVisible)
                 continue;
             let highest = 0;
-            comp.updateComponents(this.renderSet.indices.length);
-            this.renderSet.vertices.push(...comp.rArrays.vertices);
-            for (let i = 0; i < comp.rArrays.indices.length; i++) {
-                if (comp.rArrays.indices[i] + index > highest)
-                    highest = comp.rArrays.indices[i] + index;
-                this.renderSet.indices.push(comp.rArrays.indices[i] + index);
+            let subRArrays = comp.updateComponents(this.renderSet.indices.length);
+            this.renderSet.vertices.push(...subRArrays.vertices);
+            for (let i = 0; i < subRArrays.indices.length; i++) {
+                if (subRArrays.indices[i] + index > highest)
+                    highest = subRArrays.indices[i] + index;
+                this.renderSet.indices.push(subRArrays.indices[i] + index);
             }
             index = highest + 1;
-            this.renderSet.textureCoords.push(...comp.rArrays.textureCoords);
+            this.renderSet.textureCoords.push(...subRArrays.textureCoords);
         }
         this.renderSet.bufferArrays();
         console.log(this.renderSet.vertices);

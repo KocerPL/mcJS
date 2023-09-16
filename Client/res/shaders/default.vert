@@ -4,8 +4,8 @@ precision highp float;
 uniform mat4 projection;
 //transformation matrix
 uniform mat4 transformation;
-layout (location=1) in vec3 tcoord;
-out vec3 pass_tc;
+layout (location=1) in vec2 tcoord;
+out vec2 pass_tc;
 //View matrix
 uniform mat4 view;
 //Center(where camera stands)(for fog effect)

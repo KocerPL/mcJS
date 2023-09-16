@@ -50,7 +50,7 @@ export class Chunk {
         this.vbo = new VBO();
         this.vao.addPtr(0,3,0,0);
         this.vtc = new VBO();
-        this.vao.addPtr(1,3,0,0);
+        this.vao.addPtr(1,2,0,0);
         this.vlo = new VBO();
         this.vao.addPtr(2,1,0,0);
         this.vfb = new VBO();

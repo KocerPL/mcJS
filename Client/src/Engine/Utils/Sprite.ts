@@ -1,6 +1,6 @@
-import { Texture2 } from "../Loader";
+import { RenderArrays } from "../RenderArrays.js";
 
-export class BoundingBox
+export class Sprite
 {
     x:number;
     y:number;
@@ -16,24 +16,25 @@ export class BoundingBox
         this.dx = dx;
         this.dy = dy;
     }
-    getRenderStuff(coords:{ x:number;
+    getRenderArrays(coords:{ x:number;
         y:number,
         dx:number,
-        dy:number}):{vertices:number[],textureCoords:number[],indices:number[]}
-    {
-        let vertices =
+        dy:number}):RenderArrays
+    {   
+        let rArrays = new RenderArrays();
+        rArrays.vertices =
         [this.x,this.dy,
         this.dx,this.y,
         this.x,this.y,
         this.dx,this.dy];
-        let textureCoords = 
+        rArrays.textureCoords = 
         [
             coords.x,coords.dy,
             coords.dx,coords.y,
             coords.x,coords.y,
             coords.dx,coords.dy,
         ]
-        let indices = [0,1,2,1,0,3];
-        return {vertices,indices,textureCoords};
+        rArrays.indices = [0,1,2,1,0,3];
+        return  rArrays;
     }
 }

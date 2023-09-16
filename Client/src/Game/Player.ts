@@ -550,7 +550,7 @@ export class Player
         {      const   transformation = Matrix4.identity();
             this.blockOverlay.vao.bind();
             Main.shader.use();
-            gl.bindTexture(gl.TEXTURE_2D_ARRAY ,Texture.blockOverlay);
+            gl.bindTexture(gl.TEXTURE_2D ,Texture.blockOverlay);
             Main.shader.loadUniforms(this.camera.getProjection(),transformation,this.camera.getView(),15);
             gl.drawElements(gl.TRIANGLES,this.blockOverlay.count,gl.UNSIGNED_INT,0);
         }

@@ -7,8 +7,8 @@ export class Texture
     static rowSize = 16;
     static blocksGridTest = Loader.imageArray("./res/textures/Blocks.png",20,16);
     // static GUI = Loader.image("/JS/Engine/Textures/GUI.png");
+    static blockAtlas = Loader.imageAtlasByJSON("./res/textures/Blocks.png",Loader.json("./res/textures/Blocks.json"),1024,1024)
     static blockOverlay = Loader.imageArray("./res/textures/blockOverlay.png",6,8);
-    static skin = Loader.imageArrayByJSON("./res/textures/skinMC.png",Model.player);
     static GUI = Loader.imageAtlasByJSON("./res/textures/GUI.png", Loader.json("./res/textures/GUI.json"),256,256);
     static crossHair = Loader.image("./res/textures/crosshair.png");
     static hammer:WebGLTexture = Loader.image("./res/textures/hammer.png");

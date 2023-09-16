@@ -358,7 +358,7 @@ export class Main
         gl.clearColor(0.43*(this.sunLight/15) ,0.69 *(this.sunLight/15),(this.sunLight/15),1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
    
-        gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
+       Texture.blockAtlas.bind();
     
         Main.shader.loadUniforms(Main.player.camera.getProjection(), Matrix4.identity(), Main.player.camera.getView(),Main.sunLight);
         for(const chunk of this.loadedChunks)
@@ -371,7 +371,6 @@ export class Main
         {
             this.entities[i].render();
         }
-        //render crosshair
         this.player.render();
         this.gui.render();
     }

@@ -127,10 +127,10 @@ export class Loader {
         gl.activeTexture(gl.TEXTURE0);
         for (let x = 0; x < json.length; x++) {
             coords.push({
-                x: (json[x].pos[0] + 0.1) / imgSizeX,
-                y: (json[x].pos[1] + 0.1) / imgSizeY,
-                dx: ((json[x].pos[0] + json[x].size[0]) - 0.1) / imgSizeX,
-                dy: ((json[x].pos[1] + json[x].size[1]) - 0.1) / imgSizeY,
+                x: (json[x].pos[0] + 0.5) / imgSizeX,
+                y: (json[x].pos[1] + 0.5) / imgSizeY,
+                dx: ((json[x].pos[0] + json[x].size[0]) - 0.5) / imgSizeX,
+                dy: ((json[x].pos[1] + json[x].size[1]) - 0.5) / imgSizeY,
                 rotation: json[x].rotation
             });
         }
@@ -139,9 +139,9 @@ export class Loader {
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, img.width, img.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, img);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            //   gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
+            gl.generateMipmap(gl.TEXTURE_2D);
             console.log("loaded json");
         };
         if (img.complete) {

@@ -1,5 +1,5 @@
 import { Texture } from "../../Engine/Texture.js";
-import { BoundingBox } from "../../Engine/Utils/BoundingBox.js";
+import { Sprite } from "../../Engine/Utils/Sprite.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { GuiComponent } from "./GuiComponent.js";
 import { ItemSlot } from "./ItemSlot.js";
@@ -11,7 +11,7 @@ export class ItemBar extends GuiComponent {
         super(id);
         this.visible = true;
         this.renderMe = false;
-        this.boundingBox = new BoundingBox(-0.7, -0.05, 0.7, 0.05);
+        this.sprite = new Sprite(-0.7, -0.05, 0.7, 0.05);
         this.transformation = Matrix3.identity().translate(0, -0.95);
         this.tcoords = Texture.GUI.coords[3];
         this.add(this.slot);

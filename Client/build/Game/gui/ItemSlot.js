@@ -1,12 +1,12 @@
 import { GuiComponent } from "./GuiComponent.js";
 import { Texture } from "../../Engine/Texture.js";
-import { BoundingBox } from "../../Engine/Utils/BoundingBox.js";
+import { Sprite } from "../../Engine/Utils/Sprite.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 export class ItemSlot extends GuiComponent {
     constructor(x, y, id) {
         super(id);
         this.visible = true;
-        this.boundingBox = new BoundingBox(-0.05, -0.05, 0.05, 0.05);
+        this.sprite = new Sprite(-0.05, -0.05, 0.05, 0.05);
         this.transformation = Matrix3.identity().translate(x, y);
         this.tcoords = Texture.GUI.coords[1];
     }

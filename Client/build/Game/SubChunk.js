@@ -3,6 +3,7 @@ import { Vector } from "../Engine/Utils/Vector.js";
 import { Block, blocks } from "./Block.js";
 import { World } from "./World.js";
 import { Mesh } from "./Mesh.js";
+import { Texture } from "../Engine/Texture.js";
 class SubChunk {
     mesh = new Mesh(); //Mesh that contains all data needed for rendering  
     blocks = new Array3D(16, 16, 16); //Array of blocks
@@ -397,11 +398,12 @@ class SubChunk {
     });
     static getTextureCords(id, face) {
         const index = blocks[id].textureIndex[face];
+        const uvs = Texture.blockAtlas.coords[index];
         const temp = [
-            0.0, 1.0, index,
-            1.0, 1.0, index,
-            1.0, 0.0, index,
-            0.0, 0.0, index
+            uvs.x, uvs.dy,
+            uvs.dx, uvs.dy,
+            uvs.dx, uvs.y,
+            uvs.x, uvs.y,
         ];
         return temp;
     }

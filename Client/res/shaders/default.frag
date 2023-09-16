@@ -1,14 +1,13 @@
 #version 300 es
 precision highp float;
-precision mediump sampler2DArray;
-in vec3 pass_tc;
+in vec2 pass_tc;
 out vec4 color;
 //in vec3 FragPos;
 //in vec3 pass_Normal;
 uniform float fogDistance;
 in float pass_Light;
 //uniform vec3 lightPos;
-uniform sampler2DArray tex;
+uniform sampler2D tex;
 in vec3 pass_center;
 in vec3 pass_ready;
 float cdistance;// Center distance
