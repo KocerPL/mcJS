@@ -45,7 +45,6 @@ export abstract class GuiComponent
         for(const comp of this.components)
         {
             comp.changed=false;
-            if(!comp.getVisible) continue;
             const subRArrays  =  comp.updateComponents(vStart+ rArrays.indices.length);
             for(let i =0;i<subRArrays.vertices.length;i+=2)
             {
@@ -103,7 +102,7 @@ export abstract class GuiComponent
     }
     render(shader:Shader,transf:Matrix3)
     {
-       
+       if(!this.visible) return;
         const mat = transf.multiplyMat(this.transformation);//.multiplyMat(transf);
         for(const comp of this.components)
             comp.render(shader,mat);

@@ -4,7 +4,6 @@ import { GuiComponent } from "./GuiComponent.js";
 import { ItemSlot } from "./ItemSlot.js";
 import { SelectedSlot } from "./SelectedSlot.js";
 import { BorderedSprite } from "../../Engine/Utils/BorderedSprite.js";
-import { TextComponent } from "./TextComponent.js";
 export class ItemBar extends GuiComponent {
     slot = new SelectedSlot(0, 0, "selected");
     currentSlot = 5;
@@ -15,7 +14,6 @@ export class ItemBar extends GuiComponent {
         this.sprite = new BorderedSprite(-0.475, -0.075, 0.475, 0.075, 0.025, Texture.GUI.coords[3], Texture.GUI.coords[4], Texture.GUI.coords[5], Texture.GUI.coords[6], Texture.GUI.coords[7], Texture.GUI.coords[8], Texture.GUI.coords[9], Texture.GUI.coords[10], Texture.GUI.coords[11]);
         this.transformation = Matrix3.identity().translate(0, -0.925);
         this.tcoords = Texture.GUI.coords[3];
-        this.add(new TextComponent("TEXT"));
         this.add(this.slot);
         this.add(new ItemSlot(-0.4, 0, "slot_1"));
         this.add(new ItemSlot(-0.3, 0, "slot_2"));

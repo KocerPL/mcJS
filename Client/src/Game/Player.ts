@@ -22,7 +22,7 @@ export class invItem
     constructor(id)
     {
         this.id=id;
-        this.count=1;
+        this.count=0;
     }
 }
 export class Player
@@ -196,7 +196,16 @@ export class Player
             return true;
         if(World.getBlock(new Vector(pos.x+0.33,pos.y-1,pos.z-0.33)).id>0)
             return true;
-        
+
+            if(World.getBlock(new Vector(pos.x+0.33,pos.y-0.1,pos.z+0.33)).id>0)
+            return true;
+        if(World.getBlock(new Vector(pos.x-0.33,pos.y-0.1,pos.z+0.33)).id>0)
+            return true;
+        if(World.getBlock(new Vector(pos.x-0.33,pos.y-0.1,pos.z-0.33)).id>0)
+            return true;
+        if(World.getBlock(new Vector(pos.x+0.33,pos.y-0.1,pos.z-0.33)).id>0)
+            return true;
+
         if(World.getBlock(new Vector(pos.x+0.33,pos.y+0.75,pos.z+0.33)).id >0)
             return true;
         if(World.getBlock(new Vector(pos.x-0.33,pos.y+0.75,pos.z+0.33)).id>0)
@@ -319,10 +328,11 @@ export class Player
             
                 }
             }   
-            if(World.getBlock(new Vector(tempPos.x,tempPos.y-1,tempPos.z)).id<=0)
+            if(World.getBlock(new Vector(tempPos.x,tempPos.y-1,tempPos.z)).id<=0 && !Main.fly)
+            {
                 this.yAcc+=0.01;
             tempPos.y-=this.yAcc;
-                
+            }   
             if(!this.isBlockInWay(tempPos)) 
                 this.pos = tempPos;
             else  if(!this.isBlockInWay(new Vector(tempPos.x,this.pos.y,tempPos.z)))
@@ -378,6 +388,8 @@ export class Player
             
                 }
             }
+            if(Main.fly && CanvaManager.getKey(90))
+            tempPos.y-=0.3;
             /*  else if(CanvaManager.getKey(16) && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z)) ).id<1)
         this.pos.y-=0.1;
         */    
@@ -479,8 +491,12 @@ export class Player
                 World.placeBlock(lastPos,this.itemsBar[this.selectedItem].id);
             
                 this.itemsBar[this.selectedItem].count--;
+               
                 if(this.itemsBar[this.selectedItem].count==0)
                     this.itemsBar[this.selectedItem].id=0;
+                    const hold =  Main.gui.get("slot_"+(this.selectedItem+1)+"_holder");
+                    if(hold instanceof ItemHolder)
+                        hold.change(this.itemsBar[this.selectedItem].id,1);
                 CanvaManager.mouse.right=false;
               
             }
@@ -508,6 +524,9 @@ export class Player
             if(this.itemsBar[x].id==id && this.itemsBar[x].count<64)
             {
                 this.itemsBar[x].count+=item.count;
+                const hold =  Main.gui.get("slot_"+(x+1)+"_holder");
+                if(hold instanceof ItemHolder)
+                    hold.change(id,this.itemsBar[x].count);
                 return;
             }
             if(this.itemsBar[x].id ==0 ) 
@@ -515,7 +534,7 @@ export class Player
                 console.log(x);
                 const hold =  Main.gui.get("slot_"+(x+1)+"_holder");
                 if(hold instanceof ItemHolder)
-                    hold.change(id);
+                    hold.change(id,1);
                 this.itemsBar[x].id = id;
                 this.itemsBar[x].count+=item.count;
                 return;

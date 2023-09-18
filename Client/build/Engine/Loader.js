@@ -169,15 +169,19 @@ export class Loader {
         ctx.fillStyle = "transparent";
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.fillStyle = "white";
+        ctx.globalAlpha = 1.0;
+        let curX = 0;
         for (let i = 0; i < 128; i++) {
-            ctx.fillText(String.fromCharCode(i), 16 + (i * 32), 16, 32);
+            let measure = ctx.measureText(String.fromCharCode(i));
+            ctx.fillText(String.fromCharCode(i), curX + (measure.width / 2), 16);
             const coord = {
-                x: (i * 32) / canvas.width,
+                x: curX / canvas.width,
                 y: 0,
-                dx: (32 + (i * 32)) / canvas.width,
+                dx: (curX + measure.width) / canvas.width,
                 dy: 1,
                 rotation: null
             };
+            curX += measure.width + 1;
             coords.push(coord);
         }
         const texture = gl.createTexture();

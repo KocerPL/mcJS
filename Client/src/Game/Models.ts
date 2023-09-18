@@ -18,7 +18,8 @@ export const Model=
         },
         {//2 leftHead
             pos:[0,8],
-            size:[8,8]
+            size:[8,8],
+            rotation:rot2d.D90
         },
         {//3 rightHead
             pos:[16,8],

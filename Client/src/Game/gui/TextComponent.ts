@@ -8,12 +8,12 @@ import { TextSprite } from "../../Engine/Utils/TextSprite.js";
 const gl =CanvaManager.gl;
 export class TextComponent extends GuiComponent
 {
-    constructor(id:string)
+    constructor(id:string,text:string,w:number,h?:number)
     {
         super(id);
-        this.sprite = new TextSprite(-0.5,-0.2,0.5,0.2,"TEST");
+        this.sprite = new TextSprite(-w,-(h??w),w,(h??w),text);
         this.visible =true;
-        this.transformation = Matrix3.identity().translate(0,0.5);
+        this.transformation = Matrix3.identity()
         this.tcoords = Texture.fontAtlas.coords[49];
       
     }
@@ -22,5 +22,11 @@ export class TextComponent extends GuiComponent
         shader.loadMatrix3("transformation",mat);
         if(this.renderMe)
             gl.drawElements(gl.TRIANGLES,this.vEnd-this.vStart,gl.UNSIGNED_INT,this.vStart*4);
+    }
+    changeText(text:string)
+    {
+        if(this.sprite instanceof TextSprite)
+        this.sprite.text = text;
+        this.gui.needsRefresh();
     }
 }

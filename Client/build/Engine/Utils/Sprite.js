@@ -24,7 +24,7 @@ export class Sprite {
                 coords.x, coords.dy,
                 coords.dx, coords.y,
             ];
-        rArrays.indices = [0, 1, 2, 1, 0, 3];
+        rArrays.indices = [2, 1, 0, 3, 0, 1];
         return rArrays;
     }
 }

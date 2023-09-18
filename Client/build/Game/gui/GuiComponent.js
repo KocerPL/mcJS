@@ -32,8 +32,6 @@ export class GuiComponent {
         rArrays.resetArrays();
         for (const comp of this.components) {
             comp.changed = false;
-            if (!comp.getVisible)
-                continue;
             const subRArrays = comp.updateComponents(vStart + rArrays.indices.length);
             for (let i = 0; i < subRArrays.vertices.length; i += 2) {
                 //const result:Vector3 = this.transformation.multiplyVec(new Vector3(subRArrays.vertices[i],subRArrays.vertices[i+1],1)); 
@@ -86,6 +84,8 @@ export class GuiComponent {
             }
     }
     render(shader, transf) {
+        if (!this.visible)
+            return;
         const mat = transf.multiplyMat(this.transformation); //.multiplyMat(transf);
         for (const comp of this.components)
             comp.render(shader, mat);

@@ -10,13 +10,12 @@ export class TextSprite extends Sprite {
     getRenderArrays(coords) {
         const rArrays = new RenderArrays();
         const width = Math.abs(this.x - this.dx);
-        const chWidth = width / this.text.length;
         let i = 0;
         for (const char of this.text) {
-            rArrays.vertices.push(this.x + (chWidth * i), this.dy, this.x + (chWidth * (i + 1)), this.y, this.x + (chWidth * i), this.y, this.x + (chWidth * (i + 1)), this.dy);
+            rArrays.vertices.push(this.x + (width * i), this.dy, this.x + (width * (i + 1)), this.y, this.x + (width * i), this.y, this.x + (width * (i + 1)), this.dy);
             coords = Texture.fontAtlas.coords[char.charCodeAt(0)];
             rArrays.textureCoords.push(coords.x, coords.y, coords.dx, coords.dy, coords.x, coords.dy, coords.dx, coords.y);
-            rArrays.indices.push(i * 0, i * 1, i * 2, i * 1, i * 0, i * 3);
+            rArrays.indices.push((4 * i) + 2, (4 * i) + 1, (4 * i) + 0, (4 * i) + 3, (4 * i) + 0, (4 * i) + 1);
             i++;
         }
         return rArrays;

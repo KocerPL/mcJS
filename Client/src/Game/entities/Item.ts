@@ -54,14 +54,44 @@ export class Item extends Entity
         this.rs.bufferArrays();
     }
     prepareModel()
-    {
-        this.rs.vertices = [...SubChunk.defVertices];
-        this.rs.textureCoords =[...SubChunk.getTextureCords(this.type,Side.front),...SubChunk.getTextureCords(this.type,Side.back),
-            ...SubChunk.getTextureCords(this.type,Side.left),...SubChunk.getTextureCords(this.type,Side.right),
-            ...SubChunk.getTextureCords(this.type,Side.bottom),...SubChunk.getTextureCords(this.type,Side.top)];
+    {//top,bottom,front,back,left, right
+        this.rs.vertices = [  
+            -0.5,0.5,-0.5,
+            -0.5,0.5,0.5,
+            0.5,0.5 ,0.5,
+            0.5,0.5,-0.5,
+        //bottom
+        -0.5,-0.5,-0.5,
+        0.5,-0.5,-0.5,
+        0.5,-0.5 ,0.5,
+        -0.5,-0.5,0.5,
+            //front 
+            -0.5,-0.5,0.5,
+            0.5,-0.5,0.5,
+            0.5,0.5,0.5,
+            -0.5,0.5,0.5,
+            //back
+            -0.5,-0.5,-0.5,
+        -0.5,0.5,-0.5,
+        0.5,0.5,-0.5,
+        0.5,-0.5,-0.5,
+        //left
+        0.5,-0.5,-0.5,
+        0.5,0.5,-0.5,
+        0.5,0.5 ,0.5,
+        0.5,-0.5,0.5,
+        //right
+        -0.5,-0.5,-0.5,
+        -0.5,-0.5,0.5,
+        -0.5,0.5 ,0.5,
+        -0.5,0.5,-0.5,
+            ];
+        this.rs.textureCoords =[...SubChunk.getTextureCords(this.type,Side.top),...SubChunk.getTextureCords(this.type,Side.bottom),
+            ...SubChunk.getTextureCords(this.type,Side.front),...SubChunk.getTextureCords(this.type,Side.back),
+            ...SubChunk.getTextureCords(this.type,Side.left),...SubChunk.getTextureCords(this.type,Side.right)];
         //     console.log(this.rs.textureCoords);
-        this.rs.indices = [2,1,0,2,0,3
-            ,6,5,4,6,4,7, 10,9,8,10,8,11, 14,13,12,14,12,15, 18,17,16,18,16,19, 22,21,20,22,20,23];
+        this.rs.indices = [2,1,0,2,0,3, 6,5,4,6,4,7, 10,9,8,10,8,11, 14,13,12,14,12,15,  18,17,16,18,16,19, 22,21,20,22,20,23];
+           //  ];
         this.rs.skyLight = [14,14,14,14, 14,14,14,14 ,14,14,14,14 ,14,14,14,14 ,14,14,14,14, 14,14,14,14];
            
     }
@@ -103,7 +133,7 @@ export class Item extends Entity
         this.transformation=this.transformation.translate(this.pos.x,this.pos.y+(Math.abs(this.rotation-180)/360),this.pos.z);
         this.transformation=this.transformation.scale(0.3,0.3,0.3);
         this.transformation=    this.transformation.rotateY(this.rotation);
-        gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
+        Texture.blockAtlas.bind();
         this.rs.vao.bind();
         // Main.shader.use();
         Main.shader.loadUniforms(Main.player.camera.getProjection(),this.transformation,Main.player.camera.getView(),Main.sunLight);
@@ -113,7 +143,7 @@ export class Item extends Entity
         gl.drawElements(gl.TRIANGLES,this.rs.count,gl.UNSIGNED_INT,0);
         if(this.count>1)
         {
-            gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
+      //      gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
             this.rs.vao.bind();
             this.transformation=this.transformation.translate(0.3,-0.3,0.3);
             Main.shader.loadUniforms(Main.player.camera.getProjection(),this.transformation,Main.player.camera.getView(),Main.sunLight);

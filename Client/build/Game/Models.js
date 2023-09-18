@@ -17,7 +17,8 @@ export const Model = {
         },
         {
             pos: [0, 8],
-            size: [8, 8]
+            size: [8, 8],
+            rotation: rot2d.D90
         },
         {
             pos: [16, 8],

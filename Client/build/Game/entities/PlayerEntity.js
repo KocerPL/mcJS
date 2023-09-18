@@ -204,7 +204,6 @@ export class PlayerEntity extends Entity {
         this.rs.blockLight = this.rs.skyLight;
         let tc = [];
         const pushFunc = (ind) => {
-            console.log("rotation: ", Texture.skinAtlas.coords[ind].rotation);
             if (Texture.skinAtlas.coords[ind].rotation == undefined)
                 tc = tc.concat([
                     Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].dy,
@@ -213,7 +212,6 @@ export class PlayerEntity extends Entity {
                     Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].y,
                 ]);
             else if (Texture.skinAtlas.coords[ind].rotation == rot2d.D90) {
-                console.log("rev90");
                 tc = tc.concat([
                     Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].dy,
                     Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].y,
