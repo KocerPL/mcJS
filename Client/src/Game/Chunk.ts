@@ -321,7 +321,7 @@ export class Chunk {
                     }
                 }
             }
-        this.lightQueue=  this.lightQueue.concat(queue);
+        this.lightQueue.push(...queue);
         
     }
     setBlock(pos:Vector,blockID:number)

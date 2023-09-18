@@ -156,6 +156,7 @@ export class World
             return undefined;
         }
     }
+    
     static  getBlockAndSub(blockPos:Vector):{block:Block,sub:SubChunk}
     {
         let inChunkPos = new Vector(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);

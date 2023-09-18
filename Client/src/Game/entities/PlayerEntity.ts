@@ -211,26 +211,26 @@ export class PlayerEntity extends Entity
             console.log("rotation: ",Texture.skinAtlas.coords[ind].rotation);
             if(Texture.skinAtlas.coords[ind].rotation == undefined)
                 tc=   tc.concat([
-                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].dy,0,
-                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].dy,0,
-                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].y,0,
-                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].y,0]);
+                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].dy,
+                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].dy,
+                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].y,
+                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].y,]);
             else if(Texture.skinAtlas.coords[ind].rotation==rot2d.D90)
             {
                 console.log("rev90");
                 tc=   tc.concat([
-                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].dy,0,
-                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].y,0,
-                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].y,0,
-                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].dy,0]);
+                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].dy,
+                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].y,
+                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].y,
+                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].dy,]);
             }
             else if(Texture.skinAtlas.coords[ind].rotation==rot2d.D180)
             {
                 tc=   tc.concat([
-                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].y,0,
-                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].dy,0,
-                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].dy,0,
-                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].y,0
+                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].y,
+                    Texture.skinAtlas.coords[ind].x, Texture.skinAtlas.coords[ind].dy,
+                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].dy,
+                    Texture.skinAtlas.coords[ind].dx, Texture.skinAtlas.coords[ind].y,
                 ] );
             }
 

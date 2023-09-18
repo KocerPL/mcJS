@@ -150,6 +150,48 @@ export class Loader {
         const textureHolder = new Texture2(coords, texture);
         return textureHolder;
     }
+    static fontAtlas(fontName) {
+        const coords = [];
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = 128 * 32;
+        canvas.height = 32;
+        // Prepare the font to be able to measure
+        const fontSize = 16;
+        // Resize canvas to match text size 
+        canvas.style.width = canvas.width + "px";
+        canvas.style.height = canvas.height + "px";
+        // Re-apply font since canvas is resized.
+        ctx.font = `${fontSize}px ` + fontName;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        // Make the canvas transparent for simplicity
+        ctx.fillStyle = "transparent";
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.fillStyle = "white";
+        for (let i = 0; i < 128; i++) {
+            ctx.fillText(String.fromCharCode(i), 16 + (i * 32), 16, 32);
+            const coord = {
+                x: (i * 32) / canvas.width,
+                y: 0,
+                dx: (32 + (i * 32)) / canvas.width,
+                dy: 1,
+                rotation: null
+            };
+            coords.push(coord);
+        }
+        const texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, canvas.width, canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        //document.body.appendChild(canvas);
+        return new Texture2(coords, texture);
+    }
     static loadObj(path) {
         const text = this.txtFile(path);
         const rs = new RenderSet(Main.atlasShader);

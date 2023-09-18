@@ -28,13 +28,13 @@ export class GuiComponent {
     }
     updateComponents(vStart) {
         let index = 0;
-        let rArrays = new RenderArrays();
+        const rArrays = new RenderArrays();
         rArrays.resetArrays();
         for (const comp of this.components) {
             comp.changed = false;
             if (!comp.getVisible)
                 continue;
-            let subRArrays = comp.updateComponents(vStart + rArrays.indices.length);
+            const subRArrays = comp.updateComponents(vStart + rArrays.indices.length);
             for (let i = 0; i < subRArrays.vertices.length; i += 2) {
                 //const result:Vector3 = this.transformation.multiplyVec(new Vector3(subRArrays.vertices[i],subRArrays.vertices[i+1],1)); 
                 rArrays.vertices.push(subRArrays.vertices[i], subRArrays.vertices[i + 1]);
@@ -86,14 +86,14 @@ export class GuiComponent {
             }
     }
     render(shader, transf) {
-        let mat = transf.multiplyMat(this.transformation); //.multiplyMat(transf);
+        const mat = transf.multiplyMat(this.transformation); //.multiplyMat(transf);
         for (const comp of this.components)
             comp.render(shader, mat);
         this.renderItself(shader, mat);
     }
     attachGUI(gui) {
         this.gui = gui;
-        for (let comp of this.components)
+        for (const comp of this.components)
             comp.attachGUI(gui);
     }
     renderItself(shader, mat) {

@@ -129,7 +129,7 @@ class Player {
                 let light = [];
                 let textureCoords = [];
                 for (let i = 0; i < 6; i++) {
-                    let coords = Texture.blockOverlay.coords;
+                    const coords = Texture.blockOverlay.coords;
                     textureCoords = textureCoords.concat([coords[index].x, coords[index].y,
                         coords[index].dx, coords[index].y,
                         coords[index].dx, coords[index].dy,
@@ -430,7 +430,7 @@ class Player {
             }
             if (this.itemsBar[x].id == 0) {
                 console.log(x);
-                let hold = Main.gui.get("slot_" + (x + 1) + "_holder");
+                const hold = Main.gui.get("slot_" + (x + 1) + "_holder");
                 if (hold instanceof ItemHolder)
                     hold.change(id);
                 this.itemsBar[x].id = id;

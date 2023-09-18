@@ -62,7 +62,7 @@ export class Main
     public static range = {start:0, end:1};
     //public static chunks:Array<Array<Chunk>>=new Array(8);
     public static chunkQueue:Array<Chunk> = []; 
-    public static loadedChunks:Array<Chunk> = [];
+    public static loadedChunks:Map<string,Chunk> = new Map();
     public static toUpdate:Set<SubChunk> = new Set();
     public static integratedServer:Worker;
     public static heh():void
@@ -84,7 +84,7 @@ export class Main
         if(chunk==undefined)
         {
             chunk = new Chunk(ev.data.subX,ev.data.subZ);
-            this.loadedChunks.push(chunk);
+            this.loadedChunks.set(chunk.pos.x+"-"+chunk.pos.z,chunk);
         }
         chunk.subchunks[ev.data.subY] = new SubChunk(new Vector(ev.data.subX,ev.data.subY,ev.data.subZ),chunk);
         for(let x=0;x<16;x++)    for(let y=0;y<16;y++)    for(let z=0;z<16;z++)
@@ -335,9 +335,9 @@ export class Main
     }
     public static getChunkAt(x:number,z:number):Chunk | undefined
     {
-        for(let i=0;i<this.loadedChunks.length;i++)
-            if(this.loadedChunks[i].pos.x == x && this.loadedChunks[i].pos.z == z)
-                return this.loadedChunks[i];
+        const ch = this.loadedChunks.get(x+"-"+z);
+        if(ch)
+            return ch;
         return undefined;
     }
     public static renderDebug()
@@ -358,13 +358,13 @@ export class Main
         gl.clearColor(0.43*(this.sunLight/15) ,0.69 *(this.sunLight/15),(this.sunLight/15),1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
    
-       Texture.blockAtlas.bind();
+        Texture.blockAtlas.bind();
     
         Main.shader.loadUniforms(Main.player.camera.getProjection(), Matrix4.identity(), Main.player.camera.getView(),Main.sunLight);
-        for(const chunk of this.loadedChunks)
+        for(const val of this.loadedChunks)
         {
         
-            chunk.render();   
+            val[1].render();   
         
         } 
         for(let i=0;i<this.entities.length;i++)

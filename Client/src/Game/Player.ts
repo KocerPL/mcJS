@@ -116,19 +116,19 @@ export class Player
         {
             if(Math.abs(CanvaManager.scrollAmount)>0.1) 
             {
-            const ib =   Main.gui.get("ItemBar");
+                const ib =   Main.gui.get("ItemBar");
             
-            if(ib instanceof ItemBar)
-            {
-                if(CanvaManager.scrollAmount> 0)
-                    ib.currentSlot ++;
-                else
-                    ib.currentSlot--;
-                ib.currentSlot = clamp(ib.currentSlot,0,8);
-                this.selectedItem = ib.currentSlot;
-                ib.updateSlot();
-                CanvaManager.scrollAmount=0;
-            }
+                if(ib instanceof ItemBar)
+                {
+                    if(CanvaManager.scrollAmount> 0)
+                        ib.currentSlot ++;
+                    else
+                        ib.currentSlot--;
+                    ib.currentSlot = clamp(ib.currentSlot,0,8);
+                    this.selectedItem = ib.currentSlot;
+                    ib.updateSlot();
+                    CanvaManager.scrollAmount=0;
+                }
             }
         }
         if(this.targetedBlock instanceof Block)
@@ -144,26 +144,26 @@ export class Player
             const index = 5-Math.round((((Date.now()/1000)-this.startTime)/blocks[this.targetedBlock.id].breakTime)*5); 
             if(index>-1)
             {
-            let indices = [];
-            let light=[];
-            let textureCoords = [];
-            for(let i=0;i<6;i++)
-            {
-                let coords = Texture.blockOverlay.coords;
-                textureCoords= textureCoords.concat([coords[index].x, coords[index].y,
-                    coords[index].dx, coords[index].y, 
-                    coords[index].dx, coords[index].dy,
-                    coords[index].x, coords[index].dy]);
-                light=    light.concat([14,14,14,14]);
-                const k = 4*i;
-                indices= indices.concat([2+k,1+k,k,2+k,0+k,3+k]);
-            }
-            this.blockOverlay.blockLight=light;
-            this.blockOverlay.textureCoords=textureCoords;
-            this.blockOverlay.skyLight=light;
-            this.blockOverlay.vertices=vertices;
-            this.blockOverlay.indices=indices;
-            this.blockOverlay.bufferArrays();
+                let indices = [];
+                let light=[];
+                let textureCoords = [];
+                for(let i=0;i<6;i++)
+                {
+                    const coords = Texture.blockOverlay.coords;
+                    textureCoords= textureCoords.concat([coords[index].x, coords[index].y,
+                        coords[index].dx, coords[index].y, 
+                        coords[index].dx, coords[index].dy,
+                        coords[index].x, coords[index].dy]);
+                    light=    light.concat([14,14,14,14]);
+                    const k = 4*i;
+                    indices= indices.concat([2+k,1+k,k,2+k,0+k,3+k]);
+                }
+                this.blockOverlay.blockLight=light;
+                this.blockOverlay.textureCoords=textureCoords;
+                this.blockOverlay.skyLight=light;
+                this.blockOverlay.vertices=vertices;
+                this.blockOverlay.indices=indices;
+                this.blockOverlay.bufferArrays();
             }
         }
         else
@@ -513,9 +513,9 @@ export class Player
             if(this.itemsBar[x].id ==0 ) 
             {
                 console.log(x);
-              let hold =  Main.gui.get("slot_"+(x+1)+"_holder");
-              if(hold instanceof ItemHolder)
-               hold.change(id);
+                const hold =  Main.gui.get("slot_"+(x+1)+"_holder");
+                if(hold instanceof ItemHolder)
+                    hold.change(id);
                 this.itemsBar[x].id = id;
                 this.itemsBar[x].count+=item.count;
                 return;
@@ -549,7 +549,7 @@ export class Player
         {      const   transformation = Matrix4.identity();
             this.blockOverlay.vao.bind();
             Main.shader.use();
-            Texture.blockOverlay.bind()
+            Texture.blockOverlay.bind();
             Main.shader.loadUniforms(this.camera.getProjection(),transformation,this.camera.getView(),15);
             gl.drawElements(gl.TRIANGLES,this.blockOverlay.count,gl.UNSIGNED_INT,0);
         }

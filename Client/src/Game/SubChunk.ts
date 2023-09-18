@@ -289,7 +289,7 @@ export class SubChunk
         return  (5-((side1?1:0) +(corner?1:0)+ (side2?1:0)))/5;
     }
     //DONE: update vertices only tree sides
-    updateSide(x:number,y:number,z:number,dx:number,dy:number,dz:number,vStart:number,side:Side,block:Block,index:number,vBuffer:Array<number>)
+    updateSide(x:number,y:number,z:number,dx:number,dy:number,dz:number,vStart:number,side:Side,block:Block,index:number,vBuffer:Array<Array<number>>)
     {
         const testedBlock = this.getBlockWV(dx+x,dy+y,dz+z);
         if(testedBlock==undefined) return;
@@ -298,7 +298,7 @@ export class SubChunk
      
             if(testedBlock.id>0)
             {
-                this.mesh.vertices.push(...vBuffer.slice(vStart-12,vStart));
+                this.mesh.vertices.push(...(vBuffer[side]));
                 this.mesh.tCoords.push(...SubChunk.getTextureCords(testedBlock.id, SubChunk.flip(side)));
                 this.mesh.indices.push(index+2,index+1,index,index+2,index,index+3);
                 if( dy==1)
@@ -337,7 +337,7 @@ export class SubChunk
         {
             if(testedBlock.id<1)
             {  
-                this.mesh.vertices.push(...vBuffer.slice(vStart,vStart+12));
+                this.mesh.vertices.push(...vBuffer[SubChunk.flip(side)]);
                 this.mesh.tCoords.push(...SubChunk.getTextureCords(block.id, side));
                 this.mesh.indices.push(index+2,index+1,index,index+2,index,index+3);
                 if( dy==1)
@@ -378,17 +378,20 @@ export class SubChunk
     {
         let index=0;
         let block:Block;
-        const temp:Array<number> = [];
+        const temp:Array<Array<number>> = [];
         for(let x=0;x<16;x++) for(let y=0;y<16;y++) for(let z=0;z<16;z++) 
         {
             block = this.blocks[x][y][z];
-            
-            //20 ms for 65535
-            for(let i=0;i<SubChunk.defVertices.length;i+=3)
+            for(let j=0;j<SubChunk.cubeVert.length;j++)
             {
-                temp.push(SubChunk.defVertices[i]+x);
-                temp.push(SubChunk.defVertices[i+1]+y+(this.pos.y*16));
-                temp.push(SubChunk.defVertices[i+2]+z);
+                const tempArr = [];
+                for(let i=0;i<SubChunk.cubeVert[j].length;i+=3)
+                {
+                    tempArr.push(SubChunk.cubeVert[j][i]+x);
+                    tempArr.push(SubChunk.cubeVert[j][i+1]+y+(this.pos.y*16));
+                    tempArr.push(SubChunk.cubeVert[j][i+2]+z);
+                }
+                temp.push(tempArr);
             }
             index= this.updateSide(x,y,z,1,0,0,36,Side.left,block,index,temp);
             index= this.updateSide(x,y,z,0,1,0,60,Side.top,block,index,temp);
@@ -404,18 +407,18 @@ export class SubChunk
     {
         switch(side)
         {
-            case Side.back:
-                return Side.front;
-            case Side.front:
-                return Side.back;
-            case Side.top:
-                return Side.bottom;
-            case Side.bottom:
-                return Side.top;
-            case Side.left:
-                return Side.right;
-            case Side.right:
-                return Side.left;
+        case Side.back:
+            return Side.front;
+        case Side.front:
+            return Side.back;
+        case Side.top:
+            return Side.bottom;
+        case Side.bottom:
+            return Side.top;
+        case Side.left:
+            return Side.right;
+        case Side.right:
+            return Side.left;
         }
     }
 
@@ -457,12 +460,12 @@ export class SubChunk
         const index = blocks[id].textureIndex[face];
         const uvs = Texture.blockAtlas.coords[index];
         if(face == Side.front || face == Side.right || face == Side.bottom)
-        return [
-            uvs.x, uvs.dy,
-            uvs.dx, uvs.dy,
-            uvs.dx, uvs.y,
-            uvs.x, uvs.y,
-        ];
+            return [
+                uvs.x, uvs.dy,
+                uvs.dx, uvs.dy,
+                uvs.dx, uvs.y,
+                uvs.x, uvs.y,
+            ];
         else return [ uvs.x, uvs.dy,
             uvs.x, uvs.y,
             uvs.dx, uvs.y,
@@ -513,6 +516,10 @@ export class SubChunk
         0,-0.3,0,
         0,0.2,-0.2
     ];
+    /*export enum Side
+{
+   top,bottom,front,back,left, right
+}*/
     static defVertices =[
         //przód
         -0.5,-0.5,0.5,
@@ -544,7 +551,45 @@ export class SubChunk
         -0.5,0.5,0.5,
         0.5,0.5 ,0.5,
         0.5,0.5,-0.5
-  
+    ];
+    static cubeVert =[
+        [
+            -0.5,0.5,-0.5,
+            0.5,0.5,-0.5,
+            0.5,0.5 ,0.5,
+            -0.5,0.5,0.5, 
+        ],
+        [
+            -0.5,0.5,-0.5,
+            -0.5,0.5,0.5,
+            0.5,0.5 ,0.5,
+            0.5,0.5,-0.5  
+        ],
+       
+        [
+            -0.5,-0.5,0.5,
+            -0.5,0.5,0.5,
+            0.5,0.5,0.5,
+            0.5,-0.5,0.5, 
+        ],
+        [
+            -0.5,-0.5,0.5,
+            0.5,-0.5,0.5,
+            0.5,0.5,0.5,
+            -0.5,0.5,0.5,
+        ],
+        [
+            0.5,-0.5,-0.5,
+            0.5,-0.5,0.5,
+            0.5,0.5 ,0.5,
+            0.5,0.5,-0.5,
+        ],
+        [
+            0.5,-0.5,-0.5,
+            0.5,0.5,-0.5,
+            0.5,0.5 ,0.5,
+            0.5,-0.5,0.5,
+        ]
     ];
 
 }

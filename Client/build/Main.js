@@ -54,7 +54,7 @@ class Main {
     static range = { start: 0, end: 1 };
     //public static chunks:Array<Array<Chunk>>=new Array(8);
     static chunkQueue = [];
-    static loadedChunks = [];
+    static loadedChunks = new Map();
     static toUpdate = new Set();
     static integratedServer;
     static heh() {
@@ -71,7 +71,7 @@ class Main {
         let chunk = Main.getChunkAt(ev.data.subX, ev.data.subZ);
         if (chunk == undefined) {
             chunk = new Chunk(ev.data.subX, ev.data.subZ);
-            this.loadedChunks.push(chunk);
+            this.loadedChunks.set(chunk.pos.x + "-" + chunk.pos.z, chunk);
         }
         chunk.subchunks[ev.data.subY] = new SubChunk(new Vector(ev.data.subX, ev.data.subY, ev.data.subZ), chunk);
         for (let x = 0; x < 16; x++)
@@ -294,9 +294,9 @@ class Main {
         });
     }
     static getChunkAt(x, z) {
-        for (let i = 0; i < this.loadedChunks.length; i++)
-            if (this.loadedChunks[i].pos.x == x && this.loadedChunks[i].pos.z == z)
-                return this.loadedChunks[i];
+        const ch = this.loadedChunks.get(x + "-" + z);
+        if (ch)
+            return ch;
         return undefined;
     }
     static renderDebug() {
@@ -315,8 +315,8 @@ class Main {
         gl.clear(gl.COLOR_BUFFER_BIT);
         Texture.blockAtlas.bind();
         Main.shader.loadUniforms(Main.player.camera.getProjection(), Matrix4.identity(), Main.player.camera.getView(), Main.sunLight);
-        for (const chunk of this.loadedChunks) {
-            chunk.render();
+        for (const val of this.loadedChunks) {
+            val[1].render();
         }
         for (let i = 0; i < this.entities.length; i++) {
             this.entities[i].render();

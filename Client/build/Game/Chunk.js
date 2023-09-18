@@ -272,7 +272,7 @@ export class Chunk {
                     }
                 }
             }
-        this.lightQueue = this.lightQueue.concat(queue);
+        this.lightQueue.push(...queue);
     }
     setBlock(pos, blockID) {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {

@@ -12,5 +12,6 @@ class Texture {
     static crossHair = Loader.image("./res/textures/crosshair.png");
     static hammer = Loader.image("./res/textures/hammer.png");
     static skinAtlas = Loader.imageAtlasByJSON("./res/textures/skinMC.png" /*"http://i.imgur.com/PNJXVA3.png"*/, Model.player, 64, 64);
+    static fontAtlas = Loader.fontAtlas("monospace");
 }
 export { Texture };

@@ -11,7 +11,7 @@ export class Sprite {
         this.dy = dy;
     }
     getRenderArrays(coords) {
-        let rArrays = new RenderArrays();
+        const rArrays = new RenderArrays();
         rArrays.vertices =
             [this.x, this.dy,
                 this.dx, this.y,
@@ -19,10 +19,10 @@ export class Sprite {
                 this.dx, this.dy];
         rArrays.textureCoords =
             [
-                coords.x, coords.dy,
-                coords.dx, coords.y,
                 coords.x, coords.y,
                 coords.dx, coords.dy,
+                coords.x, coords.dy,
+                coords.dx, coords.y,
             ];
         rArrays.indices = [0, 1, 2, 1, 0, 3];
         return rArrays;

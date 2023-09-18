@@ -1,5 +1,5 @@
 import { RenderArrays } from "../RenderArrays.js";
-import { Sprite } from "./Sprite.js"
+import { Sprite } from "./Sprite.js";
 type boundingBox = { x:number;
     y:number,
     dx:number,
@@ -19,15 +19,15 @@ export class BorderedSprite extends Sprite
     left:boundingBox;
     center:boundingBox;
     constructor(x: number, y: number, dx: number, dy: number,border:number,
-    topLeftCorner:boundingBox,
-    top:boundingBox,
-    topRightCorner:boundingBox,
-    left:boundingBox,
-    center:boundingBox,
-    right:boundingBox,
-    bottomLeftCorner:boundingBox,
-    bottom:boundingBox,
-    bottomRightCorner:boundingBox, 
+        topLeftCorner:boundingBox,
+        top:boundingBox,
+        topRightCorner:boundingBox,
+        left:boundingBox,
+        center:boundingBox,
+        right:boundingBox,
+        bottomLeftCorner:boundingBox,
+        bottom:boundingBox,
+        bottomRightCorner:boundingBox, 
     )
     {
         super(x,y,dx,dy);
@@ -41,14 +41,14 @@ export class BorderedSprite extends Sprite
         this.bottom = bottom;
         this.left = left;
         this.center = center;
-        this.boundingBoxes = new Array();
+        this.boundingBoxes = [];
         this.boundingBoxes.push(topLeftCorner,top,topRightCorner);
         this.boundingBoxes.push(left,center,right);
         this.boundingBoxes.push(bottomLeftCorner,bottom,bottomRightCorner);
-        this.sprites = new Array();
-        this.sprites.push(new Sprite(x,y,x+border,y+border),new Sprite(x+border,y,dx-border,y+border),new Sprite(dx-border,y,dx,y+border))
+        this.sprites = [];
+        this.sprites.push(new Sprite(x,y,x+border,y+border),new Sprite(x+border,y,dx-border,y+border),new Sprite(dx-border,y,dx,y+border));
         this.sprites.push(new Sprite(x,y+border,x+border,dy-border),new Sprite(x+border,y+border,dx-border,dy-border),new Sprite(dx-border,y+border,dx,dy-border));
-        this.sprites.push(new Sprite(x,dy-border,x+border,dy),new Sprite(x+border,dy-border,dx-border,dy),new Sprite(dx-border,dy-border,dx,dy))
+        this.sprites.push(new Sprite(x,dy-border,x+border,dy),new Sprite(x+border,dy-border,dx-border,dy),new Sprite(dx-border,dy-border,dx,dy));
 
 
     }
@@ -57,13 +57,13 @@ export class BorderedSprite extends Sprite
         dx:number,
         dy:number}| null):RenderArrays
     {   
-        let rArrays = new RenderArrays();
+        const rArrays = new RenderArrays();
         let i=0;
-       for(let sprite of this.sprites)
-       {
-        rArrays.addArr(sprite.getRenderArrays(this.boundingBoxes[i]),i*4);
-        i++;
-       }
+        for(const sprite of this.sprites)
+        {
+            rArrays.addArr(sprite.getRenderArrays(this.boundingBoxes[i]),i*4);
+            i++;
+        }
         return  rArrays;
     }
 }

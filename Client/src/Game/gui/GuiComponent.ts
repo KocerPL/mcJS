@@ -18,8 +18,8 @@ export abstract class GuiComponent
     gui:GUI;
     changed=true;
     id:string;
-    vStart:number=0;
-    vEnd:number=0;
+    vStart=0;
+    vEnd=0;
     parent:GuiComponent|null = null;
     transformation:Matrix3;
     tcoords:{x:number,y:number,dx:number,dy:number,rotation: rot2d};
@@ -39,14 +39,14 @@ export abstract class GuiComponent
     updateComponents(vStart:number):RenderArrays
     {
         let index=0;
-        let rArrays = new RenderArrays();
+        const rArrays = new RenderArrays();
         rArrays.resetArrays();
      
         for(const comp of this.components)
         {
             comp.changed=false;
             if(!comp.getVisible) continue;
-           let subRArrays  =  comp.updateComponents(vStart+ rArrays.indices.length);
+            const subRArrays  =  comp.updateComponents(vStart+ rArrays.indices.length);
             for(let i =0;i<subRArrays.vertices.length;i+=2)
             {
                 //const result:Vector3 = this.transformation.multiplyVec(new Vector3(subRArrays.vertices[i],subRArrays.vertices[i+1],1)); 
@@ -88,7 +88,7 @@ export abstract class GuiComponent
         this.components.push(component);
         component.gui = this.gui;
         if(this.gui)
-        this.gui.needsRefresh();
+            this.gui.needsRefresh();
         component.parent =this;
     }
     get(id:string):GuiComponent|null
@@ -104,23 +104,23 @@ export abstract class GuiComponent
     render(shader:Shader,transf:Matrix3)
     {
        
-        let mat = transf.multiplyMat(this.transformation);//.multiplyMat(transf);
+        const mat = transf.multiplyMat(this.transformation);//.multiplyMat(transf);
         for(const comp of this.components)
-        comp.render(shader,mat);
+            comp.render(shader,mat);
         this.renderItself(shader,mat);
       
     }
     attachGUI(gui:GUI)
     {
         this.gui = gui;
-        for(let comp of this.components)
-        comp.attachGUI(gui);
+        for(const comp of this.components)
+            comp.attachGUI(gui);
     }
     renderItself(shader:Shader,mat:Matrix3)
     {
         Texture.GUI.bind();  
         shader.loadMatrix3("transformation",mat);
         if(this.renderMe)
-        gl.drawElements(gl.TRIANGLES,this.vEnd-this.vStart,gl.UNSIGNED_INT,this.vStart*4);
+            gl.drawElements(gl.TRIANGLES,this.vEnd-this.vStart,gl.UNSIGNED_INT,this.vStart*4);
     }
 }
