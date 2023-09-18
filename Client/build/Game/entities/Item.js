@@ -14,7 +14,7 @@ export class Item extends Entity {
     lifeTime = 60000;
     rotation = 0;
     count = 1;
-    yAcc = 0;
+    acc = new Vector(0, 0, 0);
     constructor(pos, type) {
         super(pos, Main.atlasShader);
         this.type = type;
@@ -96,16 +96,28 @@ export class Item extends Entity {
         // console.log("rendered")
         try {
             if (World.getBlock(new Vector(this.pos.x, this.pos.y, this.pos.z)).id > 0)
-                this.yAcc -= 0.01;
+                this.acc.y += 0.01;
             else if (World.getBlock(new Vector(this.pos.x, this.pos.y - 0.5, this.pos.z)).id == 0)
-                this.yAcc += 0.01;
+                this.acc.y -= 0.01;
             else
-                this.yAcc = 0;
+                this.acc.y = 0;
         }
         catch (erro) {
             this.lifeTime = 0;
         }
-        this.pos.y -= this.yAcc;
+        if (this.acc.x > 0)
+            this.acc.x -= 0.01;
+        else if (this.acc.x < 0)
+            this.acc.x += 0.01;
+        else
+            this.acc.x = 0;
+        if (this.acc.z > 0)
+            this.acc.z -= 0.01;
+        else if (this.acc.z < 0)
+            this.acc.z += 0.01;
+        else
+            this.acc.z = 0;
+        this.pos = Vector.add(this.pos, this.acc);
         if (this.rotation < 360)
             this.rotation++;
         else {

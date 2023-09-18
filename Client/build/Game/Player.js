@@ -90,14 +90,7 @@ class Player {
             this.itemsBar[i] = new invItem(0);
         for (let i = 0; i < 27; i++)
             this.inventory[i] = new invItem(0);
-        let i = 0;
-        for (const id in blocks) {
-            if (Number(id) > 0) {
-                this.inventory[i].id = Number(id);
-                this.inventory[i].count = 64;
-                i++;
-            }
-        }
+        // this.updateItem(2,0,64);
     }
     update() {
         if (0 != CanvaManager.scrollAmount) {
@@ -230,6 +223,7 @@ class Player {
     }
     updatePos() {
         this.entity.rotation.y = -this.camera.getYaw();
+        this.entity.rotation.x = -this.camera.getPitch();
         this.entity.pos = this.pos;
         const nowTime = Date.now();
         if (this.lastTime < nowTime - 100) {
@@ -251,10 +245,11 @@ class Player {
             if (!this.locked) {
                 let yRot = -this.entity.bodyRot;
                 if (CanvaManager.getKeyOnce(81)) {
-                    Main.entities.push(new Item(this.camera.getPosition().copy(), this.itemsBar[this.selectedItem].id));
-                    this.itemsBar[this.selectedItem].count--;
-                    if (this.itemsBar[this.selectedItem].count < 1)
-                        this.itemsBar[this.selectedItem].id = 0;
+                    let it = new Item(this.camera.getPosition().copy(), this.itemsBar[this.selectedItem].id);
+                    it.acc.x = Math.sin((-this.entity.rotation.y) * Math.PI / 180) * 0.3;
+                    it.acc.z = Math.cos((-this.entity.rotation.y) * Math.PI / 180) * 0.3;
+                    Main.entities.push(it);
+                    this.updateItem(this.itemsBar[this.selectedItem].id, this.selectedItem, this.itemsBar[this.selectedItem].count - 1);
                 }
                 if (CanvaManager.getKey(16))
                     speed = 2;
@@ -415,12 +410,7 @@ class Player {
             if (World.getBlock(lastPos).id < 1 && i < 5 && !lastPos.round().equals(new Vector(this.pos.x, this.pos.y - 0.5, this.pos.z).round()) && !lastPos.round().equals(this.pos.round()) && this.itemsBar[this.selectedItem].id != 0) {
                 Main.socket.emit("placeBlock", { id: this.itemsBar[this.selectedItem].id, pos: { x: lastPos.x, y: lastPos.y, z: lastPos.z } });
                 World.placeBlock(lastPos, this.itemsBar[this.selectedItem].id);
-                this.itemsBar[this.selectedItem].count--;
-                if (this.itemsBar[this.selectedItem].count == 0)
-                    this.itemsBar[this.selectedItem].id = 0;
-                const hold = Main.gui.get("slot_" + (this.selectedItem + 1) + "_holder");
-                if (hold instanceof ItemHolder)
-                    hold.change(this.itemsBar[this.selectedItem].id, 1);
+                this.updateItem(this.itemsBar[this.selectedItem].id, this.selectedItem, this.itemsBar[this.selectedItem].count - 1);
                 CanvaManager.mouse.right = false;
             }
         }
@@ -439,19 +429,11 @@ class Player {
         const id = item.type;
         for (let x = 0; x < this.itemsBar.length; x++) {
             if (this.itemsBar[x].id == id && this.itemsBar[x].count < 64) {
-                this.itemsBar[x].count += item.count;
-                const hold = Main.gui.get("slot_" + (x + 1) + "_holder");
-                if (hold instanceof ItemHolder)
-                    hold.change(id, this.itemsBar[x].count);
+                this.updateItem(id, x, this.itemsBar[x].count + 1);
                 return;
             }
             if (this.itemsBar[x].id == 0) {
-                console.log(x);
-                const hold = Main.gui.get("slot_" + (x + 1) + "_holder");
-                if (hold instanceof ItemHolder)
-                    hold.change(id, 1);
-                this.itemsBar[x].id = id;
-                this.itemsBar[x].count += item.count;
+                this.updateItem(id, x, item.count);
                 return;
             }
         }
@@ -466,6 +448,16 @@ class Player {
                 return;
             }
         }
+    }
+    updateItem(id, slot, count) {
+        if (count < 1) {
+            id = 0;
+        }
+        this.itemsBar[slot].id = id;
+        this.itemsBar[slot].count = count;
+        const hold = Main.gui.get("slot_" + (slot + 1) + "_holder");
+        if (hold instanceof ItemHolder)
+            hold.change(id, count);
     }
     render() {
         if (this.person != "First") {

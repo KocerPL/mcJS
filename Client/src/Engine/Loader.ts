@@ -190,6 +190,56 @@ export class Loader
 
         return textureHolder;
     }
+    public static  imageAtlasByNewJSON(path:string,json:any):TextureV3
+    {
+        const img =  new Image();
+        img.src = path;
+        img.decode();
+        let imgSizeX = json.size.x;
+        let imgSizeY = json.size.y;
+        //loading image ^
+        //Buffering image
+        const texture = gl.createTexture();
+        const coords:Map<string,{x:number,dx:number,y:number,dy:number,rotation:rot2d }> = new Map();
+        gl.bindTexture(gl.TEXTURE_2D,texture);
+        gl.activeTexture(gl.TEXTURE0);
+        for(let name in json)
+        {
+            console.log(name);
+            if(name=="size") continue;
+            coords.set(name,{
+                x:(json[name].pos[0]+0.1)/imgSizeX,
+                y:(json[name].pos[1]+0.1)/imgSizeY,
+                dx:((json[name].pos[0] +json[name].size[0])-0.1)/imgSizeX,
+                dy:((json[name].pos[1] +json[name].size[1])-0.1)/imgSizeY,
+                rotation:json[name].rotation
+            });
+            
+        }
+        img.onload = ()=>{
+            gl.bindTexture(gl.TEXTURE_2D,texture);  
+            gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA8,img.width,img.height,0,gl.RGBA,gl.UNSIGNED_BYTE,img);
+    
+      
+    
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST_MIPMAP_NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.generateMipmap(gl.TEXTURE_2D);
+            console.log("loaded json");
+          
+        };
+        if(img.complete)
+        {
+            img.onload(new Event("loaded"));
+        }
+
+
+        const textureHolder = new TextureV3(coords,texture);
+
+        return textureHolder;
+    }
     static fontAtlas(fontName:string):Texture2
     {
         const coords:Array<{x:number,dx:number,y:number,dy:number,rotation:rot2d }> = [];
@@ -351,6 +401,25 @@ export class Texture2
     dy:number;
     ID:WebGLTexture;
     constructor(coords:Array<{x:number,dx:number,y:number,dy:number,rotation:rot2d }>, textureID:WebGLTexture)
+    {  
+        this.ID=textureID;
+        this.coords =coords;
+     
+    }
+    public bind()
+    {
+        gl.bindTexture(gl.TEXTURE_2D,this.ID);
+    }
+}
+export class TextureV3
+{
+    x:number;
+    y:number;
+    dx:number;
+    coords:Map<string,{x:number,dx:number,y:number,dy:number,rotation:rot2d }>;
+    dy:number;
+    ID:WebGLTexture;
+    constructor(coords:Map<string,{x:number,dx:number,y:number,dy:number,rotation:rot2d }>, textureID:WebGLTexture)
     {  
         this.ID=textureID;
         this.coords =coords;

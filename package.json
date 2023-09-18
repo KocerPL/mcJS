@@ -1,12 +1,13 @@
 {
   "dependencies": {
+    "canvas": "^2.11.2",
     "express": "^4.18.2",
     "socket.io": "^4.7.2",
     "ts-node": "^10.9.1",
     "watch": "^0.13.0"
   },
   "scripts": {
-    "build":"bash compileRun.sh",
-    "watch":"watch  'npm run build' ./Client/src --interval=5"
+    "build": "bash compileRun.sh",
+    "watch": "watch  'npm run build' ./Client/src --interval=5"
   }
 }

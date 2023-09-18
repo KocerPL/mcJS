@@ -150,6 +150,46 @@ export class Loader {
         const textureHolder = new Texture2(coords, texture);
         return textureHolder;
     }
+    static imageAtlasByNewJSON(path, json) {
+        const img = new Image();
+        img.src = path;
+        img.decode();
+        let imgSizeX = json.size.x;
+        let imgSizeY = json.size.y;
+        //loading image ^
+        //Buffering image
+        const texture = gl.createTexture();
+        const coords = new Map();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.activeTexture(gl.TEXTURE0);
+        for (let name in json) {
+            console.log(name);
+            if (name == "size")
+                continue;
+            coords.set(name, {
+                x: (json[name].pos[0] + 0.1) / imgSizeX,
+                y: (json[name].pos[1] + 0.1) / imgSizeY,
+                dx: ((json[name].pos[0] + json[name].size[0]) - 0.1) / imgSizeX,
+                dy: ((json[name].pos[1] + json[name].size[1]) - 0.1) / imgSizeY,
+                rotation: json[name].rotation
+            });
+        }
+        img.onload = () => {
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, img.width, img.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, img);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.generateMipmap(gl.TEXTURE_2D);
+            console.log("loaded json");
+        };
+        if (img.complete) {
+            img.onload(new Event("loaded"));
+        }
+        const textureHolder = new TextureV3(coords, texture);
+        return textureHolder;
+    }
     static fontAtlas(fontName) {
         const coords = [];
         const canvas = document.createElement("canvas");
@@ -276,6 +316,21 @@ export class Loader {
     }
 }
 export class Texture2 {
+    x;
+    y;
+    dx;
+    coords;
+    dy;
+    ID;
+    constructor(coords, textureID) {
+        this.ID = textureID;
+        this.coords = coords;
+    }
+    bind() {
+        gl.bindTexture(gl.TEXTURE_2D, this.ID);
+    }
+}
+export class TextureV3 {
     x;
     y;
     dx;
