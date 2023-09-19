@@ -1,7 +1,9 @@
+import { Texture } from "../Engine/Texture.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 
 export class Block
 {
+   
     id:number;
     lightFBlock=0;
     skyLight=0;
@@ -9,6 +11,148 @@ export class Block
     {
         this.id = id;
     }
+    static createInfoArray()
+    {
+        Block.info = 
+          [{//0
+            name:"Air"
+        },
+        {//1
+            name:"Dirt",
+            textureIndex:[
+                Texture.testAtkas.indexMap.get("dirt"),
+                Texture.testAtkas.indexMap.get("dirt"),
+                Texture.testAtkas.indexMap.get("dirt"),
+                Texture.testAtkas.indexMap.get("dirt"),
+                Texture.testAtkas.indexMap.get("dirt"),
+                Texture.testAtkas.indexMap.get("dirt")
+            ],
+            breakTime:2
+        },
+        {//2
+            name:"Grass",
+            textureIndex:[
+                Texture.testAtkas.indexMap.get("grassTop"),
+                Texture.testAtkas.indexMap.get("dirt"),
+                Texture.testAtkas.indexMap.get("grassSide"),
+                Texture.testAtkas.indexMap.get("grassSide"),
+                Texture.testAtkas.indexMap.get("grassSide"),
+                Texture.testAtkas.indexMap.get("grassSide")
+            ],
+            breakTime:2
+        },
+        {//3
+            name:"Stone",
+            textureIndex:[
+                Texture.testAtkas.indexMap.get("stone"),
+                Texture.testAtkas.indexMap.get("stone"),
+                Texture.testAtkas.indexMap.get("stone"),
+                Texture.testAtkas.indexMap.get("stone"),
+                Texture.testAtkas.indexMap.get("stone"),
+                Texture.testAtkas.indexMap.get("stone")
+            ],
+            breakTime:20
+        },
+        {//4
+            name:"Greenstone ore",
+            textureIndex:[
+                Texture.testAtkas.indexMap.get("greenstone"),
+                Texture.testAtkas.indexMap.get("greenstone"),
+                Texture.testAtkas.indexMap.get("greenstone"),
+                Texture.testAtkas.indexMap.get("greenstone"),
+                Texture.testAtkas.indexMap.get("greenstone"),
+                Texture.testAtkas.indexMap.get("greenstone")
+            ],
+            breakTime:20
+        },
+        {//5
+            name:"Greenstone block",
+            textureIndex:[
+                Texture.testAtkas.indexMap.get("greenstoneBlock"),
+                Texture.testAtkas.indexMap.get("greenstoneBlock"),
+                Texture.testAtkas.indexMap.get("greenstoneBlock"),
+                Texture.testAtkas.indexMap.get("greenstoneBlock"),
+                Texture.testAtkas.indexMap.get("greenstoneBlock"),
+                Texture.testAtkas.indexMap.get("greenstoneBlock")
+            ],
+            breakTime:10
+        },
+        {//6
+            name:"log",
+            textureIndex:[
+                Texture.testAtkas.indexMap.get("logTop"),
+                Texture.testAtkas.indexMap.get("logTop"),
+                Texture.testAtkas.indexMap.get("logSide"),
+                Texture.testAtkas.indexMap.get("logSide"),
+                Texture.testAtkas.indexMap.get("logSide"),
+                Texture.testAtkas.indexMap.get("logSide")
+            ],
+            breakTime:5
+        },
+        {//7
+            name:"White",
+            textureIndex:[
+                Texture.testAtkas.indexMap.get("whiteBlock"),
+                Texture.testAtkas.indexMap.get("whiteBlock"),
+                Texture.testAtkas.indexMap.get("whiteBlock"),
+                Texture.testAtkas.indexMap.get("whiteBlock"),
+                Texture.testAtkas.indexMap.get("whiteBlock"),
+                Texture.testAtkas.indexMap.get("whiteBlock")
+            ],
+            breakTime:20
+    
+        },
+        {//8
+            name:"Yellow",
+            textureIndex:[
+                Texture.testAtkas.indexMap.get("redBlock"),
+                Texture.testAtkas.indexMap.get("redBlock"),
+                Texture.testAtkas.indexMap.get("redBlock"),
+                Texture.testAtkas.indexMap.get("redBlock"),
+                Texture.testAtkas.indexMap.get("redBlock"),
+                Texture.testAtkas.indexMap.get("redBlock")
+            ],
+            breakTime:20
+        },
+        {//9
+            name:"Leaves",
+            textureIndex:[
+                Texture.testAtkas.indexMap.get("leaves"),
+                Texture.testAtkas.indexMap.get("leaves"),
+                Texture.testAtkas.indexMap.get("leaves"),
+                Texture.testAtkas.indexMap.get("leaves"),
+                Texture.testAtkas.indexMap.get("leaves"),
+                Texture.testAtkas.indexMap.get("leaves")
+            ],
+            breakTime:0.2
+        },
+        {//10
+            name:"Glowstone",
+            textureIndex:[
+                Texture.testAtkas.indexMap.get("glowstone"),
+                Texture.testAtkas.indexMap.get("glowstone"),
+                Texture.testAtkas.indexMap.get("glowstone"),
+                Texture.testAtkas.indexMap.get("glowstone"),
+                Texture.testAtkas.indexMap.get("glowstone"),
+                Texture.testAtkas.indexMap.get("glowstone")
+            ],
+            breakTime:5,
+            glowing:15
+        },
+        {//11
+            name:"Snow",
+            textureIndex:[
+                Texture.testAtkas.indexMap.get("snow"),
+                Texture.testAtkas.indexMap.get("snow"),
+                Texture.testAtkas.indexMap.get("snow"),
+                Texture.testAtkas.indexMap.get("snow"),
+                Texture.testAtkas.indexMap.get("snow"),
+                Texture.testAtkas.indexMap.get("snow")
+            ],
+            breakTime:1
+        }];
+    }
+    static info:Array<{name,textureIndex?:number[],breakTime?,glowing?}> = [];
 }
 export enum Side
 {

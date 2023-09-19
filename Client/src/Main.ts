@@ -109,6 +109,7 @@ export class Main
         console.log(this.atlasShader);
         //shader for GUI(2d)
         this.shader2d = new Shader2d();
+        Block.createInfoArray();
         this.gui = new GUI(this.shader2d);
         this.inv = new Inventory("Inventory");
        
@@ -356,9 +357,9 @@ export class Main
         this.shader.setFog(this.player.camera.getPosition(),Math.sqrt(this.maxChunks)*8);
         CanvaManager.preRender();
         gl.clearColor(0.43*(this.sunLight/15) ,0.69 *(this.sunLight/15),(this.sunLight/15),1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
    
-        Texture.blockAtlas.bind();
+        Texture.testAtkas.bind();
     
         Main.shader.loadUniforms(Main.player.camera.getProjection(), Matrix4.identity(), Main.player.camera.getView(),Main.sunLight);
         for(const val of this.loadedChunks)

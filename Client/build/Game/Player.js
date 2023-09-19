@@ -278,6 +278,8 @@ class Player {
                 this.yAcc += 0.01;
                 tempPos.y -= this.yAcc;
             }
+            if (Main.fly && CanvaManager.getKey(90))
+                tempPos.y -= 0.3;
             if (!this.isBlockInWay(tempPos))
                 this.pos = tempPos;
             else if (!this.isBlockInWay(new Vector(tempPos.x, this.pos.y, tempPos.z))) {
@@ -319,8 +321,6 @@ class Player {
                         this.jump.yAcc = 0.2;
                 }
             }
-            if (Main.fly && CanvaManager.getKey(90))
-                tempPos.y -= 0.3;
             /*  else if(CanvaManager.getKey(16) && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z)) ).id<1)
         this.pos.y-=0.1;
         */

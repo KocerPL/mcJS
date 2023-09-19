@@ -402,8 +402,8 @@ class SubChunk {
         ]
     });
     static getTextureCords(id, face) {
-        const index = blocks[id].textureIndex[face];
-        const uvs = Texture.blockAtlas.coords[index];
+        const index = Block.info[id].textureIndex[face];
+        const uvs = Texture.testAtkas.coords[index];
         if (face == Side.front || face == Side.right || face == Side.bottom)
             return [
                 uvs.x, uvs.dy,

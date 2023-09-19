@@ -195,25 +195,28 @@ export class Loader
         const img =  new Image();
         img.src = path;
         img.decode();
-        let imgSizeX = json.size.x;
-        let imgSizeY = json.size.y;
+        let imgSizeX = json["size"][0];
+        let imgSizeY = json["size"][1];
+        console.log(imgSizeX,imgSizeY);
         //loading image ^
         //Buffering image
         const texture = gl.createTexture();
-        const coords:Map<string,{x:number,dx:number,y:number,dy:number,rotation:rot2d }> = new Map();
+        const coords:Array<{x:number,dx:number,y:number,dy:number,rotation:rot2d }> = [];
+        const indexBinding:Map<string,number>=new Map();
         gl.bindTexture(gl.TEXTURE_2D,texture);
         gl.activeTexture(gl.TEXTURE0);
         for(let name in json)
         {
             console.log(name);
             if(name=="size") continue;
-            coords.set(name,{
-                x:(json[name].pos[0]+0.1)/imgSizeX,
-                y:(json[name].pos[1]+0.1)/imgSizeY,
-                dx:((json[name].pos[0] +json[name].size[0])-0.1)/imgSizeX,
-                dy:((json[name].pos[1] +json[name].size[1])-0.1)/imgSizeY,
+            coords.push({
+                x:(json[name].pos[0])/imgSizeX,
+                y:(json[name].pos[1])/imgSizeY,
+                dx:((json[name].pos[0] +json[name].size[0]))/imgSizeX,
+                dy:((json[name].pos[1] +json[name].size[1]))/imgSizeY,
                 rotation:json[name].rotation
             });
+            indexBinding.set(name,coords.length-1);
             
         }
         img.onload = ()=>{
@@ -224,9 +227,9 @@ export class Loader
     
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST_MIPMAP_NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            gl.generateMipmap(gl.TEXTURE_2D);
+           // gl.generateMipmap(gl.TEXTURE_2D);
             console.log("loaded json");
           
         };
@@ -236,7 +239,7 @@ export class Loader
         }
 
 
-        const textureHolder = new TextureV3(coords,texture);
+        const textureHolder = new TextureV3(coords,indexBinding,texture);
 
         return textureHolder;
     }
@@ -416,14 +419,15 @@ export class TextureV3
     x:number;
     y:number;
     dx:number;
-    coords:Map<string,{x:number,dx:number,y:number,dy:number,rotation:rot2d }>;
+    coords:Array<{x:number,dx:number,y:number,dy:number,rotation:rot2d }>;
+    indexMap:Map<string,number>;
     dy:number;
     ID:WebGLTexture;
-    constructor(coords:Map<string,{x:number,dx:number,y:number,dy:number,rotation:rot2d }>, textureID:WebGLTexture)
+    constructor(coords:Array<{x:number,dx:number,y:number,dy:number,rotation:rot2d }>,indexBindings:Map<string,number> ,textureID:WebGLTexture)
     {  
         this.ID=textureID;
         this.coords =coords;
-     
+        this.indexMap = indexBindings;
     }
     public bind()
     {
