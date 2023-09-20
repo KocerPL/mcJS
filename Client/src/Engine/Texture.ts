@@ -14,5 +14,5 @@ export class Texture
     static hammer:WebGLTexture = Loader.image("./res/textures/hammer.png");
     static skinAtlas =  Loader.imageAtlasByJSON("./res/textures/skinMC.png"/*"http://i.imgur.com/PNJXVA3.png"*/,Model.player,64,64);
     static fontAtlas = Loader.fontAtlas("monospace");
-    static testAtkas = Loader.imageAtlasByNewJSON("./res/textures/test.png",Loader.json("./res/textures/test.json"));
+    static testAtkas = Loader.imageAtlasByNewJSON("./res/textures/testOld.png",Loader.json("./res/textures/testOld.json"));
 }

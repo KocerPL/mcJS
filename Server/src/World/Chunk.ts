@@ -1,5 +1,5 @@
-class Chunk
+export class Chunk
 {
-    subchunks:[]
-
+    subchunks:Array<Array<number>>;
+    pos:Array<number>;
 }

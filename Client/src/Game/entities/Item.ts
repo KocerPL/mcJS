@@ -134,7 +134,7 @@ export class Item extends Entity
         this.transformation=this.transformation.translate(this.pos.x,this.pos.y+(Math.abs(this.rotation-180)/360),this.pos.z);
         this.transformation=this.transformation.scale(0.3,0.3,0.3);
         this.transformation=    this.transformation.rotateY(this.rotation);
-        Texture.blockAtlas.bind();
+        Texture.testAtkas.bind();
         this.rs.vao.bind();
         // Main.shader.use();
         Main.shader.loadUniforms(Main.player.camera.getProjection(),this.transformation,Main.player.camera.getView(),Main.sunLight);

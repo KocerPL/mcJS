@@ -4,10 +4,12 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const fs = require("fs");
+const Chunk_1 = require("./World/Chunk");
 let lastID = 0;
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+const loadedChunks = new Map();
 let pos = __dirname.length - 1;
 for (let i = 0; i < 2; pos--) {
     if (__dirname.at(pos) == "/")
@@ -24,6 +26,7 @@ io.on('connection', (socket) => {
     setTimeout(() => {
         socket.emit('login', JSON.stringify({ x: 0, y: 200, z: 0 }), socket.KOCEid);
         // console.log(io.sockets);
+        socket.emit('addItem', { id: 1, count: 64, slot: 0 });
         for (let sock of io.sockets.sockets) {
             if (sock[1] != socket) {
                 // console.log(sock[1]);
@@ -34,7 +37,8 @@ io.on('connection', (socket) => {
     }, 2000);
     socket.on('getSubchunk', (x, y, z) => {
         // console.log("Subchunk");
-        let data = JSON.parse(fs.readFileSync(__dirname + "/world/" + x + "." + y + "." + z + ".sub").toString());
+        const chunk = getChunk(x, z);
+        let data = chunk.subchunks[y];
         socket.emit('subchunk', { data: { subX: x, subY: y, subZ: z, blocks: data } });
     });
     socket.on("playerMove", (pos, rot) => {
@@ -52,9 +56,11 @@ io.on('connection', (socket) => {
         if (inPos.y < 0)
             inPos.y = 16 - Math.abs(inPos.y);
         const subchunkPos = { x: Math.floor(Math.round(data.pos.x) / 16), y: Math.floor(Math.round(data.pos.y) / 16), z: Math.floor(Math.round(data.pos.z) / 16) };
-        let fdata = JSON.parse(fs.readFileSync(__dirname + "/world/" + subchunkPos.x + "." + subchunkPos.y + "." + subchunkPos.z + ".sub").toString());
-        fdata[toIndex(inPos.x, inPos.y, inPos.z)] = data.id;
-        fs.writeFileSync(__dirname + "/world/" + subchunkPos.x + "." + subchunkPos.y + "." + subchunkPos.z + ".sub", JSON.stringify(fdata));
+        let chunk = getChunk(subchunkPos.x, subchunkPos.z);
+        console.log(subchunkPos.x, subchunkPos.y, subchunkPos.z);
+        //  let fdata = JSON.parse(fs.readFileSync(__dirname+"/world/"+subchunkPos.x+"."+subchunkPos.y+"."+subchunkPos.z+".sub").toString());
+        chunk.subchunks[subchunkPos.y][toIndex(inPos.x, inPos.y, inPos.z)] = data.id;
+        saveChunk(chunk);
     });
     socket.on("disconnect", (reason) => {
         socket.broadcast.emit("killEntity", socket.KOCEid);
@@ -72,6 +78,18 @@ app.get("*", (req, res) => {
 server.listen(3000, () => {
     console.log("listening on 3000");
 });
+function saveChunk(chunk) {
+    fs.writeFileSync(__dirname + "/world/" + chunk.pos[0] + "." + chunk.pos[1] + ".kChunk", JSON.stringify(chunk.subchunks));
+}
+function getChunk(x, z) {
+    if (loadedChunks.has(x + "-" + z))
+        return loadedChunks.get(x + "-" + z);
+    let chunk = new Chunk_1.Chunk();
+    chunk.subchunks = JSON.parse(fs.readFileSync(__dirname + "/world/" + x + "." + z + ".kChunk").toString());
+    chunk.pos = [x, z];
+    loadedChunks.set(x + "-" + z, chunk);
+    return chunk;
+}
 function genSubchunk(n) {
     let k = new Array(4096);
     for (let i = 0; i < 4096; i++) {

@@ -104,6 +104,10 @@ class Main {
         this.socket.on("subchunk", (ev) => {
             this.handleSubchunk(ev);
         });
+        //socket.emit('addItem',{id:1,count:64,slot:0});
+        this.socket.on("addItem", (obj) => {
+            this.player.updateItem(obj.id, obj.slot, obj.count);
+        });
         this.socket.on("spawnPlayer", (pos, id) => {
             console.log("summoningPLAYER");
             this.entities.push(new PlayerEntity(new Vector(pos.x, pos.y, pos.z), id));

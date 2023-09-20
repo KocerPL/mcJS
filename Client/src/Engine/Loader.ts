@@ -1,4 +1,4 @@
-import { Model, rot2d } from "../Game/Models.js";
+import { rot2d } from "../Game/Models.js";
 import { CanvaManager } from "./CanvaManager.js";
 import { RenderSet } from "./RenderSet.js";
 import { Vector } from "./Utils/Vector.js";
@@ -195,8 +195,8 @@ export class Loader
         const img =  new Image();
         img.src = path;
         img.decode();
-        let imgSizeX = json["size"][0];
-        let imgSizeY = json["size"][1];
+        const imgSizeX = json["sizes"][0][2];
+        const imgSizeY = json["sizes"][0][3];
         console.log(imgSizeX,imgSizeY);
         //loading image ^
         //Buffering image
@@ -205,10 +205,10 @@ export class Loader
         const indexBinding:Map<string,number>=new Map();
         gl.bindTexture(gl.TEXTURE_2D,texture);
         gl.activeTexture(gl.TEXTURE0);
-        for(let name in json)
+        for(const name in json)
         {
             console.log(name);
-            if(name=="size") continue;
+            if(name=="sizes") continue;
             coords.push({
                 x:(json[name].pos[0])/imgSizeX,
                 y:(json[name].pos[1])/imgSizeY,
@@ -221,15 +221,27 @@ export class Loader
         }
         img.onload = ()=>{
             gl.bindTexture(gl.TEXTURE_2D,texture);  
-            gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA8,img.width,img.height,0,gl.RGBA,gl.UNSIGNED_BYTE,img);
-    
-      
+            const canva = document.createElement("canvas");
+            const ctx = canva.getContext("2d",{willReadFrequently:true});
+            canva.width =imgSizeX;
+            canva.height=imgSizeY;
+            ctx.drawImage(img,0,0,imgSizeX,imgSizeY,0,0,imgSizeX,imgSizeY);
+            gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA8,imgSizeX,imgSizeY,0,gl.RGBA,gl.UNSIGNED_BYTE,canva);
+            for(let i=1;i<json["sizes"].length;i++)
+            {
+                canva.width =json["sizes"][i][2];
+                canva.height=json["sizes"][i][3];
+                ctx.drawImage(img,json["sizes"][i][0],json["sizes"][i][1],json["sizes"][i][2],json["sizes"][i][3],0,0,json["sizes"][i][2],json["sizes"][i][3]);
+                gl.texImage2D(gl.TEXTURE_2D,i,gl.RGBA8,json["sizes"][i][2],json["sizes"][i][3],0,gl.RGBA,gl.UNSIGNED_BYTE,canva);
+                console.log("loaded size"+i);
+            }
+            
     
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-           // gl.generateMipmap(gl.TEXTURE_2D);
+            // gl.generateMipmap(gl.TEXTURE_2D);
             console.log("loaded json");
           
         };
@@ -271,7 +283,7 @@ export class Loader
         let curX=0;
         for(let i =0;i<128;i++)
         {
-           let measure = ctx.measureText(String.fromCharCode(i));
+            const measure = ctx.measureText(String.fromCharCode(i));
          
             ctx.fillText(String.fromCharCode(i),curX+(measure.width/2),16);
             

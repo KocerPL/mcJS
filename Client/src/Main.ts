@@ -1,6 +1,4 @@
 import { CanvaManager } from "./Engine/CanvaManager.js";
-import { EBO } from "./Engine/EBO.js";
-import { Loader } from "./Engine/Loader.js";
 import { AtlasShader } from "./Engine/Shader/AtlasShader.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Shader2d } from "./Engine/Shader/Shader2d.js";
@@ -9,8 +7,6 @@ import { Texture } from "./Engine/Texture.js";
 import { Array3D } from "./Engine/Utils/Array3D.js";
 import { Matrix4 } from "./Engine/Utils/Matrix4.js";
 import { Vector } from "./Engine/Utils/Vector.js";
-import { VAO } from "./Engine/VAO.js";
-import { VBO } from "./Engine/VBO.js";
 import { Block, blocks } from "./Game/Block.js";
 import { Chunk } from "./Game/Chunk.js";
 import { Entity } from "./Game/Entity.js";
@@ -119,6 +115,10 @@ export class Main
         this.socket.on("subchunk",(ev)=>{
              
             this.handleSubchunk(ev);
+        });
+        //socket.emit('addItem',{id:1,count:64,slot:0});
+        this.socket.on("addItem",(obj:{id:number,count:number,slot:number})=>{
+            this.player.updateItem(obj.id,obj.slot,obj.count);
         });
         this.socket.on("spawnPlayer",(pos,id)=>{
             console.log("summoningPLAYER");
