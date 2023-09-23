@@ -52,11 +52,9 @@ class Main {
     static run() {
         this.shader = new DefaultShader();
         this.atlasShader = new AtlasShader();
-        console.log(this.atlasShader);
         //shader for GUI(2d)
         this.shader2d = new Shader2d();
         this.scene = new GameScene();
-        this.scene.start();
         CanvaManager.setupCanva(document.body);
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LESS);
@@ -65,14 +63,13 @@ class Main {
         //Transparency requires blending 
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        this.scene.start();
         //init world
         //loading chunks
         requestAnimationFrame(this.loop.bind(this));
     }
     ////MAIN LOOP\\\\
     static loop(time) {
-        //if(this.chunkQueue.length>0)
-        //  this.processChunk(this.chunkQueue.shift());
         if (this.Measure.lastTime <= time - 1000)
             this.resetMeasure(time);
         const delta = time - this.lastTick;
@@ -88,23 +85,6 @@ class Main {
             this.delta--;
             this.update();
         }
-        //60 updates
-        /*     const fastDelta = time-this.lastFastTick;
-             this.fastDelta += fastDelta/(2000/this.fastTPS);
-             // console.log(this.fastDelta);
-             if(this.fastDelta>=1) this.lastFastTick=time;
-          
-             while(this.fastDelta>=1)
-             {
-                 if(this.fastDelta>100) {
-                     console.log("Is game overloaded? Skipping "+fastDelta+"ms");
-                     this.fastDelta = 0;
-               
-                 }
-                 this.fastDelta--;
-                 this.fastUpdate();
-             }*/
-        //  this.updateSubchunks();
         this.render();
         this.lastFrame = time;
         requestAnimationFrame(this.loop.bind(this));
@@ -118,26 +98,6 @@ class Main {
     }
     static update() {
         this.scene.update();
-        /*  if(CanvaManager.getKeyOnce(86)) {this.inv.setVisible =!this.inv.getVisible; console.log("VVVVV");}
-          if(CanvaManager.getKeyOnce(71))
-              console.log(World.getSubchunk(this.player.pos));
-          if(CanvaManager.getKey(52)&&this.sunLight<16)
-              this.sunLight++;
-          if(CanvaManager.getKey(53)&&this.sunLight>0)
-              this.sunLight--;
-          this.Measure.ticks++;
-          // this.count++;
-          // if(this.count>this.test.indices.length)
-          //this.count=3;
-        
-          if(CanvaManager.getKeyOnce(54))
-              this.maxChunks--;
-          if(CanvaManager.getKeyOnce(55))
-              this.maxChunks++;
-          if(CanvaManager.getKeyOnce(56))
-              this.fastBreaking=!this.fastBreaking;
-          if(CanvaManager.getKeyOnce(57))
-              this.fly=!this.fly;*/
     }
     static renderDebug() {
         //  CanvaManager.debug.innerText = "Fps: "+this.Measure.fps+" Selected block: "+ blocks[this.player.itemsBar[this.player.selectedItem].id].name +" Count:"+this.player.itemsBar[this.player.selectedItem].count+
@@ -149,29 +109,6 @@ class Main {
         this.renderDebug();
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         this.scene.render();
-        /*
-        this.shader.use();
-        this.player.camera.preRender();
-        this.shader.setFog(this.player.camera.getPosition(),Math.sqrt(this.maxChunks)*8);
-        CanvaManager.preRender();
-        gl.clearColor(0.43*(this.sunLight/15) ,0.69 *(this.sunLight/15),(this.sunLight/15),1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-   
-        Texture.testAtkas.bind();
-    
-        Main.shader.loadUniforms(Main.player.camera.getProjection(), Matrix4.identity(), Main.player.camera.getView(),Main.sunLight);
-        for(const val of this.loadedChunks)
-        {
-        
-            val[1].render();
-        
-        }
-        for(let i=0;i<this.entities.length;i++)
-        {
-            this.entities[i].render();
-        }
-        this.player.render();
-        this.gui.render();*/
     }
 }
 export { Main };

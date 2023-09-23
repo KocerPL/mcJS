@@ -472,16 +472,6 @@ export class SubChunk
             uvs.dx, uvs.y,
             uvs.dx, uvs.dy,];
     }
-    static getTextureCordsInd(index) {
-        
-        const temp =   [
-            0.0, 1.0, index,
-            1.0, 1.0, index,
-            1.0, 0.0,index,
-            0.0, 0.0,index
-        ];
-        return temp;
-    }
     static  getRandColor()
     {
         return[ 0.0,0.0,

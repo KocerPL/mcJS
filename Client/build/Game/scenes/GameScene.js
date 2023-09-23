@@ -47,9 +47,11 @@ export class GameScene extends Scene {
             i++;
             if (i > this.maxSubUpdates)
                 break;
-            entry[0].update(this);
-            concatQ.add(entry[0].chunk);
-            console.log("UPDATIGN");
+            if (entry[0] != undefined) {
+                console.log(entry[0].pos);
+                entry[0].update(this);
+                concatQ.add(entry[0].chunk);
+            }
             this.toUpdate.delete(entry[0]);
         }
         concatQ.forEach((chunk) => { chunk.updateMesh(); });
@@ -61,6 +63,7 @@ export class GameScene extends Scene {
             chunk = new Chunk(ev.data.subX, ev.data.subZ);
             this.loadedChunks.set(chunk.pos.x + "-" + chunk.pos.z, chunk);
         }
+        //    console.log(ev.data);
         chunk.subchunks[ev.data.subY] = new SubChunk(new Vector(ev.data.subX, ev.data.subY, ev.data.subZ), chunk);
         for (let x = 0; x < 16; x++)
             for (let y = 0; y < 16; y++)
@@ -73,10 +76,6 @@ export class GameScene extends Scene {
                 return;
         this.chunkQueue.push(this.getChunkAt(ev.data.subX, ev.data.subZ));
     }
-    handleChunkReady(ev) {
-        console.log("received chunk ready");
-        this.chunkQueue.push(this.getChunkAt(ev.data.chunkX, ev.data.chunkZ));
-    }
     start() {
         Block.createInfoArray();
         this.gui = new GUI(Main.shader2d);
@@ -84,15 +83,13 @@ export class GameScene extends Scene {
         this.gui.add(this.inv);
         this.gui.add(new ItemBar("ItemBar"));
         this.player = new Player(new Vector(-2, 144, -7), this);
-        this.socket.on("subchunk", (ev) => {
-            this.handleSubchunk(ev);
-        });
+        this.socket.on("subchunk", this.handleSubchunk.bind(this));
         //socket.emit('addItem',{id:1,count:64,slot:0});
         this.socket.on("addItem", (obj) => {
             this.player.updateItem(obj.id, obj.slot, obj.count);
         });
         this.socket.on("spawnPlayer", (pos, id) => {
-            console.log("summoningPLAYER");
+            // console.log("summoningPLAYER");
             this.entities.push(new PlayerEntity(new Vector(pos.x, pos.y, pos.z), this, id));
         });
         this.socket.on("moveEntity", (id, pos, rot) => {
@@ -128,39 +125,13 @@ export class GameScene extends Scene {
             for (let z = -4; z < 4; z++)
                 for (let i = 15; i >= 0; i--)
                     this.socket.emit("getSubchunk", x, i, z);
-        World.init();
-        /* this.integratedServer = new Worker("./build/IntegratedServer/Main.js", {
-            type: "module"
-        });
-        this.integratedServer.onmessage =(ev)=>{
-            console.log("received Message");
-            switch(ev.data.type)
-            {
-            case "console":
-                console.log(ev.data.msg);
-                break;
-            case "subchunk":
-                this.handleSubchunk(ev);
-                break;
-            case "chunkReady":
-                this.handleChunkReady(ev);
-            
-            }
-        };
-        this.integratedServer.postMessage("start");
-        */
     }
     update() {
         if (this.chunkQueue.length > 0)
             this.processChunk(this.chunkQueue.shift());
-        for (let i = 0; i < this.entities.length; i++) {
-            this.entities[i].update(i);
-        }
-        this.player.update();
         this.updateSubchunks();
         if (CanvaManager.getKeyOnce(86)) {
             this.inv.setVisible = !this.inv.getVisible;
-            console.log("VVVVV");
         }
         if (CanvaManager.getKeyOnce(71))
             console.log(World.getSubchunk(this.player.pos, this));
@@ -179,6 +150,10 @@ export class GameScene extends Scene {
             this.fastBreaking = !this.fastBreaking;
         if (CanvaManager.getKeyOnce(57))
             this.fly = !this.fly;
+        for (let i = 0; i < this.entities.length; i++) {
+            this.entities[i].update(i);
+        }
+        this.player.update();
     }
     render() {
         Main.shader.use();
