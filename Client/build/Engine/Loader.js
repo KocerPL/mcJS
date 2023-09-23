@@ -164,7 +164,7 @@ export class Loader {
         const indexBinding = new Map();
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.activeTexture(gl.TEXTURE0);
-        for (let name in json) {
+        for (const name in json) {
             console.log(name);
             if (name == "sizes")
                 continue;
@@ -227,7 +227,7 @@ export class Loader {
         ctx.globalAlpha = 1.0;
         let curX = 0;
         for (let i = 0; i < 128; i++) {
-            let measure = ctx.measureText(String.fromCharCode(i));
+            const measure = ctx.measureText(String.fromCharCode(i));
             ctx.fillText(String.fromCharCode(i), curX + (measure.width / 2), 16);
             const coord = {
                 x: curX / canvas.width,

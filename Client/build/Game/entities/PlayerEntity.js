@@ -12,8 +12,10 @@ export class PlayerEntity extends Entity {
     bodyRot;
     nextTransitions = [];
     rsHammer = Loader.loadObj("./res/models/hammer.obj");
-    constructor(pos, id) {
+    gs;
+    constructor(pos, gs, id) {
         super(pos, Main.atlasShader, id);
+        this.gs = gs;
         this.rotation = new Vector(0, 0, 0);
         this.bodyRot = 0;
         this.rs.resetArrays();
@@ -299,7 +301,7 @@ export class PlayerEntity extends Entity {
         this.rs.vao.bind();
         const bScale = 0.5;
         Main.atlasShader.use();
-        Main.atlasShader.loadUniforms(Main.player.camera.getProjection(), transformation, Main.player.camera.getView(), 15);
+        Main.atlasShader.loadUniforms(this.gs.player.camera.getProjection(), transformation, this.gs.player.camera.getView(), 15);
         gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_INT, 0);
         Main.atlasShader.loadTransformation(Matrix4.identity().translate(this.pos.x, this.pos.y + 0.05, this.pos.z).scale(bScale, bScale, bScale).rotateY(this.bodyRot));
         //Body
@@ -323,7 +325,7 @@ export class PlayerEntity extends Entity {
         const mat = Matrix4.identity().translate(this.pos.x, this.pos.y + 0.45, this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375, -0.55, 0.5).rotateY(90).rotateZ(-90).scale(bScale, bScale, bScale);
         this.rsHammer.vao.bind();
         gl.bindTexture(gl.TEXTURE_2D, Texture.hammer);
-        Main.atlasShader.loadUniforms(Main.player.camera.getProjection(), mat, Main.player.camera.getView(), 15);
+        Main.atlasShader.loadUniforms(this.gs.player.camera.getProjection(), mat, this.gs.player.camera.getView(), 15);
         gl.drawElements(gl.TRIANGLES, this.rsHammer.count, gl.UNSIGNED_INT, 0);
     }
     setNextTransitions(nextPos, nextRot, count) {

@@ -7,6 +7,7 @@ import { Side } from "../Block.js";
 import { Entity } from "../Entity.js";
 import { SubChunk } from "../SubChunk.js";
 import { World } from "../World.js";
+import { GameScene } from "../scenes/GameScene.js";
 const gl = CanvaManager.gl;
 export class Item extends Entity
 {
@@ -15,11 +16,12 @@ export class Item extends Entity
     lifeTime = 60000;
     rotation =0;
     count=1;
+    gs:GameScene;
     acc:Vector= new Vector(0,0,0);
-    constructor(pos:Vector,type:number)
+    constructor(pos:Vector,type:number,gs:GameScene)
     {
         super(pos,Main.atlasShader);
-      
+      this.gs =gs;
         this.type = type;
         this.prepareModel();
     }
@@ -30,23 +32,23 @@ export class Item extends Entity
         this.lifeTime--;
         if( this.cooldown<1)
         {
-            if( Main.player.isTouching(this.pos,0.5))
+            if( this.gs.player.isTouching(this.pos,0.5))
             {
-                Main.player.pickupItem(this);    
-                Main.entities.splice(i,1);
+                this.gs.player.pickupItem(this);    
+                this.gs.entities.splice(i,1);
                 return;
             }
-            for(const ent of Main.entities)
+            for(const ent of this.gs.entities)
                 if(ent instanceof Item && ent.type ==this.type && ent!=this  && this.isTouching(ent.pos,1))
                 {
                     ent.count+=this.count;
-                    Main.entities.splice(i,1);
+                    this.gs.entities.splice(i,1);
                 }
         }
    
         if(this.lifeTime<1 )
-            Main.entities.splice(i,1);
-        const block =World.getBlock(new Vector(this.pos.x,this.pos.y ,this.pos.z));
+            this.gs.entities.splice(i,1);
+        const block =World.getBlock(new Vector(this.pos.x,this.pos.y ,this.pos.z),this.gs);
         let ll =  block.skyLight;
         this.rs.skyLight = [ll,ll,ll,ll, ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll, ll,ll,ll,ll];
         ll =  block.lightFBlock;
@@ -108,9 +110,9 @@ export class Item extends Entity
         // console.log("rendered")
         try
         {
-            if(World.getBlock(new Vector(this.pos.x,this.pos.y ,this.pos.z)).id>0 )
+            if(World.getBlock(new Vector(this.pos.x,this.pos.y ,this.pos.z),this.gs).id>0 )
                 this.acc.y+=0.01;
-            else if(World.getBlock(new Vector(this.pos.x,this.pos.y-0.5 ,this.pos.z)).id==0 )
+            else if(World.getBlock(new Vector(this.pos.x,this.pos.y-0.5 ,this.pos.z),this.gs).id==0 )
                 this.acc.y-=0.01;
             else 
                 this.acc.y=0;
@@ -137,7 +139,7 @@ export class Item extends Entity
         Texture.testAtkas.bind();
         this.rs.vao.bind();
         // Main.shader.use();
-        Main.shader.loadUniforms(Main.player.camera.getProjection(),this.transformation,Main.player.camera.getView(),Main.sunLight);
+        Main.shader.loadUniforms(this.gs.player.camera.getProjection(),this.transformation,this.gs.player.camera.getView(),this.gs.sunLight);
         //     Main.shader.use();
         
       
@@ -147,7 +149,7 @@ export class Item extends Entity
       //      gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
             this.rs.vao.bind();
             this.transformation=this.transformation.translate(0.3,-0.3,0.3);
-            Main.shader.loadUniforms(Main.player.camera.getProjection(),this.transformation,Main.player.camera.getView(),Main.sunLight);
+            Main.shader.loadUniforms(this.gs.player.camera.getProjection(),this.transformation,this.gs.player.camera.getView(),this.gs.sunLight);
             gl.drawElements(gl.TRIANGLES,this.rs.count,gl.UNSIGNED_INT,0);
         }
     }

@@ -8,7 +8,6 @@ import { Block } from "./Block.js";
 import { SubChunk } from "./SubChunk.js";
 import { Matrix4 } from "../Engine/Utils/Matrix4.js";
 import { Mesh } from "./Mesh.js";
-import { World } from "./World.js";
 import { randRange } from "../Engine/Utils/Math.js";
 import { Lighter } from "../Lighter.js";
 import { SkyLighter } from "../SkyLighter.js";
@@ -84,10 +83,10 @@ export class Chunk {
     postGenerate() {
         const x = randRange(0, 15) + (this.pos.x * 16);
         const z = randRange(0, 15) + (this.pos.z * 16);
-        if (World.getHeight(x, z) < 150)
-            World.generateTree(new Vector(x, World.getHeight(x, z), z));
+        //  if(World.getHeight(x,z)<150)
+        //   World.generateTree(new Vector(x,World.getHeight(x,z),z));
     }
-    updateNeighbour(neigbDir, chunk) {
+    updateNeighbour(neigbDir, chunk, gs) {
         //console.log("what")
         //console.log(this.pos,neigbDir);
         if (chunk == undefined || this.allNeighbours)
@@ -96,29 +95,29 @@ export class Chunk {
         if (this.neighbours["NEG_X"] != undefined && this.neighbours["POS_X"] != undefined && this.neighbours["POS_Z"] != undefined && this.neighbours["NEG_Z"] != undefined) {
             console.log("gathered all neighbours :)");
             this.allNeighbours = true;
-            this.updateAllSubchunks();
+            this.updateAllSubchunks(gs);
         }
     }
-    sdNeighbour(neighbour, dir) {
+    sdNeighbour(neighbour, dir, gs) {
         try {
             neighbour.updateNeighbour(dir, this);
-            this.updateNeighbour(flipDir(dir), neighbour);
+            this.updateNeighbour(flipDir(dir), neighbour, gs);
         }
         catch (error) { /* empty */ }
     }
-    sendNeighbours() {
+    sendNeighbours(gs) {
         if (this.allNeighbours || !this.generated)
             return;
-        let neighbour = Main.getChunkAt(this.pos.x - 1, this.pos.z);
-        this.sdNeighbour(neighbour, "POS_X");
-        neighbour = Main.getChunkAt(this.pos.x + 1, this.pos.z);
-        this.sdNeighbour(neighbour, "NEG_X");
-        neighbour = Main.getChunkAt(this.pos.x, this.pos.z - 1);
-        this.sdNeighbour(neighbour, "POS_Z");
-        neighbour = Main.getChunkAt(this.pos.x, this.pos.z + 1);
-        this.sdNeighbour(neighbour, "NEG_Z");
+        let neighbour = gs.getChunkAt(this.pos.x - 1, this.pos.z);
+        this.sdNeighbour(neighbour, "POS_X", gs);
+        neighbour = gs.getChunkAt(this.pos.x + 1, this.pos.z);
+        this.sdNeighbour(neighbour, "NEG_X", gs);
+        neighbour = gs.getChunkAt(this.pos.x, this.pos.z - 1);
+        this.sdNeighbour(neighbour, "POS_Z", gs);
+        neighbour = gs.getChunkAt(this.pos.x, this.pos.z + 1);
+        this.sdNeighbour(neighbour, "NEG_Z", gs);
     }
-    preUpdate(yPos) {
+    preUpdate(yPos, gs) {
         const lastHeightMap = this.heightmap;
         this.heightmap = new Array(16);
         for (let i = 0; i < this.heightmap.length; i++) {
@@ -141,7 +140,7 @@ export class Chunk {
             for (let z = 0; z < 16; z++) {
                 if (this.heightmap[x][z] > lastHeightMap[x][z]) {
                     for (let i = lastHeightMap[x][z] + 1; i <= this.heightmap[x][z]; i++) {
-                        SkyLighter.removeLight((this.pos.x * 16) + x, i, (this.pos.z * 16) + z, 15);
+                        SkyLighter.removeLight((this.pos.x * 16) + x, i, (this.pos.z * 16) + z, 15, gs);
                     }
                 }
                 else if (this.heightmap[x][z] < lastHeightMap[x][z]) {
@@ -152,14 +151,14 @@ export class Chunk {
                 }
             }
         for (const k of this.lightQueue) {
-            SkyLighter.light(k[0], k[1], k[2], 15);
+            SkyLighter.light(k[0], k[1], k[2], 15, gs);
         }
         this.lightQueue.length = 0;
         for (const k of queue) {
-            SkyLighter.light(k[0], k[1], k[2], 15);
+            SkyLighter.light(k[0], k[1], k[2], 15, gs);
         }
         for (const ls of this.subchunks[yPos].lightList) {
-            Lighter.light(ls.x + (this.pos.x * 16), ls.y + (yPos * 16), ls.z + (this.pos.z * 16), 15);
+            Lighter.light(ls.x + (this.pos.x * 16), ls.y + (yPos * 16), ls.z + (this.pos.z * 16), 15, gs);
         }
         this.subchunks[yPos].fPass = false;
     }
@@ -228,9 +227,9 @@ export class Chunk {
             //   console.log("Subchunk is undefined");
         }
     }
-    updateAllSubchunks() {
+    updateAllSubchunks(gs) {
         for (let i = 15; i >= 0; i--)
-            Main.toUpdate.add(this.subchunks[i]);
+            gs.toUpdate.add(this.subchunks[i]);
         // console.log("now not lazy hehehehe")
     }
     getSubchunk(y) {
@@ -238,11 +237,11 @@ export class Chunk {
         if (this.subchunks[yPos] != undefined)
             return this.subchunks[yPos];
     }
-    updateSubchunkAt(y) {
+    updateSubchunkAt(y, gs) {
         if (!this.allNeighbours)
             return;
         const yPos = Math.floor(Math.round(y) / 16);
-        Main.toUpdate.add(this.subchunks[yPos]);
+        gs.toUpdate.add(this.subchunks[yPos]);
     }
     prepareLight() {
         const queue = [];
@@ -274,7 +273,7 @@ export class Chunk {
             }
         this.lightQueue.push(...queue);
     }
-    setBlock(pos, blockID) {
+    setBlock(pos, blockID, gs) {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {
             throw new Error("Incorrect cordinates");
         }
@@ -285,26 +284,26 @@ export class Chunk {
             if (!(this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
                 this.subchunks[yPos].blocks[pos.x][y][pos.z] = new Block(0);
             this.subchunks[yPos].blocks[pos.x][y][pos.z].id = blockID;
-            Main.toUpdate.add(this.subchunks[yPos]);
+            gs.toUpdate.add(this.subchunks[yPos]);
             try {
                 // console.log("executing block update part")
                 if (pos.x == 0) {
-                    Main.toUpdate.add(this.neighbours["NEG_X"].subchunks[yPos]);
+                    gs.toUpdate.add(this.neighbours["NEG_X"].subchunks[yPos]);
                 }
                 else if (pos.x == 15) {
-                    Main.toUpdate.add(this.neighbours["POS_X"].subchunks[yPos]);
+                    gs.toUpdate.add(this.neighbours["POS_X"].subchunks[yPos]);
                 }
                 if (y == 0) {
-                    Main.toUpdate.add(this.subchunks[yPos - 1]);
+                    gs.toUpdate.add(this.subchunks[yPos - 1]);
                 }
                 else if (y == 15) {
-                    Main.toUpdate.add(this.subchunks[yPos + 1]);
+                    gs.toUpdate.add(this.subchunks[yPos + 1]);
                 }
                 if (pos.z == 0) {
-                    Main.toUpdate.add(this.neighbours["NEG_Z"].subchunks[yPos]);
+                    gs.toUpdate.add(this.neighbours["NEG_Z"].subchunks[yPos]);
                 }
                 else if (pos.z == 15) {
-                    Main.toUpdate.add(this.neighbours["POS_Z"].subchunks[yPos]);
+                    gs.toUpdate.add(this.neighbours["POS_Z"].subchunks[yPos]);
                 }
             }
             catch (error) {

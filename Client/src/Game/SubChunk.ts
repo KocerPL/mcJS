@@ -5,6 +5,7 @@ import { Chunk } from "./Chunk.js";
 import { World } from "./World.js";
 import { Mesh } from "./Mesh.js";
 import { Texture } from "../Engine/Texture.js";
+import { GameScene } from "./scenes/GameScene.js";
 export class SubChunk
 {
     public mesh:Mesh= new Mesh();//Mesh that contains all data needed for rendering  
@@ -126,11 +127,11 @@ export class SubChunk
                         this.lightList.push(new Vector(i,j,k));
                 }
     }
-    update()
+    update(gs:GameScene)
     {
         // this.chunk.updateLight();
         this.scanLight();
-        this.chunk.preUpdate(this.pos.y);
+        this.chunk.preUpdate(this.pos.y,gs);
         this.mesh.reset();
         this.updateVerticesOptimized();
         this.mesh.count = this.mesh.indices.length;

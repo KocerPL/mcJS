@@ -1,5 +1,6 @@
 import { Vector } from "./Engine/Utils/Vector.js";
 import { World } from "./Game/World.js";
+import { GameScene } from "./Game/scenes/GameScene.js";
 import { Main } from "./Main.js";
 
 class LightNode
@@ -28,7 +29,7 @@ function hasNode(x:number,y:number,z:number,list:Array<LightNode>)
 }
 export class SkyLighter
 {
-    static light(x:number,y:number,z:number,light:number)
+    static light(x:number,y:number,z:number,light:number,gs:GameScene)
     {
         const list:Array<LightNode> = [];
         let firstNode=true;
@@ -42,44 +43,44 @@ export class SkyLighter
             z=curLightNode.z;
             y=curLightNode.y;
             light=curLightNode.light;
-            if(!firstNode &&    World.getBlock(new Vector(x,y,z)).id>0) continue;
+            if(!firstNode &&    World.getBlock(new Vector(x,y,z),gs).id>0) continue;
             firstNode=false;
-            const d = World.getBlockAndSub(new Vector(x,y,z));
+            const d = World.getBlockAndSub(new Vector(x,y,z),gs);
             d.block.skyLight = curLightNode.light;
-            Main.toUpdate.add(d.sub);
+            gs.toUpdate.add(d.sub);
 
-            let test=  World.getBlock(new Vector(x+1,y,z));
+            let test=  World.getBlock(new Vector(x+1,y,z),gs);
             if(test && test.skyLight+1<curLightNode.light && !hasNode(x+1,y,z,list))
             {
                 list.push(new LightNode(x+1,y,z,light-1));
             }
             
-            test=  World.getBlock(new Vector(x-1,y,z));
+            test=  World.getBlock(new Vector(x-1,y,z),gs);
             if(test &&test.skyLight+1<curLightNode.light && !hasNode(x-1,y,z,list))
             {
                 list.push(new LightNode(x-1,y,z,light-1));
             }
 
 
-            test=  World.getBlock(new Vector(x,y+1,z));
+            test=  World.getBlock(new Vector(x,y+1,z),gs);
             if(test &&test.skyLight+1<curLightNode.light && !hasNode(x,y+1,z,list))
             {
                 list.push(new LightNode(x,y+1,z,light-1));
             }
             
-            test=  World.getBlock(new Vector(x,y-1,z));
+            test=  World.getBlock(new Vector(x,y-1,z),gs);
             if(test &&test.skyLight+1<curLightNode.light && !hasNode(x,y-1,z,list))
             {
                 list.push(new LightNode(x,y-1,z,light-1));
             }
             
-            test=  World.getBlock(new Vector(x,y,z+1));
+            test=  World.getBlock(new Vector(x,y,z+1),gs);
             if(test &&test.skyLight+1<curLightNode.light && !hasNode(x,y,z+1,list))
             {
                 list.push(new LightNode(x,y,z+1,light-1));
             }
             
-            test=  World.getBlock(new Vector(x,y,z-1));
+            test=  World.getBlock(new Vector(x,y,z-1),gs);
             if(test &&test.skyLight+1<curLightNode.light && !hasNode(x,y,z-1,list))
             {
                 list.push(new LightNode(x,y,z-1,light-1));
@@ -87,7 +88,7 @@ export class SkyLighter
       
         }
     }
-    static removeLight(x:number,y:number,z:number,light:number)
+    static removeLight(x:number,y:number,z:number,light:number,gs:GameScene)
     {
 
         const list:Array<LightNode> = [];
@@ -102,46 +103,46 @@ export class SkyLighter
             z=curLightNode.z;
             y=curLightNode.y;
             light=curLightNode.light;
-            if(!firstNode &&    World.getBlock(new Vector(x,y,z)).id>0) continue;
+            if(!firstNode &&    World.getBlock(new Vector(x,y,z),gs).id>0) continue;
             firstNode=false;
            
-            const d = World.getBlockAndSub(new Vector(x,y,z));
+            const d = World.getBlockAndSub(new Vector(x,y,z),gs);
         
             d.block.skyLight = 0;
-            Main.toUpdate.add(d.sub);
+            gs.toUpdate.add(d.sub);
 
-            let test=  World.getBlock(new Vector(x+1,y,z));
+            let test=  World.getBlock(new Vector(x+1,y,z),gs);
             if(test &&test.skyLight+1<curLightNode.light && !hasNode(x+1,y,z,list))
             {
                 list.push(new LightNode(x+1,y,z,light-1));
             }
             
-            test=  World.getBlock(new Vector(x-1,y,z));
+            test=  World.getBlock(new Vector(x-1,y,z),gs);
             if(test &&test.skyLight+1<curLightNode.light && !hasNode(x-1,y,z,list))
             {
                 list.push(new LightNode(x-1,y,z,light-1));
             }
 
 
-            test=  World.getBlock(new Vector(x,y+1,z));
+            test=  World.getBlock(new Vector(x,y+1,z),gs);
             if(test &&test.skyLight+1<curLightNode.light && !hasNode(x,y+1,z,list))
             {
                 list.push(new LightNode(x,y+1,z,light-1));
             }
             
-            test=  World.getBlock(new Vector(x,y-1,z));
+            test=  World.getBlock(new Vector(x,y-1,z),gs);
             if(test &&test.skyLight+1<curLightNode.light && !hasNode(x,y-1,z,list))
             {
                 list.push(new LightNode(x,y-1,z,light-1));
             }
             
-            test=  World.getBlock(new Vector(x,y,z+1));
+            test=  World.getBlock(new Vector(x,y,z+1),gs);
             if(test &&test.skyLight+1<curLightNode.light && !hasNode(x,y,z+1,list))
             {
                 list.push(new LightNode(x,y,z+1,light-1));
             }
             
-            test=  World.getBlock(new Vector(x,y,z-1));
+            test=  World.getBlock(new Vector(x,y,z-1),gs);
             if(test &&test.skyLight+1<curLightNode.light && !hasNode(x,y,z-1,list))
             {
                 list.push(new LightNode(x,y,z-1,light-1));
@@ -150,40 +151,40 @@ export class SkyLighter
         }
         for(let i=list.length-1; i>=0;i--)
         {
-            if(World.getBlock(list[i].toVector()).id<=0)
-                this.processOneBlockLight(list[i].x,list[i].y,list[i].z);
+            if(World.getBlock(list[i].toVector(),gs).id<=0)
+                this.processOneBlockLight(list[i].x,list[i].y,list[i].z,gs);
         }
     }
-    static processOneBlockLight(x,y,z)
+    static processOneBlockLight(x,y,z,gs:GameScene)
     {
        
         let light =0;
-        let test = World.getBlock(new Vector(x+1,y,z));
+        let test = World.getBlock(new Vector(x+1,y,z),gs);
         if(test && test.skyLight>light+1)
             light= test.skyLight-1;
-        test = World.getBlock(new Vector(x-1,y,z));
+        test = World.getBlock(new Vector(x-1,y,z),gs);
         if(test && test.skyLight>light+1)
             light= test.skyLight-1;
-        test = World.getBlock(new Vector(x,y+1,z));
-        if(test && test.skyLight>light+1)
-            light= test.skyLight-1;
-
-        test = World.getBlock(new Vector(x,y-1,z));
-        if(test && test.skyLight>light+1)
-            light= test.skyLight-1;
-        
-        test = World.getBlock(new Vector(x,y+1,z));
-        if(test && test.skyLight>light+1)
-            light= test.skyLight-1;
-        
-        test = World.getBlock(new Vector(x,y,z-1));
+        test = World.getBlock(new Vector(x,y+1,z),gs);
         if(test && test.skyLight>light+1)
             light= test.skyLight-1;
 
-        test = World.getBlock(new Vector(x,y,z+1));
+        test = World.getBlock(new Vector(x,y-1,z),gs);
         if(test && test.skyLight>light+1)
             light= test.skyLight-1;
-        this.light(x,y,z,light);
+        
+        test = World.getBlock(new Vector(x,y+1,z),gs);
+        if(test && test.skyLight>light+1)
+            light= test.skyLight-1;
+        
+        test = World.getBlock(new Vector(x,y,z-1),gs);
+        if(test && test.skyLight>light+1)
+            light= test.skyLight-1;
+
+        test = World.getBlock(new Vector(x,y,z+1),gs);
+        if(test && test.skyLight>light+1)
+            light= test.skyLight-1;
+        this.light(x,y,z,light,gs);
 
     }
 }

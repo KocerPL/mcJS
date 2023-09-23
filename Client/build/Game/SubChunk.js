@@ -100,10 +100,10 @@ class SubChunk {
                         this.lightList.push(new Vector(i, j, k));
                 }
     }
-    update() {
+    update(gs) {
         // this.chunk.updateLight();
         this.scanLight();
-        this.chunk.preUpdate(this.pos.y);
+        this.chunk.preUpdate(this.pos.y, gs);
         this.mesh.reset();
         this.updateVerticesOptimized();
         this.mesh.count = this.mesh.indices.length;

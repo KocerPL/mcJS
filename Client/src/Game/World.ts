@@ -6,6 +6,7 @@ import { SkyLighter } from "../SkyLighter.js";
 import { Block, blocks, directions } from "./Block.js";
 import { Chunk } from "./Chunk.js";
 import { SubChunk } from "./SubChunk.js";
+import { GameScene } from "./scenes/GameScene.js";
 const perlin = new PerlinN();
 export class World
 {
@@ -17,7 +18,7 @@ export class World
     {
         console.log(perlin);
     }
-    public static generateTree(vec:Vector)
+  /*  public static generateTree(vec:Vector)
     {
         console.log("shedule Generating tree");
         let i=vec.y+5;
@@ -59,8 +60,8 @@ export class World
             this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
 
         }
-    }
-    public static setBlockNoLight(blockPos:Vector,type:number)
+    }*/
+    public static setBlockNoLight(blockPos:Vector,type:number,gs:GameScene)
     {
         const inChunkPos:Vector = new Vector(Math.round(Math.round(blockPos.x)%16),Math.round(blockPos.y),Math.round(Math.round(blockPos.z)%16));
         if(inChunkPos.x<0)
@@ -71,8 +72,8 @@ export class World
         const chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
         try
         {
-            const chunk = Main.getChunkAt(chunkPos.x,chunkPos.z);
-            chunk.setBlock(inChunkPos,type);
+            const chunk = gs.getChunkAt(chunkPos.x,chunkPos.z);
+            chunk.setBlock(inChunkPos,type,gs);
         }
         catch(error)
         {
@@ -81,7 +82,7 @@ export class World
             return;
         }
     }
-    public static  getHeightMap(blockPos:Vector):number
+    public static  getHeightMap(blockPos:Vector,gs:GameScene):number
     {
         const chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
         const inChunkPos = new Vector(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);
@@ -91,47 +92,47 @@ export class World
             inChunkPos.z = 16-Math.abs(inChunkPos.z);
         try
         {
-            return  Main.getChunkAt(chunkPos.x,chunkPos.z).heightmap[inChunkPos.x][inChunkPos.z];
+            return  gs.getChunkAt(chunkPos.x,chunkPos.z).heightmap[inChunkPos.x][inChunkPos.z];
         } 
         catch(error)
         {
             return undefined;
         }
     }
-    public static getSubchunk(blockPos:Vector)
+    public static getSubchunk(blockPos:Vector,gs:GameScene)
     {
         const chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
 
         try
         {
-            return  Main.getChunkAt(chunkPos.x,chunkPos.z).getSubchunk(chunkPos.y);
+            return  gs.getChunkAt(chunkPos.x,chunkPos.z).getSubchunk(chunkPos.y);
         } 
         catch(error)
         {
             console.log(error);
         }
     }
-    public static placeBlock(pos:Vector,id:number)
+    public static placeBlock(pos:Vector,id:number,gs:GameScene)
     {
-        const llight =  World.getBlock(pos).lightFBlock;
-        const slight =  World.getBlock(pos).skyLight;
-        World.setBlockNoLight(pos,id);
-        Lighter.removeLight(pos.x,pos.y,pos.z,llight);
-        SkyLighter.removeLight(pos.x,pos.y,pos.z,slight);
+        const llight =  World.getBlock(pos,gs).lightFBlock;
+        const slight =  World.getBlock(pos,gs).skyLight;
+        World.setBlockNoLight(pos,id,gs);
+        Lighter.removeLight(pos.x,pos.y,pos.z,llight,gs);
+        SkyLighter.removeLight(pos.x,pos.y,pos.z,slight,gs);
     }
-    public static breakBlock(pos:Vector)
+    public static breakBlock(pos:Vector,gs:GameScene)
     {
         let isGlowing=false;
-        if(blocks[World.getBlock(pos).id].glowing)
+        if(blocks[World.getBlock(pos,gs).id].glowing)
             isGlowing=true;
-        World.setBlockNoLight(pos,0);
+        World.setBlockNoLight(pos,0,gs);
         if(isGlowing)
-            Lighter.removeLight(pos.x,pos.y,pos.z,15);
+            Lighter.removeLight(pos.x,pos.y,pos.z,15,gs);
         else
-            Lighter.processOneBlockLight(pos.x,pos.y,pos.z);
-        SkyLighter.processOneBlockLight(pos.x,pos.y,pos.z);
+            Lighter.processOneBlockLight(pos.x,pos.y,pos.z,gs);
+        SkyLighter.processOneBlockLight(pos.x,pos.y,pos.z,gs);
     }
-    public static getBlock(blockPos:Vector):Block
+    public static getBlock(blockPos:Vector,gs:GameScene):Block
     {
         let inChunkPos = new Vector(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);
         if(inChunkPos.x<0)
@@ -150,14 +151,14 @@ export class World
         try
         {
           
-            return Main.getChunkAt(chunkPos.x,chunkPos.z).getBlock(inChunkPos);
+            return gs.getChunkAt(chunkPos.x,chunkPos.z).getBlock(inChunkPos);
         }catch(error)
         {
             return undefined;
         }
     }
     
-    static  getBlockAndSub(blockPos:Vector):{block:Block,sub:SubChunk}
+    static  getBlockAndSub(blockPos:Vector,gs:GameScene):{block:Block,sub:SubChunk}
     {
         let inChunkPos = new Vector(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);
         if(inChunkPos.x<0)
@@ -170,13 +171,12 @@ export class World
             inChunkPos=  inChunkPos.abs();
       
         }
- 
 
         const chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
         try
         {
           
-            return Main.getChunkAt(chunkPos.x,chunkPos.z).getBlockSub(inChunkPos);
+            return gs.getChunkAt(chunkPos.x,chunkPos.z).getBlockSub(inChunkPos);
         }catch(error)
         {
             console.log(inChunkPos);
