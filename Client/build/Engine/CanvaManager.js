@@ -1,3 +1,4 @@
+import { Main } from "../Main.js";
 import { Vector } from "./Utils/Vector.js";
 class CanvaManager {
     static canva = document.createElement("canvas");
@@ -19,6 +20,7 @@ class CanvaManager {
         this.debug.style.top = "0";
         this.debug.style.left = "0";
         location.appendChild(this.debug);
+        window.addEventListener("click", ev => { Main.scene.onClick(((ev.x / this.WIDTH) * 2) - 1, ((ev.y / this.HEIGHT) * 2) - 1); console.log("TEST"); });
         window.addEventListener("resize", this.onResize.bind(this), false);
         window.addEventListener("keydown", this.onKeyDown.bind(this), false);
         window.addEventListener("keyup", this.onKeyUp.bind(this), false);

@@ -7,6 +7,8 @@ import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { Vector3 } from "../../Engine/Utils/Vector3.js";
 import { rot2d } from "../Models.js";
 import { GUI } from "./GUI.js";
+import { Button } from "./Button.js";
+import { isIn } from "../../Engine/BoundingBox.js";
 
 const gl = CanvaManager.gl;
 export abstract class GuiComponent
@@ -108,6 +110,14 @@ export abstract class GuiComponent
             comp.render(shader,mat);
         this.renderItself(shader,mat);
       
+    }
+    onClick(x:number,y:number)
+    {
+       for(let comp of this.components)
+       comp.onClick(x,y);
+        if(this instanceof Button && isIn(x,y,this.boundingBox))
+            this.onclick();
+            
     }
     attachGUI(gui:GUI)
     {

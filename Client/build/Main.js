@@ -68,6 +68,10 @@ class Main {
         //loading chunks
         requestAnimationFrame(this.loop.bind(this));
     }
+    static changeScene(scene) {
+        this.scene = scene;
+        this.scene.start();
+    }
     ////MAIN LOOP\\\\
     static loop(time) {
         if (this.Measure.lastTime <= time - 1000)

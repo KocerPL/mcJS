@@ -19,6 +19,7 @@ declare var io;
 let gl = CanvaManager.gl;
 export class GameScene extends Scene
 {
+  
     public maxChunks =128;
     public maxSubUpdates = 5;
     public okok = false;
@@ -89,7 +90,7 @@ export class GameScene extends Scene
         
         this.gui = new GUI(Main.shader2d);
         this.inv = new Inventory("Inventory");
-       
+       CanvaManager.rPointer = true;
         this.gui.add(this.inv);
         this.gui.add(new ItemBar("ItemBar"));
         this.player = new Player(new Vector(-2,144,-7),this);
@@ -139,6 +140,8 @@ export class GameScene extends Scene
                 for(let i=15;i>=0;i--)
                     this.socket.emit("getSubchunk",x,i,z);
 
+    }
+    onClick(x:number,y:number) {
     }
     update() {
        

@@ -67,6 +67,11 @@ export class GUI
         this.renderSet.bufferArrays();
         console.log(this.renderSet.vertices);
     }
+    onClick(x:number,y:number)
+    {
+        for(let comp of this.components)
+        comp.onClick(x,y);
+    }
     get(id:string):GuiComponent|null
     {
         for(const comp of this.components)

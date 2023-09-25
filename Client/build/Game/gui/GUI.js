@@ -53,6 +53,10 @@ export class GUI {
         this.renderSet.bufferArrays();
         console.log(this.renderSet.vertices);
     }
+    onClick(x, y) {
+        for (let comp of this.components)
+            comp.onClick(x, y);
+    }
     get(id) {
         for (const comp of this.components)
             if (comp.id == id)

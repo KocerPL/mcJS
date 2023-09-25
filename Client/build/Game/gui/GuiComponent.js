@@ -2,6 +2,8 @@ import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { RenderArrays } from "../../Engine/RenderArrays.js";
 import { Texture } from "../../Engine/Texture.js";
 import { Vector3 } from "../../Engine/Utils/Vector3.js";
+import { Button } from "./Button.js";
+import { isIn } from "../../Engine/BoundingBox.js";
 const gl = CanvaManager.gl;
 export class GuiComponent {
     sprite;
@@ -90,6 +92,12 @@ export class GuiComponent {
         for (const comp of this.components)
             comp.render(shader, mat);
         this.renderItself(shader, mat);
+    }
+    onClick(x, y) {
+        for (let comp of this.components)
+            comp.onClick(x, y);
+        if (this instanceof Button && isIn(x, y, this.boundingBox))
+            this.onclick();
     }
     attachGUI(gui) {
         this.gui = gui;

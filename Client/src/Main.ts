@@ -91,7 +91,11 @@ export class Main
         requestAnimationFrame(this.loop.bind(this));
     
     }
-
+    public static changeScene(scene:Scene)
+    {
+        this.scene =scene;
+        this.scene.start();
+    }
     ////MAIN LOOP\\\\
     public static loop(time:number):void
     {
