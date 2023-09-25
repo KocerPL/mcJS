@@ -127,8 +127,7 @@ export class GameScene extends Scene {
                     this.socket.emit("getSubchunk", x, i, z);
     }
     update() {
-        if (this.chunkQueue.length > 0)
-            this.processChunk(this.chunkQueue.shift());
+        this.processChunks();
         this.updateSubchunks();
         if (CanvaManager.getKeyOnce(86)) {
             this.inv.setVisible = !this.inv.getVisible;
@@ -184,8 +183,14 @@ export class GameScene extends Scene {
             return ch;
         return undefined;
     }
-    processChunk(chunk) {
-        chunk.prepareLight();
-        chunk.sendNeighbours(this);
+    processChunks() {
+        for (let i = this.chunkQueue.length - 1; i >= 0; i--) {
+            let chunk = this.chunkQueue[i];
+            if (chunk.isSubArrayReady()) {
+                chunk.prepareLight();
+                chunk.sendNeighbours(this);
+                this.chunkQueue.splice(i);
+            }
+        }
     }
 }

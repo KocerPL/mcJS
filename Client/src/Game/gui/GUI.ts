@@ -34,11 +34,12 @@ export class GUI
       
      //   gl.drawElements(gl.TRIANGLES,this.renderSet.count,gl.UNSIGNED_INT,0);
     }
-    add(component:GuiComponent)
+    add(component:GuiComponent):GuiComponent
     {
         this.components.push(component);
         component.attachGUI(this);
         this.needsRefresh();
+        return component;
     }
     needsRefresh()
     {

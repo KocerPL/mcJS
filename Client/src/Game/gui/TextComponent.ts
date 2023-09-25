@@ -1,17 +1,16 @@
 import { Texture } from "../../Engine/Texture.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
-import { Sprite } from "../../Engine/Utils/Sprite.js";
 import { GuiComponent } from "./GuiComponent.js";
 import { Shader } from "../../Engine/Shader/Shader.js";
 import { CanvaManager } from "../../Engine/CanvaManager.js";
-import { TextSprite } from "../../Engine/Utils/TextSprite.js";
+import { ALIGN, TextSprite } from "../../Engine/Utils/TextSprite.js";
 const gl =CanvaManager.gl;
 export class TextComponent extends GuiComponent
 {
-    constructor(id:string,text:string,w:number,h?:number)
+    constructor(id:string,text:string,w:number,h?:number,align?:ALIGN)
     {
         super(id);
-        this.sprite = new TextSprite(-w,-(h??w),w,(h??w),text);
+        this.sprite = new TextSprite(-w,-(h??w),w,(h??w),text,align);
         this.visible =true;
         this.transformation = Matrix3.identity()
         this.tcoords = Texture.fontAtlas.coords[49];

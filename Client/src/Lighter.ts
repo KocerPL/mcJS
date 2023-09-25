@@ -52,38 +52,38 @@ export class Lighter
           
 
             let test=  World.getBlock(new Vector(x+1,y,z),gs);
-            if(test.lightFBlock+1<curLightNode.light && !hasNode(x+1,y,z,list))
+            if(test&& test.lightFBlock+1<curLightNode.light && !hasNode(x+1,y,z,list))
             {
                 list.push(new LightNode(x+1,y,z,light-1));
             }
             
             test=  World.getBlock(new Vector(x-1,y,z),gs);
-            if(test.lightFBlock+1<curLightNode.light && !hasNode(x-1,y,z,list))
+            if(test&&test.lightFBlock+1<curLightNode.light && !hasNode(x-1,y,z,list))
             {
                 list.push(new LightNode(x-1,y,z,light-1));
             }
 
 
             test=  World.getBlock(new Vector(x,y+1,z),gs);
-            if(test.lightFBlock+1<curLightNode.light && !hasNode(x,y+1,z,list))
+            if(test&&test.lightFBlock+1<curLightNode.light && !hasNode(x,y+1,z,list))
             {
                 list.push(new LightNode(x,y+1,z,light-1));
             }
             
             test=  World.getBlock(new Vector(x,y-1,z),gs);
-            if(test.lightFBlock+1<curLightNode.light && !hasNode(x,y-1,z,list))
+            if(test&&test.lightFBlock+1<curLightNode.light && !hasNode(x,y-1,z,list))
             {
                 list.push(new LightNode(x,y-1,z,light-1));
             }
             
             test=  World.getBlock(new Vector(x,y,z+1),gs);
-            if(test.lightFBlock+1<curLightNode.light && !hasNode(x,y,z+1,list))
+            if(test&&test.lightFBlock+1<curLightNode.light && !hasNode(x,y,z+1,list))
             {
                 list.push(new LightNode(x,y,z+1,light-1));
             }
             
             test=  World.getBlock(new Vector(x,y,z-1),gs);
-            if(test.lightFBlock+1<curLightNode.light && !hasNode(x,y,z-1,list))
+            if(test&&test.lightFBlock+1<curLightNode.light && !hasNode(x,y,z-1,list))
             {
                 list.push(new LightNode(x,y,z-1,light-1));
             }

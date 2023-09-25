@@ -28,6 +28,7 @@ export class GUI {
         this.components.push(component);
         component.attachGUI(this);
         this.needsRefresh();
+        return component;
     }
     needsRefresh() {
         this.needRefresh = true;

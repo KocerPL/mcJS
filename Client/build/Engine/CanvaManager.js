@@ -3,7 +3,7 @@ class CanvaManager {
     static canva = document.createElement("canvas");
     static HEIGHT = window.innerHeight;
     static WIDTH = window.innerWidth;
-    static rPointer = true;
+    static rPointer = false;
     static gl = this.canva.getContext("webgl2");
     static debug = document.createElement("span");
     static proportion = 1024 / 1920;

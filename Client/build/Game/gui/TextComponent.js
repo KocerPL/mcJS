@@ -5,9 +5,9 @@ import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { TextSprite } from "../../Engine/Utils/TextSprite.js";
 const gl = CanvaManager.gl;
 export class TextComponent extends GuiComponent {
-    constructor(id, text, w, h) {
+    constructor(id, text, w, h, align) {
         super(id);
-        this.sprite = new TextSprite(-w, -(h ?? w), w, (h ?? w), text);
+        this.sprite = new TextSprite(-w, -(h ?? w), w, (h ?? w), text, align);
         this.visible = true;
         this.transformation = Matrix3.identity();
         this.tcoords = Texture.fontAtlas.coords[49];

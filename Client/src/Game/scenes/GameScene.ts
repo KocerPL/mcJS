@@ -144,8 +144,7 @@ export class GameScene extends Scene
        
  
        
-        if(this.chunkQueue.length>0)
-        this.processChunk(this.chunkQueue.shift());
+        this.processChunks();
         this.updateSubchunks();
         if(CanvaManager.getKeyOnce(86)) {this.inv.setVisible =!this.inv.getVisible;}
         if(CanvaManager.getKeyOnce(71))    console.log(World.getSubchunk(this.player.pos,this));
@@ -203,10 +202,18 @@ export class GameScene extends Scene
             return ch;
         return undefined;
     }
-    public processChunk(chunk:Chunk)
+    public processChunks()
     {
+        for(let i=this.chunkQueue.length-1;i>=0;i--)
+        {
+        let chunk = this.chunkQueue[i];
+        if(chunk.isSubArrayReady())
+        {
         chunk.prepareLight();
         chunk.sendNeighbours(this);
+        this.chunkQueue.splice(i);
+        }
+        }
     }
     
 }

@@ -5,7 +5,7 @@ export class CanvaManager
     private static canva:HTMLCanvasElement = document.createElement("canvas"); 
     private static HEIGHT:number = window.innerHeight;
     private static WIDTH:number = window.innerWidth;
-    public static rPointer =true;
+    public static rPointer =false;
     public static gl:WebGL2RenderingContext =this.canva.getContext("webgl2");
     public static debug:HTMLSpanElement = document.createElement("span"); 
     private static proportion:number  = 1024/1920;

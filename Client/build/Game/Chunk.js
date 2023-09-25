@@ -24,6 +24,7 @@ export class Chunk {
     subchunks = new Array(16);
     heightmap = new Array(16);
     neighbours = {};
+    readySubchunks = false;
     allNeighbours = false;
     generated = true;
     generatingIndex = 0;
@@ -93,15 +94,16 @@ export class Chunk {
             return;
         this.neighbours[neigbDir] = chunk;
         if (this.neighbours["NEG_X"] != undefined && this.neighbours["POS_X"] != undefined && this.neighbours["POS_Z"] != undefined && this.neighbours["NEG_Z"] != undefined) {
-            console.log("gathered all neighbours :)");
+            //  console.log("gathered all neighbours :)");
             this.allNeighbours = true;
             this.updateAllSubchunks(gs);
         }
     }
     sdNeighbour(neighbour, dir, gs) {
         try {
-            neighbour.updateNeighbour(dir, this);
-            this.updateNeighbour(flipDir(dir), neighbour, gs);
+            neighbour.updateNeighbour(dir, this, gs);
+            if (neighbour.isSubArrayReady())
+                this.updateNeighbour(flipDir(dir), neighbour, gs);
         }
         catch (error) { /* empty */ }
     }
@@ -228,9 +230,14 @@ export class Chunk {
         }
     }
     updateAllSubchunks(gs) {
-        for (let i = 15; i >= 0; i--)
+        console.log("UPDATING SUBSS");
+        console.log(gs);
+        for (let i = 15; i >= 0; i--) {
+            console.log(i);
+            console.log(this.subchunks[i]);
             gs.toUpdate.add(this.subchunks[i]);
-        // console.log("now not lazy hehehehe")
+        }
+        console.log("now not lazy hehehehe");
     }
     getSubchunk(y) {
         const yPos = Math.floor(Math.round(y) / 16);
@@ -272,6 +279,12 @@ export class Chunk {
                 }
             }
         this.lightQueue.push(...queue);
+    }
+    isSubArrayReady() {
+        for (let i = 0; i < 16; i++)
+            if (this.subchunks[i] == undefined)
+                return false;
+        return true;
     }
     setBlock(pos, blockID, gs) {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {

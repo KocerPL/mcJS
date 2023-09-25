@@ -2,7 +2,7 @@ import { CanvaManager } from "./Engine/CanvaManager.js";
 import { AtlasShader } from "./Engine/Shader/AtlasShader.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Shader2d } from "./Engine/Shader/Shader2d.js";
-import { GameScene } from "./Game/scenes/GameScene.js";
+import { MenuScene } from "./Game/scenes/MenuScene.js";
 const gl = CanvaManager.gl;
 class Main {
     static scene;
@@ -54,7 +54,7 @@ class Main {
         this.atlasShader = new AtlasShader();
         //shader for GUI(2d)
         this.shader2d = new Shader2d();
-        this.scene = new GameScene();
+        this.scene = new MenuScene();
         CanvaManager.setupCanva(document.body);
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LESS);

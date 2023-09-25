@@ -29,6 +29,7 @@ export class Chunk {
     subchunks: Array<SubChunk> = new Array(16);
     heightmap: Array<Array<number>> = new Array(16);
     neighbours:{POS_X?:Chunk,POS_Z?:Chunk,NEG_X?:Chunk,NEG_Z?:Chunk}={};
+    readySubchunks=false;
     allNeighbours=false;
     generated = true;
     generatingIndex =0;
@@ -101,20 +102,21 @@ export class Chunk {
     {
     //console.log("what")
     //console.log(this.pos,neigbDir);
-        if(chunk==undefined|| this.allNeighbours) return;
+        if(chunk==undefined || this.allNeighbours) return;
         this.neighbours[neigbDir] =chunk;
         if(this.neighbours["NEG_X"]!=undefined && this.neighbours["POS_X"]!=undefined && this.neighbours["POS_Z"]!=undefined && this.neighbours["NEG_Z"]!=undefined)
         {
-            console.log("gathered all neighbours :)");
+          //  console.log("gathered all neighbours :)");
             this.allNeighbours = true;
-
             this.updateAllSubchunks(gs);
+          
         }
     }
-    sdNeighbour(neighbour,dir,gs:GameScene)
+    sdNeighbour(neighbour:Chunk,dir,gs:GameScene)
     { try
     {
-        neighbour.updateNeighbour(dir,this);
+        neighbour.updateNeighbour(dir,this,gs);
+        if(neighbour.isSubArrayReady())
         this.updateNeighbour(flipDir(dir),neighbour,gs);
     }
     catch(error)
@@ -122,6 +124,7 @@ export class Chunk {
     }
     sendNeighbours( gs:GameScene)
     {
+ 
         if(this.allNeighbours || !this.generated) return;
         let neighbour = gs.getChunkAt(this.pos.x-1,this.pos.z);
         this.sdNeighbour(neighbour,"POS_X",gs);
@@ -267,10 +270,15 @@ export class Chunk {
     }
     updateAllSubchunks(gs:GameScene)
     {
+        console.log("UPDATING SUBSS");
+        console.log(gs);
         for(let i=15;i>=0;i--)
+        {
+            console.log(i);
+            console.log(this.subchunks[i]);
             gs.toUpdate.add(this.subchunks[i]);
-    
-        // console.log("now not lazy hehehehe")
+        }
+         console.log("now not lazy hehehehe")
     }
     getSubchunk(y)
     {
@@ -324,6 +332,13 @@ export class Chunk {
             }
         this.lightQueue.push(...queue);
         
+    }
+    isSubArrayReady()
+    {
+        for(let i=0;i<16;i++)
+        if(this.subchunks[i]==undefined)
+        return false;
+        return true;
     }
     setBlock(pos:Vector,blockID:number,gs:GameScene)
     {

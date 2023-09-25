@@ -19,6 +19,7 @@ import { Inventory } from "./Game/gui/Inventory.js";
 import { ItemBar } from "./Game/gui/ItemBar.js";
 import { Scene } from "./Engine/Scene.js";
 import { GameScene } from "./Game/scenes/GameScene.js";
+import { MenuScene } from "./Game/scenes/MenuScene.js";
 const gl = CanvaManager.gl;
 declare const io;
 export class Main
@@ -74,7 +75,7 @@ export class Main
         this.atlasShader = new AtlasShader();
         //shader for GUI(2d)
         this.shader2d = new Shader2d();
-        this.scene = new GameScene();
+        this.scene = new MenuScene();
      
         CanvaManager.setupCanva(document.body);
         gl.enable(gl.DEPTH_TEST);
