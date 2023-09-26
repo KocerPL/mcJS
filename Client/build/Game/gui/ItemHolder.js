@@ -2,6 +2,7 @@ import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { Texture } from "../../Engine/Texture.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { Sprite } from "../../Engine/Utils/Sprite.js";
+import { ALIGN } from "../../Engine/Utils/TextSprite.js";
 import { blocks, Side } from "../Block.js";
 import { GuiComponent } from "./GuiComponent.js";
 import { TextComponent } from "./TextComponent.js";
@@ -13,9 +14,8 @@ export class ItemHolder extends GuiComponent {
         this.sprite = new Sprite(-size, -size, size, size);
         this.tcoords = Texture.blockAtlas.coords[0];
         this.transformation = Matrix3.identity();
-        this.add(new TextComponent(this.id + "_text", "64", 0.01, 0.02));
-        let tComp = this.get(this.id + "_text");
-        tComp.transformation = tComp.transformation.translate(0.0, -0.03);
+        let tComp = this.add(new TextComponent(this.id + "_text", "64", 0.01, 0.02, ALIGN.right));
+        tComp.transformation = tComp.transformation.translate(0.03, -0.03);
     }
     change(blockID, count) {
         if (blockID == 0) {

@@ -84,13 +84,14 @@ export abstract class GuiComponent
         console.log(this.id,"=", this.vStart,"|||",this.vEnd);
         return rArrays;
     }
-    add(component:GuiComponent)
+    add(component:GuiComponent):GuiComponent
     {
         this.components.push(component);
         component.gui = this.gui;
         if(this.gui)
             this.gui.needsRefresh();
         component.parent =this;
+        return component;
     }
     get(id:string):GuiComponent|null
     {
@@ -106,9 +107,10 @@ export abstract class GuiComponent
     {
        if(!this.visible) return;
         const mat = transf.multiplyMat(this.transformation);//.multiplyMat(transf);
+        this.renderItself(shader,mat);
         for(const comp of this.components)
             comp.render(shader,mat);
-        this.renderItself(shader,mat);
+       
       
     }
     onClick(x:number,y:number)

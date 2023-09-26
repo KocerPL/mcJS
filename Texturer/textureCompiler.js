@@ -30,13 +30,13 @@ for(const file of fileList)
       }
     }
 }
-width =256;
+//width =256;
 //Now paint all into canvas and save canvas as png
 let atlasJSON = {};
 console.log(width,"   ",maxHeight);
-let canva = createCanvas(width,maxHeight+(maxHeight/2)+(maxHeight/4)+(maxHeight/8)+(maxHeight/16));
+let canva = createCanvas(width,maxHeight)//+(maxHeight/2)+(maxHeight/4)+(maxHeight/8)+(maxHeight/16));
 let ctx = canva.getContext("2d");
-atlasJSON.sizes=[];
+//atlasJSON.sizes=[];
 let yOffset=0;
 let imgStart=0;
 for(let val of images)
@@ -48,8 +48,8 @@ for(let val of images)
    imgStart+=val[1].width;
    
 }
-atlasJSON.sizes.push([0,0,width,maxHeight])
-yOffset=16;
+atlasJSON.size = [0,0,width,maxHeight];
+/*yOffset=16;
 for(let i=1;i<5;i++)
 {
   imgStart=0;
@@ -64,7 +64,7 @@ for(let val of images)
 }
 atlasJSON.sizes.push([0,yOffset,width/(Math.pow(2,i)),maxHeight/(Math.pow(2,i))]);
 yOffset+=maxHeight/(Math.pow(2,i));
-}
+}*/
 let buf = canva.toBuffer("image/png");
 fs.writeFileSync("./atlas.png",buf);
 fs.writeFileSync("./atlas.json",JSON.stringify(atlasJSON));

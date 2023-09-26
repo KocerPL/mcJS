@@ -79,7 +79,7 @@ export class Main
      
         CanvaManager.setupCanva(document.body);
         gl.enable(gl.DEPTH_TEST);
-        gl.depthFunc(gl.LESS);
+        gl.depthFunc(gl.LEQUAL);
         gl.enable(gl.CULL_FACE);
         gl.cullFace(gl.BACK);
         //Transparency requires blending 

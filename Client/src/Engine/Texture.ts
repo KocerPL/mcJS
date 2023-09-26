@@ -15,4 +15,5 @@ export class Texture
     static skinAtlas =  Loader.imageAtlasByJSON("./res/textures/skinMC.png"/*"http://i.imgur.com/PNJXVA3.png"*/,Model.player,64,64);
     static fontAtlas = Loader.fontAtlas("monospace");
     static testAtkas = Loader.imageAtlasByNewJSON("./res/textures/testOld.png",Loader.json("./res/textures/testOld.json"));
+    static screenAtlas = Loader.imageAtlasByNewJSON("./res/textures/titleScreen.png",Loader.json("./res/textures/titleScreen.json"));
 }

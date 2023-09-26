@@ -74,6 +74,7 @@ export class GuiComponent {
         if (this.gui)
             this.gui.needsRefresh();
         component.parent = this;
+        return component;
     }
     get(id) {
         for (const comp of this.components)
@@ -89,9 +90,9 @@ export class GuiComponent {
         if (!this.visible)
             return;
         const mat = transf.multiplyMat(this.transformation); //.multiplyMat(transf);
+        this.renderItself(shader, mat);
         for (const comp of this.components)
             comp.render(shader, mat);
-        this.renderItself(shader, mat);
     }
     onClick(x, y) {
         for (let comp of this.components)

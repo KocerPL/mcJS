@@ -1,22 +1,28 @@
 import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { Scene } from "../../Engine/Scene.js";
+import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { ALIGN } from "../../Engine/Utils/TextSprite.js";
 import { Main } from "../../Main.js";
 import { Button } from "../gui/Button.js";
 import { GUI } from "../gui/GUI.js";
+import { ImgComponent } from "../gui/ImgComponent.js";
 import { TextComponent } from "../gui/TextComponent.js";
 import { GameScene } from "./GameScene.js";
 let gl = CanvaManager.gl;
 export class MenuScene extends Scene {
     start() {
         this.gui = new GUI(Main.shader2d);
-        let txt = new TextComponent("title", "Mine-but-dont-craft", 0.05, 0.2, ALIGN.center);
+        this.gui.add(new ImgComponent("titleImage"));
+        let txt = new TextComponent("title", "MemeButDontCraft", 0.05, null, ALIGN.center);
         this.gui.add(txt);
         let but = new Button("Test");
         this.gui.add(but);
+        this.gui.add(new TextComponent("author", "Copyleft Kocer BA. Do distribute!", 0.01, null, ALIGN.right)).transformation = Matrix3.identity().translate(1.0, -0.98);
+        this.gui.add(new TextComponent("version", "MemeButDontCraft v1.0", 0.01, null, ALIGN.left)).transformation = Matrix3.identity().translate(-1.0, -0.98);
         but.onclick = () => {
             Main.changeScene(new GameScene());
         };
+        but.changeText("Play");
         txt.transformation = txt.transformation.translate(0.0, 0.8);
         // throw new Error("Method not implemented.");
     }

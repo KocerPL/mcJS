@@ -20,13 +20,13 @@ export class TextSprite extends Sprite {
         const width = Math.abs(this.x - this.dx);
         let i = 0;
         let textWidth = width * this.text.length;
-        let offset = 0;
+        let offset = width / 2;
         switch (this.align) {
             case ALIGN.center:
-                offset = -textWidth / 2;
+                offset = (-textWidth / 2) + width / 2;
                 break;
             case ALIGN.right:
-                offset = -textWidth;
+                offset = -textWidth + width / 2;
                 break;
         }
         for (const char of this.text) {

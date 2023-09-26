@@ -209,10 +209,10 @@ export class Loader {
         const coords = [];
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        canvas.width = 128 * 32;
-        canvas.height = 32;
         // Prepare the font to be able to measure
-        const fontSize = 16;
+        const fontSize = 32;
+        canvas.height = fontSize;
+        canvas.width = 128 * fontSize;
         // Resize canvas to match text size 
         canvas.style.width = canvas.width + "px";
         canvas.style.height = canvas.height + "px";

@@ -14,7 +14,6 @@ export class ItemBar extends GuiComponent {
         this.sprite = new BorderedSprite(-0.475, -0.075, 0.475, 0.075, 0.025, Texture.GUI.coords[3], Texture.GUI.coords[4], Texture.GUI.coords[5], Texture.GUI.coords[6], Texture.GUI.coords[7], Texture.GUI.coords[8], Texture.GUI.coords[9], Texture.GUI.coords[10], Texture.GUI.coords[11]);
         this.transformation = Matrix3.identity().translate(0, -0.925);
         this.tcoords = Texture.GUI.coords[3];
-        this.add(this.slot);
         this.add(new ItemSlot(-0.4, 0, "slot_1"));
         this.add(new ItemSlot(-0.3, 0, "slot_2"));
         this.add(new ItemSlot(-0.2, 0, "slot_3"));
@@ -24,12 +23,13 @@ export class ItemBar extends GuiComponent {
         this.add(new ItemSlot(0.2, 0, "slot_7"));
         this.add(new ItemSlot(0.3, 0, "slot_8"));
         this.add(new ItemSlot(0.4, 0, "slot_9"));
+        this.add(this.slot);
     }
     updateSlot() {
         this.slot.changePos(-0.4 + (0.1 * this.currentSlot), 0);
     }
     renderItself(shader, mat) {
-        shader.loadFloat("depth", -0.9);
+        //shader.loadFloat("depth",-0.9);
         super.renderItself(shader, mat);
     }
 }

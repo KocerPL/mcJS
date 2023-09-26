@@ -21,6 +21,7 @@ export class GameScene extends Scene {
     dispLl = false;
     fly = false;
     fastBreaking = false;
+    renderGUI = true;
     // public static minimalStorage = [];
     sunLight = 14;
     entities = [];
@@ -152,6 +153,8 @@ export class GameScene extends Scene {
             this.fastBreaking = !this.fastBreaking;
         if (CanvaManager.getKeyOnce(57))
             this.fly = !this.fly;
+        if (CanvaManager.getKeyOnce(112))
+            this.renderGUI = !this.renderGUI;
         for (let i = 0; i < this.entities.length; i++) {
             this.entities[i].update(i);
         }
@@ -171,7 +174,8 @@ export class GameScene extends Scene {
             this.entities[i].render();
         }
         this.player.render();
-        this.gui.render();
+        if (this.renderGUI)
+            this.gui.render();
         gl.clearColor(0.43 * (this.sunLight / 15), 0.69 * (this.sunLight / 15), (this.sunLight / 15), 1.0);
     }
     getEntity(id) {
