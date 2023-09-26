@@ -51,4 +51,39 @@ export class Matrix3 {
     toFloat32Array() {
         return new Float32Array(this._data);
     }
+    inverse() {
+        let a = 1 / this.det();
+        let mat = new Matrix3();
+        mat._data[0] = det2(this._data[4], this._data[5], this._data[7], this._data[8]) * a;
+        mat._data[1] = det2(this._data[2], this._data[1], this._data[8], this._data[7]) * a;
+        mat._data[2] = det2(this._data[1], this._data[2], this._data[4], this._data[5]) * a;
+        mat._data[3] = det2(this._data[5], this._data[3], this._data[8], this._data[6]) * a;
+        mat._data[4] = det2(this._data[0], this._data[2], this._data[6], this._data[8]) * a;
+        mat._data[5] = det2(this._data[2], this._data[0], this._data[5], this._data[3]) * a;
+        mat._data[6] = det2(this._data[3], this._data[4], this._data[6], this._data[7]) * a;
+        mat._data[7] = det2(this._data[1], this._data[0], this._data[7], this._data[6]) * a;
+        mat._data[8] = det2(this._data[0], this._data[1], this._data[3], this._data[4]) * a;
+        return mat;
+    }
+    det() {
+        return (this._data[0] * det2(this._data[4], this._data[5], this._data[7], this._data[8])) -
+            (this._data[1] * det2(this._data[3], this._data[5], this._data[6], this._data[8])) +
+            (this._data[2] * det2(this._data[3], this._data[4], this._data[6], this._data[7]));
+    }
+    rotate(rad) {
+        let rot = new Matrix3();
+        rot._data[0] = Math.cos(rad);
+        rot._data[1] = -Math.sin(rad);
+        rot._data[2] = 0;
+        rot._data[3] = Math.sin(rad);
+        rot._data[4] = Math.cos(rad);
+        rot._data[5] = 0;
+        rot._data[6] = 0;
+        rot._data[7] = 0;
+        rot._data[8] = 1;
+        return this.multiplyMat(rot);
+    }
+}
+function det2(a11, a12, a21, a22) {
+    return (a11 * a22) - (a12 * a21);
 }

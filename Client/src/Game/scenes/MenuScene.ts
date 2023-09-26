@@ -1,5 +1,6 @@
 import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { Scene } from "../../Engine/Scene.js"
+import { randRange } from "../../Engine/Utils/Math.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { Matrix4 } from "../../Engine/Utils/Matrix4.js";
 import { ALIGN } from "../../Engine/Utils/TextSprite.js";
@@ -18,11 +19,13 @@ export class MenuScene extends Scene
         let txt = new TextComponent("title","MemeButDontCraft",0.05,null,ALIGN.center);
         this.gui.add(txt);
       let but=  new Button("Test");
+     but.transformation =  but.transformation.rotate(0.5).translate(0.5,0.0);
        this.gui.add(but);
        this.gui.add(new TextComponent("author","Copyleft Kocer BA. Do distribute!",0.01,null,ALIGN.right)).transformation = Matrix3.identity().translate(1.0,-0.98);
        this.gui.add(new TextComponent("version","MemeButDontCraft ahplA 0.1",0.01,null,ALIGN.left)).transformation = Matrix3.identity().translate(-1.0,-0.98);
        but.onclick = ()=>{
-        Main.changeScene(new GameScene());
+       //console.log("Clicked button");
+         Main.changeScene(new GameScene());
        };
        but.changeText("Play");
       txt.transformation = txt.transformation.translate(0.0,0.8);
@@ -39,6 +42,7 @@ export class MenuScene extends Scene
       //  Main.changeScene(new GameScene());
     }
     render() {
+      this.gui.get("titleImage").transformation = Matrix3.identity().translate(randRange(-0.1,0.1),randRange(-0.1,0.1));
         this.gui.render();
         gl.clearColor(0 ,0,0,1.0);
     }

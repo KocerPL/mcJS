@@ -97,7 +97,8 @@ export class GuiComponent {
     onClick(x, y) {
         for (let comp of this.components)
             comp.onClick(x, y);
-        if (this instanceof Button && isIn(x, y, this.boundingBox))
+        let v = this.transformation.inverse().multiplyVec(new Vector3(CanvaManager.mouse.pos.x, CanvaManager.mouse.pos.y, 1));
+        if (this instanceof Button && isIn(v.x, v.y, this.boundingBox))
             this.onclick();
     }
     attachGUI(gui) {
