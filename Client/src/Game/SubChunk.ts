@@ -1,6 +1,6 @@
 import { Array3D } from "../Engine/Utils/Array3D.js";
 import { Vector } from "../Engine/Utils/Vector.js";
-import { Block, blocks,Side } from "./Block.js";
+import { Block, blocks,blockType,Side } from "./Block.js";
 import { Chunk } from "./Chunk.js";
 import { World } from "./World.js";
 import { Mesh } from "./Mesh.js";
@@ -123,7 +123,7 @@ export class SubChunk
             for(let j=0;j<16;j++)
                 for(let k=0;k<16;k++)
                 {
-                    if(this.blocks[i][j][k] && blocks[this.blocks[i][j][k].id].glowing)
+                    if(this.blocks[i][j][k] &&Block.info[this.blocks[i][j][k].id].glowing)
                         this.lightList.push(new Vector(i,j,k));
                 }
     }
@@ -162,7 +162,7 @@ export class SubChunk
     {
         return this.blocks[x][y][z];
     }
-    getBlockWV(x,y,z)
+    getBlockWV(x,y,z):Block
     {
         if(x>-1 && x<16 && y>-1 && y<16 && z >-1 && z<16)
         {
@@ -299,7 +299,11 @@ export class SubChunk
      
             if(testedBlock.id>0)
             {
-                this.mesh.vertices.push(...(vBuffer[side]));
+                if(Block.info[testedBlock.id].type==blockType.FULL)
+                    this.mesh.vertices.push(...vBuffer[side]);
+                else if(Block.info[testedBlock.id].type==blockType.NOTFULL)
+                    this.mesh.vertices.push(...(SubChunk.transform(x,y+(this.pos.y*16),z,Block.info[testedBlock.id].customMesh[side])));
+                // this.mesh.vertices.push(...(vBuffer[side]));
                 this.mesh.tCoords.push(...SubChunk.getTextureCords(testedBlock.id, SubChunk.flip(side)));
                 this.mesh.indices.push(index+2,index+1,index,index+2,index,index+3);
                 if( dy==1)
@@ -338,7 +342,10 @@ export class SubChunk
         {
             if(testedBlock.id<1)
             {  
-                this.mesh.vertices.push(...vBuffer[SubChunk.flip(side)]);
+                if(Block.info[block.id].type==blockType.FULL)
+                    this.mesh.vertices.push(...vBuffer[SubChunk.flip(side)]);
+                else if(Block.info[block.id].type==blockType.NOTFULL)
+                    this.mesh.vertices.push(...(SubChunk.transform(x,y+(this.pos.y*16),z,Block.info[block.id].customMesh[SubChunk.flip(side)])));
                 this.mesh.tCoords.push(...SubChunk.getTextureCords(block.id, side));
                 this.mesh.indices.push(index+2,index+1,index,index+2,index,index+3);
                 if( dy==1)
@@ -480,7 +487,17 @@ export class SubChunk
             1.0,0.0,
         ] ;
     }
-        
+    static transform(x,y,z,arr:number[])
+    {
+        const tempArr=[];
+        for(let i=0;i<arr.length;i+=3)
+        {
+            tempArr.push(arr[i]+x);
+            tempArr.push(arr[i+1]+y);
+            tempArr.push(arr[i+2]+z);
+        }
+        return tempArr;
+    }
     static defArrow = [
         //Facing POS_Z
         0.2,0,-0.2,

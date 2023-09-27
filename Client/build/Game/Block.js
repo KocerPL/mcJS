@@ -1,5 +1,11 @@
 import { Texture } from "../Engine/Texture.js";
 import { Vector } from "../Engine/Utils/Vector.js";
+export var blockType;
+(function (blockType) {
+    blockType[blockType["FULL"] = 0] = "FULL";
+    blockType[blockType["NOTFULL"] = 1] = "NOTFULL";
+    blockType[blockType["EMPTY"] = 2] = "EMPTY";
+})(blockType || (blockType = {}));
 class Block {
     id;
     lightFBlock = 0;
@@ -10,10 +16,12 @@ class Block {
     static createInfoArray() {
         Block.info =
             [{
-                    name: "Air"
+                    name: "Air",
+                    type: blockType.EMPTY
                 },
                 {
                     name: "Dirt",
+                    type: blockType.FULL,
                     textureIndex: [
                         Texture.testAtkas.indexMap.get("dirt"),
                         Texture.testAtkas.indexMap.get("dirt"),
@@ -26,6 +34,7 @@ class Block {
                 },
                 {
                     name: "Grass",
+                    type: blockType.FULL,
                     textureIndex: [
                         Texture.testAtkas.indexMap.get("grassTop"),
                         Texture.testAtkas.indexMap.get("dirt"),
@@ -38,6 +47,7 @@ class Block {
                 },
                 {
                     name: "Stone",
+                    type: blockType.FULL,
                     textureIndex: [
                         Texture.testAtkas.indexMap.get("stone"),
                         Texture.testAtkas.indexMap.get("stone"),
@@ -50,6 +60,7 @@ class Block {
                 },
                 {
                     name: "Greenstone ore",
+                    type: blockType.FULL,
                     textureIndex: [
                         Texture.testAtkas.indexMap.get("greenstone"),
                         Texture.testAtkas.indexMap.get("greenstone"),
@@ -62,6 +73,7 @@ class Block {
                 },
                 {
                     name: "Greenstone block",
+                    type: blockType.FULL,
                     textureIndex: [
                         Texture.testAtkas.indexMap.get("greenstoneBlock"),
                         Texture.testAtkas.indexMap.get("greenstoneBlock"),
@@ -74,6 +86,7 @@ class Block {
                 },
                 {
                     name: "log",
+                    type: blockType.FULL,
                     textureIndex: [
                         Texture.testAtkas.indexMap.get("logTop"),
                         Texture.testAtkas.indexMap.get("logTop"),
@@ -86,6 +99,7 @@ class Block {
                 },
                 {
                     name: "White",
+                    type: blockType.FULL,
                     textureIndex: [
                         Texture.testAtkas.indexMap.get("whiteBlock"),
                         Texture.testAtkas.indexMap.get("whiteBlock"),
@@ -98,6 +112,7 @@ class Block {
                 },
                 {
                     name: "Yellow",
+                    type: blockType.FULL,
                     textureIndex: [
                         Texture.testAtkas.indexMap.get("redBlock"),
                         Texture.testAtkas.indexMap.get("redBlock"),
@@ -110,6 +125,7 @@ class Block {
                 },
                 {
                     name: "Leaves",
+                    type: blockType.FULL,
                     textureIndex: [
                         Texture.testAtkas.indexMap.get("leaves"),
                         Texture.testAtkas.indexMap.get("leaves"),
@@ -122,6 +138,7 @@ class Block {
                 },
                 {
                     name: "Glowstone",
+                    type: blockType.FULL,
                     textureIndex: [
                         Texture.testAtkas.indexMap.get("glowstone"),
                         Texture.testAtkas.indexMap.get("glowstone"),
@@ -135,6 +152,7 @@ class Block {
                 },
                 {
                     name: "Snow",
+                    type: blockType.FULL,
                     textureIndex: [
                         Texture.testAtkas.indexMap.get("snow"),
                         Texture.testAtkas.indexMap.get("snow"),
@@ -143,6 +161,20 @@ class Block {
                         Texture.testAtkas.indexMap.get("snow"),
                         Texture.testAtkas.indexMap.get("snow")
                     ],
+                    breakTime: 1
+                },
+                {
+                    name: "Dirt slab",
+                    type: blockType.NOTFULL,
+                    textureIndex: [
+                        Texture.testAtkas.indexMap.get("dirt"),
+                        Texture.testAtkas.indexMap.get("dirt"),
+                        Texture.testAtkas.indexMap.get("dirt"),
+                        Texture.testAtkas.indexMap.get("dirt"),
+                        Texture.testAtkas.indexMap.get("dirt"),
+                        Texture.testAtkas.indexMap.get("dirt")
+                    ],
+                    customMesh: slab,
                     breakTime: 1
                 }];
     }
@@ -338,3 +370,41 @@ export const dirAssoc = Object.freeze({
     5: new Vector(0, 1, 0),
     6: new Vector(0, -1, 0)
 });
+const slab = [
+    [
+        -0.5, 0.5, -0.5,
+        0.5, 0.5, -0.5,
+        0.5, 0.5, 0.5,
+        -0.5, 0.5, 0.5,
+    ],
+    [
+        -0.5, 0.0, -0.5,
+        -0.5, 0.0, 0.5,
+        0.5, 0.0, 0.5,
+        0.5, 0.0, -0.5
+    ],
+    [
+        -0.5, -0.5, 0.5,
+        -0.5, 0.0, 0.5,
+        0.5, 0.0, 0.5,
+        0.5, -0.5, 0.5,
+    ],
+    [
+        -0.5, -0.5, 0.5,
+        0.5, -0.5, 0.5,
+        0.5, 0.0, 0.5,
+        -0.5, 0.0, 0.5,
+    ],
+    [
+        0.5, -0.5, -0.5,
+        0.5, -0.5, 0.5,
+        0.5, 0.0, 0.5,
+        0.5, 0.0, -0.5,
+    ],
+    [
+        0.5, -0.5, -0.5,
+        0.5, 0.0, -0.5,
+        0.5, 0.0, 0.5,
+        0.5, -0.5, 0.5,
+    ]
+];

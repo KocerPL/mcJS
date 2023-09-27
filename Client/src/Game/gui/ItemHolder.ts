@@ -4,7 +4,7 @@ import { Texture } from "../../Engine/Texture.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { Sprite } from "../../Engine/Utils/Sprite.js";
 import { ALIGN } from "../../Engine/Utils/TextSprite.js";
-import { blocks ,Side} from "../Block.js";
+import { Block, blocks ,Side} from "../Block.js";
 import { GuiComponent } from "./GuiComponent.js";
 import { TextComponent } from "./TextComponent.js";
 const gl =CanvaManager.gl;
@@ -28,7 +28,7 @@ export class ItemHolder extends GuiComponent
         let tComp = this.get(this.id+"_text");
         if(tComp instanceof TextComponent)
         tComp.changeText(`${count}`);
-      this.tcoords=    Texture.blockAtlas.coords[blocks[blockID].textureIndex[Side.front]];
+      this.tcoords=    Texture.blockAtlas.coords[Block.info[blockID].textureIndex[Side.front]];
       this.gui.needsRefresh();
     }
     renderItself(shader: Shader, mat: Matrix3): void {

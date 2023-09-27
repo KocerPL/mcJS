@@ -123,7 +123,7 @@ export class World
     public static breakBlock(pos:Vector,gs:GameScene)
     {
         let isGlowing=false;
-        if(blocks[World.getBlock(pos,gs).id].glowing)
+        if(Block.info[World.getBlock(pos,gs).id].glowing)
             isGlowing=true;
         World.setBlockNoLight(pos,0,gs);
         if(isGlowing)

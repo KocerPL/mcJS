@@ -133,7 +133,7 @@ export class Player
                 vertices[i+1] =vertices[i+1]+this.tbPos.y;
                 vertices[i+2] =vertices[i+2]+this.tbPos.z;
             }
-            const index = 5-Math.round((((Date.now()/1000)-this.startTime)/blocks[this.targetedBlock.id].breakTime)*5); 
+            const index = 5-Math.round((((Date.now()/1000)-this.startTime)/Block.info[this.targetedBlock.id].breakTime)*5); 
             if(index>-1)
             {
                 let indices = [];
@@ -449,7 +449,7 @@ export class Player
                     this.startTime = Date.now()/1000;
                     this.targetedBlock = block;
                 }
-                if((Date.now()/1000)-blocks[this.targetedBlock.id].breakTime>=this.startTime || this.gs.fastBreaking)
+                if((Date.now()/1000)-Block.info[this.targetedBlock.id].breakTime>=this.startTime || this.gs.fastBreaking)
                 { const middle = Vector.add(blockPos.round(),new Vector(randRange(-0.2,0.2),randRange(-0.2,0.2),randRange(-0.2,0.2)));
                     this.gs.entities.push(new Item(middle,World.getBlock(blockPos,this.gs).id,this.gs));
                     this.gs.socket.emit("placeBlock",{id:0,pos:{x:blockPos.x,y:blockPos.y,z:blockPos.z}});

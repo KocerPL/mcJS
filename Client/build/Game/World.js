@@ -2,7 +2,7 @@ import { Vector } from "../Engine/Utils/Vector.js";
 import { Lighter } from "../Lighter.js";
 import { PerlinN } from "../PerlinNoise.js";
 import { SkyLighter } from "../SkyLighter.js";
-import { blocks } from "./Block.js";
+import { Block } from "./Block.js";
 const perlin = new PerlinN();
 class World {
     Chunks = [];
@@ -103,7 +103,7 @@ class World {
     }
     static breakBlock(pos, gs) {
         let isGlowing = false;
-        if (blocks[World.getBlock(pos, gs).id].glowing)
+        if (Block.info[World.getBlock(pos, gs).id].glowing)
             isGlowing = true;
         World.setBlockNoLight(pos, 0, gs);
         if (isGlowing)
