@@ -1,4 +1,5 @@
 import { Vector } from "./Engine/Utils/Vector.js";
+import { Block, blockType } from "./Game/Block.js";
 import { World } from "./Game/World.js";
 class LightNode {
     x;
@@ -37,7 +38,7 @@ export class Lighter {
             light = curLightNode.light;
             const d = World.getBlockAndSub(new Vector(x, y, z), gs);
             gs.toUpdate.add(d.sub);
-            if (!firstNode && d.block.id > 0)
+            if (!firstNode && Block.info[d.block.id].type == blockType.FULL)
                 continue;
             firstNode = false;
             d.block.lightFBlock = curLightNode.light;

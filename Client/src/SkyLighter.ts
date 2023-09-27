@@ -1,4 +1,5 @@
 import { Vector } from "./Engine/Utils/Vector.js";
+import { Block, blockType } from "./Game/Block.js";
 import { World } from "./Game/World.js";
 import { GameScene } from "./Game/scenes/GameScene.js";
 import { Main } from "./Main.js";
@@ -43,7 +44,7 @@ export class SkyLighter
             z=curLightNode.z;
             y=curLightNode.y;
             light=curLightNode.light;
-            if(!firstNode &&    World.getBlock(new Vector(x,y,z),gs).id>0) continue;
+            if(!firstNode &&  Block.info[World.getBlock(new Vector(x,y,z),gs).id].type==blockType.FULL) continue;
             firstNode=false;
             const d = World.getBlockAndSub(new Vector(x,y,z),gs);
             d.block.skyLight = curLightNode.light;

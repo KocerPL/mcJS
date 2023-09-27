@@ -4,16 +4,19 @@ import { Texture } from "../../Engine/Texture.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { Sprite } from "../../Engine/Utils/Sprite.js";
 import { ALIGN } from "../../Engine/Utils/TextSprite.js";
-import { Block, blocks ,Side} from "../Block.js";
+import { Block, blocks ,blockType,Side} from "../Block.js";
 import { GuiComponent } from "./GuiComponent.js";
 import { TextComponent } from "./TextComponent.js";
 const gl =CanvaManager.gl;
 export class ItemHolder extends GuiComponent
 {
+    size:number;
+    blockID=0;
     constructor(id:string,size:number)
     {
      
         super(id);
+        this.size=size;
         this.visible =false;
         this.sprite = new Sprite(-size,-size,size,size);
         this.tcoords = Texture.blockAtlas.coords[0];
@@ -23,11 +26,14 @@ export class ItemHolder extends GuiComponent
     }
     change(blockID:number,count:number)
     {
+        this.blockID=blockID;
         if(blockID==0){ this.visible=false; return;}
         this.visible=true;
         let tComp = this.get(this.id+"_text");
         if(tComp instanceof TextComponent)
         tComp.changeText(`${count}`);
+    if( Block.info[blockID].type==blockType.NOTFULL)
+        this.sprite.dy = 0;
       this.tcoords=    Texture.blockAtlas.coords[Block.info[blockID].textureIndex[Side.front]];
       this.gui.needsRefresh();
     }

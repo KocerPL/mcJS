@@ -1,4 +1,5 @@
 import { Vector } from "./Engine/Utils/Vector.js";
+import { Block, blockType } from "./Game/Block.js";
 import { World } from "./Game/World.js";
 class LightNode {
     x;
@@ -35,7 +36,7 @@ export class SkyLighter {
             z = curLightNode.z;
             y = curLightNode.y;
             light = curLightNode.light;
-            if (!firstNode && World.getBlock(new Vector(x, y, z), gs).id > 0)
+            if (!firstNode && Block.info[World.getBlock(new Vector(x, y, z), gs).id].type == blockType.FULL)
                 continue;
             firstNode = false;
             const d = World.getBlockAndSub(new Vector(x, y, z), gs);

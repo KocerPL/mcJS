@@ -53,7 +53,7 @@ export class GameScene extends Scene
         for(const entry of this.toUpdate.entries())
         {
             i++;
-            if(i>this.maxSubUpdates) break;
+            if(i>this.maxSubUpdates|| !entry[0].chunk.isSubArrayReady()) break;
             if(entry[0]!=undefined)
             {
             console.log(entry[0].pos);
@@ -220,6 +220,7 @@ export class GameScene extends Scene
         chunk.sendNeighbours(this);
         this.chunkQueue.splice(i);
         }
+        else return;
         }
     }
     

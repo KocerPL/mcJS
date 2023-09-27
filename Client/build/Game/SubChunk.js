@@ -263,8 +263,8 @@ class SubChunk {
         const testedBlock = this.getBlockWV(dx + x, dy + y, dz + z);
         if (testedBlock == undefined)
             return;
-        if (block.id < 1) {
-            if (testedBlock.id > 0) {
+        if (Block.info[block.id].type != blockType.FULL) {
+            if (Block.info[testedBlock.id].type != blockType.EMPTY) {
                 if (Block.info[testedBlock.id].type == blockType.FULL)
                     this.mesh.vertices.push(...vBuffer[side]);
                 else if (Block.info[testedBlock.id].type == blockType.NOTFULL)
@@ -299,8 +299,8 @@ class SubChunk {
                 index += 4;
             }
         }
-        else {
-            if (testedBlock.id < 1) {
+        if (Block.info[block.id].type != blockType.EMPTY) {
+            if (Block.info[testedBlock.id].type != blockType.FULL) {
                 if (Block.info[block.id].type == blockType.FULL)
                     this.mesh.vertices.push(...vBuffer[SubChunk.flip(side)]);
                 else if (Block.info[block.id].type == blockType.NOTFULL)

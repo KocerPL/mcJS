@@ -3,7 +3,7 @@ import { Texture } from "../../Engine/Texture.js";
 import { Matrix4 } from "../../Engine/Utils/Matrix4.js";
 import { Vector } from "../../Engine/Utils/Vector.js";
 import { Main } from "../../Main.js";
-import { Side } from "../Block.js";
+import { Block, Side, blockType } from "../Block.js";
 import { Entity } from "../Entity.js";
 import { SubChunk } from "../SubChunk.js";
 import { World } from "../World.js";
@@ -88,7 +88,14 @@ export class Item extends Entity
         -0.5,0.5 ,0.5,
         -0.5,0.5,-0.5,
             ];
-        this.rs.textureCoords =[...SubChunk.getTextureCords(this.type,Side.top),...SubChunk.getTextureCords(this.type,Side.bottom),
+            if(Block.info[this.type].type==blockType.NOTFULL)
+            {
+            this.rs.vertices =[];
+            for(let i=0;i< Block.info[this.type].customMesh.length;i++)
+          this.rs.vertices.push( ...Block.info[this.type].customMesh[i]);
+            
+        }
+            this.rs.textureCoords =[...SubChunk.getTextureCords(this.type,Side.top),...SubChunk.getTextureCords(this.type,Side.bottom),
             ...SubChunk.getTextureCords(this.type,Side.front),...SubChunk.getTextureCords(this.type,Side.back),
             ...SubChunk.getTextureCords(this.type,Side.left),...SubChunk.getTextureCords(this.type,Side.right)];
         //     console.log(this.rs.textureCoords);
@@ -122,8 +129,8 @@ export class Item extends Entity
             this.lifeTime=0;
       
         }
-        if(this.acc.x>0) this.acc.x-=0.01;else  if(this.acc.x<0) this.acc.x+=0.01;else this.acc.x =0;
-        if(this.acc.z>0) this.acc.z-=0.01; else if(this.acc.z<0) this.acc.z+=0.01; else this.acc.z=0;
+        if(this.acc.x>0.02) this.acc.x-=0.01;else  if(this.acc.x<-0.02) this.acc.x+=0.01;else this.acc.x =0;
+        if(this.acc.z>0.02) this.acc.z-=0.01; else if(this.acc.z<-0.02) this.acc.z+=0.01; else this.acc.z=0;
       this.pos = Vector.add(this.pos,this.acc);
         if(this.rotation<360)
             this.rotation++;
