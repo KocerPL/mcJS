@@ -4,6 +4,7 @@ import { Task } from "../../Engine/Task.js";
 import { Texture } from "../../Engine/Texture.js";
 import { Matrix4 } from "../../Engine/Utils/Matrix4.js";
 import { Vector } from "../../Engine/Utils/Vector.js";
+import { Vector3 } from "../../Engine/Utils/Vector3.js";
 import { Main } from "../../Main.js";
 import { Block } from "../Block.js";
 import { Chunk } from "../Chunk.js";
@@ -15,8 +16,8 @@ import { PlayerEntity } from "../entities/PlayerEntity.js";
 import { GUI } from "../gui/GUI.js";
 import { Inventory } from "../gui/Inventory.js";
 import { ItemBar } from "../gui/ItemBar.js";
-declare var io;
-let gl = CanvaManager.gl;
+declare let io;
+const gl = CanvaManager.gl;
 export class GameScene extends Scene
 {
   
@@ -27,7 +28,7 @@ export class GameScene extends Scene
     public fly =false;
     public fastBreaking=false;
     public renderGUI =true;
-   // public static minimalStorage = [];
+    // public static minimalStorage = [];
     public sunLight=14;
     public entities:Array<Entity> = [];
     //private static unloadedChunks:Array<Chunk> = [];
@@ -46,6 +47,7 @@ export class GameScene extends Scene
     public loadedChunks:Map<string,Chunk> = new Map();
     public toUpdate:Set<SubChunk> = new Set();
     public  integratedServer:Worker;
+    public logged =false;
     private updateSubchunks()
     {
         const concatQ:Set<Chunk> = new Set();
@@ -56,9 +58,9 @@ export class GameScene extends Scene
             if(i>this.maxSubUpdates|| !entry[0].chunk.isSubArrayReady()) break;
             if(entry[0]!=undefined)
             {
-            console.log(entry[0].pos);
-            entry[0].update(this);
-            concatQ.add(entry[0].chunk);
+                console.log(entry[0].pos);
+                entry[0].update(this);
+                concatQ.add(entry[0].chunk);
             }
             this.toUpdate.delete(entry[0]);
         }
@@ -74,7 +76,7 @@ export class GameScene extends Scene
             chunk = new Chunk(ev.data.subX,ev.data.subZ);
             this.loadedChunks.set(chunk.pos.x+"-"+chunk.pos.z,chunk);
         }
-    //    console.log(ev.data);
+        //    console.log(ev.data);
         chunk.subchunks[ev.data.subY] = new SubChunk(new Vector(ev.data.subX,ev.data.subY,ev.data.subZ),chunk);
         for(let x=0;x<16;x++)    for(let y=0;y<16;y++)    for(let z=0;z<16;z++)
         {
@@ -91,7 +93,7 @@ export class GameScene extends Scene
         
         this.gui = new GUI(Main.shader2d);
         this.inv = new Inventory("Inventory");
-       CanvaManager.rPointer = true;
+        CanvaManager.rPointer = true;
         this.gui.add(this.inv);
         this.gui.add(new ItemBar("ItemBar"));
         this.player = new Player(new Vector(-2,144,-7),this);
@@ -101,7 +103,7 @@ export class GameScene extends Scene
             this.player.updateItem(obj.id,obj.slot,obj.count);
         });
         this.socket.on("spawnPlayer",(pos,id)=>{
-           // console.log("summoningPLAYER");
+            // console.log("summoningPLAYER");
             this.entities.push(new PlayerEntity(new Vector(pos.x,pos.y,pos.z),this,id));
         });
         this.socket.on("moveEntity",(id,pos,rot)=>{
@@ -116,6 +118,7 @@ export class GameScene extends Scene
             this.player.id = id;
             const pos =JSON.parse(posStr);
             this.player.pos = new Vector(pos.x,pos.y,pos.z);
+            this.logged=true;
         });
         this.socket.io.on("reconnect",()=>{
             location.reload();
@@ -136,17 +139,24 @@ export class GameScene extends Scene
                 }
             }
         });
-        for(let x=-4;x<4;x++)
-            for(let z=-4;z<4;z++)
-                for(let i=15;i>=0;i--)
-                    this.socket.emit("getSubchunk",x,i,z);
+       
 
     }
     onClick(x:number,y:number) {
     }
     update() {
-       
- 
+        const pPC =this.toChunkPos(this.player.pos);
+        //console.log(pPC);
+        const lPos = pPC.copy();
+        if(this.logged)
+        for(pPC.x-=2;pPC.x<=(2+lPos.x);pPC.x++)
+            for(pPC.z-=2;pPC.z<=(2+lPos.z);pPC.z++)
+                if(!this.loadedChunks.has(pPC.x+"-"+pPC.z))
+                {
+                    this.loadedChunks.set(pPC.x+"-"+pPC.z,new Chunk(pPC.x,pPC.z));
+                    for(let i=15;i>=0;i--)
+                        this.socket.emit("getSubchunk",pPC.x,i,pPC.z);
+                }
        
         this.processChunks();
         this.updateSubchunks();
@@ -168,11 +178,11 @@ export class GameScene extends Scene
             this.fly=!this.fly;
         if(CanvaManager.getKeyOnce(112))
             this.renderGUI=!this.renderGUI;
-            for(let i=0;i<this.entities.length;i++)
-            {
-                this.entities[i].update(i);
-            }
-            this.player.update();
+        for(let i=0;i<this.entities.length;i++)
+        {
+            this.entities[i].update(i);
+        }
+        this.player.update();
     }
     render() {
         Main.shader.use();
@@ -191,7 +201,7 @@ export class GameScene extends Scene
         }
         this.player.render();
         if(this.renderGUI)
-        this.gui.render();
+            this.gui.render();
         gl.clearColor(0.43*(this.sunLight/15) ,0.69 *(this.sunLight/15),(this.sunLight/15),1.0);
     }
     public getEntity(id)
@@ -213,15 +223,19 @@ export class GameScene extends Scene
     {
         for(let i=this.chunkQueue.length-1;i>=0;i--)
         {
-        let chunk = this.chunkQueue[i];
-        if(chunk.isSubArrayReady())
-        {
-        chunk.prepareLight();
-        chunk.sendNeighbours(this);
-        this.chunkQueue.splice(i);
+            const chunk = this.chunkQueue[i];
+            if(chunk.isSubArrayReady())
+            {
+                chunk.prepareLight();
+                chunk.sendNeighbours(this);
+                this.chunkQueue.splice(i);
+            }
+            else return;
         }
-        else return;
-        }
+    }
+    public toChunkPos(vec:Vector)
+    {
+        return new Vector(Math.floor(Math.round(vec.x)/16),0,Math.floor(Math.round(vec.z)/16));
     }
     
 }

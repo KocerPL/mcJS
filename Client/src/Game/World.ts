@@ -3,7 +3,7 @@ import { Lighter } from "../Lighter.js";
 import { Main } from "../Main.js";
 import {    PerlinN } from "../PerlinNoise.js";
 import { SkyLighter } from "../SkyLighter.js";
-import { Block, blocks, directions } from "./Block.js";
+import { Block, directions } from "./Block.js";
 import { Chunk } from "./Chunk.js";
 import { SubChunk } from "./SubChunk.js";
 import { GameScene } from "./scenes/GameScene.js";
@@ -18,7 +18,7 @@ export class World
     {
         console.log(perlin);
     }
-  /*  public static generateTree(vec:Vector)
+    /*  public static generateTree(vec:Vector)
     {
         console.log("shedule Generating tree");
         let i=vec.y+5;

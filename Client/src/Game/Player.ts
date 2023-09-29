@@ -6,7 +6,7 @@ import { clamp, randRange } from "../Engine/Utils/Math.js";
 import { Matrix4 } from "../Engine/Utils/Matrix4.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { Main } from "../Main.js";
-import { Block, blocks } from "./Block.js";
+import { Block } from "./Block.js";
 import { Item } from "./entities/Item.js";
 import { PlayerEntity } from "./entities/PlayerEntity.js";
 import { ItemBar } from "./gui/ItemBar.js";
@@ -91,7 +91,7 @@ export class Player
     };
     constructor(pos:Vector,gs:GameScene)
     {
-      this.gs = gs;
+        this.gs = gs;
         this.blockOverlay = new RenderSet(Main.atlasShader);
         this.pos = pos;
         this.entity = new PlayerEntity(this.pos,gs);
@@ -100,7 +100,7 @@ export class Player
             this.itemsBar[i]= new invItem(0);
         for(let i=0;i<27;i++)
             this.inventory[i]= new invItem(0);
-       // this.updateItem(2,0,64);
+        // this.updateItem(2,0,64);
     }
     update()
     {
@@ -189,7 +189,7 @@ export class Player
         if(World.getBlock(new Vector(pos.x+0.33,pos.y-1,pos.z-0.33),this.gs).id>0)
             return true;
 
-            if(World.getBlock(new Vector(pos.x+0.33,pos.y-0.1,pos.z+0.33),this.gs).id>0)
+        if(World.getBlock(new Vector(pos.x+0.33,pos.y-0.1,pos.z+0.33),this.gs).id>0)
             return true;
         if(World.getBlock(new Vector(pos.x-0.33,pos.y-0.1,pos.z+0.33),this.gs).id>0)
             return true;
@@ -284,12 +284,12 @@ export class Player
                 let yRot = -this.entity.bodyRot;
                 if(CanvaManager.getKeyOnce(81))
                 {
-               let it = new Item(this.camera.getPosition().copy(),this.itemsBar[this.selectedItem].id,this.gs);
-               it.acc.x=Math.sin((-this.entity.rotation.y)*Math.PI/180)*0.3;
-               it.acc.z= Math.cos((-this.entity.rotation.y)*Math.PI/180)*0.3;
+                    const it = new Item(this.camera.getPosition().copy(),this.itemsBar[this.selectedItem].id,this.gs);
+                    it.acc.x=Math.sin((-this.entity.rotation.y)*Math.PI/180)*0.3;
+                    it.acc.z= Math.cos((-this.entity.rotation.y)*Math.PI/180)*0.3;
                     this.gs.entities.push(it);
 
-                   this.updateItem(this.itemsBar[this.selectedItem].id,this.selectedItem,this.itemsBar[this.selectedItem].count-1);
+                    this.updateItem(this.itemsBar[this.selectedItem].id,this.selectedItem,this.itemsBar[this.selectedItem].count-1);
                    
                 }
                 if(CanvaManager.getKey(16))
@@ -326,10 +326,10 @@ export class Player
             if(World.getBlock(new Vector(tempPos.x,tempPos.y-1,tempPos.z),this.gs).id<=0 && !this.gs.fly)
             {
                 this.yAcc+=0.01;
-            tempPos.y-=this.yAcc;
+                tempPos.y-=this.yAcc;
             }   
             if(this.gs.fly && CanvaManager.getKey(90))
-            tempPos.y-=0.3;
+                tempPos.y-=0.3;
             if(!this.isBlockInWay(tempPos)) 
                 this.pos = tempPos;
             else  if(!this.isBlockInWay(new Vector(tempPos.x,this.pos.y,tempPos.z)))
@@ -485,7 +485,7 @@ export class Player
             {
                 this.gs.socket.emit("placeBlock",{id:this.itemsBar[this.selectedItem].id,pos:{x:lastPos.x,y:lastPos.y,z:lastPos.z}});  
                 World.placeBlock(lastPos,this.itemsBar[this.selectedItem].id,this.gs);
-                    this.updateItem(this.itemsBar[this.selectedItem].id,this.selectedItem,this.itemsBar[this.selectedItem].count-1);
+                this.updateItem(this.itemsBar[this.selectedItem].id,this.selectedItem,this.itemsBar[this.selectedItem].count-1);
                 CanvaManager.mouse.right=false;
               
             }
@@ -512,7 +512,7 @@ export class Player
         {
             if(this.itemsBar[x].id==id && this.itemsBar[x].count<64)
             {
-               this.updateItem(id,x,this.itemsBar[x].count+1);
+                this.updateItem(id,x,this.itemsBar[x].count+1);
                 return;
             }
             if(this.itemsBar[x].id ==0 ) 

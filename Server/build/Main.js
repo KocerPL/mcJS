@@ -1,12 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.toIndex = void 0;
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const fs = require("fs");
 const Chunk_1 = require("./World/Chunk");
+const Generator_1 = require("./World/Generator");
 let lastID = 0;
 const app = express();
+const gen = new Generator_1.Generator();
 const server = http.createServer(app);
 const io = new Server(server);
 const loadedChunks = new Map();
@@ -84,11 +87,14 @@ function saveChunk(chunk) {
 function getChunk(x, z) {
     if (loadedChunks.has(x + "-" + z))
         return loadedChunks.get(x + "-" + z);
-    let chunk = new Chunk_1.Chunk();
-    chunk.subchunks = JSON.parse(fs.readFileSync(__dirname + "/world/" + x + "." + z + ".kChunk").toString());
-    chunk.pos = [x, z];
-    loadedChunks.set(x + "-" + z, chunk);
-    return chunk;
+    if (fs.existsSync(__dirname + "/world/" + x + "." + z + ".kChunk")) {
+        let chunk = new Chunk_1.Chunk();
+        chunk.subchunks = JSON.parse(fs.readFileSync(__dirname + "/world/" + x + "." + z + ".kChunk").toString());
+        chunk.pos = [x, z];
+        loadedChunks.set(x + "-" + z, chunk);
+        return chunk;
+    }
+    return gen.generate();
 }
 function genSubchunk(n) {
     let k = new Array(4096);
@@ -100,3 +106,4 @@ function genSubchunk(n) {
 function toIndex(x, y, z) {
     return x + (y * 16) + (z * 256);
 }
+exports.toIndex = toIndex;

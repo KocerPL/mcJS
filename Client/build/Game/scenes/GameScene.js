@@ -13,7 +13,7 @@ import { PlayerEntity } from "../entities/PlayerEntity.js";
 import { GUI } from "../gui/GUI.js";
 import { Inventory } from "../gui/Inventory.js";
 import { ItemBar } from "../gui/ItemBar.js";
-let gl = CanvaManager.gl;
+const gl = CanvaManager.gl;
 export class GameScene extends Scene {
     maxChunks = 128;
     maxSubUpdates = 5;
@@ -41,6 +41,7 @@ export class GameScene extends Scene {
     loadedChunks = new Map();
     toUpdate = new Set();
     integratedServer;
+    logged = false;
     updateSubchunks() {
         const concatQ = new Set();
         let i = 0;
@@ -105,6 +106,7 @@ export class GameScene extends Scene {
             this.player.id = id;
             const pos = JSON.parse(posStr);
             this.player.pos = new Vector(pos.x, pos.y, pos.z);
+            this.logged = true;
         });
         this.socket.io.on("reconnect", () => {
             location.reload();
@@ -123,14 +125,21 @@ export class GameScene extends Scene {
                 }
             }
         });
-        for (let x = -4; x < 4; x++)
-            for (let z = -4; z < 4; z++)
-                for (let i = 15; i >= 0; i--)
-                    this.socket.emit("getSubchunk", x, i, z);
     }
     onClick(x, y) {
     }
     update() {
+        const pPC = this.toChunkPos(this.player.pos);
+        //console.log(pPC);
+        const lPos = pPC.copy();
+        if (this.logged)
+            for (pPC.x -= 2; pPC.x <= (2 + lPos.x); pPC.x++)
+                for (pPC.z -= 2; pPC.z <= (2 + lPos.z); pPC.z++)
+                    if (!this.loadedChunks.has(pPC.x + "-" + pPC.z)) {
+                        this.loadedChunks.set(pPC.x + "-" + pPC.z, new Chunk(pPC.x, pPC.z));
+                        for (let i = 15; i >= 0; i--)
+                            this.socket.emit("getSubchunk", pPC.x, i, pPC.z);
+                    }
         this.processChunks();
         this.updateSubchunks();
         if (CanvaManager.getKeyOnce(86)) {
@@ -192,7 +201,7 @@ export class GameScene extends Scene {
     }
     processChunks() {
         for (let i = this.chunkQueue.length - 1; i >= 0; i--) {
-            let chunk = this.chunkQueue[i];
+            const chunk = this.chunkQueue[i];
             if (chunk.isSubArrayReady()) {
                 chunk.prepareLight();
                 chunk.sendNeighbours(this);
@@ -201,5 +210,8 @@ export class GameScene extends Scene {
             else
                 return;
         }
+    }
+    toChunkPos(vec) {
+        return new Vector(Math.floor(Math.round(vec.x) / 16), 0, Math.floor(Math.round(vec.z) / 16));
     }
 }

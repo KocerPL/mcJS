@@ -247,7 +247,7 @@ class Player {
             if (!this.locked) {
                 let yRot = -this.entity.bodyRot;
                 if (CanvaManager.getKeyOnce(81)) {
-                    let it = new Item(this.camera.getPosition().copy(), this.itemsBar[this.selectedItem].id, this.gs);
+                    const it = new Item(this.camera.getPosition().copy(), this.itemsBar[this.selectedItem].id, this.gs);
                     it.acc.x = Math.sin((-this.entity.rotation.y) * Math.PI / 180) * 0.3;
                     it.acc.z = Math.cos((-this.entity.rotation.y) * Math.PI / 180) * 0.3;
                     this.gs.entities.push(it);

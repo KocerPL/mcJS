@@ -3,8 +3,10 @@ import http = require("http");
 const { Server } = require("socket.io");
 import fs = require('fs');
 import { Chunk } from "./World/Chunk";
+import { Generator } from "./World/Generator";
 let lastID=0;
 const app = express();
+const gen = new Generator();
 const server =http.createServer(app);
 const io = new Server(server);
 const loadedChunks:Map<string,Chunk> = new Map();
@@ -40,6 +42,7 @@ io.on('connection', (socket) => {
     socket.on('getSubchunk',(x,y,z)=>{
        // console.log("Subchunk");
        const chunk = getChunk(x,z);
+    
         let data =chunk.subchunks[y];
         socket.emit('subchunk', {data:{subX:x,subY:y,subZ:z,blocks:data}})    
     });
@@ -91,11 +94,15 @@ function getChunk(x,z)
   
     if(loadedChunks.has(x+"-"+z))
       return loadedChunks.get(x+"-"+z)
+    if(fs.existsSync(__dirname+"/world/"+x+"."+z+".kChunk"))
+    {
     let   chunk = new Chunk();
-    chunk.subchunks=  JSON.parse(fs.readFileSync(__dirname+"/world/"+x+"."+z+".kChunk").toString());
+    chunk.subchunks= JSON.parse(fs.readFileSync(__dirname+"/world/"+x+"."+z+".kChunk").toString());
     chunk.pos=[x,z];
     loadedChunks.set(x+"-"+z,chunk);
     return chunk;
+    }
+    return gen.generate();
 }
 
 function genSubchunk(n):Array<number>
@@ -107,7 +114,7 @@ function genSubchunk(n):Array<number>
     }
     return k;
 }
-function toIndex(x,y,z)
+export function toIndex(x,y,z)
 {
     return x+(y*16)+(z*256);
 }

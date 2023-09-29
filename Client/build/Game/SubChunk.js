@@ -268,7 +268,7 @@ class SubChunk {
                 if (Block.info[testedBlock.id].type == blockType.FULL)
                     this.mesh.vertices.push(...vBuffer[side]);
                 else if (Block.info[testedBlock.id].type == blockType.NOTFULL)
-                    this.mesh.vertices.push(...(SubChunk.transform(x, y + (this.pos.y * 16), z, Block.info[testedBlock.id].customMesh[side])));
+                    this.mesh.vertices.push(...(SubChunk.transform(x + dx, y + (this.pos.y * 16) + dy, z + dz, Block.info[testedBlock.id].customMesh[SubChunk.flip(side)])));
                 // this.mesh.vertices.push(...(vBuffer[side]));
                 this.mesh.tCoords.push(...SubChunk.getTextureCords(testedBlock.id, SubChunk.flip(side)));
                 this.mesh.indices.push(index + 2, index + 1, index, index + 2, index, index + 3);
@@ -304,7 +304,7 @@ class SubChunk {
                 if (Block.info[block.id].type == blockType.FULL)
                     this.mesh.vertices.push(...vBuffer[SubChunk.flip(side)]);
                 else if (Block.info[block.id].type == blockType.NOTFULL)
-                    this.mesh.vertices.push(...(SubChunk.transform(x, y + (this.pos.y * 16), z, Block.info[block.id].customMesh[SubChunk.flip(side)])));
+                    this.mesh.vertices.push(...(SubChunk.transform(x, y + (this.pos.y * 16), z, Block.info[block.id].customMesh[side])));
                 this.mesh.tCoords.push(...SubChunk.getTextureCords(block.id, side));
                 this.mesh.indices.push(index + 2, index + 1, index, index + 2, index, index + 3);
                 if (dy == 1) {

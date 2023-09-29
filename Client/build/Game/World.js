@@ -13,48 +13,48 @@ class World {
         console.log(perlin);
     }
     /*  public static generateTree(vec:Vector)
-      {
-          console.log("shedule Generating tree");
-          let i=vec.y+5;
-         
-          
-          for(let x=vec.x-2;x<=vec.x+2;x++)
-              for(let z=vec.z-2;z<=vec.z+2;z++)
-              {
-                  this.setBlockNoLight(new Vector(x,i,z),9);
-              }
-          this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
-          i++;
-          for(let x=vec.x-2;x<=vec.x+2;x++)
-              for(let z=vec.z-2;z<=vec.z+2;z++)
-              {
-              
-                  this.setBlockNoLight(new Vector(x,i,z),9);
-              }
-          this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
-          this.setBlockNoLight(new Vector(vec.x+2,i,vec.z+2),0);
-          this.setBlockNoLight(new Vector(vec.x+2,i,vec.z-2),0);
-          this.setBlockNoLight(new Vector(vec.x-2,i,vec.z+2),0);
-          this.setBlockNoLight(new Vector(vec.x-2,i,vec.z-2),0);
-          i++;
-          this.setBlockNoLight(new Vector(vec.x+1,i,vec.z),9);
-          this.setBlockNoLight(new Vector(vec.x-1,i,vec.z),9);
-          this.setBlockNoLight(new Vector(vec.x,i,vec.z+1),9);
-          this.setBlockNoLight(new Vector(vec.x,i,vec.z-1),9);
-          this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
-          i++;
-          this.setBlockNoLight(new Vector(vec.x+1,i,vec.z),9);
-          this.setBlockNoLight(new Vector(vec.x-1,i,vec.z),9);
-          this.setBlockNoLight(new Vector(vec.x,i,vec.z+1),9);
-          this.setBlockNoLight(new Vector(vec.x,i,vec.z-1),9);
-          this.setBlockNoLight(new Vector(vec.x,i,vec.z),9);
-          for( i=vec.y+1;i<vec.y+5;i++)
-          {
-              //console.log("Generating tree")
-              this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
-  
-          }
-      }*/
+    {
+        console.log("shedule Generating tree");
+        let i=vec.y+5;
+       
+        
+        for(let x=vec.x-2;x<=vec.x+2;x++)
+            for(let z=vec.z-2;z<=vec.z+2;z++)
+            {
+                this.setBlockNoLight(new Vector(x,i,z),9);
+            }
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
+        i++;
+        for(let x=vec.x-2;x<=vec.x+2;x++)
+            for(let z=vec.z-2;z<=vec.z+2;z++)
+            {
+            
+                this.setBlockNoLight(new Vector(x,i,z),9);
+            }
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
+        this.setBlockNoLight(new Vector(vec.x+2,i,vec.z+2),0);
+        this.setBlockNoLight(new Vector(vec.x+2,i,vec.z-2),0);
+        this.setBlockNoLight(new Vector(vec.x-2,i,vec.z+2),0);
+        this.setBlockNoLight(new Vector(vec.x-2,i,vec.z-2),0);
+        i++;
+        this.setBlockNoLight(new Vector(vec.x+1,i,vec.z),9);
+        this.setBlockNoLight(new Vector(vec.x-1,i,vec.z),9);
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z+1),9);
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z-1),9);
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
+        i++;
+        this.setBlockNoLight(new Vector(vec.x+1,i,vec.z),9);
+        this.setBlockNoLight(new Vector(vec.x-1,i,vec.z),9);
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z+1),9);
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z-1),9);
+        this.setBlockNoLight(new Vector(vec.x,i,vec.z),9);
+        for( i=vec.y+1;i<vec.y+5;i++)
+        {
+            //console.log("Generating tree")
+            this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
+
+        }
+    }*/
     static setBlockNoLight(blockPos, type, gs) {
         const inChunkPos = new Vector(Math.round(Math.round(blockPos.x) % 16), Math.round(blockPos.y), Math.round(Math.round(blockPos.z) % 16));
         if (inChunkPos.x < 0)

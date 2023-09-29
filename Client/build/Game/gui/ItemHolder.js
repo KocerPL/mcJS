@@ -17,7 +17,7 @@ export class ItemHolder extends GuiComponent {
         this.sprite = new Sprite(-size, -size, size, size);
         this.tcoords = Texture.blockAtlas.coords[0];
         this.transformation = Matrix3.identity();
-        let tComp = this.add(new TextComponent(this.id + "_text", "64", 0.01, 0.02, ALIGN.right));
+        const tComp = this.add(new TextComponent(this.id + "_text", "64", 0.01, 0.02, ALIGN.right));
         tComp.transformation = tComp.transformation.translate(0.03, -0.03);
     }
     change(blockID, count) {
@@ -27,16 +27,16 @@ export class ItemHolder extends GuiComponent {
             return;
         }
         this.visible = true;
-        let tComp = this.get(this.id + "_text");
+        const tComp = this.get(this.id + "_text");
         if (tComp instanceof TextComponent)
             tComp.changeText(`${count}`);
         if (Block.info[blockID].type == blockType.NOTFULL)
             this.sprite.dy = 0;
-        this.tcoords = Texture.blockAtlas.coords[Block.info[blockID].textureIndex[Side.front]];
+        this.tcoords = Texture.testAtkas.coords[Block.info[blockID].textureIndex[Side.front]];
         this.gui.needsRefresh();
     }
     renderItself(shader, mat) {
-        Texture.blockAtlas.bind();
+        Texture.testAtkas.bind();
         shader.loadMatrix3("transformation", mat);
         if (this.renderMe)
             gl.drawElements(gl.TRIANGLES, this.vEnd - this.vStart, gl.UNSIGNED_INT, this.vStart * 4);
