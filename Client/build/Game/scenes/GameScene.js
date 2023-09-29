@@ -50,7 +50,7 @@ export class GameScene extends Scene {
             if (i > this.maxSubUpdates || !entry[0].chunk.isSubArrayReady())
                 break;
             if (entry[0] != undefined) {
-                console.log(entry[0].pos);
+                //    console.log(entry[0].pos);
                 entry[0].update(this);
                 concatQ.add(entry[0].chunk);
             }
@@ -77,7 +77,7 @@ export class GameScene extends Scene {
             if (!chunk.subchunks[i])
                 return;
         this.chunkQueue.push(this.getChunkAt(ev.data.subX, ev.data.subZ));
-        console.log("Chunk at: x:" + ev.data.subX + " z:" + ev.data.subZ + "is ready to be loaded");
+        //  console.log("Chunk at: x:"+ ev.data.subX+" z:"+ev.data.subZ+"is ready to be loaded");
     }
     start() {
         Block.createInfoArray();
@@ -131,13 +131,13 @@ export class GameScene extends Scene {
     }
     update() {
         const pPC = this.toChunkPos(this.player.pos);
-        console.log(pPC);
+        //   console.log(pPC);
         const lPos = pPC.copy();
         let i = 1;
         let iter = 1;
         let step = 1;
         if (!this.loadedChunks.has(pPC.x + "-" + pPC.z)) {
-            console.log("LOADING: " + pPC.x + "  " + pPC.z);
+            // console.log("LOADING: "+pPC.x+"  "+pPC.z);
             this.loadedChunks.set(pPC.x + "-" + pPC.z, new Chunk(pPC.x, pPC.z));
             for (let i = 15; i >= 0; i--)
                 this.socket.emit("getSubchunk", pPC.x, i, pPC.z);
@@ -147,7 +147,7 @@ export class GameScene extends Scene {
             for (let j = 0; j < i; j++) {
                 pPC.x += step;
                 if (!this.loadedChunks.has(pPC.x + "-" + pPC.z)) {
-                    console.log("LOADING: " + pPC.x + "  " + pPC.z);
+                    // console.log("LOADING: "+pPC.x+"  "+pPC.z);
                     this.loadedChunks.set(pPC.x + "-" + pPC.z, new Chunk(pPC.x, pPC.z));
                     for (let i = 15; i >= 0; i--)
                         this.socket.emit("getSubchunk", pPC.x, i, pPC.z);
@@ -157,7 +157,7 @@ export class GameScene extends Scene {
             for (let j = 0; j < i; j++) {
                 pPC.z += step;
                 if (!this.loadedChunks.has(pPC.x + "-" + pPC.z)) {
-                    console.log("LOADING: " + pPC.x + "  " + pPC.z);
+                    //  console.log("LOADING: "+pPC.x+"  "+pPC.z);
                     this.loadedChunks.set(pPC.x + "-" + pPC.z, new Chunk(pPC.x, pPC.z));
                     for (let i = 15; i >= 0; i--)
                         this.socket.emit("getSubchunk", pPC.x, i, pPC.z);
@@ -234,8 +234,8 @@ export class GameScene extends Scene {
                 this.chunkQueue.splice(i);
             }
             else {
-                console.log("preparing Chunk: ", chunk.pos);
-                continue;
+                // console.log("preparing Chunk: ",chunk.pos);
+                return;
             }
         }
     }
