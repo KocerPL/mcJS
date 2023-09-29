@@ -94,7 +94,11 @@ function getChunk(x, z) {
         loadedChunks.set(x + "-" + z, chunk);
         return chunk;
     }
-    return gen.generate();
+    def: {
+        let chunk = gen.generate(x, z);
+        loadedChunks.set(x + "-" + z, chunk);
+        return chunk;
+    }
 }
 function genSubchunk(n) {
     let k = new Array(4096);

@@ -4,9 +4,12 @@ import { Chunk } from "./Chunk";
 export class Generator
 {
     WorldSeed = 6969696969696969;
-    generate():Chunk
+    generate(x,z):Chunk
     {
         let chunk= new Chunk();
+        chunk.pos = new Array(2);
+        chunk.pos[0] =x;
+        chunk.pos[1] =z;
         chunk.subchunks = new Array(16);
         for(let i=0;i<16;i++)
         {

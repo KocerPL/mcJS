@@ -5,8 +5,11 @@ const Main_1 = require("../Main");
 const Chunk_1 = require("./Chunk");
 class Generator {
     WorldSeed = 6969696969696969;
-    generate() {
+    generate(x, z) {
         let chunk = new Chunk_1.Chunk();
+        chunk.pos = new Array(2);
+        chunk.pos[0] = x;
+        chunk.pos[1] = z;
         chunk.subchunks = new Array(16);
         for (let i = 0; i < 16; i++) {
             let sub = new Array(4096);
