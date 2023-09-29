@@ -235,7 +235,7 @@ export class GameScene extends Scene {
             }
             else {
                 // console.log("preparing Chunk: ",chunk.pos);
-                return;
+                continue;
             }
         }
     }
