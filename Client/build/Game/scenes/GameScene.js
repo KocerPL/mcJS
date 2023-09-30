@@ -16,7 +16,7 @@ import { ItemBar } from "../gui/ItemBar.js";
 const gl = CanvaManager.gl;
 export class GameScene extends Scene {
     maxChunks = 128;
-    maxSubUpdates = 5;
+    maxSubUpdates = 1;
     okok = false;
     dispLl = false;
     fly = false;

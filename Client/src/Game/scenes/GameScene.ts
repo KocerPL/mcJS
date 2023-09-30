@@ -22,7 +22,7 @@ export class GameScene extends Scene
 {
   
     public maxChunks =128;
-    public maxSubUpdates = 5;
+    public maxSubUpdates = 1;
     public okok = false;
     public dispLl = false;
     public fly =false;
