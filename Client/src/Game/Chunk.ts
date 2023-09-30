@@ -271,15 +271,15 @@ export class Chunk {
     }
     updateAllSubchunks(gs:GameScene)
     {
-        console.log("UPDATING SUBSS");
-        console.log(gs);
+       // console.log("UPDATING SUBSS");
+        //console.log(gs);
         for(let i=15;i>=0;i--)
         {
-            console.log(i);
-            console.log(this.subchunks[i]);
+          //  console.log(i);
+            //console.log(this.subchunks[i]);
             gs.toUpdate.add(this.subchunks[i]);
         }
-         console.log("now not lazy hehehehe")
+         //console.log("now not lazy hehehehe")
     }
     getSubchunk(y)
     {
