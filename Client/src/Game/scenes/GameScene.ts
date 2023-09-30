@@ -21,7 +21,7 @@ const gl = CanvaManager.gl;
 export class GameScene extends Scene
 {
   
-    public maxChunks =128;
+    public maxChunks =6;
     public maxSubUpdates = 1;
     public okok = false;
     public dispLl = false;
@@ -50,21 +50,23 @@ export class GameScene extends Scene
     public logged =false;
     private updateSubchunks()
     {
-        const concatQ:Set<Chunk> = new Set();
+        //const concatQ:Set<Chunk> = new Set();
         let i=0;
         for(const entry of this.toUpdate.entries())
         {
             i++;
-            if(i>this.maxSubUpdates|| !entry[0].chunk.isSubArrayReady()) break;
+            if( !entry[0].chunk.isSubArrayReady()) break;
             if(entry[0]!=undefined)
             {
             //    console.log(entry[0].pos);
-                entry[0].update(this);
-                concatQ.add(entry[0].chunk);
+                entry[0].update(this).then(()=>{
+                    entry[0].chunk.updateMesh();
+                });
+              //  concatQ.add(entry[0].chunk);
             }
             this.toUpdate.delete(entry[0]);
         }
-        concatQ.forEach((chunk) =>{chunk.updateMesh();});
+       // concatQ.forEach((chunk) =>{chunk.updateMesh();});
     
     }
     public handleSubchunk(ev)
@@ -146,23 +148,29 @@ export class GameScene extends Scene
     onClick(x:number,y:number) {
     }
     update() {
+        this.processChunks();
+        this.updateSubchunks();
         const pPC =this.toChunkPos(this.player.pos);
      //   console.log(pPC);
         const lPos = pPC.copy();
         let i=1;
         let iter=1;
         let step=1;
+        let time = Date.now();
         if(!this.loadedChunks.has(pPC.x+"-"+pPC.z))
                 {
                    // console.log("LOADING: "+pPC.x+"  "+pPC.z);
                     this.loadedChunks.set(pPC.x+"-"+pPC.z,new Chunk(pPC.x,pPC.z));
                     for(let i=15;i>=0;i--)
                         this.socket.emit("getSubchunk",pPC.x,i,pPC.z);
-
+                    
 
                    
                 }
-        while(i<6)
+             
+                    this.loadedChunks.get(pPC.x+"-"+pPC.z).lastUsed= time;
+              
+        while(i<this.maxChunks)
         {
            // console.log("LOADUNG: "+pPC.x+"  "+pPC.z);
                
@@ -179,6 +187,8 @@ export class GameScene extends Scene
 
                    
                 }
+                this.loadedChunks.get(pPC.x+"-"+pPC.z).lastUsed= time;
+              
                 //pPC.x+=step;
                 }
                 for(let j=0;j<i;j++)
@@ -191,14 +201,21 @@ export class GameScene extends Scene
                     for(let i=15;i>=0;i--)
                         this.socket.emit("getSubchunk",pPC.x,i,pPC.z);
                 }
+                    this.loadedChunks.get(pPC.x+"-"+pPC.z).lastUsed= time;
              
                 }
                 step=-step;
                 i++;
             }
+        for(let data of this.loadedChunks)
+        {
+            if(data[1].lastUsed+5000<time)
+            {
+            delete data[1];
+            this.loadedChunks.delete(data[0]);
+            }
+        }
        
-        this.processChunks();
-        this.updateSubchunks();
         if(CanvaManager.getKeyOnce(86)) {this.inv.setVisible =!this.inv.getVisible;}
         if(CanvaManager.getKeyOnce(71))    console.log(World.getSubchunk(this.player.pos,this));
         if(CanvaManager.getKey(52)&&this.sunLight<16) this.sunLight++;
@@ -226,7 +243,7 @@ export class GameScene extends Scene
     render() {
         Main.shader.use();
         this.player.camera.preRender();
-        Main.shader.setFog(this.player.camera.getPosition(),Math.sqrt(this.maxChunks)*8);
+        Main.shader.setFog(this.player.camera.getPosition(),this.maxChunks*16);
         CanvaManager.preRender();
         Texture.testAtkas.bind();
         Main.shader.loadUniforms(this.player.camera.getProjection(), Matrix4.identity(), this.player.camera.getView(),this.sunLight);

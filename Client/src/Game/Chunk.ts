@@ -43,6 +43,7 @@ export class Chunk {
     vlo:VBO;
     vfb:VBO;
     ebo:EBO;
+    lastUsed:number=0;
     lightQueue:Array<Array<number>>=[];
     transformation = Matrix4.identity();
     constructor(x:number, z:number) {

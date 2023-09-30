@@ -9,6 +9,7 @@ import { GameScene } from "./scenes/GameScene.js";
 export class SubChunk
 {
     public mesh:Mesh= new Mesh();//Mesh that contains all data needed for rendering  
+    private tmpMesh:Mesh = new Mesh();
     blocks:Array<Array<Array<Block>>>= new Array3D(16,16,16);//Array of blocks
     generated=true; //Is SubChunk already generated
     lightUpdate = false; //Is subchunk updating light
@@ -127,15 +128,21 @@ export class SubChunk
                         this.lightList.push(new Vector(i,j,k));
                 }
     }
-    update(gs:GameScene)
+    update(gs:GameScene):Promise<void>
     {
         // this.chunk.updateLight();
+        return new Promise((resolve,reject)=>{
         this.scanLight();
         this.chunk.preUpdate(this.pos.y,gs);
-        this.mesh.reset();
-        this.updateVerticesOptimized();
+        //this.mesh.reset();
+        this.tmpMesh = new Mesh();
+        this.updateVerticesOptimized().then(()=>{
+        this.mesh = this.tmpMesh;
         this.mesh.count = this.mesh.indices.length;
         this.lightUpdate =false;
+        resolve();
+        });
+        });
     }
     getBlock(pos:Vector):Block // gets block at position relative to subchunk position
     {
@@ -300,20 +307,20 @@ export class SubChunk
             if(Block.info[testedBlock.id].type!=blockType.EMPTY)
             {
                 if(Block.info[testedBlock.id].type==blockType.FULL)
-                    this.mesh.vertices.push(...vBuffer[ side]);
+                    this.tmpMesh.vertices.push(...vBuffer[ side]);
                 else if(Block.info[testedBlock.id].type==blockType.NOTFULL)
-                    this.mesh.vertices.push(...(SubChunk.transform(x+dx,y+(this.pos.y*16)+dy,z+dz,Block.info[testedBlock.id].customMesh[SubChunk.flip(side)])));
-                // this.mesh.vertices.push(...(vBuffer[side]));
-                this.mesh.tCoords.push(...SubChunk.getTextureCords(testedBlock.id, SubChunk.flip(side)));
-                this.mesh.indices.push(index+2,index+1,index,index+2,index,index+3);
+                    this.tmpMesh.vertices.push(...(SubChunk.transform(x+dx,y+(this.pos.y*16)+dy,z+dz,Block.info[testedBlock.id].customMesh[SubChunk.flip(side)])));
+                // this.tmpMesh.vertices.push(...(vBuffer[side]));
+                this.tmpMesh.tCoords.push(...SubChunk.getTextureCords(testedBlock.id, SubChunk.flip(side)));
+                this.tmpMesh.indices.push(index+2,index+1,index,index+2,index,index+3);
                 if( dy==1)
                 {
                     const o1 =this.vertexAO(this.isBlock(x-1,y,z),this.isBlock(x,y,z-1),this.isBlock(x-1,y,z-1));
                     const o2 = this.vertexAO(this.isBlock(x-1,y,z),this.isBlock(x,y,z+1),this.isBlock(x-1,y,z+1));
                     const o3 =this.vertexAO(this.isBlock(x+1,y,z),this.isBlock(x,y,z+1),this.isBlock(x+1,y,z+1));
                     const o4 = this.vertexAO(this.isBlock(x+1,y,z),this.isBlock(x,y,z-1),this.isBlock(x+1,y,z-1));
-                    this.mesh.lightLevels.push(o1*block.skyLight,o4*block.skyLight,o3*block.skyLight,o2*block.skyLight);
-                    this.mesh.fb.push(block.lightFBlock*o1,block.lightFBlock*o4,block.lightFBlock*o3,block.lightFBlock*o2);
+                    this.tmpMesh.lightLevels.push(o1*block.skyLight,o4*block.skyLight,o3*block.skyLight,o2*block.skyLight);
+                    this.tmpMesh.fb.push(block.lightFBlock*o1,block.lightFBlock*o4,block.lightFBlock*o3,block.lightFBlock*o2);
                 }
                 else if(dx==1)
                 {
@@ -321,8 +328,8 @@ export class SubChunk
                     const o2 =  this.vertexAO(this.isBlock(x,y-1,z),this.isBlock(x,y,z+1),this.isBlock(x,y-1,z+1));
                     const o3 =  this.vertexAO(this.isBlock(x,y+1,z),this.isBlock(x,y,z+1),this.isBlock(x,y+1,z+1));
                     const o4 = this.vertexAO(this.isBlock(x,y+1,z),this.isBlock(x,y,z-1),this.isBlock(x,y+1,z-1));
-                    this.mesh.lightLevels.push(o1*block.skyLight,o2*block.skyLight,o3*block.skyLight,o4*block.skyLight);
-                    this.mesh.fb.push(block.lightFBlock*o1,block.lightFBlock*o2,block.lightFBlock*o3,block.lightFBlock*o4);
+                    this.tmpMesh.lightLevels.push(o1*block.skyLight,o2*block.skyLight,o3*block.skyLight,o4*block.skyLight);
+                    this.tmpMesh.fb.push(block.lightFBlock*o1,block.lightFBlock*o2,block.lightFBlock*o3,block.lightFBlock*o4);
                 }
                 else if(dz==1)
                 {
@@ -330,8 +337,8 @@ export class SubChunk
                     const o2 = this.vertexAO(this.isBlock(x+1,y,z),this.isBlock(x,y-1,z),this.isBlock(x+1,y-1,z));
                     const o3 =  this.vertexAO(this.isBlock(x+1,y,z),this.isBlock(x,y+1,z),this.isBlock(x+1,y+1,z));
                     const o4 =  this.vertexAO(this.isBlock(x-1,y,z),this.isBlock(x,y+1,z),this.isBlock(x-1,y+1,z));
-                    this.mesh.lightLevels.push(o1*block.skyLight,o4*block.skyLight,o3*block.skyLight,o2*block.skyLight);
-                    this.mesh.fb.push(block.lightFBlock*o1,block.lightFBlock*o4,block.lightFBlock*o3,block.lightFBlock*o2);
+                    this.tmpMesh.lightLevels.push(o1*block.skyLight,o4*block.skyLight,o3*block.skyLight,o2*block.skyLight);
+                    this.tmpMesh.fb.push(block.lightFBlock*o1,block.lightFBlock*o4,block.lightFBlock*o3,block.lightFBlock*o2);
                 }
                
                 index+=4;
@@ -343,19 +350,19 @@ export class SubChunk
             if(Block.info[testedBlock.id].type!=blockType.FULL)
             {  
                 if(Block.info[block.id].type==blockType.FULL)
-                    this.mesh.vertices.push(...vBuffer[SubChunk.flip(side)]);
+                    this.tmpMesh.vertices.push(...vBuffer[SubChunk.flip(side)]);
                 else if(Block.info[block.id].type==blockType.NOTFULL)
-                    this.mesh.vertices.push(...(SubChunk.transform(x,y+(this.pos.y*16),z,Block.info[block.id].customMesh[side])));
-                this.mesh.tCoords.push(...SubChunk.getTextureCords(block.id, side));
-                this.mesh.indices.push(index+2,index+1,index,index+2,index,index+3);
+                    this.tmpMesh.vertices.push(...(SubChunk.transform(x,y+(this.pos.y*16),z,Block.info[block.id].customMesh[side])));
+                this.tmpMesh.tCoords.push(...SubChunk.getTextureCords(block.id, side));
+                this.tmpMesh.indices.push(index+2,index+1,index,index+2,index,index+3);
                 if( dy==1)
                 {
                     const o1 = this.vertexAO(this.isBlock(x-1,y+1,z),this.isBlock(x,y+1,z-1),this.isBlock(x-1,y+1,z-1));
                     const o2 = this.vertexAO(this.isBlock(x-1,y+1,z),this.isBlock(x,y+1,z+1),this.isBlock(x-1,y+1,z+1));
                     const o3 = this.vertexAO(this.isBlock(x+1,y+1,z),this.isBlock(x,y+1,z+1),this.isBlock(x+1,y+1,z+1));
                     const o4 = this.vertexAO(this.isBlock(x+1,y+1,z),this.isBlock(x,y+1,z-1),this.isBlock(x+1,y+1,z-1));
-                    this.mesh.lightLevels.push(testedBlock.skyLight*o1,testedBlock.skyLight*o2,testedBlock.skyLight*o3,testedBlock.skyLight*o4);
-                    this.mesh.fb.push(testedBlock.lightFBlock*o1,testedBlock.lightFBlock*o2,testedBlock.lightFBlock*o3,testedBlock.lightFBlock*o4);
+                    this.tmpMesh.lightLevels.push(testedBlock.skyLight*o1,testedBlock.skyLight*o2,testedBlock.skyLight*o3,testedBlock.skyLight*o4);
+                    this.tmpMesh.fb.push(testedBlock.lightFBlock*o1,testedBlock.lightFBlock*o2,testedBlock.lightFBlock*o3,testedBlock.lightFBlock*o4);
                 }
                 else if(dx==1)
                 {
@@ -363,8 +370,8 @@ export class SubChunk
                     const o2 = this.vertexAO(this.isBlock(x+1,y-1,z),this.isBlock(x+1,y,z+1),this.isBlock(x+1,y-1,z+1));
                     const o3 = this.vertexAO(this.isBlock(x+1,y+1,z),this.isBlock(x+1,y,z+1),this.isBlock(x+1,y+1,z+1));
                     const o4 = this.vertexAO(this.isBlock(x+1,y+1,z),this.isBlock(x+1,y,z-1),this.isBlock(x+1,y+1,z-1));
-                    this.mesh.lightLevels.push(testedBlock.skyLight*o1,testedBlock.skyLight*o4,testedBlock.skyLight*o3,testedBlock.skyLight*o2);
-                    this.mesh.fb.push(testedBlock.lightFBlock*o1,testedBlock.lightFBlock*o4,testedBlock.lightFBlock*o3,testedBlock.lightFBlock*o2);
+                    this.tmpMesh.lightLevels.push(testedBlock.skyLight*o1,testedBlock.skyLight*o4,testedBlock.skyLight*o3,testedBlock.skyLight*o2);
+                    this.tmpMesh.fb.push(testedBlock.lightFBlock*o1,testedBlock.lightFBlock*o4,testedBlock.lightFBlock*o3,testedBlock.lightFBlock*o2);
                         
                 }
                 else if(dz==1) //fine
@@ -373,8 +380,8 @@ export class SubChunk
                     const o2 =this.vertexAO(this.isBlock(x,y-1,z+1),this.isBlock(x+1,y,z+1),this.isBlock(x+1,y-1,z+1));
                     const o3 =  this.vertexAO(this.isBlock(x,y+1,z+1),this.isBlock(x+1,y,z+1),this.isBlock(x+1,y+1,z+1));
                     const o4 =   this.vertexAO(this.isBlock(x,y+1,z+1),this.isBlock(x-1,y,z+1),this.isBlock(x-1,y+1,z+1));
-                    this.mesh.lightLevels.push(testedBlock.skyLight*o1,testedBlock.skyLight*o2,testedBlock.skyLight*o3,testedBlock.skyLight*o4);
-                    this.mesh.fb.push(testedBlock.lightFBlock*o1,testedBlock.lightFBlock*o2,testedBlock.lightFBlock*o3,testedBlock.lightFBlock*o4);
+                    this.tmpMesh.lightLevels.push(testedBlock.skyLight*o1,testedBlock.skyLight*o2,testedBlock.skyLight*o3,testedBlock.skyLight*o4);
+                    this.tmpMesh.fb.push(testedBlock.lightFBlock*o1,testedBlock.lightFBlock*o2,testedBlock.lightFBlock*o3,testedBlock.lightFBlock*o4);
                 }
                 index+=4;
       
@@ -382,8 +389,10 @@ export class SubChunk
         }
         return index;
     }
-    updateVerticesOptimized():number
+    updateVerticesOptimized():Promise<number>
     {
+        return new Promise((resolve,reject)=>{
+      
         let index=0;
         let block:Block;
         const temp:Array<Array<number>> = [];
@@ -407,8 +416,8 @@ export class SubChunk
             temp.length=0;
 
         }
-        return index;
-        
+        resolve(index);
+        });
     }
 
     static flip(side:Side):Side

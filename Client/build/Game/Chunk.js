@@ -38,6 +38,7 @@ export class Chunk {
     vlo;
     vfb;
     ebo;
+    lastUsed = 0;
     lightQueue = [];
     transformation = Matrix4.identity();
     constructor(x, z) {
