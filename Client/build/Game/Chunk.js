@@ -120,7 +120,7 @@ export class Chunk {
         neighbour = gs.getChunkAt(this.pos.x, this.pos.z + 1);
         this.sdNeighbour(neighbour, "NEG_Z", gs);
     }
-    preUpdate(yPos, gs) {
+    async preUpdate(yPos, gs) {
         const lastHeightMap = this.heightmap;
         this.heightmap = new Array(16);
         for (let i = 0; i < this.heightmap.length; i++) {
@@ -144,6 +144,7 @@ export class Chunk {
                 if (this.heightmap[x][z] > lastHeightMap[x][z]) {
                     for (let i = lastHeightMap[x][z] + 1; i <= this.heightmap[x][z]; i++) {
                         SkyLighter.removeLight((this.pos.x * 16) + x, i, (this.pos.z * 16) + z, 15, gs);
+                        //  await occasionalSleeper();
                     }
                 }
                 else if (this.heightmap[x][z] < lastHeightMap[x][z]) {
@@ -155,13 +156,16 @@ export class Chunk {
             }
         for (const k of this.lightQueue) {
             SkyLighter.light(k[0], k[1], k[2], 15, gs);
+            //     await occasionalSleeper();
         }
         this.lightQueue.length = 0;
         for (const k of queue) {
             SkyLighter.light(k[0], k[1], k[2], 15, gs);
+            await occasionalSleeper();
         }
         for (const ls of this.subchunks[yPos].lightList) {
             Lighter.light(ls.x + (this.pos.x * 16), ls.y + (yPos * 16), ls.z + (this.pos.z * 16), 15, gs);
+            // await occasionalSleeper();
         }
         this.subchunks[yPos].fPass = false;
     }
@@ -326,3 +330,16 @@ export class Chunk {
         }
     }
 }
+const occasionalSleeper = (function () {
+    //
+    let lastSleepingTime = performance.now();
+    return function () {
+        return new Promise(resolve => setTimeout(resolve, 0));
+        if (performance.now() - lastSleepingTime > 0.5) {
+            lastSleepingTime = performance.now();
+        }
+        else {
+            return Promise.resolve();
+        }
+    };
+}());

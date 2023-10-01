@@ -101,20 +101,18 @@ class SubChunk {
                         this.lightList.push(new Vector(i, j, k));
                 }
     }
-    update(gs) {
+    async update(gs) {
         // this.chunk.updateLight();
-        return new Promise((resolve, reject) => {
-            this.scanLight();
-            this.chunk.preUpdate(this.pos.y, gs);
-            //this.mesh.reset();
-            this.tmpMesh = new Mesh();
-            this.updateVerticesOptimized().then(() => {
-                this.mesh = this.tmpMesh;
-                this.mesh.count = this.mesh.indices.length;
-                this.lightUpdate = false;
-                resolve();
-            });
-        });
+        this.scanLight();
+        await this.chunk.preUpdate(this.pos.y, gs);
+        //this.mesh.reset();
+        this.tmpMesh = new Mesh();
+        await this.updateVerticesOptimized(); //.then(()=>{
+        this.mesh = this.tmpMesh;
+        this.mesh.count = this.mesh.indices.length;
+        this.lightUpdate = false;
+        //resolve();
+        //});
     }
     getBlock(pos) {
         if (pos.x > -1 && pos.x < 16 && pos.y > -1 && pos.y < 16 && pos.z > -1 && pos.z < 16) {
@@ -344,31 +342,30 @@ class SubChunk {
         }
         return index;
     }
-    updateVerticesOptimized() {
-        return new Promise((resolve, reject) => {
-            let index = 0;
-            let block;
-            const temp = [];
-            for (let x = 0; x < 16; x++)
-                for (let y = 0; y < 16; y++)
-                    for (let z = 0; z < 16; z++) {
-                        block = this.blocks[x][y][z];
-                        for (let j = 0; j < SubChunk.cubeVert.length; j++) {
-                            const tempArr = [];
-                            for (let i = 0; i < SubChunk.cubeVert[j].length; i += 3) {
-                                tempArr.push(SubChunk.cubeVert[j][i] + x);
-                                tempArr.push(SubChunk.cubeVert[j][i + 1] + y + (this.pos.y * 16));
-                                tempArr.push(SubChunk.cubeVert[j][i + 2] + z);
-                            }
-                            temp.push(tempArr);
+    async updateVerticesOptimized() {
+        let index = 0;
+        let block;
+        const temp = [];
+        for (let x = 0; x < 16; x++)
+            for (let y = 0; y < 16; y++)
+                for (let z = 0; z < 16; z++) {
+                    block = this.blocks[x][y][z];
+                    for (let j = 0; j < SubChunk.cubeVert.length; j++) {
+                        const tempArr = [];
+                        for (let i = 0; i < SubChunk.cubeVert[j].length; i += 3) {
+                            tempArr.push(SubChunk.cubeVert[j][i] + x);
+                            tempArr.push(SubChunk.cubeVert[j][i + 1] + y + (this.pos.y * 16));
+                            tempArr.push(SubChunk.cubeVert[j][i + 2] + z);
                         }
-                        index = this.updateSide(x, y, z, 1, 0, 0, 36, Side.left, block, index, temp);
-                        index = this.updateSide(x, y, z, 0, 1, 0, 60, Side.top, block, index, temp);
-                        index = this.updateSide(x, y, z, 0, 0, 1, 12, Side.front, block, index, temp);
-                        temp.length = 0;
+                        temp.push(tempArr);
                     }
-            resolve(index);
-        });
+                    index = this.updateSide(x, y, z, 1, 0, 0, 36, Side.left, block, index, temp);
+                    index = this.updateSide(x, y, z, 0, 1, 0, 60, Side.top, block, index, temp);
+                    index = this.updateSide(x, y, z, 0, 0, 1, 12, Side.front, block, index, temp);
+                    temp.length = 0;
+                    await occasionalSleeper();
+                }
+        return index;
     }
     static flip(side) {
         switch (side) {
@@ -551,3 +548,16 @@ class SubChunk {
     ];
 }
 export { SubChunk };
+export const occasionalSleeper = (function () {
+    //
+    let lastSleepingTime = performance.now();
+    return function () {
+        if (performance.now() - lastSleepingTime > 0.5) {
+            lastSleepingTime = performance.now();
+            return new Promise(resolve => setTimeout(resolve, 0));
+        }
+        else {
+            return Promise.resolve();
+        }
+    };
+}());

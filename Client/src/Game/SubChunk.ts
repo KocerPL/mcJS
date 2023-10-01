@@ -128,21 +128,21 @@ export class SubChunk
                         this.lightList.push(new Vector(i,j,k));
                 }
     }
-    update(gs:GameScene):Promise<void>
+    async update(gs:GameScene):Promise<void>
     {
         // this.chunk.updateLight();
-        return new Promise((resolve,reject)=>{
+       
         this.scanLight();
-        this.chunk.preUpdate(this.pos.y,gs);
+         await  this.chunk.preUpdate(this.pos.y,gs);
         //this.mesh.reset();
         this.tmpMesh = new Mesh();
-        this.updateVerticesOptimized().then(()=>{
+        await    this.updateVerticesOptimized()//.then(()=>{
         this.mesh = this.tmpMesh;
         this.mesh.count = this.mesh.indices.length;
         this.lightUpdate =false;
-        resolve();
-        });
-        });
+        //resolve();
+        //});
+    
     }
     getBlock(pos:Vector):Block // gets block at position relative to subchunk position
     {
@@ -389,15 +389,16 @@ export class SubChunk
         }
         return index;
     }
-    updateVerticesOptimized():Promise<number>
+  async  updateVerticesOptimized():Promise<number>
     {
-        return new Promise((resolve,reject)=>{
+       
       
         let index=0;
         let block:Block;
         const temp:Array<Array<number>> = [];
         for(let x=0;x<16;x++) for(let y=0;y<16;y++) for(let z=0;z<16;z++) 
         {
+            
             block = this.blocks[x][y][z];
             for(let j=0;j<SubChunk.cubeVert.length;j++)
             {
@@ -414,10 +415,10 @@ export class SubChunk
             index= this.updateSide(x,y,z,0,1,0,60,Side.top,block,index,temp);
             index = this.updateSide(x,y,z,0,0,1,12,Side.front,block,index,temp);
             temp.length=0;
-
+            await occasionalSleeper();
         }
-        resolve(index);
-        });
+        return index;
+        
     }
 
     static flip(side:Side):Side
@@ -610,3 +611,16 @@ export class SubChunk
     ];
 
 }
+ const occasionalSleeper = (function() {
+    //
+    let lastSleepingTime = performance.now();
+
+    return function() {
+      if (performance.now() - lastSleepingTime > 0.5) {
+        lastSleepingTime = performance.now();
+        return new Promise(resolve => setTimeout(resolve, 0));
+      } else {
+        return Promise.resolve();
+      }
+    }
+  }());

@@ -5,7 +5,7 @@ import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
 import {  Main } from "../Main.js";
 import { Block} from "./Block.js";
-import { SubChunk } from "./SubChunk.js";
+import { SubChunk} from "./SubChunk.js";
 import { Matrix4 } from "../Engine/Utils/Matrix4.js";
 import { Mesh } from "./Mesh.js";
 import { World } from "./World.js";
@@ -136,7 +136,7 @@ export class Chunk {
         neighbour = gs.getChunkAt(this.pos.x,this.pos.z+1);
         this.sdNeighbour(neighbour,"NEG_Z",gs);
     }
-    preUpdate(yPos,gs:GameScene)
+    async preUpdate(yPos,gs:GameScene)
     {
         const lastHeightMap = this.heightmap;
         this.heightmap =new Array(16);
@@ -167,7 +167,8 @@ export class Chunk {
                 {
                     for(let i=lastHeightMap[x][z]+1 ;i<=this.heightmap[x][z];i++)
                     {
-                        SkyLighter.removeLight((this.pos.x*16)+x , i ,(this.pos.z*16)+z ,15,gs);
+                    SkyLighter.removeLight((this.pos.x*16)+x , i ,(this.pos.z*16)+z ,15,gs);
+                  //  await occasionalSleeper();
                    
                     }
                 }
@@ -182,16 +183,19 @@ export class Chunk {
             }
         for(const k of this.lightQueue)
         {
-            SkyLighter.light(k[0],k[1],k[2],15,gs);
+         SkyLighter.light(k[0],k[1],k[2],15,gs);
+    //     await occasionalSleeper();
         }
         this.lightQueue.length =0;
         for(const k of queue)
         {
-            SkyLighter.light(k[0],k[1],k[2],15,gs);
+           SkyLighter.light(k[0],k[1],k[2],15,gs);
+            await occasionalSleeper();
         }
         for(const ls of this.subchunks[yPos].lightList)
         {
-            Lighter.light(ls.x+(this.pos.x*16),ls.y+(yPos*16),ls.z+(this.pos.z*16),15,gs);
+         Lighter.light(ls.x+(this.pos.x*16),ls.y+(yPos*16),ls.z+(this.pos.z*16),15,gs);
+        // await occasionalSleeper();
         }
         this.subchunks[yPos].fPass=false;
     }
@@ -396,3 +400,17 @@ export class Chunk {
   
 
 }
+const occasionalSleeper = (function() {
+    //
+    let lastSleepingTime = performance.now();
+
+    return function() {
+        return new Promise(resolve => setTimeout(resolve, 0));
+      if (performance.now() - lastSleepingTime > 0.5) {
+        lastSleepingTime = performance.now();
+      
+      } else {
+        return Promise.resolve();
+      }
+    }
+  }());
