@@ -282,7 +282,7 @@ export class Player
             if(!this.locked)
             {
                 let yRot = -this.entity.bodyRot;
-                if(CanvaManager.getKeyOnce(81))
+                if(CanvaManager.getKeyOnce("Q"))
                 {
                     const it = new Item(this.camera.getPosition().copy(),this.itemsBar[this.selectedItem].id,this.gs);
                     it.acc.x=Math.sin((-this.entity.rotation.y)*Math.PI/180)*0.3;
@@ -292,9 +292,9 @@ export class Player
                     this.updateItem(this.itemsBar[this.selectedItem].id,this.selectedItem,this.itemsBar[this.selectedItem].count-1);
                    
                 }
-                if(CanvaManager.getKey(16))
+                if(CanvaManager.getKey("SHIFT"))
                     speed=2;
-                if(CanvaManager.getKey(87))
+                if(CanvaManager.getKey("W"))
                 {
                     this.entity.bodyRot = this.entity.rotation.y;
                     yRot = -this.entity.bodyRot;
@@ -302,19 +302,19 @@ export class Player
                     tempPos.z +=Math.cos(yRot*Math.PI/180)*0.1*speed;
               
                 }
-                else if(CanvaManager.getKey(83))
+                else if(CanvaManager.getKey("S"))
                 {
                     this.entity.bodyRot = this.entity.rotation.y;
                     yRot = -this.entity.bodyRot;
                     tempPos.x-=Math.sin(yRot*Math.PI/180)*0.1;
                     tempPos.z-=Math.cos(yRot*Math.PI/180)*0.1;
                 }
-                if(CanvaManager.getKey(68))
+                if(CanvaManager.getKey("D"))
                 {
                     tempPos.x+=Math.sin((yRot+90)*Math.PI/180)*0.1;
                     tempPos.z+=Math.cos((yRot+90)*Math.PI/180)*0.1;
                 }
-                else if(CanvaManager.getKey(65))
+                else if(CanvaManager.getKey("A"))
                 {
            
 
@@ -328,7 +328,7 @@ export class Player
                 this.yAcc+=0.01;
                 tempPos.y-=this.yAcc;
             }   
-            if(this.gs.fly && CanvaManager.getKey(90))
+            if(this.gs.fly && CanvaManager.getKey("Z"))
                 tempPos.y-=0.3;
             if(!this.isBlockInWay(tempPos)) 
                 this.pos = tempPos;
@@ -363,7 +363,7 @@ export class Player
                 this.pos = new Vector(tempPos.x,this.pos.y,this.pos.z);
             }
                
-            if(CanvaManager.getKey(32))
+            if(CanvaManager.getKey(" "))
             {
                 //  hop=true;
                 if(this.gs.fly)
@@ -396,7 +396,7 @@ export class Player
         }
         if(Math.abs(this.entity.rotation.z)>45)
             this.legChange= -this.legChange;
-        if(CanvaManager.getKey(87)||CanvaManager.getKey(83)||CanvaManager.getKey(68)||CanvaManager.getKey(65))
+        if(CanvaManager.getKey("W")||CanvaManager.getKey("A")||CanvaManager.getKey("S")||CanvaManager.getKey("D"))
             this.entity.rotation.z += this.legChange*speed;
         else 
             this.entity.rotation.z = 0;
@@ -409,15 +409,15 @@ export class Player
         if(CanvaManager.mouse.left) this.mine(); else this.blockBreakingTime=0;
         if(CanvaManager.mouse.right) this.place();
        
-        if(CanvaManager.getKey(49))
+        if(CanvaManager.getKey("1"))
         {
             this.switchPerson("First");
         }
-        else if(CanvaManager.getKey(50))
+        else if(CanvaManager.getKey("2"))
         {
             this.switchPerson("Second");
         }
-        else if(CanvaManager.getKey(51))
+        else if(CanvaManager.getKey("3"))
         {
             this.switchPerson("Third");
         }

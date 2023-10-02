@@ -3,7 +3,7 @@ import { Chunk } from "./Chunk";
 
 export class Generator
 {
-    WorldSeed = 6969696969696969;
+    WorldSeed = 141425;
     generate(x1,z1):Chunk
     {
         let chunk= new Chunk();

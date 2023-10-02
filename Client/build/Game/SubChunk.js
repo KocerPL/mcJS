@@ -548,11 +548,11 @@ class SubChunk {
     ];
 }
 export { SubChunk };
-export const occasionalSleeper = (function () {
+const occasionalSleeper = (function () {
     //
     let lastSleepingTime = performance.now();
     return function () {
-        if (performance.now() - lastSleepingTime > 0.5) {
+        if (performance.now() - lastSleepingTime > 100) {
             lastSleepingTime = performance.now();
             return new Promise(resolve => setTimeout(resolve, 0));
         }

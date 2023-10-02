@@ -4,7 +4,6 @@ import { Task } from "../../Engine/Task.js";
 import { Texture } from "../../Engine/Texture.js";
 import { Matrix4 } from "../../Engine/Utils/Matrix4.js";
 import { Vector } from "../../Engine/Utils/Vector.js";
-import { Vector3 } from "../../Engine/Utils/Vector3.js";
 import { Main } from "../../Main.js";
 import { Block } from "../Block.js";
 import { Chunk } from "../Chunk.js";
@@ -14,14 +13,15 @@ import { SubChunk } from "../SubChunk.js";
 import { World } from "../World.js";
 import { PlayerEntity } from "../entities/PlayerEntity.js";
 import { GUI } from "../gui/GUI.js";
-import { Inventory } from "../gui/Inventory.js";
+import { Cross } from "../gui/Cross.js";
 import { ItemBar } from "../gui/ItemBar.js";
+import { Inventory } from "../gui/Inventory.js";
 declare let io;
 const gl = CanvaManager.gl;
 export class GameScene extends Scene
 {
   
-    public maxChunks =6;
+    public maxChunks =10;
     public maxSubUpdates = 1;
     public okok = false;
     public dispLl = false;
@@ -39,7 +39,7 @@ export class GameScene extends Scene
     //private static delta = 0;
     //private static fastDelta=0;
     //private static lastFastTick=0;
-    public inv:Inventory;
+    public cross:Cross;
     public player:Player ;
     public range = {start:0, end:1};
     //public static chunks:Array<Array<Chunk>>=new Array(8);
@@ -48,30 +48,36 @@ export class GameScene extends Scene
     public toUpdate:Set<SubChunk> = new Set();
     public  integratedServer:Worker;
     public logged =false;
-    private updateSubchunks()
+    private updateSubchunk()
     {
         //const concatQ:Set<Chunk> = new Set();
-        let i=0;
-        for(const entry of this.toUpdate.entries())
+        const entry:Array<SubChunk> = this.toUpdate.entries().next().value;
+        //console.log("running...",entry);
+        //    console.log(entry[0].pos);
+        if(entry)
         {
-            i++;
-            if( !entry[0].chunk.isSubArrayReady()) break;
-            if(entry[0]!=undefined)
-            {
-            //    console.log(entry[0].pos);
-                entry[0].update(this).then(()=>{
-                    entry[0].chunk.updateMesh();
-                });
-              //  concatQ.add(entry[0].chunk);
-            }
             this.toUpdate.delete(entry[0]);
+            entry[0].update(this).then(()=>{
+                // console.log("updating...");
+                entry[0].chunk.updateMesh();
+                //   occasionalSleeper().then(()=>{
+                //     this.updateSubchunk();
+                // });
+                setTimeout( ()=>{ this.updateSubchunk();},0);
+            }).catch(()=>{
+                setTimeout( ()=>{ this.updateSubchunk();},0);
+            });
         }
-       // concatQ.forEach((chunk) =>{chunk.updateMesh();});
+        else
+            setTimeout( ()=>{ this.updateSubchunk();},100);
+        //  concatQ.add(entry[0].chunk);
+       
+        // concatQ.forEach((chunk) =>{chunk.updateMesh();});
     
     }
     public handleSubchunk(ev)
     {
-      //  console.log("received subchunk");
+        console.log("received subchunk");
         let chunk = this.getChunkAt(ev.data.subX,ev.data.subZ);
         if(chunk==undefined)
         {
@@ -89,16 +95,17 @@ export class GameScene extends Scene
             if(!chunk.subchunks[i])
                 return;
         this.chunkQueue.push(this.getChunkAt(ev.data.subX,ev.data.subZ));
-      //  console.log("Chunk at: x:"+ ev.data.subX+" z:"+ev.data.subZ+"is ready to be loaded");
+        //  console.log("Chunk at: x:"+ ev.data.subX+" z:"+ev.data.subZ+"is ready to be loaded");
     }
     start() {
         Block.createInfoArray();
         
         this.gui = new GUI(Main.shader2d);
-        this.inv = new Inventory("Inventory");
+        this.cross = new Cross("Cross");
         CanvaManager.rPointer = true;
-        this.gui.add(this.inv);
+        this.gui.add(this.cross);
         this.gui.add(new ItemBar("ItemBar"));
+        this.gui.add(new Inventory("Inventory"));
         this.player = new Player(new Vector(-2,144,-7),this);
         this.socket.on("subchunk",this.handleSubchunk.bind(this));
         //socket.emit('addItem',{id:1,count:64,slot:0});
@@ -143,43 +150,43 @@ export class GameScene extends Scene
             }
         });
        
-
+        this.updateSubchunk();
     }
-    onClick(x:number,y:number) {
+    onClick(x:number,y:number)
+    {
+        console.log("CLICK");
     }
     update() {
         this.processChunks();
-        this.updateSubchunks();
+        //  this.updateSubchunks();
         const pPC =this.toChunkPos(this.player.pos);
-     //   console.log(pPC);
-        const lPos = pPC.copy();
+        //   console.log(pPC);
         let i=1;
-        let iter=1;
         let step=1;
-        let time = Date.now();
+        const time = Date.now();
         if(!this.loadedChunks.has(pPC.x+"-"+pPC.z))
-                {
-                   // console.log("LOADING: "+pPC.x+"  "+pPC.z);
-                    this.loadedChunks.set(pPC.x+"-"+pPC.z,new Chunk(pPC.x,pPC.z));
-                    for(let i=15;i>=0;i--)
-                        this.socket.emit("getSubchunk",pPC.x,i,pPC.z);
+        {
+            // console.log("LOADING: "+pPC.x+"  "+pPC.z);
+            this.loadedChunks.set(pPC.x+"-"+pPC.z,new Chunk(pPC.x,pPC.z));
+            for(let i=15;i>=0;i--)
+                this.socket.emit("getSubchunk",pPC.x,i,pPC.z);
                     
 
                    
-                }
+        }
              
-                    this.loadedChunks.get(pPC.x+"-"+pPC.z).lastUsed= time;
+        this.loadedChunks.get(pPC.x+"-"+pPC.z).lastUsed= time;
               
         while(i<this.maxChunks)
         {
-           // console.log("LOADUNG: "+pPC.x+"  "+pPC.z);
+            // console.log("LOADUNG: "+pPC.x+"  "+pPC.z);
                
-                for(let j=0;j<i;j++)
-                {
-                    pPC.x+=step;
+            for(let j=0;j<i;j++)
+            {
+                pPC.x+=step;
                 if(!this.loadedChunks.has(pPC.x+"-"+pPC.z))
                 {
-                   // console.log("LOADING: "+pPC.x+"  "+pPC.z);
+                    // console.log("LOADING: "+pPC.x+"  "+pPC.z);
                     this.loadedChunks.set(pPC.x+"-"+pPC.z,new Chunk(pPC.x,pPC.z));
                     for(let i=15;i>=0;i--)
                         this.socket.emit("getSubchunk",pPC.x,i,pPC.z);
@@ -190,49 +197,50 @@ export class GameScene extends Scene
                 this.loadedChunks.get(pPC.x+"-"+pPC.z).lastUsed= time;
               
                 //pPC.x+=step;
-                }
-                for(let j=0;j<i;j++)
-                {
-                    pPC.z+=step;
+            }
+            for(let j=0;j<i;j++)
+            {
+                pPC.z+=step;
                 if(!this.loadedChunks.has(pPC.x+"-"+pPC.z))
                 {
-                  //  console.log("LOADING: "+pPC.x+"  "+pPC.z);
+                    //  console.log("LOADING: "+pPC.x+"  "+pPC.z);
                     this.loadedChunks.set(pPC.x+"-"+pPC.z,new Chunk(pPC.x,pPC.z));
                     for(let i=15;i>=0;i--)
                         this.socket.emit("getSubchunk",pPC.x,i,pPC.z);
                 }
-                    this.loadedChunks.get(pPC.x+"-"+pPC.z).lastUsed= time;
+                this.loadedChunks.get(pPC.x+"-"+pPC.z).lastUsed= time;
              
-                }
-                step=-step;
-                i++;
             }
-        for(let data of this.loadedChunks)
+            step=-step;
+            i++;
+        }
+        for(const data of this.loadedChunks)
         {
             if(data[1].lastUsed+5000<time)
             {
-            delete data[1];
-            this.loadedChunks.delete(data[0]);
+                delete data[1];
+                this.loadedChunks.delete(data[0]);
             }
         }
        
-        if(CanvaManager.getKeyOnce(86)) {this.inv.setVisible =!this.inv.getVisible;}
-        if(CanvaManager.getKeyOnce(71))    console.log(World.getSubchunk(this.player.pos,this));
-        if(CanvaManager.getKey(52)&&this.sunLight<16) this.sunLight++;
-        if(CanvaManager.getKey(53)&&this.sunLight>0) this.sunLight--;  
+        // if(CanvaManager.getKeyOnce("F2")) {this.cross.setVisible =!this.cross.getVisible;}
+        if(CanvaManager.getKeyOnce("6"))    console.log(World.getSubchunk(this.player.pos,this));
+        if(CanvaManager.getKey("5")&&this.sunLight<16) this.sunLight++;
+        if(CanvaManager.getKey("4")&&this.sunLight>0) this.sunLight--;  
+        if(CanvaManager.getKeyOnce("E")) this.gui.get("Inventory").setVisible =  !this.gui.get("Inventory").getVisible;
         // this.count++;
         // if(this.count>this.test.indices.length)
         //this.count=3;
-      
-        if(CanvaManager.getKeyOnce(54))
+        
+        if(CanvaManager.getKeyOnce("F3"))
             this.maxChunks--;
-        if(CanvaManager.getKeyOnce(55))
+        if(CanvaManager.getKeyOnce("F4"))
             this.maxChunks++;
-        if(CanvaManager.getKeyOnce(56))
+        if(CanvaManager.getKeyOnce("8"))
             this.fastBreaking=!this.fastBreaking;
-        if(CanvaManager.getKeyOnce(57))
+        if(CanvaManager.getKeyOnce("9"))
             this.fly=!this.fly;
-        if(CanvaManager.getKeyOnce(112))
+        if(CanvaManager.getKeyOnce("F2"))
             this.renderGUI=!this.renderGUI;
         for(let i=0;i<this.entities.length;i++)
         {
@@ -287,8 +295,8 @@ export class GameScene extends Scene
                 this.chunkQueue.splice(i);
             }
             else{
-               // console.log("preparing Chunk: ",chunk.pos);
-            continue;
+                // console.log("preparing Chunk: ",chunk.pos);
+                continue;
             }
         }
     }
@@ -298,3 +306,16 @@ export class GameScene extends Scene
     }
     
 }
+const occasionalSleeper = (function() {
+    //
+    let lastSleepingTime = performance.now();
+
+    return function() {
+        if (performance.now() - lastSleepingTime > 100) {
+            lastSleepingTime = performance.now();
+            return new Promise(resolve => setTimeout(resolve, 0));
+        } else {
+            return Promise.resolve();
+        }
+    };
+}());

@@ -4,7 +4,7 @@ exports.Generator = void 0;
 const Main_1 = require("../Main");
 const Chunk_1 = require("./Chunk");
 class Generator {
-    WorldSeed = 6969696969696969;
+    WorldSeed = 141425;
     generate(x1, z1) {
         let chunk = new Chunk_1.Chunk();
         chunk.pos = new Array(2);

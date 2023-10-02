@@ -43,7 +43,7 @@ export class Chunk {
     vlo:VBO;
     vfb:VBO;
     ebo:EBO;
-    lastUsed:number=0;
+    lastUsed=0;
     lightQueue:Array<Array<number>>=[];
     transformation = Matrix4.identity();
     constructor(x:number, z:number) {
@@ -96,8 +96,8 @@ export class Chunk {
 
         const x = randRange(0,15)+(this.pos.x*16);
         const z= randRange(0,15)+(this.pos.z*16);
-      //  if(World.getHeight(x,z)<150)
-         //   World.generateTree(new Vector(x,World.getHeight(x,z),z));
+        //  if(World.getHeight(x,z)<150)
+        //   World.generateTree(new Vector(x,World.getHeight(x,z),z));
     }
     updateNeighbour(neigbDir:DIR,chunk:Chunk,gs:GameScene)
     {
@@ -107,7 +107,7 @@ export class Chunk {
         this.neighbours[neigbDir] =chunk;
         if(this.neighbours["NEG_X"]!=undefined && this.neighbours["POS_X"]!=undefined && this.neighbours["POS_Z"]!=undefined && this.neighbours["NEG_Z"]!=undefined)
         {
-          //  console.log("gathered all neighbours :)");
+            //  console.log("gathered all neighbours :)");
             this.allNeighbours = true;
             this.updateAllSubchunks(gs);
           
@@ -118,7 +118,7 @@ export class Chunk {
     {
         neighbour.updateNeighbour(dir,this,gs);
         if(neighbour.isSubArrayReady())
-        this.updateNeighbour(flipDir(dir),neighbour,gs);
+            this.updateNeighbour(flipDir(dir),neighbour,gs);
     }
     catch(error)
     { /* empty */ }
@@ -167,8 +167,8 @@ export class Chunk {
                 {
                     for(let i=lastHeightMap[x][z]+1 ;i<=this.heightmap[x][z];i++)
                     {
-                    SkyLighter.removeLight((this.pos.x*16)+x , i ,(this.pos.z*16)+z ,15,gs);
-                  //  await occasionalSleeper();
+                        SkyLighter.removeLight((this.pos.x*16)+x , i ,(this.pos.z*16)+z ,15,gs);
+                        //  await occasionalSleeper();
                    
                     }
                 }
@@ -183,18 +183,18 @@ export class Chunk {
             }
         for(const k of this.lightQueue)
         {
-         SkyLighter.light(k[0],k[1],k[2],15,gs);
-    //     await occasionalSleeper();
+            SkyLighter.light(k[0],k[1],k[2],15,gs);
+            //     await occasionalSleeper();
         }
         this.lightQueue.length =0;
         for(const k of queue)
         {
-           SkyLighter.light(k[0],k[1],k[2],15,gs);
+            SkyLighter.light(k[0],k[1],k[2],15,gs);
             await occasionalSleeper();
         }
         for(const ls of this.subchunks[yPos].lightList)
         {
-         Lighter.light(ls.x+(this.pos.x*16),ls.y+(yPos*16),ls.z+(this.pos.z*16),15,gs);
+            Lighter.light(ls.x+(this.pos.x*16),ls.y+(yPos*16),ls.z+(this.pos.z*16),15,gs);
         // await occasionalSleeper();
         }
         this.subchunks[yPos].fPass=false;
@@ -275,15 +275,15 @@ export class Chunk {
     }
     updateAllSubchunks(gs:GameScene)
     {
-       // console.log("UPDATING SUBSS");
+        // console.log("UPDATING SUBSS");
         //console.log(gs);
         for(let i=15;i>=0;i--)
         {
-          //  console.log(i);
+            //  console.log(i);
             //console.log(this.subchunks[i]);
             gs.toUpdate.add(this.subchunks[i]);
         }
-         //console.log("now not lazy hehehehe")
+        //console.log("now not lazy hehehehe")
     }
     getSubchunk(y)
     {
@@ -341,8 +341,8 @@ export class Chunk {
     isSubArrayReady()
     {
         for(let i=0;i<16;i++)
-        if(this.subchunks[i]==undefined)
-        return false;
+            if(this.subchunks[i]==undefined)
+                return false;
         return true;
     }
     setBlock(pos:Vector,blockID:number,gs:GameScene)
@@ -371,7 +371,7 @@ export class Chunk {
                 }
                 if(y ==0)
                 {
-                   gs.toUpdate.add(this.subchunks[yPos-1]);
+                    gs.toUpdate.add(this.subchunks[yPos-1]);
                 }
                 else if(y ==15)
                 {
@@ -380,7 +380,7 @@ export class Chunk {
                 }
                 if(pos.z ==0)
                 {
-                   gs.toUpdate.add(this.neighbours["NEG_Z"].subchunks[yPos]);
+                    gs.toUpdate.add(this.neighbours["NEG_Z"].subchunks[yPos]);
                   
                 }
                 else if(pos.z ==15)
@@ -406,11 +406,11 @@ const occasionalSleeper = (function() {
 
     return function() {
         return new Promise(resolve => setTimeout(resolve, 0));
-      if (performance.now() - lastSleepingTime > 0.5) {
-        lastSleepingTime = performance.now();
+        if (performance.now() - lastSleepingTime > 0.5) {
+            lastSleepingTime = performance.now();
       
-      } else {
-        return Promise.resolve();
-      }
-    }
-  }());
+        } else {
+            return Promise.resolve();
+        }
+    };
+}());

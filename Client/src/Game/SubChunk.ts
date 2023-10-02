@@ -133,10 +133,10 @@ export class SubChunk
         // this.chunk.updateLight();
        
         this.scanLight();
-         await  this.chunk.preUpdate(this.pos.y,gs);
+        await  this.chunk.preUpdate(this.pos.y,gs);
         //this.mesh.reset();
         this.tmpMesh = new Mesh();
-        await    this.updateVerticesOptimized()//.then(()=>{
+        await    this.updateVerticesOptimized();//.then(()=>{
         this.mesh = this.tmpMesh;
         this.mesh.count = this.mesh.indices.length;
         this.lightUpdate =false;
@@ -389,7 +389,7 @@ export class SubChunk
         }
         return index;
     }
-  async  updateVerticesOptimized():Promise<number>
+    async  updateVerticesOptimized():Promise<number>
     {
        
       
@@ -611,16 +611,16 @@ export class SubChunk
     ];
 
 }
- const occasionalSleeper = (function() {
+const occasionalSleeper = (function() {
     //
     let lastSleepingTime = performance.now();
 
     return function() {
-      if (performance.now() - lastSleepingTime > 0.5) {
-        lastSleepingTime = performance.now();
-        return new Promise(resolve => setTimeout(resolve, 0));
-      } else {
-        return Promise.resolve();
-      }
-    }
-  }());
+        if (performance.now() - lastSleepingTime > 100) {
+            lastSleepingTime = performance.now();
+            return new Promise(resolve => setTimeout(resolve, 0));
+        } else {
+            return Promise.resolve();
+        }
+    };
+}());

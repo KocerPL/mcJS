@@ -11,11 +11,12 @@ import { SubChunk } from "../SubChunk.js";
 import { World } from "../World.js";
 import { PlayerEntity } from "../entities/PlayerEntity.js";
 import { GUI } from "../gui/GUI.js";
-import { Inventory } from "../gui/Inventory.js";
+import { Cross } from "../gui/Cross.js";
 import { ItemBar } from "../gui/ItemBar.js";
+import { Inventory } from "../gui/Inventory.js";
 const gl = CanvaManager.gl;
 export class GameScene extends Scene {
-    maxChunks = 6;
+    maxChunks = 10;
     maxSubUpdates = 1;
     okok = false;
     dispLl = false;
@@ -33,7 +34,7 @@ export class GameScene extends Scene {
     //private static delta = 0;
     //private static fastDelta=0;
     //private static lastFastTick=0;
-    inv;
+    cross;
     player;
     range = { start: 0, end: 1 };
     //public static chunks:Array<Array<Chunk>>=new Array(8);
@@ -42,26 +43,31 @@ export class GameScene extends Scene {
     toUpdate = new Set();
     integratedServer;
     logged = false;
-    updateSubchunks() {
+    updateSubchunk() {
         //const concatQ:Set<Chunk> = new Set();
-        let i = 0;
-        for (const entry of this.toUpdate.entries()) {
-            i++;
-            if (!entry[0].chunk.isSubArrayReady())
-                break;
-            if (entry[0] != undefined) {
-                //    console.log(entry[0].pos);
-                entry[0].update(this).then(() => {
-                    entry[0].chunk.updateMesh();
-                });
-                //  concatQ.add(entry[0].chunk);
-            }
+        const entry = this.toUpdate.entries().next().value;
+        //console.log("running...",entry);
+        //    console.log(entry[0].pos);
+        if (entry) {
             this.toUpdate.delete(entry[0]);
+            entry[0].update(this).then(() => {
+                // console.log("updating...");
+                entry[0].chunk.updateMesh();
+                //   occasionalSleeper().then(()=>{
+                //     this.updateSubchunk();
+                // });
+                setTimeout(() => { this.updateSubchunk(); }, 0);
+            }).catch(() => {
+                setTimeout(() => { this.updateSubchunk(); }, 0);
+            });
         }
+        else
+            setTimeout(() => { this.updateSubchunk(); }, 100);
+        //  concatQ.add(entry[0].chunk);
         // concatQ.forEach((chunk) =>{chunk.updateMesh();});
     }
     handleSubchunk(ev) {
-        //  console.log("received subchunk");
+        console.log("received subchunk");
         let chunk = this.getChunkAt(ev.data.subX, ev.data.subZ);
         if (chunk == undefined) {
             chunk = new Chunk(ev.data.subX, ev.data.subZ);
@@ -84,10 +90,11 @@ export class GameScene extends Scene {
     start() {
         Block.createInfoArray();
         this.gui = new GUI(Main.shader2d);
-        this.inv = new Inventory("Inventory");
+        this.cross = new Cross("Cross");
         CanvaManager.rPointer = true;
-        this.gui.add(this.inv);
+        this.gui.add(this.cross);
         this.gui.add(new ItemBar("ItemBar"));
+        this.gui.add(new Inventory("Inventory"));
         this.player = new Player(new Vector(-2, 144, -7), this);
         this.socket.on("subchunk", this.handleSubchunk.bind(this));
         //socket.emit('addItem',{id:1,count:64,slot:0});
@@ -128,19 +135,19 @@ export class GameScene extends Scene {
                 }
             }
         });
+        this.updateSubchunk();
     }
     onClick(x, y) {
+        console.log("CLICK");
     }
     update() {
         this.processChunks();
-        this.updateSubchunks();
+        //  this.updateSubchunks();
         const pPC = this.toChunkPos(this.player.pos);
         //   console.log(pPC);
-        const lPos = pPC.copy();
         let i = 1;
-        let iter = 1;
         let step = 1;
-        let time = Date.now();
+        const time = Date.now();
         if (!this.loadedChunks.has(pPC.x + "-" + pPC.z)) {
             // console.log("LOADING: "+pPC.x+"  "+pPC.z);
             this.loadedChunks.set(pPC.x + "-" + pPC.z, new Chunk(pPC.x, pPC.z));
@@ -174,33 +181,33 @@ export class GameScene extends Scene {
             step = -step;
             i++;
         }
-        for (let data of this.loadedChunks) {
+        for (const data of this.loadedChunks) {
             if (data[1].lastUsed + 5000 < time) {
                 delete data[1];
                 this.loadedChunks.delete(data[0]);
             }
         }
-        if (CanvaManager.getKeyOnce(86)) {
-            this.inv.setVisible = !this.inv.getVisible;
-        }
-        if (CanvaManager.getKeyOnce(71))
+        // if(CanvaManager.getKeyOnce("F2")) {this.cross.setVisible =!this.cross.getVisible;}
+        if (CanvaManager.getKeyOnce("6"))
             console.log(World.getSubchunk(this.player.pos, this));
-        if (CanvaManager.getKey(52) && this.sunLight < 16)
+        if (CanvaManager.getKey("5") && this.sunLight < 16)
             this.sunLight++;
-        if (CanvaManager.getKey(53) && this.sunLight > 0)
+        if (CanvaManager.getKey("4") && this.sunLight > 0)
             this.sunLight--;
+        if (CanvaManager.getKeyOnce("E"))
+            this.gui.get("Inventory").setVisible = !this.gui.get("Inventory").getVisible;
         // this.count++;
         // if(this.count>this.test.indices.length)
         //this.count=3;
-        if (CanvaManager.getKeyOnce(54))
+        if (CanvaManager.getKeyOnce("F3"))
             this.maxChunks--;
-        if (CanvaManager.getKeyOnce(55))
+        if (CanvaManager.getKeyOnce("F4"))
             this.maxChunks++;
-        if (CanvaManager.getKeyOnce(56))
+        if (CanvaManager.getKeyOnce("8"))
             this.fastBreaking = !this.fastBreaking;
-        if (CanvaManager.getKeyOnce(57))
+        if (CanvaManager.getKeyOnce("9"))
             this.fly = !this.fly;
-        if (CanvaManager.getKeyOnce(112))
+        if (CanvaManager.getKeyOnce("F2"))
             this.renderGUI = !this.renderGUI;
         for (let i = 0; i < this.entities.length; i++) {
             this.entities[i].update(i);
@@ -255,3 +262,16 @@ export class GameScene extends Scene {
         return new Vector(Math.floor(Math.round(vec.x) / 16), 0, Math.floor(Math.round(vec.z) / 16));
     }
 }
+const occasionalSleeper = (function () {
+    //
+    let lastSleepingTime = performance.now();
+    return function () {
+        if (performance.now() - lastSleepingTime > 100) {
+            lastSleepingTime = performance.now();
+            return new Promise(resolve => setTimeout(resolve, 0));
+        }
+        else {
+            return Promise.resolve();
+        }
+    };
+}());

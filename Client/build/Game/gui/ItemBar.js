@@ -32,8 +32,8 @@ export class ItemBar extends GuiComponent {
     }
     updateSlot() {
         this.slot.changePos(-0.4 + (0.1 * this.currentSlot), 0);
-        let act = this.get("ActionBar");
-        let itHold = this.get("slot_" + (this.currentSlot + 1) + "_holder");
+        const act = this.get("ActionBar");
+        const itHold = this.get("slot_" + (this.currentSlot + 1) + "_holder");
         if (act instanceof TextComponent && itHold instanceof ItemHolder)
             act.changeText(Block.info[itHold.blockID].name);
     }

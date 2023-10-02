@@ -52,11 +52,12 @@ export class CanvaManager
     }
     private static onKeyDown(ev)
     {
-        this.keys[ev.keyCode] = true;
+        console.log(ev.key);
+        this.keys[ev.key.toUpperCase()] = true;
     }
-    private static onKeyUp(ev)
+    private static onKeyUp(ev:KeyboardEvent)
     {
-        this.keys[ev.keyCode] = false;
+        this.keys[ev.key.toUpperCase()] = false;
     }
     private static onMouseDown(ev:MouseEvent)
     {
@@ -75,14 +76,14 @@ export class CanvaManager
             this.mouse.right = false;
         ev.preventDefault();
     }
-    public static getKey(keycode:number)
+    public static getKey(key:string)
     {
-        return this.keys[keycode] ?? false;
+        return this.keys[key] ?? false;
     }
-    public static getKeyOnce(keycode:number)
+    public static getKeyOnce(keyS:string)
     {
-        const key = this.keys[keycode];
-        this.keys[keycode] =false;
+        const key = this.keys[keyS];
+        this.keys[keyS] =false;
         return key ?? false;
     }
     private static onResize():void

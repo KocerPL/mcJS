@@ -45,10 +45,11 @@ class CanvaManager {
         this.mouseMovement.y += ev.movementY;
     }
     static onKeyDown(ev) {
-        this.keys[ev.keyCode] = true;
+        console.log(ev.key);
+        this.keys[ev.key.toUpperCase()] = true;
     }
     static onKeyUp(ev) {
-        this.keys[ev.keyCode] = false;
+        this.keys[ev.key.toUpperCase()] = false;
     }
     static onMouseDown(ev) {
         if (ev.button == 0)
@@ -65,12 +66,12 @@ class CanvaManager {
             this.mouse.right = false;
         ev.preventDefault();
     }
-    static getKey(keycode) {
-        return this.keys[keycode] ?? false;
+    static getKey(key) {
+        return this.keys[key] ?? false;
     }
-    static getKeyOnce(keycode) {
-        const key = this.keys[keycode];
-        this.keys[keycode] = false;
+    static getKeyOnce(keyS) {
+        const key = this.keys[keyS];
+        this.keys[keyS] = false;
         return key ?? false;
     }
     static onResize() {
