@@ -292,7 +292,7 @@ export class Player
                     this.updateItem(this.itemsBar[this.selectedItem].id,this.selectedItem,this.itemsBar[this.selectedItem].count-1);
                    
                 }
-                if(CanvaManager.getKey("SHIFT"))
+                if(CanvaManager.getKey("CAPSLOCK"))
                     speed=2;
                 if(CanvaManager.getKey("W"))
                 {

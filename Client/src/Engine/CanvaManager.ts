@@ -50,14 +50,16 @@ export class CanvaManager
         this.mouseMovement.x += ev.movementX;
         this.mouseMovement.y += ev.movementY;
     }
-    private static onKeyDown(ev)
+    private static onKeyDown(ev:KeyboardEvent)
     {
         console.log(ev.key);
         this.keys[ev.key.toUpperCase()] = true;
+        ev.preventDefault();
     }
     private static onKeyUp(ev:KeyboardEvent)
     {
         this.keys[ev.key.toUpperCase()] = false;
+        ev.preventDefault();
     }
     private static onMouseDown(ev:MouseEvent)
     {

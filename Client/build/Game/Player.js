@@ -253,7 +253,7 @@ class Player {
                     this.gs.entities.push(it);
                     this.updateItem(this.itemsBar[this.selectedItem].id, this.selectedItem, this.itemsBar[this.selectedItem].count - 1);
                 }
-                if (CanvaManager.getKey("SHIFT"))
+                if (CanvaManager.getKey("CAPSLOCK"))
                     speed = 2;
                 if (CanvaManager.getKey("W")) {
                     this.entity.bodyRot = this.entity.rotation.y;
