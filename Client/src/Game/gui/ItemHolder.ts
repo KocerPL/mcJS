@@ -1,3 +1,4 @@
+import { BoundingBox } from "../../Engine/BoundingBox.js";
 import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { Shader } from "../../Engine/Shader/Shader.js";
 import { Texture } from "../../Engine/Texture.js";
@@ -11,6 +12,8 @@ const gl =CanvaManager.gl;
 export class ItemHolder extends GuiComponent
 {
     size:number;
+    //  onclick:Function=()=>{};
+    //boundingBox:BoundingBox;
     blockID=0;
     constructor(id:string,size:number)
     {
@@ -20,6 +23,7 @@ export class ItemHolder extends GuiComponent
         this.visible =false;
         this.sprite = new Sprite(-size,-size,size,size);
         this.tcoords = Texture.blockAtlas.coords[0];
+        this.boundingBox = {x:-size,y:-size,dx:size,dy:size};
         this.transformation = Matrix3.identity();
         const tComp =this.add(new TextComponent(this.id+"_text","64",0.01,0.02,ALIGN.right));
         tComp.transformation = tComp.transformation.translate(0.03,-0.03);

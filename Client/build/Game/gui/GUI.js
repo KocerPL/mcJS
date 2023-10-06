@@ -38,7 +38,7 @@ export class GUI {
         this.renderSet.resetArrays();
         for (const comp of this.components) {
             let highest = 0;
-            let subRArrays = comp.updateComponents(this.renderSet.indices.length);
+            const subRArrays = comp.updateComponents(this.renderSet.indices.length);
             this.renderSet.vertices.push(...subRArrays.vertices);
             for (let i = 0; i < subRArrays.indices.length; i++) {
                 if (subRArrays.indices[i] + index > highest)
@@ -49,11 +49,12 @@ export class GUI {
             this.renderSet.textureCoords.push(...subRArrays.textureCoords);
         }
         this.renderSet.bufferArrays();
-        console.log(this.renderSet.vertices);
+        // console.log(this.renderSet.vertices);
     }
     onClick(x, y) {
-        for (let comp of this.components)
-            comp.onClick(x, y);
+        //  console.log("propagating onclick");
+        for (const comp of this.components)
+            comp.onClick(CanvaManager.mouse.pos.x, CanvaManager.mouse.pos.y);
     }
     get(id) {
         for (const comp of this.components)

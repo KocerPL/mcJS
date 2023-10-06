@@ -12,8 +12,8 @@ import { Vector3 } from "../../Engine/Utils/Vector3.js";
 const gl = CanvaManager.gl;
 export class Button extends GuiComponent
 {
-    onclick:Function=()=>{};
-    boundingBox:BoundingBox;
+    //onclick:Function=()=>{};
+   // boundingBox:BoundingBox;
     constructor(id:string)
     {
         super(id);

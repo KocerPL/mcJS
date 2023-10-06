@@ -16,6 +16,10 @@ import { GUI } from "../gui/GUI.js";
 import { Cross } from "../gui/Cross.js";
 import { ItemBar } from "../gui/ItemBar.js";
 import { Inventory } from "../gui/Inventory.js";
+import { TextComponent } from "../gui/TextComponent.js";
+import { ALIGN } from "../../Engine/Utils/TextSprite.js";
+import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
+import { ItemHolder } from "../gui/ItemHolder.js";
 declare let io;
 const gl = CanvaManager.gl;
 export class GameScene extends Scene
@@ -48,6 +52,7 @@ export class GameScene extends Scene
     public toUpdate:Set<SubChunk> = new Set();
     public  integratedServer:Worker;
     public logged =false;
+    private counter =0;
     private updateSubchunk()
     {
         //const concatQ:Set<Chunk> = new Set();
@@ -106,6 +111,12 @@ export class GameScene extends Scene
         this.gui.add(this.cross);
         this.gui.add(new ItemBar("ItemBar"));
         this.gui.add(new Inventory("Inventory"));
+        this.gui.add(new TextComponent("debug","FPS:",0.01,null,ALIGN.left)).transformation =Matrix3.identity().translate(-1,0.98);
+        const slot = this.gui.get("slot_1_holder");
+        if(slot instanceof ItemHolder)
+            slot.onclick = ()=>{
+                console.log("Clicked first slot");
+            };
         this.player = new Player(new Vector(-2,144,-7),this);
         this.socket.on("subchunk",this.handleSubchunk.bind(this));
         //socket.emit('addItem',{id:1,count:64,slot:0});
@@ -154,7 +165,7 @@ export class GameScene extends Scene
     }
     onClick(x:number,y:number)
     {
-        console.log("CLICK");
+        this.gui.onClick(x,y);
     }
     update() {
         this.processChunks();
@@ -227,7 +238,12 @@ export class GameScene extends Scene
         if(CanvaManager.getKeyOnce("6"))    console.log(World.getSubchunk(this.player.pos,this));
         if(CanvaManager.getKey("5")&&this.sunLight<16) this.sunLight++;
         if(CanvaManager.getKey("4")&&this.sunLight>0) this.sunLight--;  
-        if(CanvaManager.getKeyOnce("E")) this.gui.get("Inventory").setVisible =  !this.gui.get("Inventory").getVisible;
+        if(CanvaManager.getKeyOnce("E"))
+        { 
+            this.gui.get("Inventory").setVisible =  !this.gui.get("Inventory").getVisible;
+            CanvaManager.rPointer = !this.gui.get("Inventory").getVisible;
+            if(!CanvaManager.rPointer) CanvaManager.unlockPointer();
+        }
         // this.count++;
         // if(this.count>this.test.indices.length)
         //this.count=3;
@@ -249,9 +265,17 @@ export class GameScene extends Scene
         this.player.update();
     }
     render() {
+        this.counter++;
+        if(this.counter>10)
+        {
+            this.counter=0;
+            const txt = this.gui.get("debug");
+            if(txt instanceof TextComponent)
+                txt.changeText("FPS:"+ Main.Measure.fps+" Position: X:"+this.player.pos.x+" Y:"+this.player.pos.y+ " Z:"+this.player.pos.z);
+        }
         Main.shader.use();
         this.player.camera.preRender();
-        Main.shader.setFog(this.player.camera.getPosition(),this.maxChunks*16);
+        Main.shader.setFog(this.player.camera.getPosition(),(this.maxChunks-1)*16);
         CanvaManager.preRender();
         Texture.testAtkas.bind();
         Main.shader.loadUniforms(this.player.camera.getProjection(), Matrix4.identity(), this.player.camera.getView(),this.sunLight);

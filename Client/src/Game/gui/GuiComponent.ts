@@ -8,7 +8,8 @@ import { Vector3 } from "../../Engine/Utils/Vector3.js";
 import { rot2d } from "../Models.js";
 import { GUI } from "./GUI.js";
 import { Button } from "./Button.js";
-import { isIn } from "../../Engine/BoundingBox.js";
+import { BoundingBox, isIn } from "../../Engine/BoundingBox.js";
+import { ItemHolder } from "./ItemHolder.js";
 
 const gl = CanvaManager.gl;
 export abstract class GuiComponent
@@ -16,6 +17,8 @@ export abstract class GuiComponent
     protected sprite:Sprite;
     protected components:GuiComponent[]=[];
     renderMe=true;
+    boundingBox:BoundingBox =undefined;
+    onclick = ()=>{};
     protected visible:boolean;
     gui:GUI;
     changed=true;
@@ -81,7 +84,7 @@ export abstract class GuiComponent
             index = highest+1;
             rArrays.textureCoords.push(...set.textureCoords);
         }
-        console.log(this.id,"=", this.vStart,"|||",this.vEnd);
+       // console.log(this.id,"=", this.vStart,"|||",this.vEnd);
         return rArrays;
     }
     add(component:GuiComponent):GuiComponent
@@ -115,10 +118,12 @@ export abstract class GuiComponent
     }
     onClick(x:number,y:number)
     {
+      //  console.log("propagating onclick");
+        const v = this.transformation.inverse().multiplyVec(new Vector3(x,y,1));
         for(const comp of this.components)
-            comp.onClick(x,y);
-        const v = this.transformation.inverse().multiplyVec(new Vector3(CanvaManager.mouse.pos.x,CanvaManager.mouse.pos.y,1));
-        if(this instanceof Button && isIn(v.x,v.y,this.boundingBox))
+            comp.onClick(v.x,v.y);
+        
+        if(this.boundingBox&& isIn(v.x,v.y,this.boundingBox))
             this.onclick();
             
     }

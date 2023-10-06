@@ -9,8 +9,8 @@ import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { Vector3 } from "../../Engine/Utils/Vector3.js";
 const gl = CanvaManager.gl;
 export class Button extends GuiComponent {
-    onclick = () => { };
-    boundingBox;
+    //onclick:Function=()=>{};
+    // boundingBox:BoundingBox;
     constructor(id) {
         super(id);
         this.add(new TextComponent(id + "_text", "", 0.03, null, ALIGN.center));

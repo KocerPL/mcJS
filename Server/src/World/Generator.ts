@@ -18,13 +18,14 @@ export class Generator
             for(let x=0;x<16;x++)
             for(let z=0;z<16;z++)
             {
-                let height = Math.floor(perlin(this.WorldSeed,(x+(x1*16))/256,(z+(z1*16))/256));
+                let height = 50+Math.floor(perlin(this.WorldSeed,(x+(x1*16))/256,(z+(z1*16))/256,200));
+                let randomAdditive = randRange(-3,3)
               //  console.log(height);
                 for(let y=0;y<16;y++)
                 {
-                if(y+(i*16)>175+randRange(-3,3))
+                if(y+(i*16)<height && y+(i*16)>175+randomAdditive)
                 sub[toIndex(x,y,z)]=3;
-                if(y+(i*16)==height)
+                else if(y+(i*16)==height)
                 sub[toIndex(x,y,z)]=2;
                 else if(y+(i*16)<height &&y+(i*16)>height-4)
                 sub[toIndex(x,y,z)]=1;
@@ -50,16 +51,16 @@ function PRNG(seed:number, x:number, y:number) {
     let  random = (seed * 16807 + x * 1234 + y * 4321) % 2147483647;
     return (random - 1) / 2147483646;
   } 
-  function perlin(seed:number,x:number,y:number)
+  function perlin(seed:number,x:number,y:number,maxHeight:number)
   {
     const X = Math.floor(x);
     const Y = Math.floor(y);	
     const xf = x-Math.floor(x);
     const yf = y-Math.floor(y);
-    const valueTopRight=(PRNG(seed,X+1,Y+1)*100000000)%256;
-    const valueTopLeft=(PRNG(seed,X,Y+1)*100000000)%256;
-    const valueBottomRight=(PRNG(seed,X+1,Y)*100000000)%256;
-    const valueBottomLeft=(PRNG(seed,X,Y)*100000000)%256;
+    const valueTopRight=(PRNG(seed,X+1,Y+1)*100000000)%maxHeight;
+    const valueTopLeft=(PRNG(seed,X,Y+1)*100000000)%maxHeight;
+    const valueBottomRight=(PRNG(seed,X+1,Y)*100000000)%maxHeight;
+    const valueBottomLeft=(PRNG(seed,X,Y)*100000000)%maxHeight;
 const u = Fade(xf);
 const v = Fade(yf);
 const result = Lerp(u,

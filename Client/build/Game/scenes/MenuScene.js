@@ -9,14 +9,14 @@ import { GUI } from "../gui/GUI.js";
 import { ImgComponent } from "../gui/ImgComponent.js";
 import { TextComponent } from "../gui/TextComponent.js";
 import { GameScene } from "./GameScene.js";
-let gl = CanvaManager.gl;
+const gl = CanvaManager.gl;
 export class MenuScene extends Scene {
     start() {
         this.gui = new GUI(Main.shader2d);
         this.gui.add(new ImgComponent("titleImage"));
-        let txt = new TextComponent("title", "MemeButDontCraft", 0.05, null, ALIGN.center);
+        const txt = new TextComponent("title", "MemeButDontCraft", 0.05, null, ALIGN.center);
         this.gui.add(txt);
-        let but = new Button("Test");
+        const but = new Button("Test");
         but.transformation = but.transformation.rotate(0.5).translate(0.5, 0.0);
         this.gui.add(but);
         this.gui.add(new TextComponent("author", "Copyleft Kocer BA. Do distribute!", 0.01, null, ALIGN.right)).transformation = Matrix3.identity().translate(1.0, -0.98);

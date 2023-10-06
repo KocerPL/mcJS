@@ -37,6 +37,9 @@ class CanvaManager {
         this.scrollAmount += (Math.round(ev.deltaY / 100));
         //   console.log(ev);
     }
+    static unlockPointer() {
+        document.exitPointerLock();
+    }
     static onMouseMove(ev) {
         // console.log((ev.x/(this.canva.width/2))-1, (ev.y/(this.canva.height/2))-1);
         this.mouse.pos.x = ((ev.x / (this.canva.width / 2)) - 1) / CanvaManager.getProportion;

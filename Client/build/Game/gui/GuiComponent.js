@@ -2,13 +2,14 @@ import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { RenderArrays } from "../../Engine/RenderArrays.js";
 import { Texture } from "../../Engine/Texture.js";
 import { Vector3 } from "../../Engine/Utils/Vector3.js";
-import { Button } from "./Button.js";
 import { isIn } from "../../Engine/BoundingBox.js";
 const gl = CanvaManager.gl;
 export class GuiComponent {
     sprite;
     components = [];
     renderMe = true;
+    boundingBox = undefined;
+    onclick = () => { };
     visible;
     gui;
     changed = true;
@@ -65,7 +66,7 @@ export class GuiComponent {
             index = highest + 1;
             rArrays.textureCoords.push(...set.textureCoords);
         }
-        console.log(this.id, "=", this.vStart, "|||", this.vEnd);
+        // console.log(this.id,"=", this.vStart,"|||",this.vEnd);
         return rArrays;
     }
     add(component) {
@@ -95,10 +96,11 @@ export class GuiComponent {
             comp.render(shader, mat);
     }
     onClick(x, y) {
-        for (let comp of this.components)
-            comp.onClick(x, y);
-        let v = this.transformation.inverse().multiplyVec(new Vector3(CanvaManager.mouse.pos.x, CanvaManager.mouse.pos.y, 1));
-        if (this instanceof Button && isIn(v.x, v.y, this.boundingBox))
+        //  console.log("propagating onclick");
+        const v = this.transformation.inverse().multiplyVec(new Vector3(x, y, 1));
+        for (const comp of this.components)
+            comp.onClick(v.x, v.y);
+        if (this.boundingBox && isIn(v.x, v.y, this.boundingBox))
             this.onclick();
     }
     attachGUI(gui) {

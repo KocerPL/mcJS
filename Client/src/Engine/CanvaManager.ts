@@ -42,6 +42,10 @@ export class CanvaManager
         this.scrollAmount+=(Math.round(ev.deltaY/100));
         //   console.log(ev);
     }
+    public static unlockPointer()
+    {
+        document.exitPointerLock();
+    }
     static onMouseMove(ev: MouseEvent) 
     {
         // console.log((ev.x/(this.canva.width/2))-1, (ev.y/(this.canva.height/2))-1);
