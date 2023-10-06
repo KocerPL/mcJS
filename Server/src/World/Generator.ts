@@ -1,4 +1,5 @@
 import { toIndex } from "../Main";
+import { randRange } from "../Utils";
 import { Chunk } from "./Chunk";
 
 export class Generator
@@ -21,10 +22,14 @@ export class Generator
               //  console.log(height);
                 for(let y=0;y<16;y++)
                 {
+                if(y+(i*16)>175+randRange(-3,3))
+                sub[toIndex(x,y,z)]=3;
                 if(y+(i*16)==height)
                 sub[toIndex(x,y,z)]=2;
-                else if(y+(i*16)<height)
+                else if(y+(i*16)<height &&y+(i*16)>height-4)
                 sub[toIndex(x,y,z)]=1;
+               else if(y+(i*16)<height)
+               sub[toIndex(x,y,z)]=3;
                 else
                 sub[toIndex(x,y,z)]=0;
 

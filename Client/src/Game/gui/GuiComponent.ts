@@ -105,7 +105,7 @@ export abstract class GuiComponent
     }
     render(shader:Shader,transf:Matrix3)
     {
-       if(!this.visible) return;
+        if(!this.visible) return;
         const mat = transf.multiplyMat(this.transformation);//.multiplyMat(transf);
         this.renderItself(shader,mat);
         for(const comp of this.components)
@@ -115,9 +115,9 @@ export abstract class GuiComponent
     }
     onClick(x:number,y:number)
     {
-       for(let comp of this.components)
-       comp.onClick(x,y);
-    let v = this.transformation.inverse().multiplyVec(new Vector3(CanvaManager.mouse.pos.x,CanvaManager.mouse.pos.y,1));
+        for(const comp of this.components)
+            comp.onClick(x,y);
+        const v = this.transformation.inverse().multiplyVec(new Vector3(CanvaManager.mouse.pos.x,CanvaManager.mouse.pos.y,1));
         if(this instanceof Button && isIn(v.x,v.y,this.boundingBox))
             this.onclick();
             

@@ -37,8 +37,6 @@ export class GUI {
         let index = 0;
         this.renderSet.resetArrays();
         for (const comp of this.components) {
-            if (!comp.getVisible)
-                continue;
             let highest = 0;
             let subRArrays = comp.updateComponents(this.renderSet.indices.length);
             this.renderSet.vertices.push(...subRArrays.vertices);

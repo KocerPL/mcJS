@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Generator = void 0;
 const Main_1 = require("../Main");
+const Utils_1 = require("../Utils");
 const Chunk_1 = require("./Chunk");
 class Generator {
     WorldSeed = 141425;
@@ -18,10 +19,14 @@ class Generator {
                     let height = Math.floor(perlin(this.WorldSeed, (x + (x1 * 16)) / 256, (z + (z1 * 16)) / 256));
                     //  console.log(height);
                     for (let y = 0; y < 16; y++) {
+                        if (y + (i * 16) > 175 + (0, Utils_1.randRange)(-3, 3))
+                            sub[(0, Main_1.toIndex)(x, y, z)] = 3;
                         if (y + (i * 16) == height)
                             sub[(0, Main_1.toIndex)(x, y, z)] = 2;
-                        else if (y + (i * 16) < height)
+                        else if (y + (i * 16) < height && y + (i * 16) > height - 4)
                             sub[(0, Main_1.toIndex)(x, y, z)] = 1;
+                        else if (y + (i * 16) < height)
+                            sub[(0, Main_1.toIndex)(x, y, z)] = 3;
                         else
                             sub[(0, Main_1.toIndex)(x, y, z)] = 0;
                     }

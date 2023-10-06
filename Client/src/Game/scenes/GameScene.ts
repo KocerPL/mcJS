@@ -232,9 +232,9 @@ export class GameScene extends Scene
         // if(this.count>this.test.indices.length)
         //this.count=3;
         
-        if(CanvaManager.getKeyOnce("F3"))
+        if(CanvaManager.getKeyOnce("]"))
             this.maxChunks--;
-        if(CanvaManager.getKeyOnce("F4"))
+        if(CanvaManager.getKeyOnce("["))
             this.maxChunks++;
         if(CanvaManager.getKeyOnce("8"))
             this.fastBreaking=!this.fastBreaking;

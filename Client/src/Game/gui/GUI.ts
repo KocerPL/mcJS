@@ -11,7 +11,7 @@ export class GUI
 {
     components:GuiComponent[]=[];
     renderSet:RenderSet;
-    private needRefresh:boolean = false;
+    private needRefresh = false;
     constructor(shader:Shader2d)
     {
         this.renderSet=new RenderSet(shader);
@@ -29,10 +29,10 @@ export class GUI
         this.renderSet.shader.loadUniforms(CanvaManager.getProportion,-1,Matrix3.identity());
         for(const comp of this.components)
         {
-           comp.render(this.renderSet.shader,Matrix3.identity());
+            comp.render(this.renderSet.shader,Matrix3.identity());
         }
       
-     //   gl.drawElements(gl.TRIANGLES,this.renderSet.count,gl.UNSIGNED_INT,0);
+        //   gl.drawElements(gl.TRIANGLES,this.renderSet.count,gl.UNSIGNED_INT,0);
     }
     add(component:GuiComponent):GuiComponent
     {
@@ -51,10 +51,9 @@ export class GUI
         this.renderSet.resetArrays();
         for(const comp of this.components)
         {
-            if(!comp.getVisible) continue;
            
             let highest = 0;
-          let subRArrays=   comp.updateComponents(this.renderSet.indices.length);
+            const subRArrays=   comp.updateComponents(this.renderSet.indices.length);
             this.renderSet.vertices.push(...subRArrays.vertices);
             for(let i=0;i<subRArrays.indices.length;i++)
             {
@@ -69,8 +68,8 @@ export class GUI
     }
     onClick(x:number,y:number)
     {
-        for(let comp of this.components)
-        comp.onClick(x,y);
+        for(const comp of this.components)
+            comp.onClick(x,y);
     }
     get(id:string):GuiComponent|null
     {
