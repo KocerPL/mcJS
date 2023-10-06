@@ -24,8 +24,9 @@ export class Inventory extends GuiComponent
         this.tcoords = Texture.GUI.coords[3];
         //this.add(new TextComponent("ActionBar","NONE",0.01,null,ALIGN.center)).transformation = Matrix3.identity().translate(0.0,0.15);
         let i=1;
-        for(let x=-0.4;x<=0.4;x+=0.1)
-            for(let y=-0.1;y<=0.1;y+=0.1)
+       
+        for(let y=-0.1;y<=0.1;y+=0.1)
+            for(let x=-0.4;x<=0.4;x+=0.1)
             {
                 this.add(new ItemSlot(x,y-0.3,"invSlot_"+i));
                 i++;

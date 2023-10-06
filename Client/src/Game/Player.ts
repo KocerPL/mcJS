@@ -162,6 +162,14 @@ export class Player
             this.blockOverlay.count=0;
         this.updatePos();
     }
+    dropItem(id:number,count:number)
+    {
+        const it = new Item(this.camera.getPosition().copy(),id,this.gs);
+        it.count = count;
+        it.acc.x=Math.sin((-this.entity.rotation.y)*Math.PI/180)*0.3;
+        it.acc.z= Math.cos((-this.entity.rotation.y)*Math.PI/180)*0.3;
+        this.gs.entities.push(it);
+    }
     switchPerson(person:pers)
     {
        
@@ -284,11 +292,8 @@ export class Player
                 let yRot = -this.entity.bodyRot;
                 if(CanvaManager.getKeyOnce("Q"))
                 {
-                    const it = new Item(this.camera.getPosition().copy(),this.itemsBar[this.selectedItem].id,this.gs);
-                    it.acc.x=Math.sin((-this.entity.rotation.y)*Math.PI/180)*0.3;
-                    it.acc.z= Math.cos((-this.entity.rotation.y)*Math.PI/180)*0.3;
-                    this.gs.entities.push(it);
-
+                   
+                    this.dropItem(this.itemsBar[this.selectedItem].id,1);
                     this.updateItem(this.itemsBar[this.selectedItem].id,this.selectedItem,this.itemsBar[this.selectedItem].count-1);
                    
                 }
@@ -544,6 +549,18 @@ export class Player
         this.itemsBar[slot].id =id;
         this.itemsBar[slot].count=count;
         const hold =  this.gs.gui.get("slot_"+(slot+1)+"_holder");
+        if(hold instanceof ItemHolder)
+            hold.change(id,count);
+    }
+    updateInvItem(id:number,slot:number,count:number)
+    {
+        if(count<1)
+        {
+            id=0;
+        }
+        this.inventory[slot].id =id;
+        this.inventory[slot].count=count;
+        const hold =  this.gs.gui.get("invSlot_"+(slot+1)+"_holder");
         if(hold instanceof ItemHolder)
             hold.change(id,count);
     }

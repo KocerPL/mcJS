@@ -11,6 +11,7 @@ export class ItemSlot extends GuiComponent
         super(id);
         this.visible =true;
         this.sprite = new Sprite(-0.05,-0.05,0.05,0.05);
+        this.boundingBox = {x:-0.05,y:-0.05,dx:0.05,dy:0.05};
         this.transformation = Matrix3.identity().translate(x,y);
         this.tcoords = Texture.GUI.coords[1];
         this.add(new ItemHolder(this.id+"_holder",0.03));

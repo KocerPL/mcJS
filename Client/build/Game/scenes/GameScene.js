@@ -101,16 +101,63 @@ export class GameScene extends Scene {
         this.gui.add(new ItemBar("ItemBar"));
         this.gui.add(new Inventory("Inventory"));
         this.gui.add(new TextComponent("debug", "FPS:", 0.01, null, ALIGN.left)).transformation = Matrix3.identity().translate(-1, 0.98);
-        const slot = this.gui.get("slot_1_holder");
-        if (slot instanceof ItemHolder)
+        let mi = this.gui.add(new ItemHolder("mouse_item_holder", 0.02));
+        for (let i = 1; i <= 9; i++) {
+            const slot = this.gui.get("slot_" + i);
             slot.onclick = () => {
-                console.log("Clicked first slot");
+                let plSlot = this.player.itemsBar[i - 1];
+                if (mi instanceof ItemHolder)
+                    if (mi.blockID == 0) {
+                        mi.change(plSlot.id, plSlot.count);
+                        this.player.updateItem(0, i - 1, 0);
+                    }
+                    else {
+                        if (plSlot.id > 0) {
+                            let blID = plSlot.id;
+                            let count = plSlot.count;
+                            this.player.updateItem(mi.blockID, i - 1, mi.count);
+                            mi.change(blID, count);
+                        }
+                        else {
+                            this.player.updateItem(mi.blockID, i - 1, mi.count);
+                            mi.change(0, 0);
+                        }
+                    }
+                console.log("Clicked " + i + " slot");
             };
+        }
+        for (let i = 1; i <= 27; i++) {
+            const slot = this.gui.get("invSlot_" + i);
+            slot.onclick = () => {
+                let plSlot = this.player.inventory[i - 1];
+                if (mi instanceof ItemHolder)
+                    if (mi.blockID == 0) {
+                        mi.change(plSlot.id, plSlot.count);
+                        this.player.updateInvItem(0, i - 1, 0);
+                    }
+                    else {
+                        if (plSlot.id > 0) {
+                            let blID = plSlot.id;
+                            let count = plSlot.count;
+                            this.player.updateInvItem(mi.blockID, i - 1, mi.count);
+                            mi.change(blID, count);
+                        }
+                        else {
+                            this.player.updateInvItem(mi.blockID, i - 1, mi.count);
+                            mi.change(0, 0);
+                        }
+                    }
+                console.log("Clicked " + i + " slot");
+            };
+        }
         this.player = new Player(new Vector(-2, 144, -7), this);
         this.socket.on("subchunk", this.handleSubchunk.bind(this));
         //socket.emit('addItem',{id:1,count:64,slot:0});
         this.socket.on("addItem", (obj) => {
-            this.player.updateItem(obj.id, obj.slot, obj.count);
+            if (obj.inventory)
+                this.player.updateInvItem(obj.id, obj.slot, obj.count);
+            else
+                this.player.updateItem(obj.id, obj.slot, obj.count);
         });
         this.socket.on("spawnPlayer", (pos, id) => {
             // console.log("summoningPLAYER");
@@ -152,6 +199,7 @@ export class GameScene extends Scene {
         this.gui.onClick(x, y);
     }
     update() {
+        this.gui.get("mouse_item_holder").transformation = Matrix3.identity().translate(CanvaManager.mouse.pos.x, CanvaManager.mouse.pos.y);
         this.processChunks();
         //  this.updateSubchunks();
         const pPC = this.toChunkPos(this.player.pos);
@@ -208,6 +256,12 @@ export class GameScene extends Scene {
         if (CanvaManager.getKeyOnce("E")) {
             this.gui.get("Inventory").setVisible = !this.gui.get("Inventory").getVisible;
             CanvaManager.rPointer = !this.gui.get("Inventory").getVisible;
+            let mi = this.gui.get("mouse_item_holder");
+            if (mi instanceof ItemHolder)
+                if (mi.blockID != 0) {
+                    this.player.dropItem(mi.blockID, mi.count);
+                    mi.change(0, 0);
+                }
             if (!CanvaManager.rPointer)
                 CanvaManager.unlockPointer();
         }

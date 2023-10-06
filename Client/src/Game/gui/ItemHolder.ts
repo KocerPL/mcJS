@@ -15,6 +15,7 @@ export class ItemHolder extends GuiComponent
     //  onclick:Function=()=>{};
     //boundingBox:BoundingBox;
     blockID=0;
+    count =0;
     constructor(id:string,size:number)
     {
      
@@ -23,7 +24,7 @@ export class ItemHolder extends GuiComponent
         this.visible =false;
         this.sprite = new Sprite(-size,-size,size,size);
         this.tcoords = Texture.blockAtlas.coords[0];
-        this.boundingBox = {x:-size,y:-size,dx:size,dy:size};
+
         this.transformation = Matrix3.identity();
         const tComp =this.add(new TextComponent(this.id+"_text","64",0.01,0.02,ALIGN.right));
         tComp.transformation = tComp.transformation.translate(0.03,-0.03);
@@ -31,6 +32,7 @@ export class ItemHolder extends GuiComponent
     change(blockID:number,count:number)
     {
         this.blockID=blockID;
+        this.count = count;
         if(blockID==0){ this.visible=false; return;}
         this.visible=true;
         const tComp = this.get(this.id+"_text");
@@ -38,6 +40,8 @@ export class ItemHolder extends GuiComponent
             tComp.changeText(`${count}`);
         if( Block.info[blockID].type==blockType.NOTFULL)
             this.sprite.dy = 0;
+        else 
+        this.sprite.dy = this.size; 
         this.tcoords=    Texture.testAtkas.coords[Block.info[blockID].textureIndex[Side.front]];
         this.gui.needsRefresh();
     }
