@@ -29,7 +29,7 @@ io.on('connection', (socket) => {
     setTimeout(() => {
         socket.emit('login', JSON.stringify({ x: 0, y: 200, z: 0 }), socket.KOCEid);
         // console.log(io.sockets);
-        for (let i = 0; i < 10; i++)
+        for (let i = 0; i < 13; i++)
             socket.emit('addItem', { id: i + 1, count: 64, slot: i, inventory: true });
         for (let sock of io.sockets.sockets) {
             if (sock[1] != socket) {

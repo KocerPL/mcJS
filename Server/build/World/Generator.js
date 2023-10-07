@@ -20,7 +20,7 @@ class Generator {
                     let randomAdditive = (0, Utils_1.randRange)(-3, 3);
                     //  console.log(height);
                     for (let y = 0; y < 16; y++) {
-                        if (y + (i * 16) < height && y + (i * 16) > 175 + randomAdditive)
+                        if (y + (i * 16) <= height && y + (i * 16) > 175 + randomAdditive)
                             sub[(0, Main_1.toIndex)(x, y, z)] = 3;
                         else if (y + (i * 16) == height)
                             sub[(0, Main_1.toIndex)(x, y, z)] = 2;

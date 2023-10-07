@@ -23,7 +23,7 @@ export class Generator
               //  console.log(height);
                 for(let y=0;y<16;y++)
                 {
-                if(y+(i*16)<height && y+(i*16)>175+randomAdditive)
+                if(y+(i*16)<=height && y+(i*16)>175+randomAdditive)
                 sub[toIndex(x,y,z)]=3;
                 else if(y+(i*16)==height)
                 sub[toIndex(x,y,z)]=2;
