@@ -49,6 +49,7 @@ export class Player
     lastTime=0;
     lastScroll=0;
     gs:GameScene;
+    openInventory =false;
     static blVertices =[
     //przód
         -0.501,-0.501,-0.501,
@@ -287,7 +288,7 @@ export class Player
         let speed=1;
         try
         {
-            if(!this.locked)
+            if(!this.locked && !this.openInventory)
             {
                 let yRot = -this.entity.bodyRot;
                 if(CanvaManager.getKeyOnce("Q"))
@@ -401,12 +402,12 @@ export class Player
         }
         if(Math.abs(this.entity.rotation.z)>45)
             this.legChange= -this.legChange;
+        this.camera.setPosition(new Vector(this.pos.x,this.pos.y+0.7,this.pos.z));
+        if(this.locked || this.openInventory) return;
         if(CanvaManager.getKey("W")||CanvaManager.getKey("A")||CanvaManager.getKey("S")||CanvaManager.getKey("D"))
             this.entity.rotation.z += this.legChange*speed;
         else 
-            this.entity.rotation.z = 0;
-        this.camera.setPosition(new Vector(this.pos.x,this.pos.y+0.7,this.pos.z));
-        if(this.locked) return;
+            this.entity.rotation.z = 0;       
         this.camera.setPitch(this.camera.getPitch()- (CanvaManager.mouseMovement.y/10));
         this.camera.setYaw(this.camera.getYaw()+(CanvaManager.mouseMovement.x/10));
         if(this.camera.getPitch()>90) this.camera.setPitch(90);

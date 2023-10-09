@@ -20,6 +20,9 @@ import { TextComponent } from "../gui/TextComponent.js";
 import { ALIGN } from "../../Engine/Utils/TextSprite.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { ItemHolder } from "../gui/ItemHolder.js";
+import { DarkScreen } from "../gui/DarkScreen.js";
+import { Button } from "../gui/Button.js";
+import { MenuScene } from "./MenuScene.js";
 declare let io;
 const gl = CanvaManager.gl;
 export class GameScene extends Scene
@@ -106,83 +109,92 @@ export class GameScene extends Scene
         Block.createInfoArray();
         
         this.gui = new GUI(Main.shader2d);
+        this.gui.add(new DarkScreen("DarkScreen"));
         this.cross = new Cross("Cross");
         CanvaManager.rPointer = true;
         this.gui.add(this.cross);
         this.gui.add(new ItemBar("ItemBar"));
         this.gui.add(new Inventory("Inventory"));
         this.gui.add(new TextComponent("debug","FPS:",0.01,null,ALIGN.left)).transformation =Matrix3.identity().translate(-1,0.98);
-        let mi = this.gui.add(new ItemHolder("mouse_item_holder",0.02)); 
+        const ds =this.gui.add(new DarkScreen("ExitDarkScreen"));
+        ds.setVisible =true;
+        const butt = new Button("Exit game");
+        ds.add(butt);
+        butt.onclick = ()=>{
+            Main.changeScene(new MenuScene());
+        };
+        const mi = this.gui.add(new ItemHolder("mouse_item_holder",0.02)); 
         for(let i=1;i<=9;i++)
         {
-        const slot = this.gui.get("slot_"+i);
+            const slot = this.gui.get("slot_"+i);
             slot.onclick = ()=>{
-                let plSlot =this.player.itemsBar[i-1];
+                const plSlot =this.player.itemsBar[i-1];
                 
                 if(mi instanceof ItemHolder)
-                if(mi.blockID == 0)
-                {
-                    mi.change(plSlot.id,plSlot.count);
-                this.player.updateItem(0,i-1,0);
-                }
-                else
-                {
-                    if(plSlot.id>0)
+                    if(mi.blockID == 0)
                     {
-                        let blID = plSlot.id;
-                        let count = plSlot.count;
-                        this.player.updateItem(mi.blockID,i-1,mi.count);
-                        mi.change(blID,count); 
+                        mi.change(plSlot.id,plSlot.count);
+                        this.player.updateItem(0,i-1,0);
                     }
                     else
                     {
-                    this.player.updateItem(mi.blockID,i-1,mi.count);
-                    mi.change(0,0); 
-                    }
+                        if(plSlot.id>0)
+                        {
+                            const blID = plSlot.id;
+                            const count = plSlot.count;
+                            this.player.updateItem(mi.blockID,i-1,mi.count);
+                            mi.change(blID,count); 
+                        }
+                        else
+                        {
+                            this.player.updateItem(mi.blockID,i-1,mi.count);
+                            mi.change(0,0); 
+                        }
                   
-                }
+                    }
                 console.log("Clicked "+i+" slot");
             };
         }
         for(let i=1;i<=27;i++)
         {
-        const slot = this.gui.get("invSlot_"+i);
+            const slot = this.gui.get("invSlot_"+i);
             slot.onclick = ()=>{
-                let plSlot =this.player.inventory[i-1];
+                const plSlot =this.player.inventory[i-1];
                 
                 if(mi instanceof ItemHolder)
-                if(mi.blockID == 0)
-                {
-                    mi.change(plSlot.id,plSlot.count);
-                this.player.updateInvItem(0,i-1,0);
-                }
-                else
-                {
-                    if(plSlot.id>0)
+                    if(mi.blockID == 0)
                     {
-                        let blID = plSlot.id;
-                        let count = plSlot.count;
-                        this.player.updateInvItem(mi.blockID,i-1,mi.count);
-                        mi.change(blID,count); 
+                        mi.change(plSlot.id,plSlot.count);
+                        this.player.updateInvItem(0,i-1,0);
                     }
                     else
                     {
-                    this.player.updateInvItem(mi.blockID,i-1,mi.count);
-                    mi.change(0,0); 
-                    }
+                        if(plSlot.id>0)
+                        {
+                            const blID = plSlot.id;
+                            const count = plSlot.count;
+                            this.player.updateInvItem(mi.blockID,i-1,mi.count);
+                            mi.change(blID,count); 
+                        }
+                        else
+                        {
+                            this.player.updateInvItem(mi.blockID,i-1,mi.count);
+                            mi.change(0,0); 
+                        }
                   
-                }
+                    }
                 console.log("Clicked "+i+" slot");
             };
         }
         this.player = new Player(new Vector(-2,144,-7),this);
+        this.gui.get("Inventory").setVisible = this.player.openInventory;
         this.socket.on("subchunk",this.handleSubchunk.bind(this));
         //socket.emit('addItem',{id:1,count:64,slot:0});
         this.socket.on("addItem",(obj:{id:number,count:number,slot:number,inventory:boolean})=>{
             if(obj.inventory)
-            this.player.updateInvItem(obj.id,obj.slot,obj.count);
+                this.player.updateInvItem(obj.id,obj.slot,obj.count);
             else
-            this.player.updateItem(obj.id,obj.slot,obj.count);
+                this.player.updateItem(obj.id,obj.slot,obj.count);
         });
         this.socket.on("spawnPlayer",(pos,id)=>{
             // console.log("summoningPLAYER");
@@ -302,15 +314,17 @@ export class GameScene extends Scene
         if(CanvaManager.getKey("4")&&this.sunLight>0) this.sunLight--;  
         if(CanvaManager.getKeyOnce("E"))
         { 
-            this.gui.get("Inventory").setVisible =  !this.gui.get("Inventory").getVisible;
-            CanvaManager.rPointer = !this.gui.get("Inventory").getVisible;
-            let mi = this.gui.get("mouse_item_holder"); 
+            this.player.openInventory = !this.player.openInventory;
+            this.gui.get("DarkScreen").setVisible = this.player.openInventory;
+            this.gui.get("Inventory").setVisible =  this.player.openInventory;
+            CanvaManager.rPointer = !this.player.openInventory;
+            const mi = this.gui.get("mouse_item_holder"); 
             if(mi instanceof ItemHolder)
-            if(mi.blockID != 0)
-            {
-                this.player.dropItem(mi.blockID,mi.count);
-                mi.change(0,0);  
-            }
+                if(mi.blockID != 0)
+                {
+                    this.player.dropItem(mi.blockID,mi.count);
+                    mi.change(0,0);  
+                }
             if(!CanvaManager.rPointer) CanvaManager.unlockPointer();
         }
         // this.count++;

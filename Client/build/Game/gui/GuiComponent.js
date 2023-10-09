@@ -97,6 +97,8 @@ export class GuiComponent {
     }
     onClick(x, y) {
         //  console.log("propagating onclick");
+        if (!this.visible)
+            return;
         const v = this.transformation.inverse().multiplyVec(new Vector3(x, y, 1));
         for (const comp of this.components)
             comp.onClick(v.x, v.y);

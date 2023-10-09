@@ -402,14 +402,14 @@ class SubChunk {
                 }
                 else if (dz == 1) //fine
                  {
-                    const fo1 = this.vertexLAO(this.lightFBlock(x, y - 1, z + 1), this.lightFBlock(x + 1, y, z + 1), this.lightFBlock(x + 1, y - 1, z + 1), testedBlock.lightFBlock);
-                    const fo2 = this.vertexLAO(this.lightFBlock(x, y - 1, z + 1), this.lightFBlock(x - 1, y, z + 1), this.lightFBlock(x - 1, y - 1, z + 1), testedBlock.lightFBlock);
-                    const fo3 = this.vertexLAO(this.lightFBlock(x, y + 1, z + 1), this.lightFBlock(x - 1, y, z + 1), this.lightFBlock(x - 1, y + 1, z + 1), testedBlock.lightFBlock);
-                    const fo4 = this.vertexLAO(this.lightFBlock(x, y + 1, z + 1), this.lightFBlock(x + 1, y, z + 1), this.lightFBlock(x + 1, y + 1, z + 1), testedBlock.lightFBlock);
-                    const so1 = this.vertexLAO(this.lightSBlock(x, y - 1, z + 1), this.lightSBlock(x + 1, y, z + 1), this.lightSBlock(x + 1, y - 1, z + 1), testedBlock.skyLight);
-                    const so2 = this.vertexLAO(this.lightSBlock(x, y - 1, z + 1), this.lightSBlock(x - 1, y, z + 1), this.lightSBlock(x - 1, y - 1, z + 1), testedBlock.skyLight);
-                    const so3 = this.vertexLAO(this.lightSBlock(x, y + 1, z + 1), this.lightSBlock(x - 1, y, z + 1), this.lightSBlock(x - 1, y + 1, z + 1), testedBlock.skyLight);
-                    const so4 = this.vertexLAO(this.lightSBlock(x, y + 1, z + 1), this.lightSBlock(x + 1, y, z + 1), this.lightSBlock(x + 1, y + 1, z + 1), testedBlock.skyLight);
+                    const fo1 = this.vertexLAO(this.lightFBlock(x, y - 1, z + 1), this.lightFBlock(x - 1, y, z + 1), this.lightFBlock(x - 1, y - 1, z + 1), testedBlock.lightFBlock);
+                    const fo2 = this.vertexLAO(this.lightFBlock(x, y - 1, z + 1), this.lightFBlock(x + 1, y, z + 1), this.lightFBlock(x + 1, y - 1, z + 1), testedBlock.lightFBlock);
+                    const fo3 = this.vertexLAO(this.lightFBlock(x, y + 1, z + 1), this.lightFBlock(x + 1, y, z + 1), this.lightFBlock(x + 1, y + 1, z + 1), testedBlock.lightFBlock);
+                    const fo4 = this.vertexLAO(this.lightFBlock(x, y + 1, z + 1), this.lightFBlock(x - 1, y, z + 1), this.lightFBlock(x - 1, y + 1, z + 1), testedBlock.lightFBlock);
+                    const so1 = this.vertexLAO(this.lightSBlock(x, y - 1, z + 1), this.lightSBlock(x - 1, y, z + 1), this.lightSBlock(x - 1, y - 1, z + 1), testedBlock.skyLight);
+                    const so2 = this.vertexLAO(this.lightSBlock(x, y - 1, z + 1), this.lightSBlock(x + 1, y, z + 1), this.lightSBlock(x + 1, y - 1, z + 1), testedBlock.skyLight);
+                    const so3 = this.vertexLAO(this.lightSBlock(x, y + 1, z + 1), this.lightSBlock(x + 1, y, z + 1), this.lightSBlock(x + 1, y + 1, z + 1), testedBlock.skyLight);
+                    const so4 = this.vertexLAO(this.lightSBlock(x, y + 1, z + 1), this.lightSBlock(x - 1, y, z + 1), this.lightSBlock(x - 1, y + 1, z + 1), testedBlock.skyLight);
                     this.tmpMesh.lightLevels.push(so1, so2, so3, so4);
                     this.tmpMesh.fb.push(fo1, fo2, fo3, fo4);
                 }
