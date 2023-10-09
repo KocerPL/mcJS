@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <title>Mc in js </title>
-    <script src='https://git.io/perlin.js'></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="./build/Main.js" type="module" defer></script>
     <script src="/socket.io/socket.io.js"></script>
@@ -16,6 +15,50 @@
             background-color:rgb(39, 39, 39);
             overflow: hidden;
             
+        }
+        div
+        {
+            width: 50px;
+            position:absolute;
+            height: 50px;
+           
+        }
+        #control
+        {
+
+        left:0;
+            bottom:0;
+            width: 150px;
+            position:absolute;
+            height: 150px;
+        background-color: aqua;
+        }
+        #up 
+        {
+            background-color: green;    
+         
+            top:0px;
+            left:50px;
+        }
+        #left 
+        {
+            background-color: blue;    
+  
+            top:50px;
+            left:0px;
+        }
+        #down
+        {
+            background-color: red;    
+           
+            bottom:0px;
+            left:50px;
+        }
+        #right
+        {
+            right: 0px;
+            top:50px;
+            background-color: yellow;
         }
     </style>
     
