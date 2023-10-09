@@ -117,12 +117,13 @@ export class GameScene extends Scene
         this.gui.add(new Inventory("Inventory"));
         this.gui.add(new TextComponent("debug","FPS:",0.01,null,ALIGN.left)).transformation =Matrix3.identity().translate(-1,0.98);
         const ds =this.gui.add(new DarkScreen("ExitDarkScreen"));
-        ds.setVisible =true;
         const butt = new Button("Exit game");
         ds.add(butt);
+        butt.changeText("Exit game");
         butt.onclick = ()=>{
             Main.changeScene(new MenuScene());
         };
+        //  butt.changeText("Exit game");
         const mi = this.gui.add(new ItemHolder("mouse_item_holder",0.02)); 
         for(let i=1;i<=9;i++)
         {
@@ -327,6 +328,7 @@ export class GameScene extends Scene
                 }
             if(!CanvaManager.rPointer) CanvaManager.unlockPointer();
         }
+        if(CanvaManager.getKeyOnce("ESCAPE")) this.gui.get("ExitDarkScreen").setVisible =  !this.gui.get("ExitDarkScreen").getVisible;
         // this.count++;
         // if(this.count>this.test.indices.length)
         //this.count=3;

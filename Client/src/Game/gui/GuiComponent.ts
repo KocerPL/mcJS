@@ -90,7 +90,7 @@ export abstract class GuiComponent
     add(component:GuiComponent):GuiComponent
     {
         this.components.push(component);
-        component.gui = this.gui;
+        component.attachGUI(this.gui);
         if(this.gui)
             this.gui.needsRefresh();
         component.parent =this;

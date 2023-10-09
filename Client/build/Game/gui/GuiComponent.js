@@ -71,7 +71,7 @@ export class GuiComponent {
     }
     add(component) {
         this.components.push(component);
-        component.gui = this.gui;
+        component.attachGUI(this.gui);
         if (this.gui)
             this.gui.needsRefresh();
         component.parent = this;
