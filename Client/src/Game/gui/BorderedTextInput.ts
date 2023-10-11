@@ -26,15 +26,15 @@ export class BorderedTextInput extends GuiComponent
         this.boundingBox = {x:-0.475,y:-0.075,dx:0.475,dy:0.075};
         if(txt instanceof TextInput)
         {
-        this.onclick =()=>{
-            txt.selected = true;
-        };
-        this.onmissclick =()=>{
-            txt.selected = false;
-            if(txt.sprite instanceof TextSprite)
-                txt.sprite.text = txt.text+" ";
-            this.gui.needsRefresh();
-        };
+            this.onclick =()=>{
+                txt.selected = true;
+            };
+            this.onmissclick =()=>{
+                txt.selected = false;
+                if(txt.sprite instanceof TextSprite)
+                    txt.sprite.text = txt.text+" ";
+                this.gui.needsRefresh();
+            };
         }
     }
     changeText(text:string)
