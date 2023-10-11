@@ -19,6 +19,11 @@ export class TextComponent extends GuiComponent {
             gl.drawElements(gl.TRIANGLES, this.vEnd - this.vStart, gl.UNSIGNED_INT, this.vStart * 4);
     }
     changeText(text) {
+        if (text == "") {
+            this.renderMe = false;
+            return;
+        }
+        this.renderMe = true;
         if (this.sprite instanceof TextSprite)
             this.sprite.text = text;
         this.gui.needsRefresh();

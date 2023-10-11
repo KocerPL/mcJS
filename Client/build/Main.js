@@ -7,6 +7,7 @@ const gl = CanvaManager.gl;
 class Main {
     static scene;
     static FPS = 61;
+    static shared = {};
     static fastTPS = 60;
     static Measure = {
         tps: 0,
@@ -42,6 +43,7 @@ class Main {
         requestAnimationFrame(this.loop.bind(this));
     }
     static changeScene(scene) {
+        delete this.scene;
         this.scene = scene;
         this.scene.start();
     }

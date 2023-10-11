@@ -27,6 +27,7 @@ declare let io;
 const gl = CanvaManager.gl;
 export class GameScene extends Scene
 {
+    onKey(key:string) {};
   
     public maxChunks =10;
     public maxSubUpdates = 1;
@@ -56,6 +57,8 @@ export class GameScene extends Scene
     public  integratedServer:Worker;
     public logged =false;
     private counter =0;
+    private fromSlot =0;
+    private isInv =false;
     private updateSubchunk()
     {
         //const concatQ:Set<Chunk> = new Set();
@@ -121,7 +124,10 @@ export class GameScene extends Scene
         ds.add(butt);
         butt.changeText("Exit game");
         butt.onclick = ()=>{
+            this.socket.disconnect();
+            delete this.socket;
             Main.changeScene(new MenuScene());
+           
         };
         //  butt.changeText("Exit game");
         const mi = this.gui.add(new ItemHolder("mouse_item_holder",0.02)); 
@@ -134,6 +140,8 @@ export class GameScene extends Scene
                 if(mi instanceof ItemHolder)
                     if(mi.blockID == 0)
                     {
+                        this.fromSlot = i-1;
+                        this.isInv = false;
                         mi.change(plSlot.id,plSlot.count);
                         this.player.updateItem(0,i-1,0);
                     }
@@ -143,12 +151,15 @@ export class GameScene extends Scene
                         {
                             const blID = plSlot.id;
                             const count = plSlot.count;
-                            this.player.updateItem(mi.blockID,i-1,mi.count);
-                            mi.change(blID,count); 
+                            this.socket.emit("moveItem",{slot1:i-1,isInv1:false, slot2:this.fromSlot,isInv2:this.isInv});
+                            //this.player.updateItem(mi.blockID,i-1,mi.count);
+                            //mi.change(blID,count); 
+                            mi.change(0,0);
                         }
                         else
                         {
-                            this.player.updateItem(mi.blockID,i-1,mi.count);
+                            this.socket.emit("moveItem",{slot1:i-1,isInv1:false, slot2:this.fromSlot,isInv2:this.isInv});
+                            //this.player.updateItem(mi.blockID,i-1,mi.count);
                             mi.change(0,0); 
                         }
                   
@@ -165,6 +176,8 @@ export class GameScene extends Scene
                 if(mi instanceof ItemHolder)
                     if(mi.blockID == 0)
                     {
+                        this.fromSlot = i-1;
+                        this.isInv = true;
                         mi.change(plSlot.id,plSlot.count);
                         this.player.updateInvItem(0,i-1,0);
                     }
@@ -174,12 +187,15 @@ export class GameScene extends Scene
                         {
                             const blID = plSlot.id;
                             const count = plSlot.count;
-                            this.player.updateInvItem(mi.blockID,i-1,mi.count);
-                            mi.change(blID,count); 
+                            this.socket.emit("moveItem",{slot1:i-1,isInv1:true, slot2:this.fromSlot,isInv2:this.isInv});
+                            // this.player.updateInvItem(mi.blockID,i-1,mi.count);
+                            // mi.change(blID,count);
+                            mi.change(0,0); 
                         }
                         else
                         {
-                            this.player.updateInvItem(mi.blockID,i-1,mi.count);
+                            this.socket.emit("moveItem",{slot1:i-1,isInv1:true, slot2:this.fromSlot,isInv2:this.isInv});
+                            // this.player.updateInvItem(mi.blockID,i-1,mi.count);
                             mi.change(0,0); 
                         }
                   
@@ -189,9 +205,10 @@ export class GameScene extends Scene
         }
         this.player = new Player(new Vector(-2,144,-7),this);
         this.gui.get("Inventory").setVisible = this.player.openInventory;
+        this.socket.emit("login",{nick:Main.shared.nick});
         this.socket.on("subchunk",this.handleSubchunk.bind(this));
         //socket.emit('addItem',{id:1,count:64,slot:0});
-        this.socket.on("addItem",(obj:{id:number,count:number,slot:number,inventory:boolean})=>{
+        this.socket.on("updateItem",(obj:{id:number,count:number,slot:number,inventory:boolean})=>{
             if(obj.inventory)
                 this.player.updateInvItem(obj.id,obj.slot,obj.count);
             else

@@ -7,12 +7,24 @@ const { Server } = require("socket.io");
 const fs = require("fs");
 const Chunk_1 = require("./World/Chunk");
 const Generator_1 = require("./World/Generator");
+const Utils_1 = require("./Utils");
 let lastID = 0;
 const app = express();
 const gen = new Generator_1.Generator();
 const server = http.createServer(app);
 const io = new Server(server);
+class PlayerInfo {
+    inventory = new Array(27);
+    itemsBar = new Array(9);
+    constructor() {
+        for (let i = 0; i < this.inventory.length; i++)
+            this.inventory[i] = { id: Math.floor((0, Utils_1.randRange)(0, 11)), count: 64 };
+        for (let i = 0; i < this.itemsBar.length; i++)
+            this.itemsBar[i] = { id: 0, count: 0 };
+    }
+}
 const loadedChunks = new Map();
+let playersInfo = JSON.parse(fs.readFileSync(__dirname + "/players.json").toString());
 let pos = __dirname.length - 1;
 for (let i = 0; i < 2; pos--) {
     if (__dirname.at(pos) == "/")
@@ -23,14 +35,26 @@ app.get("/", (req, res) => {
     res.sendFile(rDir + "/Client/index.html");
 });
 io.on('connection', (socket) => {
-    console.log('a user connected');
+    //console.log('a user connected');
     socket.KOCEid = lastID++;
     socket.pos = { x: 0, y: 200, z: 0 };
-    setTimeout(() => {
-        socket.emit('login', JSON.stringify({ x: 0, y: 200, z: 0 }), socket.KOCEid);
+    socket.on("login", (loginObject) => {
+        socket.nick = loginObject.nick;
+        console.log(loginObject.nick + " logged in");
+        socket.emit('login', { x: 0, y: 200, z: 0 }, socket.KOCEid);
         // console.log(io.sockets);
-        for (let i = 0; i < 13; i++)
-            socket.emit('addItem', { id: i + 1, count: 64, slot: i, inventory: true });
+        if (!(socket.nick in playersInfo)) {
+            playersInfo[socket.nick] = new PlayerInfo();
+            savePlayerInfo();
+        }
+        let inventory = playersInfo[socket.nick].inventory;
+        for (let i = 0; i < inventory.length; i++) {
+            socket.emit('updateItem', { id: inventory[i].id, count: inventory[i].count, slot: i, inventory: true });
+        }
+        let itemsBar = playersInfo[socket.nick].itemsBar;
+        for (let i = 0; i < itemsBar.length; i++) {
+            socket.emit('updateItem', { id: itemsBar[i].id, count: itemsBar[i].count, slot: i, inventory: false });
+        }
         for (let sock of io.sockets.sockets) {
             if (sock[1] != socket) {
                 // console.log(sock[1]);
@@ -38,7 +62,41 @@ io.on('connection', (socket) => {
             }
         }
         socket.broadcast.emit('spawnPlayer', socket.pos, socket.KOCEid);
-    }, 2000);
+    });
+    socket.on('moveItem', (data) => {
+        //  console.log("Moving....");
+        console.log(data);
+        if (data.isInv1 && data.isInv2) {
+            //    console.log("Moved item!!");
+            let item = playersInfo[socket.nick].inventory[data.slot1];
+            playersInfo[socket.nick].inventory[data.slot1] = playersInfo[socket.nick].inventory[data.slot2];
+            playersInfo[socket.nick].inventory[data.slot2] = item;
+            socket.emit("updateItem", { id: playersInfo[socket.nick].inventory[data.slot2].id, count: playersInfo[socket.nick].inventory[data.slot2].count, slot: data.slot2, inventory: true });
+            socket.emit("updateItem", { id: playersInfo[socket.nick].inventory[data.slot1].id, count: playersInfo[socket.nick].inventory[data.slot1].count, slot: data.slot1, inventory: true });
+        }
+        else if (data.isInv1 && !data.isInv2) {
+            let item = playersInfo[socket.nick].inventory[data.slot1];
+            playersInfo[socket.nick].inventory[data.slot1] = playersInfo[socket.nick].itemsBar[data.slot2];
+            playersInfo[socket.nick].itemsBar[data.slot2] = item;
+            socket.emit("updateItem", { id: playersInfo[socket.nick].itemsBar[data.slot2].id, count: playersInfo[socket.nick].itemsBar[data.slot2].count, slot: data.slot2, inventory: false });
+            socket.emit("updateItem", { id: playersInfo[socket.nick].inventory[data.slot1].id, count: playersInfo[socket.nick].inventory[data.slot1].count, slot: data.slot1, inventory: true });
+        }
+        else if (!data.isInv1 && data.isInv2) {
+            let item = playersInfo[socket.nick].inventory[data.slot2];
+            playersInfo[socket.nick].inventory[data.slot2] = playersInfo[socket.nick].itemsBar[data.slot1];
+            playersInfo[socket.nick].itemsBar[data.slot1] = item;
+            socket.emit("updateItem", { id: playersInfo[socket.nick].itemsBar[data.slot1].id, count: playersInfo[socket.nick].itemsBar[data.slot1].count, slot: data.slot1, inventory: false });
+            socket.emit("updateItem", { id: playersInfo[socket.nick].inventory[data.slot2].id, count: playersInfo[socket.nick].inventory[data.slot2].count, slot: data.slot2, inventory: true });
+        }
+        else if (!data.isInv1 && !data.isInv2) {
+            let item = playersInfo[socket.nick].itemsBar[data.slot2];
+            playersInfo[socket.nick].itemsBar[data.slot2] = playersInfo[socket.nick].itemsBar[data.slot1];
+            playersInfo[socket.nick].itemsBar[data.slot1] = item;
+            socket.emit("updateItem", { id: playersInfo[socket.nick].itemsBar[data.slot1].id, count: playersInfo[socket.nick].itemsBar[data.slot1].count, slot: data.slot1, inventory: false });
+            socket.emit("updateItem", { id: playersInfo[socket.nick].itemsBar[data.slot2].id, count: playersInfo[socket.nick].itemsBar[data.slot2].count, slot: data.slot2, inventory: false });
+        }
+        savePlayerInfo();
+    });
     socket.on('getSubchunk', (x, y, z) => {
         // console.log("Subchunk");
         const chunk = getChunk(x, z);
@@ -51,7 +109,12 @@ io.on('connection', (socket) => {
         socket.broadcast.emit("moveEntity", socket.KOCEid, pos, rot);
     });
     socket.on("placeBlock", (data) => {
-        socket.broadcast.emit("placeBlock", data);
+        if (data.id != 0 && playersInfo[socket.nick].itemsBar[data.slot].id != data.id)
+            return;
+        playersInfo[socket.nick].itemsBar[data.slot].count--;
+        socket.emit("updateItem", { id: playersInfo[socket.nick].itemsBar[data.slot].id, count: playersInfo[socket.nick].itemsBar[data.slot].count, slot: data.slot, inventory: false });
+        savePlayerInfo();
+        io.emit("placeBlock", data);
         let inPos = { x: Math.round(Math.round(data.pos.x) % 16), y: Math.round(Math.round(data.pos.y) % 16), z: Math.round(Math.round(data.pos.z) % 16) };
         if (inPos.x < 0)
             inPos.x = 16 - Math.abs(inPos.x);
@@ -84,6 +147,9 @@ server.listen(3000, () => {
 });
 function saveChunk(chunk) {
     fs.writeFileSync(__dirname + "/world/" + chunk.pos[0] + "." + chunk.pos[1] + ".kChunk", JSON.stringify(chunk.subchunks));
+}
+function savePlayerInfo() {
+    fs.writeFileSync(__dirname + "/players.json", JSON.stringify(playersInfo));
 }
 function getChunk(x, z) {
     if (loadedChunks.has(x + "-" + z))

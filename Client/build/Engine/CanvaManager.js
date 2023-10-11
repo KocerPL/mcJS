@@ -49,6 +49,7 @@ class CanvaManager {
     }
     static onKeyDown(ev) {
         console.log(ev.key);
+        Main.scene.onKey(ev.key);
         this.keys[ev.key.toUpperCase()] = true;
         ev.preventDefault();
     }

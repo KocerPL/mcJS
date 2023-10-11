@@ -10,6 +10,8 @@ export class GuiComponent {
     renderMe = true;
     boundingBox = undefined;
     onclick = () => { };
+    onkey = (key) => { };
+    onmissclick = () => { };
     visible;
     gui;
     changed = true;
@@ -95,6 +97,13 @@ export class GuiComponent {
         for (const comp of this.components)
             comp.render(shader, mat);
     }
+    onKey(key) {
+        if (!this.visible)
+            return;
+        for (const comp of this.components)
+            comp.onKey(key);
+        this.onkey(key);
+    }
     onClick(x, y) {
         //  console.log("propagating onclick");
         if (!this.visible)
@@ -104,6 +113,8 @@ export class GuiComponent {
             comp.onClick(v.x, v.y);
         if (this.boundingBox && isIn(v.x, v.y, this.boundingBox))
             this.onclick();
+        else
+            this.onmissclick();
     }
     attachGUI(gui) {
         this.gui = gui;

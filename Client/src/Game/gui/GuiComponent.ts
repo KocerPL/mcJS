@@ -14,11 +14,13 @@ import { ItemHolder } from "./ItemHolder.js";
 const gl = CanvaManager.gl;
 export abstract class GuiComponent
 {
-    protected sprite:Sprite;
+    public sprite:Sprite;
     protected components:GuiComponent[]=[];
     renderMe=true;
     boundingBox:BoundingBox =undefined;
-    onclick = ()=>{};
+    onclick = ():void=>{};
+    onkey = (key:string):void=>{};
+    onmissclick = ():void=>{};
     protected visible:boolean;
     gui:GUI;
     changed=true;
@@ -116,9 +118,16 @@ export abstract class GuiComponent
        
       
     }
+    onKey(key:string)
+    {
+        if(!this.visible) return;
+        for(const comp of this.components)
+            comp.onKey(key);
+        this.onkey(key);
+    }
     onClick(x:number,y:number)
     {
-      //  console.log("propagating onclick");
+        //  console.log("propagating onclick");
         if(!this.visible) return;
         const v = this.transformation.inverse().multiplyVec(new Vector3(x,y,1));
         for(const comp of this.components)
@@ -126,7 +135,8 @@ export abstract class GuiComponent
         
         if(this.boundingBox&& isIn(v.x,v.y,this.boundingBox))
             this.onclick();
-            
+        else 
+            this.onmissclick();
     }
     attachGUI(gui:GUI)
     {

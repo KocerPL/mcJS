@@ -72,6 +72,11 @@ export class GUI
         for(const comp of this.components)
             comp.onClick(CanvaManager.mouse.pos.x,CanvaManager.mouse.pos.y);
     }
+    onKey(key:string)
+    {
+        for(const comp of this.components)
+        comp.onKey(key);
+    }
     get(id:string):GuiComponent|null
     {
         for(const comp of this.components)

@@ -457,10 +457,9 @@ export class Player
                 }
                 if((Date.now()/1000)-Block.info[this.targetedBlock.id].breakTime>=this.startTime || this.gs.fastBreaking)
                 { const middle = Vector.add(blockPos.round(),new Vector(randRange(-0.2,0.2),randRange(-0.2,0.2),randRange(-0.2,0.2)));
-                    this.gs.entities.push(new Item(middle,World.getBlock(blockPos,this.gs).id,this.gs));
-                    this.gs.socket.emit("placeBlock",{id:0,pos:{x:blockPos.x,y:blockPos.y,z:blockPos.z}});
+                    //this.gs.entities.push(new Item(middle,World.getBlock(blockPos,this.gs).id,this.gs));
+                    this.gs.socket.emit("placeBlock",{id:0,pos:{x:blockPos.x,y:blockPos.y,z:blockPos.z},slot:this.selectedItem});
                     World.breakBlock(blockPos,this.gs);
-     
                     this.targetedBlock=null;    
                 }
         
@@ -489,9 +488,9 @@ export class Player
             }
             if(  World.getBlock(lastPos,this.gs).id<1 && i<5 &&  !lastPos.round().equals(new Vector(this.pos.x,this.pos.y-0.5,this.pos.z).round()) &&  !lastPos.round().equals(this.pos.round()) && this.itemsBar[this.selectedItem].id!=0 )
             {
-                this.gs.socket.emit("placeBlock",{id:this.itemsBar[this.selectedItem].id,pos:{x:lastPos.x,y:lastPos.y,z:lastPos.z}});  
+                this.gs.socket.emit("placeBlock",{id:this.itemsBar[this.selectedItem].id,pos:{x:lastPos.x,y:lastPos.y,z:lastPos.z},slot:this.selectedItem});  
                 World.placeBlock(lastPos,this.itemsBar[this.selectedItem].id,this.gs);
-                this.updateItem(this.itemsBar[this.selectedItem].id,this.selectedItem,this.itemsBar[this.selectedItem].count-1);
+                //this.updateItem(this.itemsBar[this.selectedItem].id,this.selectedItem,this.itemsBar[this.selectedItem].count-1);
                 CanvaManager.mouse.right=false;
               
             }

@@ -11,6 +11,7 @@ export class Main
 {
     public static scene:Scene;
     public static FPS=61;
+    public static shared:any={};
     public static fastTPS=60;
     public static Measure = {
         tps:0,
@@ -50,6 +51,7 @@ export class Main
     }
     public static changeScene(scene:Scene)
     {
+        delete this.scene;
         this.scene =scene;
         this.scene.start();
     }
