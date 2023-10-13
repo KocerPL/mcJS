@@ -111,8 +111,12 @@ io.on('connection', (socket) => {
     socket.on("placeBlock", (data) => {
         if (data.id != 0 && playersInfo[socket.nick].itemsBar[data.slot].id != data.id)
             return;
-        playersInfo[socket.nick].itemsBar[data.slot].count--;
-        socket.emit("updateItem", { id: playersInfo[socket.nick].itemsBar[data.slot].id, count: playersInfo[socket.nick].itemsBar[data.slot].count, slot: data.slot, inventory: false });
+        if (--playersInfo[socket.nick].itemsBar[data.slot].count <= 0) {
+            playersInfo[socket.nick].itemsBar[data.slot].id = 0;
+            playersInfo[socket.nick].itemsBar[data.slot].count = 0;
+        }
+        if (data.id != 0)
+            socket.emit("updateItem", { id: playersInfo[socket.nick].itemsBar[data.slot].id, count: playersInfo[socket.nick].itemsBar[data.slot].count, slot: data.slot, inventory: false });
         savePlayerInfo();
         io.emit("placeBlock", data);
         let inPos = { x: Math.round(Math.round(data.pos.x) % 16), y: Math.round(Math.round(data.pos.y) % 16), z: Math.round(Math.round(data.pos.z) % 16) };
@@ -125,6 +129,8 @@ io.on('connection', (socket) => {
         const subchunkPos = { x: Math.floor(Math.round(data.pos.x) / 16), y: Math.floor(Math.round(data.pos.y) / 16), z: Math.floor(Math.round(data.pos.z) / 16) };
         let chunk = getChunk(subchunkPos.x, subchunkPos.z);
         console.log(subchunkPos.x, subchunkPos.y, subchunkPos.z);
+        if (data.id == 0)
+            socket.emit("spawnEntity", { type: "item", id: chunk.subchunks[subchunkPos.y][toIndex(inPos.x, inPos.y, inPos.z)], pos: data.pos });
         //  let fdata = JSON.parse(fs.readFileSync(__dirname+"/world/"+subchunkPos.x+"."+subchunkPos.y+"."+subchunkPos.z+".sub").toString());
         chunk.subchunks[subchunkPos.y][toIndex(inPos.x, inPos.y, inPos.z)] = data.id;
         saveChunk(chunk);
@@ -166,13 +172,6 @@ function getChunk(x, z) {
         loadedChunks.set(x + "-" + z, chunk);
         return chunk;
     }
-}
-function genSubchunk(n) {
-    let k = new Array(4096);
-    for (let i = 0; i < 4096; i++) {
-        k[i] = n;
-    }
-    return k;
 }
 function toIndex(x, y, z) {
     return x + (y * 16) + (z * 256);

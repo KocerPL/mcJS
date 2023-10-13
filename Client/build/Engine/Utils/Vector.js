@@ -31,6 +31,9 @@ export class Vector {
         mask ??= { x: 1, y: 1, z: 1 };
         return new Vector(mask.x ? this.x % mod : this.x, mask.y ? this.y % mod : this.y, mask.z ? this.z % mod : this.z);
     }
+    static fromData(data) {
+        return new Vector(data.x, data.y, data.z, data.w ?? 0);
+    }
     static distance(vecA, vecB) {
         return Math.sqrt(((vecA.x + vecB.x) ^ 2) + ((vecA.y + vecB.y) ^ 2) + ((vecA.z + vecB.z) ^ 2));
     }

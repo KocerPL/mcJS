@@ -21,6 +21,7 @@ import { ItemHolder } from "../gui/ItemHolder.js";
 import { DarkScreen } from "../gui/DarkScreen.js";
 import { Button } from "../gui/Button.js";
 import { MenuScene } from "./MenuScene.js";
+import { Item } from "../entities/Item.js";
 const gl = CanvaManager.gl;
 export class GameScene extends Scene {
     onKey(key) { }
@@ -208,6 +209,11 @@ export class GameScene extends Scene {
         });
         this.socket.io.on("reconnect", () => {
             location.reload();
+        });
+        this.socket.on("spawnEntity", (data) => {
+            console.log(data);
+            if (data.type == "item")
+                this.entities.push(new Item(Vector.fromData(data.pos), data.id, this));
         });
         this.socket.on("placeBlock", (data) => {
             if (data.id != 0)

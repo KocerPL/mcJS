@@ -6,7 +6,7 @@ export class Vector
     public y;
     public z;
     public w;
-    constructor(x:Number,y:Number,z:Number,w?:Number)
+    constructor(x:number,y:number,z:number,w?:number)
     {
         this.x=x;
         this.y=y;
@@ -39,8 +39,12 @@ export class Vector
     }
     modulo(mod:number,mask?:{x:bool,y:bool,z:bool})
     {
-        mask??={x:1,y:1,z:1}
+        mask??={x:1,y:1,z:1};
         return new Vector(mask.x?this.x%mod:this.x,mask.y?this.y%mod:this.y,mask.z?this.z%mod:this.z);
+    }
+    static fromData(data:{x:number,y:number,z:number,w?:number}):Vector
+    {
+        return new Vector(data.x,data.y,data.z,data.w??0);
     }
     static distance(vecA:Vector,vecB:Vector):number
     {

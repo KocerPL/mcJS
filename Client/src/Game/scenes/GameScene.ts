@@ -23,6 +23,7 @@ import { ItemHolder } from "../gui/ItemHolder.js";
 import { DarkScreen } from "../gui/DarkScreen.js";
 import { Button } from "../gui/Button.js";
 import { MenuScene } from "./MenuScene.js";
+import { Item } from "../entities/Item.js";
 declare let io;
 const gl = CanvaManager.gl;
 export class GameScene extends Scene
@@ -126,8 +127,7 @@ export class GameScene extends Scene
         butt.onclick = ()=>{
             this.socket.disconnect();
             delete this.socket;
-            Main.changeScene(new MenuScene());
-           
+            Main.changeScene(new MenuScene());          
         };
         //  butt.changeText("Exit game");
         const mi = this.gui.add(new ItemHolder("mouse_item_holder",0.02)); 
@@ -226,6 +226,7 @@ export class GameScene extends Scene
                 ent.setNextTransitions(new Vector(pos.x,pos.y,pos.z),new Vector(rot.x,rot.y,rot.z),3);
             }
         });
+        
         this.socket.on("login",(posStr:string,id)=>{
             this.player.id = id;
             const pos =JSON.parse(posStr);
@@ -234,6 +235,11 @@ export class GameScene extends Scene
         });
         this.socket.io.on("reconnect",()=>{
             location.reload();
+        });
+        this.socket.on("spawnEntity",(data)=>{
+            console.log(data);
+            if(data.type == "item")
+                this.entities.push(new Item(Vector.fromData(data.pos),data.id,this));
         });
         this.socket.on("placeBlock",(data)=>{
             if(data.id!=0)
