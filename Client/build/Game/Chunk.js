@@ -5,7 +5,6 @@ import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
 import { Main } from "../Main.js";
 import { Block } from "./Block.js";
-import { SubChunk } from "./SubChunk.js";
 import { Matrix4 } from "../Engine/Utils/Matrix4.js";
 import { Mesh } from "./Mesh.js";
 import { randRange } from "../Engine/Utils/Math.js";
@@ -64,23 +63,6 @@ export class Chunk {
             }
         }
         this.pos = new Vector(x, 0, z);
-    }
-    preGenOne() {
-        if (this.generatingIndex >= 16)
-            return;
-        this.subchunks[this.generatingIndex] = new SubChunk(new Vector(this.pos.x, this.generatingIndex, this.pos.z), this);
-        this.subchunks[this.generatingIndex].preGenerate();
-        this.generatingIndex++;
-        if (this.generatingIndex >= 16) {
-            this.generated = true;
-        }
-    }
-    preGenSubchunks() {
-        for (let i = 0; i < 16; i++) {
-            this.subchunks[i] = new SubChunk(new Vector(this.pos.x, i, this.pos.z), this);
-            this.subchunks[i].preGenerate();
-        }
-        this.generated = true;
     }
     postGenerate() {
         const x = randRange(0, 15) + (this.pos.x * 16);

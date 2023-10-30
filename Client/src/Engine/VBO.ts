@@ -1,23 +1,20 @@
 import { CanvaManager } from "./CanvaManager.js";
-
+const gl= CanvaManager.gl;
 export class VBO
 {
     private ID:WebGLBuffer;
     public constructor()
     {
-        let gl = CanvaManager.gl;
         this.ID =gl.createBuffer();
         this.bind();
     }
     public bufferData(data):void
     {
-        let gl = CanvaManager.gl;
         this.bind();
         gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(data),gl.STATIC_DRAW);
     }
     public bind():void
     {
-        let gl= CanvaManager.gl;
         gl.bindBuffer(gl.ARRAY_BUFFER, this.ID);
     }
     public get getID():WebGLBuffer
@@ -25,10 +22,11 @@ export class VBO
         return this.ID;
     }
     public static unbind():void
+    {  
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+    }
+    static delete(vbo:VBO)
     {
-        let gl= CanvaManager.gl;
-       gl.bindBuffer(gl.ARRAY_BUFFER,null)
-
-
+        gl.deleteBuffer(vbo.ID);
     }
 }

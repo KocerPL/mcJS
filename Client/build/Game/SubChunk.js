@@ -1,7 +1,6 @@
 import { Array3D } from "../Engine/Utils/Array3D.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { Block, blockType, Side } from "./Block.js";
-import { World } from "./World.js";
 import { Mesh } from "./Mesh.js";
 import { Texture } from "../Engine/Texture.js";
 class SubChunk {
@@ -20,76 +19,6 @@ class SubChunk {
         this.pos = pos;
         this.chunk = chunk;
         //   this.emptyLightMap();
-    }
-    lightPass() {
-        for (let i = 0; i < 16; i++)
-            for (let j = 0; j < 16; j++)
-                for (let k = 0; k < 16; k++) {
-                    //  if(this.lightMap[i][j][k]) continue;
-                    let test = this.getBlockWV(i - 1, j, k);
-                    if (test && test.lightFBlock + 2 > this.blocks[i][j][k].lightFBlock) {
-                        this.blocks[i][j][k].lightFBlock = test.lightFBlock - 1;
-                    }
-                    test = this.getBlockWV(i + 1, j, k);
-                    if (test && test.lightFBlock + 2 > this.blocks[i][j][k].lightFBlock) {
-                        this.blocks[i][j][k].lightFBlock = test.lightFBlock - 1;
-                    }
-                    test = this.getBlockWV(i, j - 1, k);
-                    if (test && test.lightFBlock + 2 > this.blocks[i][j][k].lightFBlock) {
-                        this.blocks[i][j][k].lightFBlock = test.lightFBlock - 1;
-                    }
-                    test = this.getBlockWV(i, j + 1, k);
-                    if (test && test.lightFBlock + 2 > this.blocks[i][j][k].lightFBlock) {
-                        this.blocks[i][j][k].lightFBlock = test.lightFBlock - 1;
-                    }
-                    test = this.getBlockWV(i, j, k - 1);
-                    if (test && test.lightFBlock + 2 > this.blocks[i][j][k].lightFBlock) {
-                        this.blocks[i][j][k].lightFBlock = test.lightFBlock - 1;
-                    }
-                    test = this.getBlockWV(i, j, k + 1);
-                    if (test && test.lightFBlock + 2 > this.blocks[i][j][k].lightFBlock) {
-                        this.blocks[i][j][k].lightFBlock = test.lightFBlock - 1;
-                    }
-                }
-    }
-    preGenerate() {
-        //setting position according to subchunk pos in world
-        const yPos = this.pos.y * 16;
-        //Iterating for each block
-        for (let x = 0; x < 16; x++)
-            for (let y = 0; y < 16; y++)
-                for (let z = 0; z < 16; z++) {
-                    const ah = this.chunk.heightmap[x][z];
-                    if (ah == (y + yPos) && ah > 170) {
-                        if (ah > 180 || Math.round(Math.random() * 10) > 180 - ah)
-                            this.blocks[x][y][z] = new Block(11);
-                        else {
-                            this.blocks[x][y][z] = new Block(0);
-                            this.blocks[x][y][z].skyLight = 15;
-                        }
-                    }
-                    else if (ah - 3 >= (y + yPos) || (ah >= (y + yPos) && ah > 150)) // if position lower than 3 blocks on heightmap
-                     {
-                        if (Math.round(Math.random() * 10) == 1) //Randomizing greenstone ores
-                            this.blocks[x][y][z] = new Block(4);
-                        else
-                            this.blocks[x][y][z] = new Block(3); //Setting stone
-                    }
-                    else if (ah - 1 >= (y + yPos))
-                        this.blocks[x][y][z] = new Block(1); //Setting Grass block
-                    else if (ah >= (y + yPos)) {
-                        this.blocks[x][y][z] = new Block(2);
-                    }
-                    else if (World.waterLevel > y + yPos)
-                        this.blocks[x][y][z] = new Block(-1);
-                    else if (!(this.blocks[x][y][z] instanceof Block)) {
-                        this.blocks[x][y][z] = new Block(0);
-                        if (ah + 1 <= (y + yPos)) {
-                            this.blocks[x][y][z].skyLight = 15;
-                        }
-                    }
-                }
-        this.generated = true;
     }
     //Subchunk update
     scanLight() {
@@ -303,17 +232,8 @@ class SubChunk {
             return undefined;
         }
     }
-    vertexAO(side1, side2, corner) {
-        if (side1 && side2) {
-            return 0.4;
-        }
-        return (5 - ((side1 ? 1 : 0) + (corner ? 1 : 0) + (side2 ? 1 : 0))) / 5;
-    }
     vertexLAO(side1, side2, corner, bl) {
-        return (side1 + side2 + corner + bl) / 4;
-        if (!side1 && !side2) {
-        }
-        return (5 - ((side1 ? 0 : (side1 / 15)) + (corner ? 0 : (corner / 15)) + (side2 ? 0 : (side2 / 15)))) / 5;
+        return (side1 + side2 + corner + (bl * 3)) / 6;
     }
     //DONE: update vertices only tree sides
     updateSide(x, y, z, dx, dy, dz, vStart, side, block, index, vBuffer) {
@@ -400,8 +320,7 @@ class SubChunk {
                     this.tmpMesh.lightLevels.push(so1, so4, so3, so2);
                     this.tmpMesh.fb.push(fo1, fo4, fo3, fo2);
                 }
-                else if (dz == 1) //fine
-                 {
+                else if (dz == 1) {
                     const fo1 = this.vertexLAO(this.lightFBlock(x, y - 1, z + 1), this.lightFBlock(x - 1, y, z + 1), this.lightFBlock(x - 1, y - 1, z + 1), testedBlock.lightFBlock);
                     const fo2 = this.vertexLAO(this.lightFBlock(x, y - 1, z + 1), this.lightFBlock(x + 1, y, z + 1), this.lightFBlock(x + 1, y - 1, z + 1), testedBlock.lightFBlock);
                     const fo3 = this.vertexLAO(this.lightFBlock(x, y + 1, z + 1), this.lightFBlock(x + 1, y, z + 1), this.lightFBlock(x + 1, y + 1, z + 1), testedBlock.lightFBlock);

@@ -5,11 +5,15 @@ import fs = require('fs');
 import { Chunk } from "./World/Chunk";
 import { Generator } from "./World/Generator";
 import { randRange } from "./Utils";
+import { NetworkHandler } from "./NetworkHandler";
+import { Entity } from "./Entities/Entity";
+import { Item } from "./Entities/Item";
 let lastID=0;
 const app = express();
 const gen = new Generator();
 const server =http.createServer(app);
 const io = new Server(server);
+const netHandler = new NetworkHandler(io);
 class PlayerInfo
 {
     
@@ -114,7 +118,12 @@ io.on('connection', (socket:any) => {
     socket.on('getSubchunk',(x,y,z)=>{
        // console.log("Subchunk");
        const chunk = getChunk(x,z);
-    
+       for( let ent of chunk.entities)
+       if((ent.pos.y/16)>y && (ent.pos.y/16)<y+1)
+       {
+       socket.emit("spawnEntity",{type:ent.type,id:ent instanceof Item?ent.id:2 ,pos:ent.pos});
+        console.log("ent");
+    }
         let data =chunk.subchunks[y];
         socket.emit('subchunk', {data:{subX:x,subY:y,subZ:z,blocks:data}})    
     });
@@ -146,7 +155,10 @@ io.on('connection', (socket:any) => {
        let chunk = getChunk(subchunkPos.x,subchunkPos.z);
        console.log(subchunkPos.x,subchunkPos.y,subchunkPos.z);
        if(data.id==0)
+       {
        socket.emit("spawnEntity",{type:"item",id: chunk.subchunks[subchunkPos.y][toIndex(inPos.x,inPos.y,inPos.z)],pos:data.pos});
+        chunk.entities.push(new Item(data.pos, chunk.subchunks[subchunkPos.y][toIndex(inPos.x,inPos.y,inPos.z)]));
+    }
      //  let fdata = JSON.parse(fs.readFileSync(__dirname+"/world/"+subchunkPos.x+"."+subchunkPos.y+"."+subchunkPos.z+".sub").toString());
        chunk.subchunks[subchunkPos.y][toIndex(inPos.x,inPos.y,inPos.z)] = data.id;
         saveChunk(chunk);
@@ -171,7 +183,7 @@ server.listen(3000,()=>{
 
 function saveChunk(chunk:Chunk)
 {
-    fs.writeFileSync(__dirname+"/world/"+chunk.pos[0]+"."+chunk.pos[1]+".kChunk",JSON.stringify(chunk.subchunks));
+    fs.writeFileSync(__dirname+"/world/"+chunk.pos[0]+"."+chunk.pos[1]+".kChunk",JSON.stringify(chunk));
 }
 function savePlayerInfo()
 { 
@@ -186,8 +198,8 @@ function getChunk(x,z)
     if(fs.existsSync(__dirname+"/world/"+x+"."+z+".kChunk"))
     {
     let   chunk = new Chunk();
-    chunk.subchunks= JSON.parse(fs.readFileSync(__dirname+"/world/"+x+"."+z+".kChunk").toString());
-    chunk.pos=[x,z];
+    chunk= JSON.parse(fs.readFileSync(__dirname+"/world/"+x+"."+z+".kChunk").toString());
+    //chunk.pos=[x,z];
     loadedChunks.set(x+"-"+z,chunk);
     return chunk;
     }
@@ -201,4 +213,11 @@ function getChunk(x,z)
 export function toIndex(x,y,z)
 {
     return x+(y*16)+(z*256);
+}
+setInterval(()=>{
+update();
+},1000);
+function update()
+{
+
 }
