@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Generator = void 0;
-const Main_1 = require("../Main");
+const World_1 = require("./World");
 const Utils_1 = require("../Utils");
 const Chunk_1 = require("./Chunk");
 class Generator {
@@ -21,15 +21,15 @@ class Generator {
                     //  console.log(height);
                     for (let y = 0; y < 16; y++) {
                         if (y + (i * 16) <= height && y + (i * 16) > 175 + randomAdditive)
-                            sub[(0, Main_1.toIndex)(x, y, z)] = 3;
+                            sub[World_1.World.toSubIndex(x, y, z)] = 3;
                         else if (y + (i * 16) == height)
-                            sub[(0, Main_1.toIndex)(x, y, z)] = 2;
+                            sub[World_1.World.toSubIndex(x, y, z)] = 2;
                         else if (y + (i * 16) < height && y + (i * 16) > height - 4)
-                            sub[(0, Main_1.toIndex)(x, y, z)] = 1;
+                            sub[World_1.World.toSubIndex(x, y, z)] = 1;
                         else if (y + (i * 16) < height)
-                            sub[(0, Main_1.toIndex)(x, y, z)] = 3;
+                            sub[World_1.World.toSubIndex(x, y, z)] = 3;
                         else
-                            sub[(0, Main_1.toIndex)(x, y, z)] = 0;
+                            sub[World_1.World.toSubIndex(x, y, z)] = 0;
                     }
                 }
             chunk.subchunks[i] = sub;

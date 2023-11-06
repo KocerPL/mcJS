@@ -190,6 +190,12 @@ export class GameScene extends Scene {
             else
                 this.player.updateItem(obj.id, obj.slot, obj.count);
         });
+        this.socket.on("updateEntity", (obj) => {
+            for (const ent of this.entities)
+                if (ent.UUID == obj.uuid) {
+                    ent.pos = new Vector(obj.pos.x, obj.pos.y, obj.pos.z);
+                }
+        });
         this.socket.on("spawnPlayer", (pos, id) => {
             // console.log("summoningPLAYER");
             this.entities.push(new PlayerEntity(new Vector(pos.x, pos.y, pos.z), this, id));
@@ -213,7 +219,7 @@ export class GameScene extends Scene {
         this.socket.on("spawnEntity", (data) => {
             console.log(data);
             if (data.type == "item")
-                this.entities.push(new Item(Vector.fromData(data.pos), data.id, this));
+                this.entities.push(new Item(Vector.fromData(data.pos), data.id, this, data.uuid));
         });
         this.socket.on("placeBlock", (data) => {
             if (data.id != 0)
@@ -223,7 +229,7 @@ export class GameScene extends Scene {
         });
         this.socket.on("killEntity", (id) => {
             for (let i = 0; i < this.entities.length; i++) {
-                if (this.entities[i].ID == id) {
+                if (this.entities[i].UUID == id) {
                     this.entities.splice(i, 1);
                     break;
                 }
@@ -350,7 +356,7 @@ export class GameScene extends Scene {
     }
     getEntity(id) {
         for (const entity of this.entities) {
-            if (entity.ID == id)
+            if (entity.UUID == id)
                 return entity;
         }
     }

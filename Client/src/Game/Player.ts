@@ -165,11 +165,7 @@ export class Player
     }
     dropItem(id:number,count:number)
     {
-        const it = new Item(this.camera.getPosition().copy(),id,this.gs);
-        it.count = count;
-        it.acc.x=Math.sin((-this.entity.rotation.y)*Math.PI/180)*0.3;
-        it.acc.z= Math.cos((-this.entity.rotation.y)*Math.PI/180)*0.3;
-        this.gs.entities.push(it);
+       
     }
     switchPerson(person:pers)
     {

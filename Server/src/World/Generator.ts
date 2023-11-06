@@ -1,4 +1,4 @@
-import { toIndex } from "../Main";
+import { World } from "./World";
 import { randRange } from "../Utils";
 import { Chunk } from "./Chunk";
 
@@ -24,15 +24,15 @@ export class Generator
                 for(let y=0;y<16;y++)
                 {
                 if(y+(i*16)<=height && y+(i*16)>175+randomAdditive)
-                sub[toIndex(x,y,z)]=3;
+                sub[World.toSubIndex(x,y,z)]=3;
                 else if(y+(i*16)==height)
-                sub[toIndex(x,y,z)]=2;
+                sub[World.toSubIndex(x,y,z)]=2;
                 else if(y+(i*16)<height &&y+(i*16)>height-4)
-                sub[toIndex(x,y,z)]=1;
+                sub[World.toSubIndex(x,y,z)]=1;
                else if(y+(i*16)<height)
-               sub[toIndex(x,y,z)]=3;
+               sub[World.toSubIndex(x,y,z)]=3;
                 else
-                sub[toIndex(x,y,z)]=0;
+                sub[World.toSubIndex(x,y,z)]=0;
 
                 
                 }

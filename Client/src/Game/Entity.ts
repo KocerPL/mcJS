@@ -8,16 +8,16 @@ export abstract class Entity
     protected transformation:Matrix4 = Matrix4.identity();
     public pos:Vector;
     protected rs:RenderSet;
-    private id;
-    constructor(pos:Vector,shad:AtlasShader,id?)
+    private uuid;
+    constructor(pos:Vector,shad:AtlasShader,uuid:number)
     {
         this.rs = new RenderSet(shad);
-        this.id = id;
+        this.uuid = uuid;
         this.pos = pos.copy();
     }
-    public get ID()
+    public get UUID()
     {
-        return this.id;
+        return this.uuid;
     }
   abstract  update(i:number):void 
   abstract  render():void 

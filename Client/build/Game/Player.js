@@ -7,7 +7,6 @@ import { Matrix4 } from "../Engine/Utils/Matrix4.js";
 import { Vector } from "../Engine/Utils/Vector.js";
 import { Main } from "../Main.js";
 import { Block } from "./Block.js";
-import { Item } from "./entities/Item.js";
 import { PlayerEntity } from "./entities/PlayerEntity.js";
 import { ItemBar } from "./gui/ItemBar.js";
 import { ItemHolder } from "./gui/ItemHolder.js";
@@ -147,11 +146,6 @@ class Player {
         this.updatePos();
     }
     dropItem(id, count) {
-        const it = new Item(this.camera.getPosition().copy(), id, this.gs);
-        it.count = count;
-        it.acc.x = Math.sin((-this.entity.rotation.y) * Math.PI / 180) * 0.3;
-        it.acc.z = Math.cos((-this.entity.rotation.y) * Math.PI / 180) * 0.3;
-        this.gs.entities.push(it);
     }
     switchPerson(person) {
         if (person == this.person)

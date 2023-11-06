@@ -16,8 +16,8 @@ export class Item extends Entity {
     count = 1;
     gs;
     acc = new Vector(0, 0, 0);
-    constructor(pos, type, gs) {
-        super(pos, Main.atlasShader);
+    constructor(pos, type, gs, uuid) {
+        super(pos, Main.atlasShader, uuid);
         this.gs = gs;
         this.type = type;
         this.prepareModel();
@@ -27,11 +27,6 @@ export class Item extends Entity {
             this.cooldown--;
         this.lifeTime--;
         if (this.cooldown < 1) {
-            if (this.gs.player.isTouching(this.pos, 0.5)) {
-                this.gs.player.pickupItem(this);
-                this.gs.entities.splice(i, 1);
-                return;
-            }
             for (const ent of this.gs.entities)
                 if (ent instanceof Item && ent.type == this.type && ent != this && this.isTouching(ent.pos, 1)) {
                     ent.count += this.count;
@@ -101,17 +96,6 @@ export class Item extends Entity {
     }
     render() {
         // console.log("rendered")
-        try {
-            if (World.getBlock(new Vector(this.pos.x, this.pos.y, this.pos.z), this.gs).id > 0)
-                this.acc.y += 0.01;
-            else if (World.getBlock(new Vector(this.pos.x, this.pos.y - 0.5, this.pos.z), this.gs).id == 0)
-                this.acc.y -= 0.01;
-            else
-                this.acc.y = 0;
-        }
-        catch (erro) {
-            this.lifeTime = 0;
-        }
         if (this.acc.x > 0.02)
             this.acc.x -= 0.01;
         else if (this.acc.x < -0.02)

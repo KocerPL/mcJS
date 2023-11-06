@@ -4,13 +4,13 @@ export class Entity {
     transformation = Matrix4.identity();
     pos;
     rs;
-    id;
-    constructor(pos, shad, id) {
+    uuid;
+    constructor(pos, shad, uuid) {
         this.rs = new RenderSet(shad);
-        this.id = id;
+        this.uuid = uuid;
         this.pos = pos.copy();
     }
-    get ID() {
-        return this.id;
+    get UUID() {
+        return this.uuid;
     }
 }

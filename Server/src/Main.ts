@@ -8,12 +8,20 @@ import { randRange } from "./Utils";
 import { NetworkHandler } from "./NetworkHandler";
 import { Entity } from "./Entities/Entity";
 import { Item } from "./Entities/Item";
+import { World } from "./World/World";
 let lastID=0;
+let counter =0;
+const world = new World(__dirname);
 const app = express();
 const gen = new Generator();
 const server =http.createServer(app);
 const io = new Server(server);
 const netHandler = new NetworkHandler(io);
+export type UUID = number;
+export function getUUID():UUID
+{
+    return Number.parseInt(Date.now().toString() +(counter++).toString());
+}
 class PlayerInfo
 {
     
@@ -28,6 +36,7 @@ class PlayerInfo
     }
 }
 const loadedChunks:Map<string,Chunk> = new Map();
+const entities:Array<Entity> = []
 let playersInfo = JSON.parse(fs.readFileSync(__dirname+"/players.json").toString());
 let pos=__dirname.length-1;
 for(let i=0;i<2;pos--)
@@ -117,11 +126,12 @@ io.on('connection', (socket:any) => {
     });
     socket.on('getSubchunk',(x,y,z)=>{
        // console.log("Subchunk");
-       const chunk = getChunk(x,z);
+       const chunk = world.getChunk(x,z);
        for( let ent of chunk.entities)
        if((ent.pos.y/16)>y && (ent.pos.y/16)<y+1)
        {
-       socket.emit("spawnEntity",{type:ent.type,id:ent instanceof Item?ent.id:2 ,pos:ent.pos});
+       socket.emit("spawnEntity",{type:ent.type,id:ent instanceof Item?ent.id:2 ,pos:ent.pos,uuid:ent.uuid});
+       entities.push(ent);
         console.log("ent");
     }
         let data =chunk.subchunks[y];
@@ -152,16 +162,16 @@ io.on('connection', (socket:any) => {
        if(inPos.y<0)
        inPos.y = 16-Math.abs(inPos.y);
        const subchunkPos = {x:Math.floor(Math.round(data.pos.x)/16),y:Math.floor(Math.round(data.pos.y)/16),z:Math.floor(Math.round(data.pos.z)/16)};
-       let chunk = getChunk(subchunkPos.x,subchunkPos.z);
+       let chunk = world.getChunk(subchunkPos.x,subchunkPos.z);
        console.log(subchunkPos.x,subchunkPos.y,subchunkPos.z);
        if(data.id==0)
        {
-       socket.emit("spawnEntity",{type:"item",id: chunk.subchunks[subchunkPos.y][toIndex(inPos.x,inPos.y,inPos.z)],pos:data.pos});
-        chunk.entities.push(new Item(data.pos, chunk.subchunks[subchunkPos.y][toIndex(inPos.x,inPos.y,inPos.z)]));
+       socket.emit("spawnEntity",{type:"item",id: chunk.subchunks[subchunkPos.y][World.toSubIndex(inPos.x,inPos.y,inPos.z)],pos:data.pos});
+        chunk.entities.push(new Item(data.pos, chunk.subchunks[subchunkPos.y][World.toSubIndex(inPos.x,inPos.y,inPos.z)]));
     }
      //  let fdata = JSON.parse(fs.readFileSync(__dirname+"/world/"+subchunkPos.x+"."+subchunkPos.y+"."+subchunkPos.z+".sub").toString());
-       chunk.subchunks[subchunkPos.y][toIndex(inPos.x,inPos.y,inPos.z)] = data.id;
-        saveChunk(chunk);
+       chunk.subchunks[subchunkPos.y][World.toSubIndex(inPos.x,inPos.y,inPos.z)] = data.id;
+        world.saveChunk(chunk);
     });
     socket.on("disconnect", (reason) => {
         socket.broadcast.emit("killEntity",socket.KOCEid);
@@ -181,43 +191,21 @@ server.listen(3000,()=>{
     console.log("listening on 3000");
 });
 
-function saveChunk(chunk:Chunk)
-{
-    fs.writeFileSync(__dirname+"/world/"+chunk.pos[0]+"."+chunk.pos[1]+".kChunk",JSON.stringify(chunk));
-}
+
 function savePlayerInfo()
 { 
     fs.writeFileSync(__dirname+"/players.json",JSON.stringify(playersInfo));
 
-}
-function getChunk(x,z)
-{
-  
-    if(loadedChunks.has(x+"-"+z))
-      return loadedChunks.get(x+"-"+z)
-    if(fs.existsSync(__dirname+"/world/"+x+"."+z+".kChunk"))
-    {
-    let   chunk = new Chunk();
-    chunk= JSON.parse(fs.readFileSync(__dirname+"/world/"+x+"."+z+".kChunk").toString());
-    //chunk.pos=[x,z];
-    loadedChunks.set(x+"-"+z,chunk);
-    return chunk;
-    }
-    def:
-    {
-    let chunk = gen.generate(x,z);
-    loadedChunks.set(x+"-"+z,chunk);
-    return chunk;
-    }
-}
-export function toIndex(x,y,z)
-{
-    return x+(y*16)+(z*256);
 }
 setInterval(()=>{
 update();
 },1000);
 function update()
 {
+    for(const ent of entities)
+    {
+        ent.pos.y+=0.1;
+        io.emit("updateEntity",{uuid:ent.uuid,pos:ent.pos});
 
+    }
 }
