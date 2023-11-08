@@ -33,12 +33,14 @@ export class Item extends Entity {
                     this.gs.entities.splice(i, 1);
                 }
         }
-        if (this.lifeTime < 1)
+        if (this.lifeTime < 1) {
             this.gs.entities.splice(i, 1);
+            return;
+        }
         const block = World.getBlock(new Vector(this.pos.x, this.pos.y, this.pos.z), this.gs);
-        let ll = block.skyLight;
+        let ll = block ? block.skyLight : 0;
         this.rs.skyLight = [ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll];
-        ll = block.lightFBlock;
+        ll = block ? block.lightFBlock : 0;
         this.rs.blockLight = [ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll];
         this.rs.bufferArrays();
     }

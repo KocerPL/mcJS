@@ -3,11 +3,21 @@ export class Vector3
     x:number;
     y:number;
     z:number;
-    constructor(x?:number,y?:number,z?:number)
+    constructor(x?:number|{x:number,y:number,z:number},y?:number,z?:number)
     {
+        if( x instanceof Object)
+        {
+            this.x = x.x;
+            this.y = x.y;
+            this.z=x.z
+            
+        }
+        else
+        {
         this.x = x;
         this.y =y;
         this.z = z;
+        }
     }
     add(vec:Vector3):Vector3
     {

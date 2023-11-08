@@ -1,5 +1,5 @@
 import { Socket } from "socket.io";
-import { UUID, paths, Main } from "../Main";
+import { UUID, paths, Main, defaultSpawnPoint, getUUID } from "../Main";
 import { randRange } from "../Utils";
 import { Vector3 } from "../Utils/Vector3";
 import * as fs from "fs";
@@ -10,13 +10,24 @@ export class PlayerInfo
 {
     inventory:Array<{id:number,count:number}>=new Array(27);
     itemsBar:Array<{id:number,count:number}>=new Array(9);
-    constructor()
+    pos:Vector3 =  defaultSpawnPoint.copy();
+   
+   
+    constructor(data?:{pos:{x:number,y:number,z:number},inventory:Array<{id:number,count:number}>,itemsBar:Array<{id:number,count:number}>})
     {
+        if(data)
+        {
+            this.pos=new Vector3(data.pos);
+            this.inventory = data.inventory;
+            this.itemsBar = data.itemsBar;
+            return;
+        }
         for(let i=0;i<this.inventory.length;i++)
         this.inventory[i] ={ id:Math.floor(randRange(0,11)),count:64};
         for(let i=0;i<this.itemsBar.length;i++)
         this.itemsBar[i] ={ id:0,count:0};
     }
+    
 }
 export class Player
 {
@@ -25,8 +36,8 @@ export class Player
     socket:Socket;
     pos:Vector3 = new Vector3(0,0,0);
     rot=new Vector(0,0,0);
-    inventory = new Array();
-    itemsBar = new Array();
+    inventory:Array<{id:number,count:number}> = new Array();
+    itemsBar:Array<{id:number,count:number}> = new Array();
     constructor(name:string,socket:Socket,uuid:UUID)
     {
         this.name = name;
@@ -35,6 +46,7 @@ export class Player
         let plInfo = Main.playerManager.getPlayerInfo(this);
         this.inventory = plInfo.inventory;
         this.itemsBar = plInfo.itemsBar;
+        this.pos = new Vector3(plInfo.pos);
         socket.on('moveItem',(data:{slot1:number,isInv1:boolean, slot2:number,isInv2:boolean})=>{
             this.moveItem(data);
           });
@@ -96,21 +108,21 @@ export class Player
     }
     playerMove(pos,rot)
     {
-        this.pos =pos;
-        this.rot=rot;
+        this.pos =new Vector3(pos);
+        this.rot= rot;
         this.socket.broadcast.emit("moveEntity",this.uuid,pos,rot);
     }
     getSubchunk(x,y,z)
     {
         
         const chunk = Main.world.getChunk(x,z);
-        for( let ent of chunk.entities)
-        if((ent.pos.y/16)>y && (ent.pos.y/16)<y+1)
+        let entities = Main.entityManager.getByAABB(x*16,y*16,z*16,(x+1)*16,(y+1)*16,(z+1)*16)
+        for( const ent of entities)
         {
         this.socket.emit("spawnEntity",{type:ent.type,id:ent instanceof Item?ent.id:2 ,pos:ent.pos,uuid:ent.uuid});
         Main.entityManager.add(ent);
          console.log("ent");
-     }
+        }
          let data =chunk.subchunks[y];
          this.socket.emit('subchunk', {data:{subX:x,subY:y,subZ:z,blocks:data}})  
     }
@@ -139,8 +151,9 @@ export class Player
        console.log(subchunkPos.x,subchunkPos.y,subchunkPos.z);
        if(data.id==0)
        {
-       this.socket.emit("spawnEntity",{type:"item",id: chunk.subchunks[subchunkPos.y][World.toSubIndex(inPos.x,inPos.y,inPos.z)],pos:data.pos});
-        chunk.entities.push(new Item(data.pos, chunk.subchunks[subchunkPos.y][World.toSubIndex(inPos.x,inPos.y,inPos.z)]));
+        let uuid = getUUID()
+       this.socket.emit("spawnEntity",{type:"item",id: chunk.subchunks[subchunkPos.y][World.toSubIndex(inPos.x,inPos.y,inPos.z)],pos:data.pos,uuid:uuid});
+       Main.entityManager.add(new Item(new Vector3(data.pos), chunk.subchunks[subchunkPos.y][World.toSubIndex(inPos.x,inPos.y,inPos.z)],uuid));
     }
      //  let fdata = JSON.parse(fs.readFileSync(__dirname+"/world/"+subchunkPos.x+"."+subchunkPos.y+"."+subchunkPos.z+".sub").toString());
        chunk.subchunks[subchunkPos.y][World.toSubIndex(inPos.x,inPos.y,inPos.z)] = data.id;
@@ -148,6 +161,7 @@ export class Player
     }
     disconnect()
     {
+        console.log(this.name +"  DISCONNECTED");
         this.socket.broadcast.emit("killEntity",this.uuid);
         Main.playerManager.remove(this.socket);
     }
@@ -155,10 +169,9 @@ export class Player
 export class PlayerManager
 {
     players:Map<Socket,Player> = new Map();
-    playersInfo:Array<PlayerInfo>;
     constructor()
     {
-        this.loadPlayerInfo();
+      
     }
     add(player:Player)
     {
@@ -166,28 +179,68 @@ export class PlayerManager
     }
     remove(socket:Socket)
     {
+        this.savePlayerInfo();
         this.players.delete(socket);
+
+    }
+    update()
+    {
+        for(let p of this.players)
+        {
+            let player = p[1];
+           let p1 =  player.pos.add(new Vector3(-2,-2,-2))
+           let p2 =  player.pos.add(new Vector3(2,2,2))
+          let entities = Main.entityManager.getByAABB(p1.x,p1.y,p1.z,p2.x,p2.y,p2.z);
+            for(let ent of entities)
+            {
+                if(ent instanceof Item)
+                {
+                    for(let i=0;i<player.itemsBar.length;i++)
+                    {
+                       const slot = player.itemsBar[i];
+                        if(!slot.id  || slot.id ==0 || (slot.id== ent.id && slot.count<64))
+                        {
+                        
+                           player.socket.emit("updateItem",{id: slot.id,count: ++slot.count,slot:i,inventory:false});
+                           this.savePlayerInfo();
+                           break;
+                        }
+                    }
+                    Main.entityManager.remove(ent);
+
+                }
+            }
+        }
     }
     getBySocket(socket:Socket)
     {
         return this.players.get(socket);
     }
-    getPlayerInfo(player)
+    getPlayerInfo(player):PlayerInfo
     {
-        if(!(player.name in this.playersInfo))
+        let playersInfo = this.loadPlayersInfo();
+        if(!(player.name in playersInfo))
                 {
-                    this.playersInfo[player.name] = new PlayerInfo();
+                    playersInfo[player.name] = new PlayerInfo();
                     this.savePlayerInfo();
                 }
-                return  this.playersInfo[player.name];
+                return  new PlayerInfo(playersInfo[player.name]);
     }
-    loadPlayerInfo()
+    loadPlayersInfo():PlayerInfo[]
     {
-      this.playersInfo=  JSON.parse(fs.readFileSync(paths.res+"/players.json").toString());
+      return JSON.parse(fs.readFileSync(paths.res+"/players.json").toString());
     }
     savePlayerInfo()
 { 
-    fs.writeFileSync(__dirname+"/players.json",JSON.stringify(this.playersInfo));
+    let playersInfo = this.loadPlayersInfo();
+    for(let player of this.players)
+    {
+        if(player[1].name in playersInfo)
+        {
+            playersInfo[player[1].name] = new PlayerInfo(player[1]);
+        }
+    }
+    fs.writeFileSync(paths.res+"/players.json",JSON.stringify(playersInfo));
 
 }
 }

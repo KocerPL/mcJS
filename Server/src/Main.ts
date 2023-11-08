@@ -1,10 +1,6 @@
 
 import fs = require('fs');
-import { Chunk } from "./World/Chunk";
 import { Generator } from "./World/Generator";
-import { randRange } from "./Utils";
-import { Entity } from "./Entities/Entity";
-import { Item } from "./Entities/Item";
 import { World } from "./World/World";
 import { EntityManager } from "./managers/EntityManager";
 import { NetworkListener, NetworkManager } from './managers/NetworkManager';
@@ -13,7 +9,7 @@ import { Player, PlayerManager } from './managers/PlayerManager';
 import { Vector3 } from './Utils/Vector3';
 let lastID=0;
 let counter =0;
-const defaultSpawnPoint = new Vector3(0,100,0);
+export const defaultSpawnPoint = new Vector3(0,100,0);
 function backOne(path:string)
 {
     if(path.at(-1)=="/")
@@ -60,8 +56,8 @@ export class Main
             {
             const player = new Player(loginObject.nick,socket,getUUID());
             this.playerManager.add(player);
-            socket.emit('login',{x:0,y:200,z:0}, player.uuid);
-          // console.log(io.sockets);
+            socket.emit('login',JSON.stringify(player.pos), player.uuid);
+         console.log(player.name + " logged in");
                 
                 let inventory = player.inventory;
                 for(let i=0;i<inventory.length;i++)
@@ -73,7 +69,7 @@ export class Main
                 {
                    socket.emit('updateItem',{id:itemsBar[i].id,count:itemsBar[i].count,slot:i,inventory:false});
                 }
-            player.pos = defaultSpawnPoint.copy();
+            //player.pos = defaultSpawnPoint.copy();
             for(let sock of  this.networkManager.getSockets())
             {
                 if(sock[1]!=socket)
@@ -84,14 +80,17 @@ export class Main
             }
             socket.broadcast.emit('spawnPlayer',player.pos,player.uuid)
             });
-           
+            setInterval(this.update.bind(this),50);
     }
     static run()
     {
-        console.log( paths.res);
-this.networkManager.addListener(new NetworkListener('connection',this.onConnection.bind(this))) ;
+        this.networkManager.addListener(new NetworkListener('connection',this.onConnection.bind(this))) ;
 
 
+    }
+    static update()
+    {
+        this.playerManager.update();
     }
 
 }

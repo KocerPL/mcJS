@@ -9,8 +9,8 @@ export class Item extends Entity
     constructor(pos:Vector3,id:number,uuid?:UUID)
     {
         super();
-        this.pos =pos;
+        this.pos =new Vector3(pos);
         this.id =id;
-        this.uuid = getUUID();
+        this.uuid = uuid ?? getUUID();
     }
 }

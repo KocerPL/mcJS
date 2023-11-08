@@ -41,11 +41,14 @@ export class Item extends Entity
         }
    
         if(this.lifeTime<1 )
+        {
             this.gs.entities.splice(i,1);
+            return;
+        }
         const block =World.getBlock(new Vector(this.pos.x,this.pos.y ,this.pos.z),this.gs);
-        let ll =  block.skyLight;
+        let ll =  block ? block.skyLight: 0;
         this.rs.skyLight = [ll,ll,ll,ll, ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll, ll,ll,ll,ll];
-        ll =  block.lightFBlock;
+        ll =  block ? block.lightFBlock: 0;
         this.rs.blockLight = [ll,ll,ll,ll, ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll, ll,ll,ll,ll];
         this.rs.bufferArrays();
     }
@@ -56,11 +59,11 @@ export class Item extends Entity
             -0.5,0.5,0.5,
             0.5,0.5 ,0.5,
             0.5,0.5,-0.5,
-        //bottom
-        -0.5,-0.5,-0.5,
-        0.5,-0.5,-0.5,
-        0.5,-0.5 ,0.5,
-        -0.5,-0.5,0.5,
+            //bottom
+            -0.5,-0.5,-0.5,
+            0.5,-0.5,-0.5,
+            0.5,-0.5 ,0.5,
+            -0.5,-0.5,0.5,
             //front 
             -0.5,-0.5,0.5,
             0.5,-0.5,0.5,
@@ -68,33 +71,33 @@ export class Item extends Entity
             -0.5,0.5,0.5,
             //back
             -0.5,-0.5,-0.5,
-        -0.5,0.5,-0.5,
-        0.5,0.5,-0.5,
-        0.5,-0.5,-0.5,
-        //left
-        0.5,-0.5,-0.5,
-        0.5,0.5,-0.5,
-        0.5,0.5 ,0.5,
-        0.5,-0.5,0.5,
-        //right
-        -0.5,-0.5,-0.5,
-        -0.5,-0.5,0.5,
-        -0.5,0.5 ,0.5,
-        -0.5,0.5,-0.5,
-            ];
-            if(Block.info[this.type].type==blockType.NOTFULL)
-            {
+            -0.5,0.5,-0.5,
+            0.5,0.5,-0.5,
+            0.5,-0.5,-0.5,
+            //left
+            0.5,-0.5,-0.5,
+            0.5,0.5,-0.5,
+            0.5,0.5 ,0.5,
+            0.5,-0.5,0.5,
+            //right
+            -0.5,-0.5,-0.5,
+            -0.5,-0.5,0.5,
+            -0.5,0.5 ,0.5,
+            -0.5,0.5,-0.5,
+        ];
+        if(Block.info[this.type].type==blockType.NOTFULL)
+        {
             this.rs.vertices =[];
             for(let i=0;i< Block.info[this.type].customMesh.length;i++)
-          this.rs.vertices.push( ...Block.info[this.type].customMesh[i]);
+                this.rs.vertices.push( ...Block.info[this.type].customMesh[i]);
             
         }
-            this.rs.textureCoords =[...SubChunk.getTextureCords(this.type,Side.top),...SubChunk.getTextureCords(this.type,Side.bottom),
+        this.rs.textureCoords =[...SubChunk.getTextureCords(this.type,Side.top),...SubChunk.getTextureCords(this.type,Side.bottom),
             ...SubChunk.getTextureCords(this.type,Side.front),...SubChunk.getTextureCords(this.type,Side.back),
             ...SubChunk.getTextureCords(this.type,Side.left),...SubChunk.getTextureCords(this.type,Side.right)];
         //     console.log(this.rs.textureCoords);
         this.rs.indices = [2,1,0,2,0,3, 6,5,4,6,4,7, 10,9,8,10,8,11, 14,13,12,14,12,15,  18,17,16,18,16,19, 22,21,20,22,20,23];
-           //  ];
+        //  ];
         this.rs.skyLight = [14,14,14,14, 14,14,14,14 ,14,14,14,14 ,14,14,14,14 ,14,14,14,14, 14,14,14,14];
            
     }
@@ -111,7 +114,7 @@ export class Item extends Entity
         // console.log("rendered")
         if(this.acc.x>0.02) this.acc.x-=0.01;else  if(this.acc.x<-0.02) this.acc.x+=0.01;else this.acc.x =0;
         if(this.acc.z>0.02) this.acc.z-=0.01; else if(this.acc.z<-0.02) this.acc.z+=0.01; else this.acc.z=0;
-      this.pos = Vector.add(this.pos,this.acc);
+        this.pos = Vector.add(this.pos,this.acc);
         if(this.rotation<360)
             this.rotation++;
         else
@@ -133,7 +136,7 @@ export class Item extends Entity
         gl.drawElements(gl.TRIANGLES,this.rs.count,gl.UNSIGNED_INT,0);
         if(this.count>1)
         {
-      //      gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
+            //      gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
             this.rs.vao.bind();
             this.transformation=this.transformation.translate(0.3,-0.3,0.3);
             Main.shader.loadUniforms(this.gs.player.camera.getProjection(),this.transformation,this.gs.player.camera.getView(),this.gs.sunLight);

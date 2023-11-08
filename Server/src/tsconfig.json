@@ -4,7 +4,6 @@
     "outDir":"../build",
     "module": "CommonJS",
     "rootDir": "./",
-    "baseUrl": "../",
     "lib": [
         "esnext",
         "dom"

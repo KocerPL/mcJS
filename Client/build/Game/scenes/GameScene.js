@@ -25,7 +25,6 @@ import { Item } from "../entities/Item.js";
 const gl = CanvaManager.gl;
 export class GameScene extends Scene {
     onKey(key) { }
-    ;
     maxChunks = 10;
     maxSubUpdates = 1;
     okok = false;
@@ -217,6 +216,7 @@ export class GameScene extends Scene {
             location.reload();
         });
         this.socket.on("spawnEntity", (data) => {
+            console.log("Spawn: " + data.uuid);
             console.log(data);
             if (data.type == "item")
                 this.entities.push(new Item(Vector.fromData(data.pos), data.id, this, data.uuid));
@@ -227,9 +227,10 @@ export class GameScene extends Scene {
             else
                 World.breakBlock(new Vector(data.pos.x, data.pos.y, data.pos.z), this);
         });
-        this.socket.on("killEntity", (id) => {
+        this.socket.on("killEntity", (uuid) => {
+            console.log("KILL: " + uuid);
             for (let i = 0; i < this.entities.length; i++) {
-                if (this.entities[i].UUID == id) {
+                if (this.entities[i].UUID == uuid) {
                     this.entities.splice(i, 1);
                     break;
                 }
@@ -240,10 +241,7 @@ export class GameScene extends Scene {
     onClick(x, y) {
         this.gui.onClick(x, y);
     }
-    update() {
-        this.gui.get("mouse_item_holder").transformation = Matrix3.identity().translate(CanvaManager.mouse.pos.x, CanvaManager.mouse.pos.y);
-        this.processChunks();
-        //  this.updateSubchunks();
+    updateChunks() {
         const pPC = this.toChunkPos(this.player.pos);
         //   console.log(pPC);
         let i = 1;
@@ -288,6 +286,13 @@ export class GameScene extends Scene {
                 this.loadedChunks.delete(data[0]);
             }
         }
+    }
+    update() {
+        this.gui.get("mouse_item_holder").transformation = Matrix3.identity().translate(CanvaManager.mouse.pos.x, CanvaManager.mouse.pos.y);
+        this.processChunks();
+        //  this.updateSubchunks();
+        if (this.logged)
+            this.updateChunks();
         // if(CanvaManager.getKeyOnce("F2")) {this.cross.setVisible =!this.cross.getVisible;}
         if (CanvaManager.getKeyOnce("6"))
             console.log(World.getSubchunk(this.player.pos, this));

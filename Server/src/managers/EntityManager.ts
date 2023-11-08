@@ -1,4 +1,6 @@
 import { Entity } from "../Entities/Entity";
+import { Main } from "../Main";
+import { NetworkListener, NetworkManager } from "./NetworkManager";
 
 export class EntityManager
 {
@@ -15,10 +17,17 @@ export class EntityManager
     }
     remove(entity:Entity)
     {
+        Main.networkManager.io.emit("killEntity",entity.uuid);
         this.entitites.delete(entity);
     }
     add(entity:Entity)
     {
+        for(const ent of this.entitites)
+        {
+            if(ent.uuid == entity.uuid)
+            return;
+        }
+        if(entity instanceof Entity)
         this.entitites.add(entity);
     }
     update()
