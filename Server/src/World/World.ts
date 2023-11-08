@@ -16,10 +16,10 @@ export class World
     {
         if(this.loadedChunks.has(x+"-"+z))
       return this.loadedChunks.get(x+"-"+z)
-    if(fs.existsSync(this.dir+"/world/"+x+"."+z+".kChunk"))
+    if(fs.existsSync(this.dir+"/"+x+"."+z+".kChunk"))
     {
     let   chunk = new Chunk();
-    chunk= JSON.parse(fs.readFileSync(this.dir+"/world/"+x+"."+z+".kChunk").toString());
+    chunk= JSON.parse(fs.readFileSync(this.dir+"/"+x+"."+z+".kChunk").toString());
     //chunk.pos=[x,z];
     this.loadedChunks.set(x+"-"+z,chunk);
     return chunk;
@@ -30,7 +30,7 @@ export class World
     }
     saveChunk(chunk:Chunk)
 {
-    fs.writeFileSync(this.dir+"/world/"+chunk.pos[0]+"."+chunk.pos[1]+".kChunk",JSON.stringify(chunk));
+    fs.writeFileSync(this.dir+"/"+chunk.pos[0]+"."+chunk.pos[1]+".kChunk",JSON.stringify(chunk));
 }
     getSubchunk()
     {

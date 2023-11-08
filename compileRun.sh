@@ -1,6 +1,7 @@
-cd Server/src
+
+cd Client/src
 npx tsc
-cd ../../Client/src
-npx tsc
-cd ../../Server/build
-node Main.js
+cd ../../Server
+npx ts-node src/Main.ts
+#cd ../../Server
+#node build/Main.js
