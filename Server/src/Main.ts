@@ -14,7 +14,7 @@ function backOne(path:string)
 {
     if(path.at(-1)=="/")
     path =path.substring(0,path.length-1);
-    while(path.at(-1)!="/" && path.length>0)
+    while((path.at(-1)!="\\" && path.at(-1)!="/") && path.length>0)
         path = path.substring(0,path.length-1) 
         path =path.substring(0,path.length-1);
     return path;
@@ -84,6 +84,8 @@ export class Main
     }
     static run()
     {
+        console.log(__dirname);
+        console.log(paths);
         this.networkManager.addListener(new NetworkListener('connection',this.onConnection.bind(this))) ;
 
 

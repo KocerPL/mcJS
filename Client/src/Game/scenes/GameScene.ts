@@ -313,7 +313,7 @@ export class GameScene extends Scene
                    
                 }
                 this.loadedChunks.get(pPC.x+"-"+pPC.z).lastUsed= time;
-              
+            
                 //pPC.x+=step;
             }
             for(let j=0;j<i;j++)
@@ -336,7 +336,8 @@ export class GameScene extends Scene
         {
             if(data[1].lastUsed+5000<time)
             {
-                delete data[1];
+                data[1].deleteNeighbours(this);
+                console.log("Removing...")
                 this.loadedChunks.delete(data[0]);
             }
         }

@@ -282,7 +282,8 @@ export class GameScene extends Scene {
         }
         for (const data of this.loadedChunks) {
             if (data[1].lastUsed + 5000 < time) {
-                delete data[1];
+                data[1].deleteNeighbours(this);
+                console.log("Removing...");
                 this.loadedChunks.delete(data[0]);
             }
         }

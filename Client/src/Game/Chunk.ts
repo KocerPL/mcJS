@@ -95,6 +95,22 @@ export class Chunk {
           
         }
     }
+    deleteNeighbour(dir:DIR)
+    {
+        this.allNeighbours = false;
+        this.neighbours[dir] = undefined;
+    }
+    deleteNeighbours(gs)
+    {
+        let neighbour:Chunk = gs.getChunkAt(this.pos.x-1,this.pos.z);
+        neighbour.deleteNeighbour("POS_X");
+        neighbour = gs.getChunkAt(this.pos.x+1,this.pos.z);
+        neighbour.deleteNeighbour("NEG_X");
+        neighbour = gs.getChunkAt(this.pos.x,this.pos.z-1);
+        neighbour.deleteNeighbour("POS_Z")
+        neighbour = gs.getChunkAt(this.pos.x,this.pos.z+1);
+        neighbour.deleteNeighbour("NEG_Z");
+    }
     sdNeighbour(neighbour:Chunk,dir,gs:GameScene)
     { try
     {
