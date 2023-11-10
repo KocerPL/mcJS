@@ -183,6 +183,10 @@ export class GameScene extends Scene {
         this.socket.emit("login", { nick: Main.shared.nick });
         this.socket.on("subchunk", this.handleSubchunk.bind(this));
         //socket.emit('addItem',{id:1,count:64,slot:0});
+        this.socket.on("loginFailed", (str) => {
+            console.error(str);
+            Main.changeScene(new MenuScene());
+        });
         this.socket.on("updateItem", (obj) => {
             if (obj.inventory)
                 this.player.updateInvItem(obj.id, obj.slot, obj.count);

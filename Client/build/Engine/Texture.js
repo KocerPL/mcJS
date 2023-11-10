@@ -1,6 +1,6 @@
 import { Model } from "../Game/Models.js";
 import { Loader } from "./Loader.js";
-class Texture {
+export class Texture {
     static SIZE = 64;
     static imageSize = 1024;
     static rowSize = 16;
@@ -16,4 +16,3 @@ class Texture {
     static testAtkas = Loader.imageAtlasByNewJSON("./res/textures/testOld.png", Loader.json("./res/textures/testOld.json"));
     static screenAtlas = Loader.imageAtlasByNewJSON("./res/textures/titleScreen.png", Loader.json("./res/textures/titleScreen.json"));
 }
-export { Texture };

@@ -88,13 +88,13 @@ export class Chunk {
     }
     deleteNeighbours(gs) {
         let neighbour = gs.getChunkAt(this.pos.x - 1, this.pos.z);
-        neighbour.deleteNeighbour("POS_X");
+        neighbour && neighbour.deleteNeighbour("POS_X");
         neighbour = gs.getChunkAt(this.pos.x + 1, this.pos.z);
-        neighbour.deleteNeighbour("NEG_X");
+        neighbour && neighbour.deleteNeighbour("NEG_X");
         neighbour = gs.getChunkAt(this.pos.x, this.pos.z - 1);
-        neighbour.deleteNeighbour("POS_Z");
+        neighbour && neighbour.deleteNeighbour("POS_Z");
         neighbour = gs.getChunkAt(this.pos.x, this.pos.z + 1);
-        neighbour.deleteNeighbour("NEG_Z");
+        neighbour && neighbour.deleteNeighbour("NEG_Z");
     }
     sdNeighbour(neighbour, dir, gs) {
         try {

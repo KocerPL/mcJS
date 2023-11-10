@@ -54,8 +54,15 @@ export class Main
            // socket.KOCEid = lastID++;
             socket.on("login",(loginObject)=>
             {
+                if(this.playerManager.existName(loginObject.nick))
+                {
+                    socket.emit('loginFailed',"Player is already in game, please use other nick");
+                    return;
+                }
             const player = new Player(loginObject.nick,socket,getUUID());
+            
             this.playerManager.add(player);
+            console.log(player.pos);
             socket.emit('login',JSON.stringify(player.pos), player.uuid);
          console.log(player.name + " logged in");
                 
@@ -70,25 +77,23 @@ export class Main
                    socket.emit('updateItem',{id:itemsBar[i].id,count:itemsBar[i].count,slot:i,inventory:false});
                 }
             //player.pos = defaultSpawnPoint.copy();
-            for(let sock of  this.networkManager.getSockets())
+            for(let pl of this.playerManager.players)
             {
-                if(sock[1]!=socket)
+                if(pl[1].name!=player.name)
                 {
                    // console.log(sock[1]);
-                    socket.emit('spawnPlayer',player.pos,player.uuid);
+                    socket.emit('spawnPlayer',pl[1].pos,pl[1].uuid);
                 }
             }
             socket.broadcast.emit('spawnPlayer',player.pos,player.uuid)
             });
-            setInterval(this.update.bind(this),50);
+           
     }
     static run()
     {
-        console.log(__dirname);
-        console.log(paths);
         this.networkManager.addListener(new NetworkListener('connection',this.onConnection.bind(this))) ;
 
-
+        setInterval(this.update.bind(this),50);
     }
     static update()
     {

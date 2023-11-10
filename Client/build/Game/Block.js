@@ -6,7 +6,7 @@ export var blockType;
     blockType[blockType["NOTFULL"] = 1] = "NOTFULL";
     blockType[blockType["EMPTY"] = 2] = "EMPTY";
 })(blockType || (blockType = {}));
-class Block {
+export class Block {
     id;
     lightFBlock = 0;
     skyLight = 0;
@@ -180,7 +180,6 @@ class Block {
     }
     static info = [];
 }
-export { Block };
 export var Side;
 (function (Side) {
     Side[Side["top"] = 0] = "top";

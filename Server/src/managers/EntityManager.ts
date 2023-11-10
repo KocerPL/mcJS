@@ -28,7 +28,10 @@ export class EntityManager
             return;
         }
         if(entity instanceof Entity)
+        {
         this.entitites.add(entity);
+        Main.networkManager.io.emit("spawnEntity",entity)
+    }
     }
     update()
     {

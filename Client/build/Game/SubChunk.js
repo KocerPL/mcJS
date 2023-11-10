@@ -3,7 +3,7 @@ import { Vector } from "../Engine/Utils/Vector.js";
 import { Block, blockType, Side } from "./Block.js";
 import { Mesh } from "./Mesh.js";
 import { Texture } from "../Engine/Texture.js";
-class SubChunk {
+export class SubChunk {
     mesh = new Mesh(); //Mesh that contains all data needed for rendering  
     tmpMesh = new Mesh();
     blocks = new Array3D(16, 16, 16); //Array of blocks
@@ -542,7 +542,6 @@ class SubChunk {
         ]
     ];
 }
-export { SubChunk };
 const occasionalSleeper = (function () {
     //
     let lastSleepingTime = performance.now();

@@ -152,7 +152,7 @@ export class Player
        if(data.id==0)
        {
         let uuid = getUUID()
-       this.socket.emit("spawnEntity",{type:"item",id: chunk.subchunks[subchunkPos.y][World.toSubIndex(inPos.x,inPos.y,inPos.z)],pos:data.pos,uuid:uuid});
+      // this.socket.emit("spawnEntity",{type:"item",id: chunk.subchunks[subchunkPos.y][World.toSubIndex(inPos.x,inPos.y,inPos.z)],pos:data.pos,uuid:uuid});
        Main.entityManager.add(new Item(new Vector3(data.pos), chunk.subchunks[subchunkPos.y][World.toSubIndex(inPos.x,inPos.y,inPos.z)],uuid));
     }
      //  let fdata = JSON.parse(fs.readFileSync(__dirname+"/world/"+subchunkPos.x+"."+subchunkPos.y+"."+subchunkPos.z+".sub").toString());
@@ -200,17 +200,27 @@ export class PlayerManager
                        const slot = player.itemsBar[i];
                         if(!slot.id  || slot.id ==0 || (slot.id== ent.id && slot.count<64))
                         {
-                        
+                        slot.id = ent.id;
                            player.socket.emit("updateItem",{id: slot.id,count: ++slot.count,slot:i,inventory:false});
+                           Main.entityManager.remove(ent);
                            this.savePlayerInfo();
                            break;
                         }
                     }
-                    Main.entityManager.remove(ent);
+                    
 
                 }
             }
         }
+    }
+    existName(name:string)
+    {
+        for(let pl of this.players)
+        {
+            if(pl[1].name == name)
+            return true;
+        }
+        return false;
     }
     getBySocket(socket:Socket)
     {
