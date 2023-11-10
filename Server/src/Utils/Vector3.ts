@@ -45,4 +45,8 @@ export class Vector3
     {
         return new Vector3(this.x,this.y,this.z);
     }
+    static distance(vecA:Vector3,vecB:Vector3)
+    {
+        return Math.sqrt(Math.pow(vecA.x-vecB.x,2)+Math.pow(vecA.y-vecB.y,2)+Math.pow(vecA.z-vecB.z,2));
+    }
 }

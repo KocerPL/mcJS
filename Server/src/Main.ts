@@ -62,7 +62,6 @@ export class Main
             const player = new Player(loginObject.nick,socket,getUUID());
             
             this.playerManager.add(player);
-            console.log(player.pos);
             socket.emit('login',JSON.stringify(player.pos), player.uuid);
          console.log(player.name + " logged in");
                 

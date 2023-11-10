@@ -37,7 +37,7 @@ export class EntityManager
     {
         for(let entity of this.entitites)
         {
-            
+            entity.update();
         }
     }
 }

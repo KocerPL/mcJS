@@ -195,6 +195,7 @@ export class PlayerManager
             {
                 if(ent instanceof Item)
                 {
+                    if(Vector3.distance(player.pos,ent.pos)<0.5)
                     for(let i=0;i<player.itemsBar.length;i++)
                     {
                        const slot = player.itemsBar[i];
@@ -206,6 +207,10 @@ export class PlayerManager
                            this.savePlayerInfo();
                            break;
                         }
+                    }
+                    else
+                    {
+                        
                     }
                     
 

@@ -13,4 +13,8 @@ export class Item extends Entity
         this.id =id;
         this.uuid = uuid ?? getUUID();
     }
+    update()
+    {
+        
+    }
 }
