@@ -21,7 +21,7 @@ export class invItem {
         this.count = 0;
     }
 }
-export class Player {
+class Player {
     //model
     id;
     entity;
@@ -486,3 +486,4 @@ export class Player {
         }
     }
 }
+export { Player };

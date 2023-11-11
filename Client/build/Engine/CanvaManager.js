@@ -1,6 +1,6 @@
 import { Main } from "../Main.js";
 import { Vector } from "./Utils/Vector.js";
-export class CanvaManager {
+class CanvaManager {
     static canva = document.createElement("canvas");
     static HEIGHT = window.innerHeight;
     static WIDTH = window.innerWidth;
@@ -166,3 +166,4 @@ export class CanvaManager {
         return this.HEIGHT;
     }
 }
+export { CanvaManager };

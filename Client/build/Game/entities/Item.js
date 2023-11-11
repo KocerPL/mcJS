@@ -26,13 +26,6 @@ export class Item extends Entity {
         if (this.cooldown > 0)
             this.cooldown--;
         this.lifeTime--;
-        if (this.cooldown < 1) {
-            for (const ent of this.gs.entities)
-                if (ent instanceof Item && ent.type == this.type && ent != this && this.isTouching(ent.pos, 1)) {
-                    ent.count += this.count;
-                    this.gs.entities.splice(i, 1);
-                }
-        }
         if (this.lifeTime < 1) {
             this.gs.entities.splice(i, 1);
             return;

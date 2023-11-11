@@ -118,8 +118,9 @@ export class SubChunk
         catch(error)
         {
             console.log("Cannot get block of next subchunk!!",x,y,z);
+            return false;
         }
-        return undefined;
+       
     }
     lightFBlock(x:number,y:number,z:number):number
     {

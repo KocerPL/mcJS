@@ -3,7 +3,7 @@ import { Vector } from "../Engine/Utils/Vector.js";
 import { Block, blockType, Side } from "./Block.js";
 import { Mesh } from "./Mesh.js";
 import { Texture } from "../Engine/Texture.js";
-export class SubChunk {
+class SubChunk {
     mesh = new Mesh(); //Mesh that contains all data needed for rendering  
     tmpMesh = new Mesh();
     blocks = new Array3D(16, 16, 16); //Array of blocks
@@ -112,8 +112,8 @@ export class SubChunk {
         }
         catch (error) {
             console.log("Cannot get block of next subchunk!!", x, y, z);
+            return false;
         }
-        return undefined;
     }
     lightFBlock(x, y, z) {
         if (x > -1 && x < 16 && y > -1 && y < 16 && z > -1 && z < 16) {
@@ -542,6 +542,7 @@ export class SubChunk {
         ]
     ];
 }
+export { SubChunk };
 const occasionalSleeper = (function () {
     //
     let lastSleepingTime = performance.now();

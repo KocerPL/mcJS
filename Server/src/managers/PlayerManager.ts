@@ -129,15 +129,17 @@ export class Player
     placeBlock(data)
     {
         if(data.id!=0 &&this.itemsBar[data.slot].id != data.id) return;
+        if(data.id!=0)
+        {
         if(--this.itemsBar[data.slot].count<=0)
         {
         this.itemsBar[data.slot].id=0;
         this.itemsBar[data.slot].count=0;
         }
-        if(data.id!=0)
         this.socket.emit("updateItem",{id:this.itemsBar[data.slot].id,count: this.itemsBar[data.slot].count,slot:data.slot,inventory:false});
-     
         Main.playerManager.savePlayerInfo();
+        }
+       
        Main.networkManager.io.emit("placeBlock",data);
        let inPos ={x:Math.round(Math.round(data.pos.x)%16),y:Math.round(Math.round(data.pos.y)%16),z:Math.round(Math.round(data.pos.z)%16)};
        if(inPos.x<0)
@@ -148,7 +150,6 @@ export class Player
        inPos.y = 16-Math.abs(inPos.y);
        const subchunkPos = {x:Math.floor(Math.round(data.pos.x)/16),y:Math.floor(Math.round(data.pos.y)/16),z:Math.floor(Math.round(data.pos.z)/16)};
        let chunk = Main.world.getChunk(subchunkPos.x,subchunkPos.z);
-       console.log(subchunkPos.x,subchunkPos.y,subchunkPos.z);
        if(data.id==0)
        {
         let uuid = getUUID()
@@ -195,7 +196,9 @@ export class PlayerManager
             {
                 if(ent instanceof Item)
                 {
-                    if(Vector3.distance(player.pos,ent.pos)<0.5)
+                    let dist = Vector3.distance(player.pos,ent.pos);
+                    if(dist<0.5)
+                    {
                     for(let i=0;i<player.itemsBar.length;i++)
                     {
                        const slot = player.itemsBar[i];
@@ -208,9 +211,12 @@ export class PlayerManager
                            break;
                         }
                     }
+                    }
                     else
                     {
-                        
+                       let k =  player.pos.add(ent.pos.multiply(-1));
+                        ent .pos = ent.pos.add(k.multiply(1/dist));
+                       Main.networkManager.io.emit("updateEntity", ent);
                     }
                     
 
