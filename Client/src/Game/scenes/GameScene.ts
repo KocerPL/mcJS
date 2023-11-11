@@ -268,9 +268,10 @@ export class GameScene extends Scene
                 if(this.entities[i].UUID ==uuid)
                 {
                     this.entities.splice(i,1);
-                    break;
+                        return;
                 }
             }
+            console.log("Entity not found!!");
         });
        
         this.updateSubchunk();

@@ -7,18 +7,22 @@ import { Entity } from "../Entity.js";
 import { rot2d } from "../Models.js";
 import { Loader } from "../../Engine/Loader.js";
 import { GameScene } from "../scenes/GameScene.js";
+import { Item } from "./Item.js";
+import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 const gl = CanvaManager.gl;
 export class PlayerEntity extends Entity
 {
     rotation:Vector;
     bodyRot:number;
     nextTransitions:Array<{pos:Vector,rot:Vector}>=[];
-    rsHammer = Loader.loadObj("./res/models/hammer.obj");
+    itemEnt:Item;
+   // rsHammer = Loader.loadObj("./res/models/hammer.obj");
     gs:GameScene;
     constructor(pos:Vector,gs:GameScene,id?)
     {
         super(pos,Main.atlasShader,id);
         this.gs = gs;
+       this.itemEnt =  new Item(new Vector(0,0,0),1,this.gs,0);
         this.rotation=new Vector(0,0,0);
         this.bodyRot =0;
         this.rs.resetArrays();
@@ -326,19 +330,34 @@ export class PlayerEntity extends Entity
         const mat = Matrix4.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.35,0).scale(bScale ,bScale ,bScale );
         Main.atlasShader.loadTransformation(mat);
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,180*4);
-        this.renderHandItem();
+      //  this.renderHandItem();
         Main.shader.use();
     }
-    renderHandItem()
+    renderHandItem(id:number)
     {
         this.updatePos();
-        const bScale = 0.1;
-        Main.atlasShader.use();
-        const mat = Matrix4.identity().translate(this.pos.x,this.pos.y+0.45,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.55,0.5).rotateY(90).rotateZ(-90).scale(bScale ,bScale ,bScale );
-        this.rsHammer.vao.bind();
-        gl.bindTexture(gl.TEXTURE_2D,Texture.hammer);
-        Main.atlasShader.loadUniforms(this.gs.player.camera.getProjection(),mat,this.gs.player.camera.getView(),15);
-        gl.drawElements(gl.TRIANGLES,this.rsHammer.count,gl.UNSIGNED_INT,0);
+        const bScale = 0.3;
+    
+        const mat = Matrix4.identity().translate(this.pos.x,this.pos.y+0.45,this.pos.z).rotateY(this.bodyRot).rotateX(-this.rotation.z).rotateZ(-5).translate(-0.375,-0.6,0.2).rotateY(90).rotateZ(-90).scale(bScale ,bScale ,bScale );
+        if(id!=0)
+        {
+            Main.shader.use();
+            Texture.blockAtlas.bind();
+            if(id!=this.itemEnt.type)
+               {
+                this.itemEnt.type =id;
+                this.itemEnt.prepareModel();
+                this. itemEnt.bufferWithDummyLight();
+                console.log("changing: "+id);
+               }
+            
+             //  this.itemEnt.pos   = new Vector(this.pos.x,this.pos.y+0.45,this.pos.z);
+               this.itemEnt.render(mat);
+        }      
+        //  this.rsHammer.vao.bind();
+        //gl.bindTexture(gl.TEXTURE_2D,Texture.hammer);
+        //Main.atlasShader.loadUniforms(this.gs.player.camera.getProjection(),mat,this.gs.player.camera.getView(),15);
+        //gl.drawElements(gl.TRIANGLES,this.rsHammer.count,gl.UNSIGNED_INT,0);
     }
     setNextTransitions(nextPos:Vector,nextRot:Vector,count:number)
     {

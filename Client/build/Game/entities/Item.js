@@ -37,6 +37,13 @@ export class Item extends Entity {
         this.rs.blockLight = [ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll];
         this.rs.bufferArrays();
     }
+    bufferWithDummyLight() {
+        let ll = 14;
+        this.rs.skyLight = [ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll];
+        ll = 14;
+        this.rs.blockLight = [ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll, ll];
+        this.rs.bufferArrays();
+    }
     prepareModel() {
         this.rs.vertices = [
             -0.5, 0.5, -0.5,
@@ -89,21 +96,11 @@ export class Item extends Entity {
             return true;
         return false;
     }
-    render() {
+    render(transformation) {
         // console.log("rendered")
-        if (this.acc.x > 0.02)
-            this.acc.x -= 0.01;
-        else if (this.acc.x < -0.02)
-            this.acc.x += 0.01;
-        else
-            this.acc.x = 0;
-        if (this.acc.z > 0.02)
-            this.acc.z -= 0.01;
-        else if (this.acc.z < -0.02)
-            this.acc.z += 0.01;
-        else
-            this.acc.z = 0;
-        this.pos = Vector.add(this.pos, this.acc);
+        //   if(this.acc.x>0.02) this.acc.x-=0.01;else  if(this.acc.x<-0.02) this.acc.x+=0.01;else this.acc.x =0;
+        // if(this.acc.z>0.02) this.acc.z-=0.01; else if(this.acc.z<-0.02) this.acc.z+=0.01; else this.acc.z=0;
+        //this.pos = Vector.add(this.pos,this.acc);
         if (this.rotation < 360)
             this.rotation++;
         else {
@@ -116,14 +113,14 @@ export class Item extends Entity {
         Texture.testAtkas.bind();
         this.rs.vao.bind();
         // Main.shader.use();
-        Main.shader.loadUniforms(this.gs.player.camera.getProjection(), this.transformation, this.gs.player.camera.getView(), this.gs.sunLight);
+        Main.shader.loadUniforms(this.gs.player.camera.getProjection(), transformation ?? this.transformation, this.gs.player.camera.getView(), this.gs.sunLight);
         //     Main.shader.use();
         gl.drawElements(gl.TRIANGLES, this.rs.count, gl.UNSIGNED_INT, 0);
         if (this.count > 1) {
             //      gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
             this.rs.vao.bind();
             this.transformation = this.transformation.translate(0.3, -0.3, 0.3);
-            Main.shader.loadUniforms(this.gs.player.camera.getProjection(), this.transformation, this.gs.player.camera.getView(), this.gs.sunLight);
+            Main.shader.loadUniforms(this.gs.player.camera.getProjection(), transformation ?? this.transformation, this.gs.player.camera.getView(), this.gs.sunLight);
             gl.drawElements(gl.TRIANGLES, this.rs.count, gl.UNSIGNED_INT, 0);
         }
     }

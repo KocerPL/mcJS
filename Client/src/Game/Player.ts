@@ -568,8 +568,7 @@ export class Player
           
             this.entity.render();
         }
-        else
-            this.entity.renderHandItem();
+            this.entity.renderHandItem(this.itemsBar[this.selectedItem].id);
         if(this.blockBreakingTime>1)
         {      const   transformation = Matrix4.identity();
             this.blockOverlay.vao.bind();

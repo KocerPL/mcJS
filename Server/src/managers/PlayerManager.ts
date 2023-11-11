@@ -205,8 +205,8 @@ export class PlayerManager
                         if(!slot.id  || slot.id ==0 || (slot.id== ent.id && slot.count<64))
                         {
                         slot.id = ent.id;
+                        Main.entityManager.remove(ent);
                            player.socket.emit("updateItem",{id: slot.id,count: ++slot.count,slot:i,inventory:false});
-                           Main.entityManager.remove(ent);
                            this.savePlayerInfo();
                            break;
                         }
@@ -216,7 +216,7 @@ export class PlayerManager
                     {
                        let k =  player.pos.add(ent.pos.multiply(-1));
                         ent .pos = ent.pos.add(k.multiply(1/dist));
-                       Main.networkManager.io.emit("updateEntity", ent);
+                       Main.networkManager.io.volatile.emit("updateEntity", ent);
                     }
                     
 
