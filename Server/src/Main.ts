@@ -21,7 +21,8 @@ function backOne(path:string)
 }
 export const paths = Object.freeze({
     res: backOne(__dirname)+"/res",
-    world:  backOne(__dirname)+"/res/world",
+    save: backOne(__dirname)+"/res/save",
+    world:  backOne(__dirname)+"/res/save/world",
     client: backOne(backOne(__dirname))+"/Client",
     main:  backOne(backOne(__dirname))
 });
@@ -90,6 +91,7 @@ export class Main
     }
     static run()
     {
+        this.makeDirs();
         this.networkManager.addListener(new NetworkListener('connection',this.onConnection.bind(this))) ;
 
         setInterval(this.update.bind(this),50);
@@ -98,6 +100,15 @@ export class Main
     {
         this.playerManager.update();
     }
-
+    static makeDirs()
+    {
+        for( let k in paths)
+        {
+            let dir = paths[k];
+        if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir, { recursive: true });
+        }
+    }
+    }
 }
 Main.run();

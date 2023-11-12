@@ -22,7 +22,6 @@ import { DarkScreen } from "../gui/DarkScreen.js";
 import { Button } from "../gui/Button.js";
 import { MenuScene } from "./MenuScene.js";
 import { Item } from "../entities/Item.js";
-import { BorderedTextInput } from "../gui/BorderedTextInput.js";
 import { TextInput } from "../gui/TextInput.js";
 const gl = CanvaManager.gl;
 export class GameScene extends Scene {
@@ -109,13 +108,14 @@ export class GameScene extends Scene {
         this.gui = new GUI(Main.shader2d);
         this.gui.add(new DarkScreen("DarkScreen"));
         this.cross = new Cross("Cross");
-        CanvaManager.rPointer = false;
+        CanvaManager.rPointer = true;
         this.gui.add(this.cross);
         this.gui.add(new ItemBar("ItemBar"));
         this.gui.add(new Inventory("Inventory"));
         this.gui.add(new TextComponent("debug", "FPS:", 0.01, null, ALIGN.left)).transformation = Matrix3.identity().translate(-1, 0.98);
         let testButton = new Button("test");
         testButton.transformation = Matrix3.identity().translate(0.9, 0.85).scale(0.2, 0.2);
+        testButton.setVisible = false;
         testButton.onclick = () => {
             let ti = this.gui.get("debuginput_text_in");
             let name = "body";
@@ -136,8 +136,8 @@ export class GameScene extends Scene {
         };
         this.gui.add(testButton);
         testButton.changeText("Set");
-        this.gui.add(new BorderedTextInput("debuginput", "body.x")).transformation = Matrix3.identity().translate(0.9, 0.95).scale(0.2, 0.2);
-        this.gui.add(new BorderedTextInput("debuginputvalue", "0")).transformation = Matrix3.identity().translate(0.9, 0.9).scale(0.2, 0.2);
+        //    this.gui.add(new BorderedTextInput("debuginput","body.x")).transformation =  Matrix3.identity().translate(0.9,0.95).scale(0.2,0.2);
+        //  this.gui.add(new BorderedTextInput("debuginputvalue","0")).transformation =  Matrix3.identity().translate(0.9,0.9).scale(0.2,0.2);
         const ds = this.gui.add(new DarkScreen("ExitDarkScreen"));
         const butt = new Button("Exit game");
         ds.add(butt);

@@ -259,7 +259,10 @@ export class PlayerManager
     }
     loadPlayersInfo():PlayerInfo[]
     {
+        if(fs.existsSync(paths.res+"/players.json"))
       return JSON.parse(fs.readFileSync(paths.res+"/players.json").toString());
+    else
+    return [];
     }
     savePlayerInfo()
 { 
@@ -271,7 +274,7 @@ export class PlayerManager
             playersInfo[player[1].name] = new PlayerInfo(player[1]);
         }
     }
-    fs.writeFileSync(paths.res+"/players.json",JSON.stringify(playersInfo));
+    fs.writeFileSync(paths.save+"/players.json",JSON.stringify(playersInfo));
 
 }
 }
