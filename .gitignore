@@ -1,2 +1,2 @@
 node_modules
-/Server/build/res/world/*
+Server/res/world
