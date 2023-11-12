@@ -131,7 +131,6 @@ export class Player
         {
         this.socket.emit("spawnEntity",{type:ent.type,id:ent instanceof Item?ent.id:2 ,pos:ent.pos,uuid:ent.uuid});
         Main.entityManager.add(ent);
-         console.log("ent");
         }
          let data =chunk.subchunks[y];
          this.socket.emit('subchunk', {data:{subX:x,subY:y,subZ:z,blocks:data}})  
@@ -257,23 +256,21 @@ export class PlayerManager
                 }
                 return  new PlayerInfo(playersInfo[player.name]);
     }
-    loadPlayersInfo():PlayerInfo[]
+    loadPlayersInfo():{}
     {
-        if(fs.existsSync(paths.res+"/players.json"))
-      return JSON.parse(fs.readFileSync(paths.res+"/players.json").toString());
+        if(fs.existsSync(paths.save+"/players.json"))
+      return JSON.parse(fs.readFileSync(paths.save+"/players.json").toString());
     else
-    return [];
+    return {};
     }
     savePlayerInfo()
 { 
     let playersInfo = this.loadPlayersInfo();
     for(let player of this.players)
     {
-        if(player[1].name in playersInfo)
-        {
-            playersInfo[player[1].name] = new PlayerInfo(player[1]);
-        }
+        playersInfo[player[1].name ] =  new PlayerInfo(player[1]);
     }
+    console.log("saved player info");
     fs.writeFileSync(paths.save+"/players.json",JSON.stringify(playersInfo));
 
 }

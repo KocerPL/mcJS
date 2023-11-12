@@ -59,16 +59,29 @@ export class GameScene extends Scene {
     fromSlot = 0;
     keyLock = false;
     isInv = false;
+    getNearestSubchunk() {
+        let plPos = this.player.pos.copy();
+        let clDistance = Number.POSITIVE_INFINITY;
+        let clSub = undefined;
+        for (let sc of this.toUpdate) {
+            let dist = Vector.distance(plPos, sc.pos.mult(16));
+            if (dist < clDistance) {
+                clDistance = dist;
+                clSub = sc;
+            }
+        }
+        return clSub;
+    }
     updateSubchunk() {
         //const concatQ:Set<Chunk> = new Set();
-        const entry = this.toUpdate.entries().next().value;
+        const entry = this.getNearestSubchunk(); // this.toUpdate.entries().next().value[0];
         //console.log("running...",entry);
         //    console.log(entry[0].pos);
         if (entry) {
-            this.toUpdate.delete(entry[0]);
-            entry[0].update(this).then(() => {
+            this.toUpdate.delete(entry);
+            entry.update(this).then(() => {
                 // console.log("updating...");
-                entry[0].chunk.updateMesh();
+                entry.chunk.updateMesh();
                 //   occasionalSleeper().then(()=>{
                 //     this.updateSubchunk();
                 // });
@@ -400,7 +413,7 @@ export class GameScene extends Scene {
         }
         Main.shader.use();
         this.player.camera.preRender();
-        Main.shader.setFog(this.player.camera.getPosition(), (this.maxChunks - 1) * 16);
+        Main.shader.setFog(this.player.camera.getPosition(), (this.maxChunks - 4) * 8);
         CanvaManager.preRender();
         Texture.testAtkas.bind();
         Main.shader.loadUniforms(this.player.camera.getProjection(), Matrix4.identity(), this.player.camera.getView(), this.sunLight);

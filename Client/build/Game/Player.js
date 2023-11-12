@@ -88,6 +88,7 @@ class Player {
         this.blockOverlay = new RenderSet(Main.atlasShader);
         this.pos = pos;
         this.entity = new PlayerEntity(this.pos, gs);
+        this.camera.offset = -0.3;
         this.camera.setPosition(new Vector(pos.x, pos.y + 1, pos.z));
         for (let i = 0; i < 9; i++)
             this.itemsBar[i] = new invItem(0);
@@ -160,7 +161,7 @@ class Player {
             this.camera.projRot = 180;
         }
         else
-            this.camera.offset = 0;
+            this.camera.offset = -0.3;
     }
     isInBlock(pos) {
         if (World.getBlock(new Vector(pos.x + 0.33, pos.y - 1, pos.z + 0.33), this.gs).id > 0)
