@@ -17,7 +17,8 @@ export class EntityManager
     }
     remove(entity:Entity)
     {
-        Main.networkManager.io.emit("killEntity",entity.uuid);
+        console.log("kILLED"+entity.uuid);
+        Main.networkManager.io. emit("killEntity",entity.uuid);
         this.entitites.delete(entity);
     }
     add(entity:Entity)

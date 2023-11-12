@@ -25,6 +25,14 @@ export class Vector3
         outVec.z = this.z*scalar;
         return outVec
     }
+    mult(scalar:number)
+    {
+        let outVec = new Vector3();
+        outVec.x = this.x*scalar;
+        outVec.y = this.y*scalar;
+        outVec.z = this.z*scalar;
+        return outVec
+    }
     copy()
     {
         return new Vector3(this.x,this.y,this.z);

@@ -20,6 +20,7 @@ export class TextInput extends GuiComponent
         this.transformation = Matrix3.identity();
         this.tcoords = Texture.fontAtlas.coords[49];
         this.onkey= (key)=>{
+           
             if(!this.selected) return;
             if(key.length==1)
                 this.text+=key;

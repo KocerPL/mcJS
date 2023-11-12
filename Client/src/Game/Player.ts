@@ -42,6 +42,7 @@ export class Player
     blockOverlay:RenderSet;
     blockBreakingTime=0;
     selectedItem = 0;
+    lastHit = 0;
     person:pers ="First"; 
     yAcc =0.01;
     legChange= 6;
@@ -261,13 +262,13 @@ export class Player
     updatePos()
     {
 
-        this.entity.rotation.y = -this.camera.getYaw();
-        this.entity.rotation.x = -this.camera.getPitch();
+        this.entity.rotations.body.y = -this.camera.getYaw();
+        this.entity.rotations.head.x = -this.camera.getPitch();
         this.entity.pos = this.pos;
         const nowTime = Date.now();
         if(this.lastTime<nowTime-100)
         {
-            this.gs.socket.emit("playerMove",this.entity.pos,this.entity.rotation);
+            this.gs.socket.emit("playerMove",this.entity.pos,this.entity.rotations);
             this.lastTime = nowTime;
         }
         //if(this.locked) return;
@@ -284,9 +285,9 @@ export class Player
         let speed=1;
         try
         {
-            if(!this.locked && !this.openInventory)
+            if(!this.locked && !this.openInventory && !this.gs.keyLock)
             {
-                let yRot = -this.entity.bodyRot;
+                let yRot = -this.entity.rotations.body.y;
                 if(CanvaManager.getKeyOnce("Q"))
                 {
                    
@@ -298,16 +299,16 @@ export class Player
                     speed=2;
                 if(CanvaManager.getKey("W"))
                 {
-                    this.entity.bodyRot = this.entity.rotation.y;
-                    yRot = -this.entity.bodyRot;
+                    //this.entity.rotations.body.y = this.entity.rotation.y;
+                    yRot = -this.entity.rotations.body.y;
                     tempPos.x+=Math.sin(yRot*Math.PI/180)*0.1*speed;
                     tempPos.z +=Math.cos(yRot*Math.PI/180)*0.1*speed;
               
                 }
                 else if(CanvaManager.getKey("S"))
                 {
-                    this.entity.bodyRot = this.entity.rotation.y;
-                    yRot = -this.entity.bodyRot;
+                  //  this.entity.bodyRot = this.entity.rotation.y;
+                    yRot = -this.entity.rotations.body.y;
                     tempPos.x-=Math.sin(yRot*Math.PI/180)*0.1;
                     tempPos.z-=Math.cos(yRot*Math.PI/180)*0.1;
                 }
@@ -396,21 +397,36 @@ export class Player
         {
         // console.log("Update pos error",error);
         }
-        if(Math.abs(this.entity.rotation.z)>45)
+        if(Math.abs(this.entity.rotations.leftLeg.x)>45)
             this.legChange= -this.legChange;
         this.camera.setPosition(new Vector(this.pos.x,this.pos.y+0.7,this.pos.z));
         if(this.locked || this.openInventory) return;
         if(CanvaManager.getKey("W")||CanvaManager.getKey("A")||CanvaManager.getKey("S")||CanvaManager.getKey("D"))
-            this.entity.rotation.z += this.legChange*speed;
+        {
+        this.entity.rotations.leftLeg.x += this.legChange*speed;
+        this.entity.rotations.rightLeg.x -= this.legChange*speed;
+    
+        this.entity.rotations.leftHand.x -= this.legChange*speed;
+        this.entity.rotations.rightHand.x += this.legChange*speed;
+        }
         else 
-            this.entity.rotation.z = 0;       
+        {
+        this.entity.rotations.leftLeg.x -= this.entity.rotations.leftLeg.x*0.1;
+        this.entity.rotations.rightLeg.x -= this.entity.rotations.rightLeg.x*0.1;
+        this.entity.rotations.leftHand.x -= this.entity.rotations.leftHand.x*0.1;
+        this.entity.rotations.rightHand.x -= this.entity.rotations.rightHand.x*0.1;
+        }      
+        if(!this.gs.keyLock)
+        {
         this.camera.setPitch(this.camera.getPitch()- (CanvaManager.mouseMovement.y/10));
         this.camera.setYaw(this.camera.getYaw()+(CanvaManager.mouseMovement.x/10));
+        }
         if(this.camera.getPitch()>90) this.camera.setPitch(90);
         if(this.camera.getPitch()<-90) this.camera.setPitch(-90);
         if(CanvaManager.mouse.left) this.mine(); else this.blockBreakingTime=0;
         if(CanvaManager.mouse.right) this.place();
-       
+       if(!this.gs.keyLock)
+       {
         if(CanvaManager.getKey("1"))
         {
             this.switchPerson("First");
@@ -423,6 +439,7 @@ export class Player
         {
             this.switchPerson("Third");
         }
+    }
     }
     mine()
     {
@@ -571,6 +588,11 @@ export class Player
             this.entity.renderHandItem(this.itemsBar[this.selectedItem].id);
         if(this.blockBreakingTime>1)
         {      const   transformation = Matrix4.identity();
+           if( (Date.now()-this.lastHit)>=300)
+           {
+            this.lastHit = Date.now();
+            this.entity.rotations.rightHand.x = randRange(-70,-45);
+           }
             this.blockOverlay.vao.bind();
             Main.shader.use();
             Texture.blockOverlay.bind();

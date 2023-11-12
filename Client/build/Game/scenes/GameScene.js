@@ -9,7 +9,7 @@ import { Chunk } from "../Chunk.js";
 import { Player } from "../Player.js";
 import { SubChunk } from "../SubChunk.js";
 import { World } from "../World.js";
-import { PlayerEntity } from "../entities/PlayerEntity.js";
+import { PlayerEntity, PlayerRotations } from "../entities/PlayerEntity.js";
 import { GUI } from "../gui/GUI.js";
 import { Cross } from "../gui/Cross.js";
 import { ItemBar } from "../gui/ItemBar.js";
@@ -22,9 +22,13 @@ import { DarkScreen } from "../gui/DarkScreen.js";
 import { Button } from "../gui/Button.js";
 import { MenuScene } from "./MenuScene.js";
 import { Item } from "../entities/Item.js";
+import { BorderedTextInput } from "../gui/BorderedTextInput.js";
+import { TextInput } from "../gui/TextInput.js";
 const gl = CanvaManager.gl;
 export class GameScene extends Scene {
-    onKey(key) { }
+    onKey(key) {
+        this.gui.onKey(key);
+    }
     maxChunks = 10;
     maxSubUpdates = 1;
     okok = false;
@@ -54,6 +58,7 @@ export class GameScene extends Scene {
     logged = false;
     counter = 0;
     fromSlot = 0;
+    keyLock = false;
     isInv = false;
     updateSubchunk() {
         //const concatQ:Set<Chunk> = new Set();
@@ -104,11 +109,35 @@ export class GameScene extends Scene {
         this.gui = new GUI(Main.shader2d);
         this.gui.add(new DarkScreen("DarkScreen"));
         this.cross = new Cross("Cross");
-        CanvaManager.rPointer = true;
+        CanvaManager.rPointer = false;
         this.gui.add(this.cross);
         this.gui.add(new ItemBar("ItemBar"));
         this.gui.add(new Inventory("Inventory"));
         this.gui.add(new TextComponent("debug", "FPS:", 0.01, null, ALIGN.left)).transformation = Matrix3.identity().translate(-1, 0.98);
+        let testButton = new Button("test");
+        testButton.transformation = Matrix3.identity().translate(0.9, 0.85).scale(0.2, 0.2);
+        testButton.onclick = () => {
+            let ti = this.gui.get("debuginput_text_in");
+            let name = "body";
+            let pName = "x";
+            if (ti instanceof TextInput) {
+                let sp = ti.text.split('.');
+                if (sp.length < 2)
+                    return;
+                name = sp[0];
+                pName = sp[1];
+            }
+            ti = this.gui.get("debuginputvalue_text_in");
+            let val = "0";
+            if (ti instanceof TextInput) {
+                val = ti.text;
+            }
+            this.player.entity.rotations[name][pName] = Number.parseFloat(val);
+        };
+        this.gui.add(testButton);
+        testButton.changeText("Set");
+        this.gui.add(new BorderedTextInput("debuginput", "body.x")).transformation = Matrix3.identity().translate(0.9, 0.95).scale(0.2, 0.2);
+        this.gui.add(new BorderedTextInput("debuginputvalue", "0")).transformation = Matrix3.identity().translate(0.9, 0.9).scale(0.2, 0.2);
         const ds = this.gui.add(new DarkScreen("ExitDarkScreen"));
         const butt = new Button("Exit game");
         ds.add(butt);
@@ -203,11 +232,17 @@ export class GameScene extends Scene {
             // console.log("summoningPLAYER");
             this.entities.push(new PlayerEntity(new Vector(pos.x, pos.y, pos.z), this, id));
         });
-        this.socket.on("moveEntity", (id, pos, rot) => {
+        this.socket.on("moveEntity", (id, pos, rots) => {
             const ent = this.getEntity(id);
             // ent.pos =new Vector(pos.x,pos.y,pos.z);
             if (ent instanceof PlayerEntity) {
-                ent.setNextTransitions(new Vector(pos.x, pos.y, pos.z), new Vector(rot.x, rot.y, rot.z), 3);
+                let plRots = new PlayerRotations();
+                for (let name in plRots) {
+                    plRots[name].x = rots[name].x;
+                    plRots[name].y = rots[name].y;
+                    plRots[name].z = rots[name].z;
+                }
+                ent.setNextTransitions(new Vector(pos.x, pos.y, pos.z), plRots, 3);
             }
         });
         this.socket.on("login", (posStr, id) => {
@@ -222,6 +257,13 @@ export class GameScene extends Scene {
         this.socket.on("spawnEntity", (data) => {
             console.log("Spawn: " + data.uuid);
             console.log(data);
+            for (let i = 0; i < this.entities.length; i++) {
+                if (this.entities[i].UUID == data.uuid) {
+                    console.log("ENTITY EXIST NOT ADDING NEW!!");
+                    //this.entities.splice(i,1);
+                    return;
+                }
+            }
             if (data.type == "item")
                 this.entities.push(new Item(Vector.fromData(data.pos), data.id, this, data.uuid));
         });
@@ -293,13 +335,12 @@ export class GameScene extends Scene {
             }
         }
     }
-    update() {
-        this.gui.get("mouse_item_holder").transformation = Matrix3.identity().translate(CanvaManager.mouse.pos.x, CanvaManager.mouse.pos.y);
-        this.processChunks();
-        //  this.updateSubchunks();
-        if (this.logged)
-            this.updateChunks();
-        // if(CanvaManager.getKeyOnce("F2")) {this.cross.setVisible =!this.cross.getVisible;}
+    keyUpdate() {
+        if (CanvaManager.getKeyOnce("F10")) {
+            this.keyLock = !this.keyLock;
+        }
+        if (this.keyLock)
+            return;
         if (CanvaManager.getKeyOnce("6"))
             console.log(World.getSubchunk(this.player.pos, this));
         if (CanvaManager.getKey("5") && this.sunLight < 16)
@@ -335,6 +376,15 @@ export class GameScene extends Scene {
             this.fly = !this.fly;
         if (CanvaManager.getKeyOnce("F2"))
             this.renderGUI = !this.renderGUI;
+    }
+    update() {
+        this.gui.get("mouse_item_holder").transformation = Matrix3.identity().translate(CanvaManager.mouse.pos.x, CanvaManager.mouse.pos.y);
+        this.processChunks();
+        //  this.updateSubchunks();
+        if (this.logged)
+            this.updateChunks();
+        // if(CanvaManager.getKeyOnce("F2")) {this.cross.setVisible =!this.cross.getVisible;}
+        this.keyUpdate();
         for (let i = 0; i < this.entities.length; i++) {
             this.entities[i].update(i);
         }

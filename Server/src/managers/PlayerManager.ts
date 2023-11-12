@@ -29,13 +29,22 @@ export class PlayerInfo
     }
     
 }
+export class PlayerRotations
+{
+    body:Vector3=new Vector3(0,0,0);
+    leftHand:Vector3 = new Vector3(0,0,0);
+    rightHand:Vector3= new Vector3(0,0,0);
+    leftLeg:Vector3 = new Vector3(0,0,0);
+    rightLeg:Vector3 = new Vector3(0,0,0);
+    head:Vector3 = new Vector3(0,0,0);   
+}
 export class Player
 {
     name:string;
     uuid:UUID;
     socket:Socket;
     pos:Vector3 = new Vector3(0,0,0);
-    rot=new Vector(0,0,0);
+    rots=new PlayerRotations();
     inventory:Array<{id:number,count:number}> = new Array();
     itemsBar:Array<{id:number,count:number}> = new Array();
     constructor(name:string,socket:Socket,uuid:UUID)
@@ -47,14 +56,15 @@ export class Player
         this.inventory = plInfo.inventory;
         this.itemsBar = plInfo.itemsBar;
         this.pos = new Vector3(plInfo.pos);
+        this.rots = new PlayerRotations();
         socket.on('moveItem',(data:{slot1:number,isInv1:boolean, slot2:number,isInv2:boolean})=>{
             this.moveItem(data);
           });
           socket.on('getSubchunk',(x:number,y:number,z:number)=>{
             this.getSubchunk(x,y,z); 
         });
-              socket.on("playerMove",(pos,rot)=>{
-                 this.playerMove(pos,rot);
+              socket.on("playerMove",(pos,rots)=>{
+                 this.playerMove(pos,rots);
               });
           socket.on("placeBlock",(data)=>{
               this.placeBlock(data);
@@ -106,11 +116,11 @@ export class Player
             }
             Main.playerManager.savePlayerInfo();
     }
-    playerMove(pos,rot)
+    playerMove(pos,rots)
     {
         this.pos =new Vector3(pos);
-        this.rot= rot;
-        this.socket.broadcast.emit("moveEntity",this.uuid,pos,rot);
+        this.rots= rots;
+        this.socket.broadcast.emit("moveEntity",this.uuid,pos,rots);
     }
     getSubchunk(x,y,z)
     {
