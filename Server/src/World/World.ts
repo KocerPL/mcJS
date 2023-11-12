@@ -54,6 +54,12 @@ chunkInfo.entities = Main.entityManager.getByAABB(chunkInfo.pos[0]*16,0,chunkInf
     (chunkInfo.pos[0]+1)*16,256,(chunkInfo.pos[1]+1)*16);
     fs.writeFileSync(this.dir+"/"+chunk.pos[0]+"."+chunk.pos[1]+".kChunk",JSON.stringify(chunkInfo));
 }
+    saveAll()
+    {
+        console.log("Saving chunks...");
+        for(let chunk of this.loadedChunks)
+        this.saveChunk(chunk[1]);
+    }
     getSubchunk()
     {
 

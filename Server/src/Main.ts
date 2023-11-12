@@ -7,6 +7,12 @@ import { NetworkListener, NetworkManager } from './managers/NetworkManager';
 import { Socket } from 'socket.io';
 import { Player, PlayerManager } from './managers/PlayerManager';
 import { Vector3 } from './Utils/Vector3';
+import readline = require('readline');
+const interf =   readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  
 let lastID=0;
 let counter =0;
 export const defaultSpawnPoint = new Vector3(0,100,0);
@@ -110,5 +116,26 @@ export class Main
         }
     }
     }
+    static saveAll()
+    {
+        Main.playerManager.savePlayerInfo();
+        Main.world.saveAll();
+        process.exit();
+    }
 }
+interf.on("line",(input)=>{
+    if(input == "stop")
+    {
+        Main.saveAll();
+    }
+});
+process.on("SIGABRT",()=>{
+    Main.saveAll();
+});
+process.on("SIGKILL",()=>{
+    Main.saveAll();
+});
+process.on("SIGINT",()=>{
+  Main.saveAll();
+});
 Main.run();
