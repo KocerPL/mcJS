@@ -1,4 +1,5 @@
-import { UUID, getUUID } from "../Main";
+import { Main, UUID, getUUID } from "../Main";
+import { clamp } from "../Utils";
 import { Vector3 } from "../Utils/Vector3";
 import { Entity } from "./Entity";
 
@@ -16,6 +17,14 @@ export class Item extends Entity
     }
     update()
     {
-        
+        let oldPos = this.pos.copy();
+        this. pos =this.pos.add(this.acc);
+        let bottPos =this.pos.copy();
+        bottPos.y-=0.5;
+        if(Main.world.getBlockID(bottPos)>0) this.acc.y=0; else this.acc.y-=0.1;
+        this.acc.y = clamp(this.acc.y,-1,1);
+       this.acc = this.acc.add(this.acc.multiply(-0.1));
+        if(Vector3.distance(oldPos,this.pos)>0.1)
+        Main.networkManager.io.volatile.emit("updateEntity", this);
     }
 }

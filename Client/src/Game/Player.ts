@@ -104,6 +104,12 @@ export class Player
         for(let i=0;i<27;i++)
             this.inventory[i]= new invItem(0);
         // this.updateItem(2,0,64);
+        const ib =   this.gs.gui.get("ItemBar");
+        if(ib instanceof ItemBar)
+        {
+            this.selectedItem = ib.currentSlot;
+            ib.updateSlot();
+        }
     }
     update()
     {

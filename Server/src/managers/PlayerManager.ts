@@ -78,10 +78,12 @@ export class Player
     }
     dropItem(slot:number,isInv:boolean)
     {
+        let it:Item;
         if(isInv)
         {
             this.inventory[slot].count--;
-            Main.entityManager.add(new Item(this.pos,this.inventory[slot].id));
+            it = new Item(this.pos,this.inventory[slot].id);
+            Main.entityManager.add(it);
             if(this.inventory[slot].count<=0)
             this.inventory[slot].id =0;
             this.socket.emit("updateItem",{id: this.inventory[slot].id,count: this.inventory[slot].count,slot:slot,inventory:true});
@@ -89,11 +91,15 @@ export class Player
         else
         {
             this.itemsBar[slot].count--;
-            Main.entityManager.add(new Item(this.pos,this.itemsBar[slot].id));
+            it = new Item(this.pos,this.itemsBar[slot].id);
+            Main.entityManager.add(it);
             if(this.itemsBar[slot].count<=0)
             this.itemsBar[slot].id =0;
             this.socket.emit("updateItem",{id: this.itemsBar[slot].id,count: this.itemsBar[slot].count,slot:slot,inventory:false});
         }
+        let yRot = -this.rots.body.y;
+        it.acc.x=Math.sin(yRot*Math.PI/180)*0.3;
+        it.acc.z=Math.cos(yRot*Math.PI/180)*0.3;
     }
     moveItem(data:{slot1:number,isInv1:boolean, slot2:number,isInv2:boolean})
     {

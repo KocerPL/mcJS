@@ -35,6 +35,10 @@ export class Vector3
         outVec.z = this.z*scalar;
         return outVec
     }
+    floor()
+    {
+        return new Vector3(Math.floor(this.x),Math.floor(this.y),Math.floor(this.z));
+    }
     isIn(x:number,y:number,z:number,dx:number,dy:number,dz:number):boolean
     {
         if(this.x>x && this.y>y && this.z>z && this.x<dx && this.y<dy &&this.z<dz)

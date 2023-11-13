@@ -57,9 +57,7 @@ export class GameScene extends Scene
     public player:Player ;
     public range = {start:0, end:1};
     //public static chunks:Array<Array<Chunk>>=new Array(8);
-    public chunkQueue:Array<Chunk> = []; 
-    private lastSubUpdated:SubChunk;
-    private countLS:number = 0;
+    public chunkQueue:Set<Chunk> = new Set(); 
     public loadedChunks:Map<string,Chunk> = new Map();
     public toUpdate:Set<SubChunk> = new Set();
     public  integratedServer:Worker;
@@ -75,12 +73,16 @@ export class GameScene extends Scene
         let clSub:SubChunk = undefined;
         for(let sc of this.toUpdate)
         {
-            if(false && !sc.chunk.allNeighbours) 
+            if(!sc.chunk.allNeighbours) 
             {
+                // console.log( "Not enough neighbours",sc.chunk.neighbours);
                 sc.chunk.sendNeighbours(this);
+                if(!sc.chunk.allNeighbours) 
+                    sc.chunk.deleteSubchunksFromQueue(this);
                 continue;
             }
             let dist =Vector.distance(plPos,sc.pos.mult(16));
+           
             if(dist<clDistance)
             {
                 clDistance =dist;
@@ -91,32 +93,18 @@ export class GameScene extends Scene
     }
     private updateSubchunk()
     {
-        console.log("Size of queue:"+this.toUpdate.size);
         //const concatQ:Set<Chunk> = new Set();
         const entry:SubChunk =this.getNearestSubchunk();// this.toUpdate.entries().next().value[0];
-        if(entry == this.lastSubUpdated)
-        {
-            this.countLS++;
-            if(this.countLS>=100)
-            {
-                console.log("Failed to update same subchunk over 100 times",entry);
-                this.toUpdate.delete(entry);
-                this.countLS=0;
-            }
-        }
-        else
-        {
-            this.countLS=0;
-            this.lastSubUpdated = entry;
-        }
         //console.log("running...",entry);
         //    console.log(entry[0].pos);
         if(entry)
         {
-            this.toUpdate.delete(entry);
+   
+           
             entry.update(this).then(()=>{
                 // console.log("updating...");
                 entry.chunk.updateMesh();
+                this.toUpdate.delete(entry);
                 //   occasionalSleeper().then(()=>{
                 //     this.updateSubchunk();
                 // });
@@ -134,7 +122,7 @@ export class GameScene extends Scene
     }
     public handleSubchunk(ev)
     {
-        console.log("received subchunk");
+       
         let chunk = this.getChunkAt(ev.data.subX,ev.data.subZ);
         if(chunk==undefined)
         {
@@ -151,8 +139,8 @@ export class GameScene extends Scene
         for(let i=0;i<16;i++)
             if(!chunk.subchunks[i])
                 return;
-        this.chunkQueue.push(this.getChunkAt(ev.data.subX,ev.data.subZ));
-        //  console.log("Chunk at: x:"+ ev.data.subX+" z:"+ev.data.subZ+"is ready to be loaded");
+        this.chunkQueue.add(this.getChunkAt(ev.data.subX,ev.data.subZ));
+        //console.log("Chunk at: x:"+ ev.data.subX+" z:"+ev.data.subZ+"is ready to be loaded");
     }
     start() {
         Block.createInfoArray();
@@ -538,18 +526,13 @@ export class GameScene extends Scene
     }
     public processChunks()
     {
-        for(let i=this.chunkQueue.length-1;i>=0;i--)
+        for(const chunk of this.chunkQueue)
         {
-            const chunk = this.chunkQueue[i];
             if(chunk.isSubArrayReady())
             {
                 chunk.prepareLight();
                 chunk.sendNeighbours(this);
-                this.chunkQueue.splice(i);
-            }
-            else{
-                // console.log("preparing Chunk: ",chunk.pos);
-                continue;
+                this.chunkQueue.delete(chunk);
             }
         }
     }

@@ -100,8 +100,14 @@ export class Chunk {
         this.allNeighbours = false;
         this.neighbours[dir] = undefined;
     }
-    deleteNeighbours(gs)
+    deleteSubchunksFromQueue(gs:GameScene)
     {
+        for(let subchunk of this.subchunks)
+        gs.toUpdate.delete(subchunk);
+    }
+    deleteNeighbours(gs:GameScene)
+    {
+        this.deleteSubchunksFromQueue(gs);
         let neighbour:Chunk = gs.getChunkAt(this.pos.x-1,this.pos.z);
         neighbour && neighbour.deleteNeighbour("POS_X");
         neighbour = gs.getChunkAt(this.pos.x+1,this.pos.z);

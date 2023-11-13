@@ -5,6 +5,7 @@ import { Entity } from "../Entities/Entity";
 import { EntityManager } from "../managers/EntityManager";
 import { Main } from "../Main";
 import { Item } from "../Entities/Item";
+import { Vector3 } from "../Utils/Vector3";
 // class all about loading world, and changing , and generation
 export class ChunkInfo
 {
@@ -54,6 +55,22 @@ chunkInfo.entities = Main.entityManager.getByAABB(chunkInfo.pos[0]*16,0,chunkInf
     (chunkInfo.pos[0]+1)*16,256,(chunkInfo.pos[1]+1)*16);
     fs.writeFileSync(this.dir+"/"+chunk.pos[0]+"."+chunk.pos[1]+".kChunk",JSON.stringify(chunkInfo));
 }
+    getBlockID(pos:Vector3)
+    {
+       let floored  = pos.floor();
+       let inChunkPos = new Vector3(floored.x%16,floored.y%16,floored.z%16);
+       if(inChunkPos.x<0)
+           inChunkPos.x = 16-Math.abs(inChunkPos.x);
+       if(inChunkPos.z<0)
+           inChunkPos.z = 16-Math.abs(inChunkPos.z);
+    
+
+
+       const chunkPos =new Vector3(Math.floor(floored.x/16),Math.floor(floored.y/16),Math.floor(Math.round(floored.z)/16));
+    //   console.log(chunkPos.y);
+       if(chunkPos.y>15 || chunkPos.y<0) return 20;
+      return this.getChunk(chunkPos.x,chunkPos.z).subchunks[chunkPos.y][World.toSubIndex(inChunkPos.x,inChunkPos.y,inChunkPos.z)];
+    }
     saveAll()
     {
         console.log("Saving chunks...");

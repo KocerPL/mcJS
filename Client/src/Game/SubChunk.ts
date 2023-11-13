@@ -594,6 +594,7 @@ const occasionalSleeper = (function() {
     let lastSleepingTime = performance.now();
 
     return function() {
+        return Promise.resolve();
         if (performance.now() - lastSleepingTime > 100) {
             lastSleepingTime = performance.now();
             return new Promise(resolve => setTimeout(resolve, 0));

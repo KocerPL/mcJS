@@ -13,7 +13,7 @@ import { Block } from "../Block.js";
 export class ItemBar extends GuiComponent
 {
     slot = new SelectedSlot(0,0,"selected");
-    currentSlot = 5;
+    currentSlot = 0;
     constructor(id:string)
     {
         super(id);

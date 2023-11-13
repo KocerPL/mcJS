@@ -105,6 +105,7 @@ export class Main
     static update()
     {
         this.playerManager.update();
+        this.entityManager.update();
     }
     static makeDirs()
     {

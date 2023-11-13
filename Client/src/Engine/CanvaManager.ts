@@ -124,7 +124,7 @@ export class CanvaManager
     }
     private static onKeyDown(ev:KeyboardEvent)
     {
-        console.log(ev.key);
+        //console.log(ev.key);
         Main.scene.onKey(ev.key);
         this.keys[ev.key.toUpperCase()] = true;
         ev.preventDefault();
