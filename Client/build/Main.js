@@ -4,7 +4,7 @@ import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Shader2d } from "./Engine/Shader/Shader2d.js";
 import { MenuScene } from "./Game/scenes/MenuScene.js";
 const gl = CanvaManager.gl;
-class Main {
+export class Main {
     static scene;
     static FPS = 61;
     static shared = {};
@@ -90,5 +90,4 @@ class Main {
         this.scene.render();
     }
 }
-export { Main };
 Main.run();

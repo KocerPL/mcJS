@@ -6,6 +6,7 @@ export class Item extends Entity
 {
     type= "item";
     id:number;
+    invurnerableEnd:number= Date.now()+3000;
     constructor(pos:Vector3,id:number,uuid?:UUID)
     {
         super();

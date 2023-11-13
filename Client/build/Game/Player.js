@@ -21,7 +21,7 @@ export class invItem {
         this.count = 0;
     }
 }
-class Player {
+export class Player {
     //model
     id;
     entity;
@@ -251,8 +251,9 @@ class Player {
             if (!this.locked && !this.openInventory && !this.gs.keyLock) {
                 let yRot = -this.entity.rotations.body.y;
                 if (CanvaManager.getKeyOnce("Q")) {
-                    this.dropItem(this.itemsBar[this.selectedItem].id, 1);
-                    this.updateItem(this.itemsBar[this.selectedItem].id, this.selectedItem, this.itemsBar[this.selectedItem].count - 1);
+                    //this.dropItem(this.itemsBar[this.selectedItem].id,1);
+                    this.gs.socket.emit("dropItem", this.selectedItem, false);
+                    // this.updateItem(this.itemsBar[this.selectedItem].id,this.selectedItem,this.itemsBar[this.selectedItem].count-1);
                 }
                 if (CanvaManager.getKey("CAPSLOCK"))
                     speed = 2;
@@ -503,4 +504,3 @@ class Player {
         }
     }
 }
-export { Player };

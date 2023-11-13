@@ -72,6 +72,28 @@ export class Player
           socket.on("disconnect", (reason) => {
               this.disconnect();
             });
+            socket.on("dropItem",(slot:number,isInv:boolean)=>{
+                this.dropItem(slot,isInv);
+            })
+    }
+    dropItem(slot:number,isInv:boolean)
+    {
+        if(isInv)
+        {
+            this.inventory[slot].count--;
+            Main.entityManager.add(new Item(this.pos,this.inventory[slot].id));
+            if(this.inventory[slot].count<=0)
+            this.inventory[slot].id =0;
+            this.socket.emit("updateItem",{id: this.inventory[slot].id,count: this.inventory[slot].count,slot:slot,inventory:true});
+        }
+        else
+        {
+            this.itemsBar[slot].count--;
+            Main.entityManager.add(new Item(this.pos,this.itemsBar[slot].id));
+            if(this.itemsBar[slot].count<=0)
+            this.itemsBar[slot].id =0;
+            this.socket.emit("updateItem",{id: this.itemsBar[slot].id,count: this.itemsBar[slot].count,slot:slot,inventory:false});
+        }
     }
     moveItem(data:{slot1:number,isInv1:boolean, slot2:number,isInv2:boolean})
     {
@@ -203,7 +225,7 @@ export class PlayerManager
           let entities = Main.entityManager.getByAABB(p1.x,p1.y,p1.z,p2.x,p2.y,p2.z);
             for(let ent of entities)
             {
-                if(ent instanceof Item)
+                if(ent instanceof Item && ent.invurnerableEnd<= Date.now())
                 {
                     let dist = Vector3.distance(player.pos,ent.pos);
                     if(dist<0.5)

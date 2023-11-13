@@ -4,7 +4,7 @@ import { PerlinN } from "../PerlinNoise.js";
 import { SkyLighter } from "../SkyLighter.js";
 import { Block } from "./Block.js";
 const perlin = new PerlinN();
-class World {
+export class World {
     Chunks = [];
     static waterLevel = 0;
     static height = 50;
@@ -171,4 +171,3 @@ class World {
         return 0;
     }
 }
-export { World };

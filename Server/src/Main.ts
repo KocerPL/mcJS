@@ -132,9 +132,6 @@ interf.on("line",(input)=>{
 process.on("SIGABRT",()=>{
     Main.saveAll();
 });
-process.on("SIGKILL",()=>{
-    Main.saveAll();
-});
 process.on("SIGINT",()=>{
   Main.saveAll();
 });

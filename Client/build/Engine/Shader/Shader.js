@@ -6,7 +6,7 @@ export var dimensions;
     dimensions[dimensions["_2d"] = 0] = "_2d";
     dimensions[dimensions["_3d"] = 1] = "_3d";
 })(dimensions || (dimensions = {}));
-class Shader {
+export class Shader {
     dimensions;
     locationCache = new Map();
     ID;
@@ -65,4 +65,3 @@ class Shader {
     }
     static current = null;
 }
-export { Shader };

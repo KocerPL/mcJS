@@ -51,6 +51,8 @@ export class GameScene extends Scene {
     range = { start: 0, end: 1 };
     //public static chunks:Array<Array<Chunk>>=new Array(8);
     chunkQueue = [];
+    lastSubUpdated;
+    countLS = 0;
     loadedChunks = new Map();
     toUpdate = new Set();
     integratedServer;
@@ -64,6 +66,10 @@ export class GameScene extends Scene {
         let clDistance = Number.POSITIVE_INFINITY;
         let clSub = undefined;
         for (let sc of this.toUpdate) {
+            if (false && !sc.chunk.allNeighbours) {
+                sc.chunk.sendNeighbours(this);
+                continue;
+            }
             let dist = Vector.distance(plPos, sc.pos.mult(16));
             if (dist < clDistance) {
                 clDistance = dist;
@@ -73,8 +79,21 @@ export class GameScene extends Scene {
         return clSub;
     }
     updateSubchunk() {
+        console.log("Size of queue:" + this.toUpdate.size);
         //const concatQ:Set<Chunk> = new Set();
         const entry = this.getNearestSubchunk(); // this.toUpdate.entries().next().value[0];
+        if (entry == this.lastSubUpdated) {
+            this.countLS++;
+            if (this.countLS >= 100) {
+                console.log("Failed to update same subchunk over 100 times", entry);
+                this.toUpdate.delete(entry);
+                this.countLS = 0;
+            }
+        }
+        else {
+            this.countLS = 0;
+            this.lastSubUpdated = entry;
+        }
         //console.log("running...",entry);
         //    console.log(entry[0].pos);
         if (entry) {
