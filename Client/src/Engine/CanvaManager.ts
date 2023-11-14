@@ -20,56 +20,56 @@ export class CanvaManager
 
         location.appendChild(this.canva);
 
-            if (navigator.userAgent.match(/Android/i)
+        if (navigator.userAgent.match(/Android/i)
             || navigator.userAgent.match(/webOS/i)
             || navigator.userAgent.match(/iPhone/i)
             || navigator.userAgent.match(/iPad/i)
             || navigator.userAgent.match(/iPod/i)
             || navigator.userAgent.match(/BlackBerry/i)
             || navigator.userAgent.match(/Windows Phone/i)){
-            let controlDiv = document.createElement("div");
-            let upDiv = document.createElement("div");
-            let downDiv = document.createElement("div");
-            let rightDiv = document.createElement("div");
-            let leftDiv = document.createElement("div");
+            const controlDiv = document.createElement("div");
+            const upDiv = document.createElement("div");
+            const downDiv = document.createElement("div");
+            const rightDiv = document.createElement("div");
+            const leftDiv = document.createElement("div");
             upDiv.id = "up";
             leftDiv.id = "left";
             rightDiv.id = "right";
             downDiv.id = "down";
-            controlDiv.id = "control"
+            controlDiv.id = "control";
             location.appendChild(controlDiv);
             controlDiv.appendChild(upDiv);
             controlDiv.appendChild(downDiv);
             controlDiv.appendChild(rightDiv);
             controlDiv.appendChild(leftDiv);
-           upDiv.addEventListener("touchstart",()=>{
+            upDiv.addEventListener("touchstart",()=>{
                 this.keys["W"] = true;
             },true);
             upDiv.addEventListener("touchend",()=>{
                 this.keys["W"] =false;
-            },true)
+            },true);
 
             rightDiv.addEventListener("touchstart",()=>{
                 this.keys["D"] = true;
             },true);
             rightDiv.addEventListener("touchend",()=>{
                 this.keys["D"] =false;
-            },true)
+            },true);
 
             leftDiv.addEventListener("touchstart",()=>{
                 this.keys["A"] = true;
             },true);
             leftDiv.addEventListener("touchend",()=>{
                 this.keys["A"] =false;
-            },true)
+            },true);
 
             downDiv.addEventListener("touchstart",()=>{
                 this.keys["S"] = true;
             },true);
             downDiv.addEventListener("touchend",()=>{
                 this.keys["S"] =false;
-            },true)
-         }
+            },true);
+        }
         this.debug.style.position = "absolute";
         this.debug.style.color = "white";
         this.debug.style.top = "0";
@@ -100,7 +100,7 @@ export class CanvaManager
         this.mouse.pos.x =  ev.touches[0].clientX;
         this.mouse.pos.y =  ev.touches[0].clientY;
       
-       ev.preventDefault();
+        ev.preventDefault();
     }
     static onTouchMove(ev:TouchEvent)
     {
@@ -108,7 +108,7 @@ export class CanvaManager
         this.mouseMovement.y += this.mouse.pos.y-ev.touches[0].clientY;
         this.mouse.pos.x =  ev.touches[0].clientX;
         this.mouse.pos.y =  ev.touches[0].clientY;
-       ev.preventDefault();
+        ev.preventDefault();
     }
     public static unlockPointer()
     {
