@@ -25,14 +25,14 @@ export class PlayerEntity extends Entity
     nextTransitions:Array<{pos:Vector,rots:PlayerRotations}>=[];
     itemEnt:Item;
     rotations:PlayerRotations = new PlayerRotations();
-   // rsHammer = Loader.loadObj("./res/models/hammer.obj");
+    // rsHammer = Loader.loadObj("./res/models/hammer.obj");
     gs:GameScene;
     constructor(pos:Vector,gs:GameScene,id?)
     {
         super(pos,Main.atlasShader,id);
         this.gs = gs;
         
-       this.itemEnt =  new Item(new Vector(0,0,0),1,this.gs,0);
+        this.itemEnt =  new Item(new Vector(0,0,0),1,this.gs,0);
         this.rs.resetArrays();
         this.rs.vertices =[ //tył
             -0.5,-0.5,-0.5,
@@ -335,28 +335,29 @@ export class PlayerEntity extends Entity
         const mat = Matrix4.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.rotations.body.y).translate(-0.375,0,0).rotateX(this.rotations.leftHand.x).rotateY(this.rotations.leftHand.y).rotateZ(this.rotations.leftHand.z).translate(0,-0.35,0).scale(bScale ,bScale ,bScale );
         Main.atlasShader.loadTransformation(mat);
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,180*4);
-              //Right Hand
+        //Right Hand
         Main.atlasShader.loadTransformation( Matrix4.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.rotations.body.y).translate(0.375,0,0).rotateX(this.rotations.rightHand.x).rotateY(this.rotations.rightHand.y).rotateZ(this.rotations.rightHand.z).translate(0,-0.35,0).scale(bScale ,bScale ,bScale ));
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,144*4);
-      //  this.renderHandItem();
+        //  this.renderHandItem();
         Main.shader.use();
     }
     renderHandItem(id:number)
     {
-        Texture.skinAtlas.bind();
+    /*    Texture.skinAtlas.bind();
         this.rs.vao.bind();
-       const cScale = 0.5;
+        const cScale = 0.5;
         Main.atlasShader.use();
         Main.atlasShader.loadUniforms(this.gs.player.camera.getProjection(),Matrix4.identity().translate(this.pos.x,this.pos.y+0.40,this.pos.z).rotateY(this.rotations.body.y).translate(0.375,0,0).rotateX(this.rotations.rightHand.x).rotateY(this.rotations.rightHand.y).rotateZ(this.rotations.rightHand.z).translate(0,-0.35,0).scale(cScale ,cScale ,cScale ),this.gs.player.camera.getView(),15);
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,144*4);
+         */
         const bScale = 0.3;
         const isRightHanded = true;
-        
+       
         let mat = Matrix4.identity().translate(this.pos.x,this.pos.y+0.45,this.pos.z).rotateY(this.rotations.body.y);
         if(isRightHanded)
-        mat =mat.rotateX(this.rotations.rightHand.x).rotateZ(5).translate( isRightHanded?0.375:-0.375,-0.6,0.2);
+            mat =mat.rotateX(this.rotations.rightHand.x).rotateZ(5).translate( isRightHanded?0.375:-0.375,-0.6,0.2);
         else
-        mat =mat.rotateX(-this.rotations.leftHand.x).rotateZ(-5).translate(-0.375,-0.7,0.2);
+            mat =mat.rotateX(-this.rotations.leftHand.x).rotateZ(-5).translate(-0.375,-0.7,0.2);
 
         mat = mat.rotateY(-90).rotateY(45).scale(bScale ,bScale ,bScale );
         if(id!=0)
@@ -364,15 +365,15 @@ export class PlayerEntity extends Entity
             Main.shader.use();
             Texture.blockAtlas.bind();
             if(id!=this.itemEnt.type)
-               {
+            {
                 this.itemEnt.type =id; 
                 this.itemEnt.prepareModel();
                 this. itemEnt.bufferWithDummyLight();
                 console.log("changing: "+id);
-               }
+            }
             
-             //  this.itemEnt.pos   = new Vector(this.pos.x,this.pos.y+0.45,this.pos.z);
-               this.itemEnt.render(mat);
+            //  this.itemEnt.pos   = new Vector(this.pos.x,this.pos.y+0.45,this.pos.z);
+            this.itemEnt.render(mat);
         }      
         
         //  this.rsHammer.vao.bind();
@@ -382,21 +383,17 @@ export class PlayerEntity extends Entity
     }
     setNextTransitions(nextPos:Vector,nextRots:PlayerRotations,count:number)
     {
-        //while(this.nextTransitions.length>0 && !this.nextTransitions.at(-1))
-        //this.nextTransitions.pop();
         const deltaPos = Vector.add(nextPos,this.nextTransitions.length>0?this.nextTransitions.at(-1).pos.mult(-1):this.pos.mult(-1));
-        //console.error(this.rotations);
         const deltaRots = new PlayerRotations();
-        for(let name in this.rotations)
+        for(const name in this.rotations)
         {
-          //  console.error(this.rotations[name]);
-         deltaRots[name] =    nextRots[name].add(this.nextTransitions.length>0?this.nextTransitions.at(-1).rots[name].mult(-1):this.rotations[name].mult(-1));
+            deltaRots[name] =    nextRots[name].add(this.nextTransitions.length>0?this.nextTransitions.at(-1).rots[name].mult(-1):this.rotations[name].mult(-1));
         }
         const OneStepPos = deltaPos.mult(1/count);
         const OneStepRots  = new PlayerRotations();
-        for(let name in deltaRots)
+        for(const name in deltaRots)
         {
-         OneStepRots[name] = this.rotations[name].add( deltaRots[name].mult(1/count));
+            OneStepRots[name] = this.rotations[name].add( deltaRots[name].mult(1/count));
         }
         for(let i=1;i<count;i++)
         {

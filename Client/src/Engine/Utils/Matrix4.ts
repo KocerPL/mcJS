@@ -233,7 +233,7 @@ export class Matrix4
         const rightdown = (mat[3]*mat[6]*mat[9]*mat[12])+(mat[0]*mat[7]*mat[10]*mat[13])+(mat[1]*mat[4]*mat[11]*mat[14])+(mat[2]*mat[5]*mat[8]*mat[15]);
         return leftdown-rightdown ;
     }
-    translate(x,y,z)
+    translate(x:number,y:number,z:number)
     {
         const transl = new Matrix4();
         transl._data[3] = x;

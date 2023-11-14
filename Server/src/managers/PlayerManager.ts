@@ -98,8 +98,8 @@ export class Player
             this.socket.emit("updateItem",{id: this.itemsBar[slot].id,count: this.itemsBar[slot].count,slot:slot,inventory:false});
         }
         let yRot = -this.rots.body.y;
-        it.acc.x=Math.sin(yRot*Math.PI/180)*0.3;
-        it.acc.z=Math.cos(yRot*Math.PI/180)*0.3;
+        it.acc.x=Math.sin(yRot*Math.PI/180)*0.7;
+        it.acc.z=Math.cos(yRot*Math.PI/180)*0.7;
     }
     moveItem(data:{slot1:number,isInv1:boolean, slot2:number,isInv2:boolean})
     {

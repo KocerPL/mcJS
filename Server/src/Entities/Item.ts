@@ -7,7 +7,8 @@ export class Item extends Entity
 {
     type= "item";
     id:number;
-    invurnerableEnd:number= Date.now()+3000;
+    invurnerableEnd:number= Date.now()+1000;
+    friction:number = 0.3;
     constructor(pos:Vector3,id:number,uuid?:UUID)
     {
         super();
@@ -23,7 +24,7 @@ export class Item extends Entity
         bottPos.y-=0.5;
         if(Main.world.getBlockID(bottPos)>0) this.acc.y=0; else this.acc.y-=0.1;
         this.acc.y = clamp(this.acc.y,-1,1);
-       this.acc = this.acc.add(this.acc.multiply(-0.1));
+       this.acc = this.acc.add(this.acc.multiply(-this.friction).setY(0));
         if(Vector3.distance(oldPos,this.pos)>0.1)
         Main.networkManager.io.volatile.emit("updateEntity", this);
     }

@@ -39,6 +39,11 @@ export class Vector3
     {
         return new Vector3(Math.floor(this.x),Math.floor(this.y),Math.floor(this.z));
     }
+    round()
+    {
+        return new Vector3(Math.round(this.x),Math.round(this.y),Math.round(this.z));
+
+    }
     isIn(x:number,y:number,z:number,dx:number,dy:number,dz:number):boolean
     {
         if(this.x>x && this.y>y && this.z>z && this.x<dx && this.y<dy &&this.z<dz)
@@ -52,5 +57,20 @@ export class Vector3
     static distance(vecA:Vector3,vecB:Vector3)
     {
         return Math.sqrt(Math.pow(vecA.x-vecB.x,2)+Math.pow(vecA.y-vecB.y,2)+Math.pow(vecA.z-vecB.z,2));
+    }
+    setX(x:number)
+    {
+        this.x=x;
+        return this;
+    }
+    setY(y:number)
+    {
+        this.y=y;
+        return this;
+    }
+    setZ(z:number)
+    {
+        this.z =z;
+        return this;
     }
 }

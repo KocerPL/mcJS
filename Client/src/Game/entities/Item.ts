@@ -26,22 +26,13 @@ export class Item extends Entity
         this.prepareModel();
     }
     update(i:number): void {
-       
-        if(this.cooldown>0)
-            this.cooldown--;
-        this.lifeTime--;
-   
-        if(this.lifeTime<1 )
-        {
-            this.gs.entities.splice(i,1);
-            return;
-        }
         const block =World.getBlock(new Vector(this.pos.x,this.pos.y ,this.pos.z),this.gs);
         let ll =  block ? block.skyLight: 0;
         this.rs.skyLight = [ll,ll,ll,ll, ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll, ll,ll,ll,ll];
         ll =  block ? block.lightFBlock: 0;
         this.rs.blockLight = [ll,ll,ll,ll, ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll, ll,ll,ll,ll];
         this.rs.bufferArrays();
+        this.updatePosBOT();
     }
     bufferWithDummyLight()
     {
@@ -111,8 +102,8 @@ export class Item extends Entity
     }
     render(transformation?:Matrix4): void {
         // console.log("rendered")
-     //   if(this.acc.x>0.02) this.acc.x-=0.01;else  if(this.acc.x<-0.02) this.acc.x+=0.01;else this.acc.x =0;
-       // if(this.acc.z>0.02) this.acc.z-=0.01; else if(this.acc.z<-0.02) this.acc.z+=0.01; else this.acc.z=0;
+        //   if(this.acc.x>0.02) this.acc.x-=0.01;else  if(this.acc.x<-0.02) this.acc.x+=0.01;else this.acc.x =0;
+        // if(this.acc.z>0.02) this.acc.z-=0.01; else if(this.acc.z<-0.02) this.acc.z+=0.01; else this.acc.z=0;
         //this.pos = Vector.add(this.pos,this.acc);
         if(this.rotation<360)
             this.rotation++;

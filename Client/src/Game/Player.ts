@@ -97,7 +97,8 @@ export class Player
         this.blockOverlay = new RenderSet(Main.atlasShader);
         this.pos = pos;
         this.entity = new PlayerEntity(this.pos,gs);
-        this.camera.offset = -0.3;
+        this.camera.offset.z = -0.15;
+        this.camera.offset.y = -0.1;
         this.camera.setPosition(new Vector(pos.x,pos.y+1,pos.z));
         for(let i=0;i<9;i++)
             this.itemsBar[i]= new invItem(0);
@@ -181,15 +182,19 @@ export class Player
         if(person== this.person) return;
         this.person = person;
         this.camera.projRot = 0;
+        this.camera.offset.y = 0;
         if(person=="Third")
-            this.camera.offset = 5;
+            this.camera.offset.z = 5;
         else if(person=="Second")
         {
-            this.camera.offset = -5;
+            this.camera.offset.z = -5;
             this.camera.projRot = 180;
         }
         else 
-            this.camera.offset = -0.3;
+        {
+            this.camera.offset.z = -0.15;
+            this.camera.offset.y = -0.1;
+        }
     }
     isInBlock(pos:Vector):boolean
     {
@@ -300,7 +305,7 @@ export class Player
                    
                     //this.dropItem(this.itemsBar[this.selectedItem].id,1);
                     this.gs.socket.emit("dropItem",this.selectedItem,false);
-                   // this.updateItem(this.itemsBar[this.selectedItem].id,this.selectedItem,this.itemsBar[this.selectedItem].count-1);
+                    // this.updateItem(this.itemsBar[this.selectedItem].id,this.selectedItem,this.itemsBar[this.selectedItem].count-1);
                    
                 }
                 if(CanvaManager.getKey("CAPSLOCK"))
@@ -315,7 +320,7 @@ export class Player
                 }
                 else if(CanvaManager.getKey("S"))
                 {
-                  //  this.entity.bodyRot = this.entity.rotation.y;
+                    //  this.entity.bodyRot = this.entity.rotation.y;
                     yRot = -this.entity.rotations.body.y;
                     tempPos.x-=Math.sin(yRot*Math.PI/180)*0.1;
                     tempPos.z-=Math.cos(yRot*Math.PI/180)*0.1;
@@ -411,43 +416,43 @@ export class Player
         if(this.locked || this.openInventory) return;
         if(CanvaManager.getKey("W")||CanvaManager.getKey("A")||CanvaManager.getKey("S")||CanvaManager.getKey("D"))
         {
-        this.entity.rotations.leftLeg.x += this.legChange*speed;
-        this.entity.rotations.rightLeg.x -= this.legChange*speed;
+            this.entity.rotations.leftLeg.x += this.legChange*speed;
+            this.entity.rotations.rightLeg.x -= this.legChange*speed;
     
-        this.entity.rotations.leftHand.x -= this.legChange*speed;
-        this.entity.rotations.rightHand.x += this.legChange*speed;
+            this.entity.rotations.leftHand.x -= this.legChange*speed;
+            this.entity.rotations.rightHand.x += this.legChange*speed;
         }
         else 
         {
-        this.entity.rotations.leftLeg.x -= this.entity.rotations.leftLeg.x*0.1;
-        this.entity.rotations.rightLeg.x -= this.entity.rotations.rightLeg.x*0.1;
-        this.entity.rotations.leftHand.x -= this.entity.rotations.leftHand.x*0.1;
-        this.entity.rotations.rightHand.x -= this.entity.rotations.rightHand.x*0.1;
+            this.entity.rotations.leftLeg.x -= this.entity.rotations.leftLeg.x*0.1;
+            this.entity.rotations.rightLeg.x -= this.entity.rotations.rightLeg.x*0.1;
+            this.entity.rotations.leftHand.x -= this.entity.rotations.leftHand.x*0.1;
+            this.entity.rotations.rightHand.x -= this.entity.rotations.rightHand.x*0.1;
         }      
         if(!this.gs.keyLock)
         {
-        this.camera.setPitch(this.camera.getPitch()- (CanvaManager.mouseMovement.y/10));
-        this.camera.setYaw(this.camera.getYaw()+(CanvaManager.mouseMovement.x/10));
+            this.camera.setPitch(this.camera.getPitch()- (CanvaManager.mouseMovement.y/10));
+            this.camera.setYaw(this.camera.getYaw()+(CanvaManager.mouseMovement.x/10));
         }
         if(this.camera.getPitch()>90) this.camera.setPitch(90);
         if(this.camera.getPitch()<-90) this.camera.setPitch(-90);
         if(CanvaManager.mouse.left) this.mine(); else this.blockBreakingTime=0;
         if(CanvaManager.mouse.right) this.place();
-       if(!this.gs.keyLock)
-       {
-        if(CanvaManager.getKey("1"))
+        if(!this.gs.keyLock)
         {
-            this.switchPerson("First");
+            if(CanvaManager.getKey("1"))
+            {
+                this.switchPerson("First");
+            }
+            else if(CanvaManager.getKey("2"))
+            {
+                this.switchPerson("Second");
+            }
+            else if(CanvaManager.getKey("3"))
+            {
+                this.switchPerson("Third");
+            }
         }
-        else if(CanvaManager.getKey("2"))
-        {
-            this.switchPerson("Second");
-        }
-        else if(CanvaManager.getKey("3"))
-        {
-            this.switchPerson("Third");
-        }
-    }
     }
     mine()
     {
@@ -587,20 +592,16 @@ export class Player
     }
     render()
     {   
+        this.entity.render();
         
-        if(this.person != "First") 
-        {
-          
-            this.entity.render();
-        }
-            this.entity.renderHandItem(this.itemsBar[this.selectedItem].id);
+        this.entity.renderHandItem(this.itemsBar[this.selectedItem].id);
         if(this.blockBreakingTime>1)
         {      const   transformation = Matrix4.identity();
-           if( (Date.now()-this.lastHit)>=300)
-           {
-            this.lastHit = Date.now();
-            this.entity.rotations.rightHand.x = randRange(-70,-45);
-           }
+            if( (Date.now()-this.lastHit)>=300)
+            {
+                this.lastHit = Date.now();
+                this.entity.rotations.rightHand.x = randRange(-70,-45);
+            }
             this.blockOverlay.vao.bind();
             Main.shader.use();
             Texture.blockOverlay.bind();

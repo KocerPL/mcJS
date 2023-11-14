@@ -68,10 +68,10 @@ export class GameScene extends Scene
     private isInv =false;
     private getNearestSubchunk():SubChunk
     {
-        let plPos = this.player.pos.copy();
+        const plPos = this.player.pos.copy();
         let clDistance = Number.POSITIVE_INFINITY;
         let clSub:SubChunk = undefined;
-        for(let sc of this.toUpdate)
+        for(const sc of this.toUpdate)
         {
             if(!sc.chunk.allNeighbours) 
             {
@@ -81,7 +81,7 @@ export class GameScene extends Scene
                     sc.chunk.deleteSubchunksFromQueue(this);
                 continue;
             }
-            let dist =Vector.distance(plPos,sc.pos.mult(16));
+            const dist =Vector.distance(plPos,sc.pos.mult(16));
            
             if(dist<clDistance)
             {
@@ -153,34 +153,34 @@ export class GameScene extends Scene
         this.gui.add(new ItemBar("ItemBar"));
         this.gui.add(new Inventory("Inventory"));
         this.gui.add(new TextComponent("debug","FPS:",0.01,null,ALIGN.left)).transformation =Matrix3.identity().translate(-1,0.98);
-        let testButton  =new Button("test");
+        const testButton  =new Button("test");
         testButton.transformation = Matrix3.identity().translate(0.9,0.85).scale(0.2,0.2);
         testButton.setVisible = false;
         testButton.onclick = ()=>{
             let ti = this.gui.get("debuginput_text_in");
             let name ="body";
-            let pName = "x"
+            let pName = "x";
             if(ti instanceof TextInput)
             {
-                let sp =  ti.text.split('.');
+                const sp =  ti.text.split(".");
                 if(sp.length<2)
-                return;
+                    return;
                 name =sp[0];
                 pName = sp[1];
             }
-             ti = this.gui.get("debuginputvalue_text_in");
+            ti = this.gui.get("debuginputvalue_text_in");
             let val ="0";
             if(ti instanceof TextInput)
             {
                 val = ti.text;
             }
             this.player.entity.rotations[name][pName] = Number.parseFloat(val);
-        }
+        };
         
-        this.gui.add(testButton)
+        this.gui.add(testButton);
         testButton.changeText("Set");
-    //    this.gui.add(new BorderedTextInput("debuginput","body.x")).transformation =  Matrix3.identity().translate(0.9,0.95).scale(0.2,0.2);
-      //  this.gui.add(new BorderedTextInput("debuginputvalue","0")).transformation =  Matrix3.identity().translate(0.9,0.9).scale(0.2,0.2);
+        //    this.gui.add(new BorderedTextInput("debuginput","body.x")).transformation =  Matrix3.identity().translate(0.9,0.95).scale(0.2,0.2);
+        //  this.gui.add(new BorderedTextInput("debuginputvalue","0")).transformation =  Matrix3.identity().translate(0.9,0.9).scale(0.2,0.2);
         const ds =this.gui.add(new DarkScreen("ExitDarkScreen"));
         const butt = new Button("Exit game");
         ds.add(butt);
@@ -284,7 +284,7 @@ export class GameScene extends Scene
             for(const ent of this.entities)
                 if(ent.UUID == obj.uuid)
                 {
-                    ent.pos = new Vector(obj.pos.x,obj.pos.y,obj.pos.z);
+                    ent.addNextTransitions(new Vector(obj.pos.x,obj.pos.y,obj.pos.z),3);
                 }
         });
         this.socket.on("spawnPlayer",(pos,id)=>{
@@ -296,12 +296,12 @@ export class GameScene extends Scene
            
             // ent.pos =new Vector(pos.x,pos.y,pos.z);
             if(ent instanceof PlayerEntity)
-            { let plRots = new PlayerRotations()
-                for(let name in plRots)
+            { const plRots = new PlayerRotations();
+                for(const name in plRots)
                 {
-                plRots[name].x =  rots[name].x;
-                plRots[name].y =  rots[name].y;
-                plRots[name].z =  rots[name].z;
+                    plRots[name].x =  rots[name].x;
+                    plRots[name].y =  rots[name].y;
+                    plRots[name].z =  rots[name].z;
                 }
                 ent.setNextTransitions(new Vector(pos.x,pos.y,pos.z),plRots,3);
             }
@@ -325,7 +325,7 @@ export class GameScene extends Scene
                 {
                     console.log("ENTITY EXIST NOT ADDING NEW!!");
                     //this.entities.splice(i,1);
-                        return;
+                    return;
                 }
             }
             if(data.type == "item")
@@ -344,7 +344,7 @@ export class GameScene extends Scene
                 if(this.entities[i].UUID ==uuid)
                 {
                     this.entities.splice(i,1);
-                        return;
+                    return;
                 }
             }
             console.log("Entity not found!!");
@@ -418,7 +418,7 @@ export class GameScene extends Scene
             if(data[1].lastUsed+5000<time)
             {
                 data[1].deleteNeighbours(this);
-                console.log("Removing...")
+                console.log("Removing...");
                 this.loadedChunks.delete(data[0]);
             }
         }
@@ -462,7 +462,7 @@ export class GameScene extends Scene
         if(CanvaManager.getKeyOnce("9"))
             this.fly=!this.fly;
         if(CanvaManager.getKeyOnce("F2"))
-        this.renderGUI=!this.renderGUI;
+            this.renderGUI=!this.renderGUI;
     }
     update() {
         this.gui.get("mouse_item_holder").transformation = Matrix3.identity().translate(CanvaManager.mouse.pos.x,CanvaManager.mouse.pos.y);
@@ -482,6 +482,7 @@ export class GameScene extends Scene
         this.player.update();
     }
     render() {
+        gl.clearColor(0.43*(this.sunLight/15) ,0.69 *(this.sunLight/15),(this.sunLight/15),1.0);
         this.counter++;
         if(this.counter>10)
         {
@@ -507,7 +508,7 @@ export class GameScene extends Scene
         this.player.render();
         if(this.renderGUI)
             this.gui.render();
-        gl.clearColor(0.43*(this.sunLight/15) ,0.69 *(this.sunLight/15),(this.sunLight/15),1.0);
+       
     }
     public getEntity(id)
     {

@@ -1,6 +1,7 @@
 import { CanvaManager } from "./CanvaManager.js";
 import { Matrix4 } from "./Utils/Matrix4.js";
 import { Vector } from "./Utils/Vector.js";
+import { Vector3 } from "./Utils/Vector3.js";
 
 export class Camera
 {
@@ -13,7 +14,7 @@ export class Camera
     private near = 0.1;
     private far =10000;
     private aspect =CanvaManager.getHeight/CanvaManager.getWidth;
-    public offset = 0;
+    public offset:Vector3 = new Vector3(0,0,0);
     public projRot=0;
     public updateProjection()
     {
@@ -21,7 +22,7 @@ export class Camera
         this.projection = Matrix4.projection(this.fov,this.near,this.far,this.aspect);
         this.projection  = this.projection.rotateX(this.projRot);
         this.projection  = this.projection.rotateZ(this.projRot);
-        this.projection  = this.projection.translate(0,0,this.offset);
+        this.projection  = this.projection.translate(this.offset.x,this.offset.y,this.offset.z);
     }
     public preRender()
     {
