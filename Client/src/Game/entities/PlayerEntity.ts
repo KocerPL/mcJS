@@ -10,12 +10,14 @@ import { GameScene } from "../scenes/GameScene.js";
 import { Item } from "./Item.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { Vector3 } from "../../Engine/Utils/Vector3.js";
+import { World } from "../World.js";
+import { Block } from "../Block.js";
 const gl = CanvaManager.gl;
 export class PlayerRotations
 {
     body:Vector3=new Vector3(0,0,0);
-    leftHand:Vector3 = new Vector3(-3,0,0);
-    rightHand:Vector3= new Vector3(3,0,0);
+    leftHand:Vector3 = new Vector3(0,0,-5);
+    rightHand:Vector3= new Vector3(0,0,5);
     leftLeg:Vector3 = new Vector3(0,0,0);
     rightLeg:Vector3 = new Vector3(0,0,0);
     head:Vector3 = new Vector3(0,0,0);   
@@ -319,7 +321,9 @@ export class PlayerEntity extends Entity
         this.rs.vao.bind();
         const bScale = 0.5;
         Main.atlasShader.use();
-        Main.atlasShader.loadUniforms(this.gs.player.camera.getProjection(),transformation,this.gs.player.camera.getView(),15);
+        let block = World.getBlock(this.pos,this.gs);
+        if(!block) block = new Block(0);
+        Main.atlasShader.loadUniforms(this.gs.player.camera.getProjection(),transformation,this.gs.player.camera.getView(),Math.max(block.lightFBlock,Math.min(block.skyLight,this.gs.sunLight)));
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,0);
         //Body
         Main.atlasShader.loadTransformation( Matrix4.identity().translate(this.pos.x,this.pos.y+0.05,this.pos.z).scale(bScale ,bScale ,bScale ).rotateX(this.rotations.body.x).rotateY(this.rotations.body.y).rotateZ(this.rotations.body.z));
