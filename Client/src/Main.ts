@@ -105,9 +105,10 @@ export class Main
     {
         this.Measure.frames++;
   
-        this.renderDebug();
+        
        
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        this.renderDebug();
         this.scene.render();
     }
 }

@@ -98,7 +98,7 @@ export class Player
         this.pos = pos;
         this.entity = new PlayerEntity(this.pos,gs);
         this.camera.offset.z = -0.15;
-        this.camera.offset.y = -0.1;
+        this.camera.offset.y = -0.25;
         this.camera.setPosition(new Vector(pos.x,pos.y+1,pos.z));
         for(let i=0;i<9;i++)
             this.itemsBar[i]= new invItem(0);
@@ -174,7 +174,7 @@ export class Player
     }
     dropItem(id:number,count:number)
     {
-       
+        return;
     }
     switchPerson(person:pers)
     {
@@ -193,7 +193,7 @@ export class Player
         else 
         {
             this.camera.offset.z = -0.15;
-            this.camera.offset.y = -0.1;
+            this.camera.offset.y = -0.25;
         }
     }
     isInBlock(pos:Vector):boolean
@@ -276,6 +276,7 @@ export class Player
 
         this.entity.rotations.body.y = -this.camera.getYaw();
         this.entity.rotations.head.x = -this.camera.getPitch();
+        this.camera.setPosition(new Vector(this.pos.x,this.pos.y+0.45,this.pos.z));
         this.entity.pos = this.pos;
         const nowTime = Date.now();
         if(this.lastTime<nowTime-100)
@@ -412,7 +413,7 @@ export class Player
         }
         if(Math.abs(this.entity.rotations.leftLeg.x)>45)
             this.legChange= -this.legChange;
-        this.camera.setPosition(new Vector(this.pos.x,this.pos.y+0.7,this.pos.z));
+        
         if(this.locked || this.openInventory) return;
         if(CanvaManager.getKey("W")||CanvaManager.getKey("A")||CanvaManager.getKey("S")||CanvaManager.getKey("D"))
         {
@@ -514,8 +515,14 @@ export class Player
             }
             if(  World.getBlock(lastPos,this.gs).id<1 && i<5 &&  !lastPos.round().equals(new Vector(this.pos.x,this.pos.y-0.5,this.pos.z).round()) &&  !lastPos.round().equals(this.pos.round()) && this.itemsBar[this.selectedItem].id!=0 )
             {
-                this.gs.socket.emit("placeBlock",{id:this.itemsBar[this.selectedItem].id,pos:{x:lastPos.x,y:lastPos.y,z:lastPos.z},slot:this.selectedItem});  
                 World.placeBlock(lastPos,this.itemsBar[this.selectedItem].id,this.gs);
+                if(this.isInBlock(this.pos))
+                {
+                    World.placeBlock(lastPos,0,this.gs);
+                    return;
+                }
+                this.gs.socket.emit("placeBlock",{id:this.itemsBar[this.selectedItem].id,pos:{x:lastPos.x,y:lastPos.y,z:lastPos.z},slot:this.selectedItem});  
+                
                 //this.updateItem(this.itemsBar[this.selectedItem].id,this.selectedItem,this.itemsBar[this.selectedItem].count-1);
                 CanvaManager.mouse.right=false;
               

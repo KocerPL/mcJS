@@ -355,11 +355,11 @@ export class PlayerEntity extends Entity
        
         let mat = Matrix4.identity().translate(this.pos.x,this.pos.y+0.45,this.pos.z).rotateY(this.rotations.body.y);
         if(isRightHanded)
-            mat =mat.rotateX(this.rotations.rightHand.x).rotateZ(5).translate( isRightHanded?0.375:-0.375,-0.6,0.2);
+            mat =mat.rotateX(this.rotations.rightHand.x).rotateZ(5).translate( isRightHanded?0.375:-0.375,-0.8,0.2);
         else
             mat =mat.rotateX(-this.rotations.leftHand.x).rotateZ(-5).translate(-0.375,-0.7,0.2);
 
-        mat = mat.rotateY(-90).rotateY(45).scale(bScale ,bScale ,bScale );
+        mat = mat.rotateY(-90).rotateY(45).rotateZ(30).scale(bScale ,bScale ,bScale );
         if(id!=0)
         {
             Main.shader.use();
