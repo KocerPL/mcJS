@@ -1,6 +1,7 @@
 import { World } from "./World";
 import { randRange } from "../Utils";
 import { Chunk } from "./Chunk";
+import { Vector3 } from "../Utils/Vector3";
 
 export class Generator
 {
@@ -39,9 +40,46 @@ export class Generator
             }
             chunk.subchunks[i] = sub;
         }
-        return  chunk;
+        return  genTree(chunk);
     }
  
+}
+function genTree(chunk)
+{
+  
+  for(let t=0;t<3;t++)
+  {
+    let x = Math.round(randRange(2,14));
+    let z = Math.round(randRange(2,14));
+    if(Math.floor(randRange(0,3)) ==0)
+    {
+      let i=255;
+      while((Chunk.getAt(chunk,new Vector3(x,i,z))==0 || Chunk.getAt(chunk,new Vector3(x,i,z))==6 ||Chunk.getAt(chunk,new Vector3(x,i,z))==9) && i>0)
+      {
+        i--;
+      }
+      i++;
+      for(let ni=i+4;ni<i+6;ni++)
+      for(let kx=-2;kx<3;kx++)
+        for(let kz=-2;kz<3;kz++)
+        Chunk.setAt(chunk,new Vector3(x+kx,ni,z+kz),9);
+        Chunk.setAt(chunk,new Vector3(x,i+6,z),9);
+        Chunk.setAt(chunk,new Vector3(x+1,i+6,z),9);
+        Chunk.setAt(chunk,new Vector3(x-1,i+6,z),9);
+        Chunk.setAt(chunk,new Vector3(x,i+6,z+1),9);
+        Chunk.setAt(chunk,new Vector3(x,i+6,z-1),9);
+   
+        Chunk.setAt(chunk,new Vector3(x,i+7,z),9);
+        Chunk.setAt(chunk,new Vector3(x+1,i+7,z),9);
+        Chunk.setAt(chunk,new Vector3(x-1,i+7,z),9);
+        Chunk.setAt(chunk,new Vector3(x,i+7,z+1),9);
+        Chunk.setAt(chunk,new Vector3(x,i+7,z-1),9);
+      for(let ni=i+6;i<ni;i++)
+      Chunk.setAt(chunk,new Vector3(x,i,z),6)
+      
+    }
+  }
+  return chunk;
 }
 function PRNG(seed:number, x:number, y:number) {
     seed = seed % 2147483647;
