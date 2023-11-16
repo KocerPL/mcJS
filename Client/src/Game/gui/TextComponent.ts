@@ -7,10 +7,10 @@ import { ALIGN, TextSprite } from "../../Engine/Utils/TextSprite.js";
 const gl =CanvaManager.gl;
 export class TextComponent extends GuiComponent
 {
-    constructor(id:string,text:string,w:number,h?:number,align?:ALIGN)
+    constructor(id:string,text:string,w:number,h?:number,align?:ALIGN,renderFromTop?:boolean)
     {
         super(id);
-        this.sprite = new TextSprite(-w,-(h??(w*2)),w,(h??(w*2)),text,align);
+        this.sprite = new TextSprite(-w,-(h??(w*2)),w,(h??(w*2)),text,align,renderFromTop);
         this.visible =true;
         this.transformation = Matrix3.identity();
         this.tcoords = Texture.fontAtlas.coords[49];

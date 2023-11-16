@@ -27,12 +27,23 @@ import { Item } from "../entities/Item.js";
 import { Vector3 } from "../../Engine/Utils/Vector3.js";
 import { BorderedTextInput } from "../gui/BorderedTextInput.js";
 import { TextInput } from "../gui/TextInput.js";
+import { InlineTextInput } from "../gui/InlineTextInput.js";
 declare let io;
 const gl = CanvaManager.gl;
 export class GameScene extends Scene
 {
     onKey(key:string) {
-        this.gui.onKey(key);
+        if(key=="`")
+        {
+            const txt = this.gui.get("chat_text_in");
+            if(txt instanceof TextInput)
+            {
+                this.keyLock = !this.keyLock;
+                txt.selected = this.keyLock;   
+            }
+        }
+        else
+            this.gui.onKey(key);
     }
   
     public maxChunks =10;
@@ -152,7 +163,12 @@ export class GameScene extends Scene
         this.gui.add(this.cross);
         this.gui.add(new ItemBar("ItemBar"));
         this.gui.add(new Inventory("Inventory"));
-        this.gui.add(new TextComponent("debug","FPS:",0.01,null,ALIGN.left)).transformation =Matrix3.identity().translate(-1,0.98);
+        this.gui.add(new TextComponent("debug","FPS:",0.01,null,ALIGN.left,true)).transformation =Matrix3.identity().translate(-1,0.98);
+        const chat=  this.gui.add(new TextComponent("chat","",0.01,null,ALIGN.left,false));
+        this.gui.add(new InlineTextInput("chat_text_in","test"));
+        chat.transformation =Matrix3.identity().translate(-1,0);
+        if(chat instanceof TextComponent)
+            chat.changeText("Kocer Joined Game \nCreeper is not existing\nNever craft any item".replaceAll(" ","\n"));
         const testButton  =new Button("test");
         testButton.transformation = Matrix3.identity().translate(0.9,0.85).scale(0.2,0.2);
         testButton.setVisible = false;
@@ -489,7 +505,17 @@ export class GameScene extends Scene
             this.counter=0;
             const txt = this.gui.get("debug");
             if(txt instanceof TextComponent)
-                txt.changeText("FPS:"+ Main.Measure.fps+" Position: X:"+this.player.pos.x+" Y:"+this.player.pos.y+ " Z:"+this.player.pos.z);
+            {
+                txt.changeText("FPS:"+ Main.Measure.fps+"Position: X:"+this.player.pos.x+" Y:"+this.player.pos.y+ " Z:"+this.player.pos.z);
+                txt.transformation =Matrix3.identity().translate(-(CanvaManager.getWidth/CanvaManager.getHeight),0.98);
+            }
+            const chatTxt =  this.gui.get("chat");
+            const chatIn  = this.gui.get("chat_text_in");
+            if(chatTxt instanceof TextComponent)
+            {
+                chatTxt.transformation =Matrix3.identity().translate(-(CanvaManager.getWidth/CanvaManager.getHeight),-0.90);
+            }
+            chatIn.transformation =Matrix3.identity().translate(-(CanvaManager.getWidth/CanvaManager.getHeight),-0.98).scale(0.4,0.4);
         }
         Main.shader.use();
         this.player.camera.preRender();
