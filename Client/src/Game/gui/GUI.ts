@@ -64,18 +64,18 @@ export class GUI
             this.renderSet.textureCoords.push(...subRArrays.textureCoords);
         }
         this.renderSet.bufferArrays();
-       // console.log(this.renderSet.vertices);
+        // console.log(this.renderSet.vertices);
     }
     onClick(x:number,y:number)
     {
-      //  console.log("propagating onclick");
+        //  console.log("propagating onclick");
         for(const comp of this.components)
             comp.onClick(CanvaManager.mouse.pos.x,CanvaManager.mouse.pos.y);
     }
     onKey(key:string)
     {
         for(const comp of this.components)
-        comp.onKey(key);
+            comp.onKey(key);
     }
     get(id:string):GuiComponent|null
     {

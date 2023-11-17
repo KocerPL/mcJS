@@ -70,6 +70,7 @@ export class Main
             
             this.playerManager.add(player);
             socket.emit('login',JSON.stringify(player.pos), player.uuid);
+            this.networkManager.io.emit("message",player.name+" joined game")
          console.log(player.name + " logged in");
                 
                 let inventory = player.inventory;

@@ -47,8 +47,13 @@ export class TextInput extends GuiComponent
             }
         }
         shader.loadMatrix3("transformation",mat);
+        shader.loadFloat("transparency",this.transparency);
         if(this.renderMe)
             gl.drawElements(gl.TRIANGLES,this.vEnd-this.vStart,gl.UNSIGNED_INT,this.vStart*4);
+    }
+    getText()
+    {
+        return this.text;
     }
     changeText(text:string)
     {

@@ -8,9 +8,10 @@ export class Shader2d extends Shader
         super("./res/shaders/2d.vert","./res/shaders/2d.frag");
         this.dimensions = dimensions._2d;
     }
-    loadUniforms(prop:number,depth:number,transformation:Matrix3) {
+    loadUniforms(prop:number,depth:number, transformation:Matrix3,transparency?:number) {
         this.loadFloat("depth",depth);
         this.loadFloat("prop",prop);
+        this.loadFloat("transparency",transparency??1);
         this.loadMatrix3("transformation",transformation);
         return;
     }

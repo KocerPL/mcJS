@@ -22,6 +22,7 @@ export abstract class GuiComponent
     onkey = (key:string):void=>{};
     onmissclick = ():void=>{};
     protected visible:boolean;
+    public transparency=1;
     gui:GUI;
     changed=true;
     id:string;
@@ -86,7 +87,7 @@ export abstract class GuiComponent
             index = highest+1;
             rArrays.textureCoords.push(...set.textureCoords);
         }
-       // console.log(this.id,"=", this.vStart,"|||",this.vEnd);
+        // console.log(this.id,"=", this.vStart,"|||",this.vEnd);
         return rArrays;
     }
     add(component:GuiComponent):GuiComponent
@@ -148,6 +149,7 @@ export abstract class GuiComponent
     {
         Texture.GUI.bind();  
         shader.loadMatrix3("transformation",mat);
+        shader.loadFloat("transparency",this.transparency);
         if(this.renderMe)
             gl.drawElements(gl.TRIANGLES,this.vEnd-this.vStart,gl.UNSIGNED_INT,this.vStart*4);
     }

@@ -75,6 +75,10 @@ export class Player
             socket.on("dropItem",(slot:number,isInv:boolean)=>{
                 this.dropItem(slot,isInv);
             })
+            socket.on("message",(text:string)=>{
+               
+                this.message(text);
+            })
     }
     dropItem(slot:number,isInv:boolean)
     {
@@ -150,6 +154,11 @@ export class Player
         this.rots= rots;
         this.socket.broadcast.emit("moveEntity",this.uuid,pos,rots);
     }
+    message(text)
+    {
+        Main.networkManager.io.emit("message","<"+this.name+"> "+ text);
+
+    }
     getSubchunk(x,y,z)
     {
         
@@ -200,6 +209,7 @@ export class Player
     disconnect()
     {
         console.log(this.name +"  DISCONNECTED");
+        Main.networkManager.io.emit("message",this.name+" left the game");
         this.socket.broadcast.emit("killEntity",this.uuid);
         Main.playerManager.remove(this.socket);
     }

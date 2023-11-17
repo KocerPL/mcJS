@@ -33,13 +33,22 @@ const gl = CanvaManager.gl;
 export class GameScene extends Scene
 {
     onKey(key:string) {
+        console.log(key);
         if(key=="`")
         {
-            const txt = this.gui.get("chat_text_in");
+            const txt = this.gui.get("chatInput_text_in");
             if(txt instanceof TextInput)
             {
+             
                 this.keyLock = !this.keyLock;
                 txt.selected = this.keyLock;   
+                const chat = this.gui.get("chat");
+                if(this.keyLock)
+                {
+                    chat.transparency=1;
+                }
+                else
+                    chat.transparency=0.3;
             }
         }
         else
@@ -165,10 +174,10 @@ export class GameScene extends Scene
         this.gui.add(new Inventory("Inventory"));
         this.gui.add(new TextComponent("debug","FPS:",0.01,null,ALIGN.left,true)).transformation =Matrix3.identity().translate(-1,0.98);
         const chat=  this.gui.add(new TextComponent("chat","",0.01,null,ALIGN.left,false));
-        this.gui.add(new InlineTextInput("chat_text_in","test"));
+        const chatIn =this.gui.add(new InlineTextInput("chatInput","test"));
         chat.transformation =Matrix3.identity().translate(-1,0);
-        if(chat instanceof TextComponent)
-            chat.changeText("Kocer Joined Game \nCreeper is not existing\nNever craft any item".replaceAll(" ","\n"));
+        if(chatIn instanceof InlineTextInput)
+            chatIn.unselect();
         const testButton  =new Button("test");
         testButton.transformation = Matrix3.identity().translate(0.9,0.85).scale(0.2,0.2);
         testButton.setVisible = false;
@@ -294,6 +303,24 @@ export class GameScene extends Scene
                 this.player.updateInvItem(obj.id,obj.slot,obj.count);
             else
                 this.player.updateItem(obj.id,obj.slot,obj.count);
+        });
+        this.socket.on("message",(text:string)=>{
+            let change =false;
+            for(let i=0; i<text.length;i++)
+            {
+                if((i+1)%40==0)
+                    change=true;
+                if(change && text.at(i)==" ")
+                {
+                    const arr = text.split("");
+                    arr[i]="\n";
+                    text = arr.join("");
+                    change =false;
+                }
+            }
+            if(chat instanceof TextComponent)
+                chat.appendText("\n"+text);
+            
         });
         this.socket.on("updateEntity",(obj:{uuid:number,pos:Vector})=>
         {
@@ -441,6 +468,17 @@ export class GameScene extends Scene
     }
     keyUpdate()
     {
+        if(CanvaManager.getKeyOnce("ENTER"))
+        {
+            const txt = this.gui.get("chatInput_text_in");
+            console.log(txt);
+            if(txt instanceof TextInput && txt.selected)
+            {
+                this.socket.emit("message",txt.getText());
+              
+                txt.changeText("");
+            }
+        }
         if(CanvaManager.getKeyOnce("F10")) 
         {
             this.keyLock= !this.keyLock;
@@ -464,6 +502,7 @@ export class GameScene extends Scene
                 }
             if(!CanvaManager.rPointer) CanvaManager.unlockPointer();
         }
+        
         if(CanvaManager.getKeyOnce("ESCAPE")) this.gui.get("ExitDarkScreen").setVisible =  !this.gui.get("ExitDarkScreen").getVisible;
         // this.count++;
         // if(this.count>this.test.indices.length)
@@ -510,12 +549,12 @@ export class GameScene extends Scene
                 txt.transformation =Matrix3.identity().translate(-(CanvaManager.getWidth/CanvaManager.getHeight),0.98);
             }
             const chatTxt =  this.gui.get("chat");
-            const chatIn  = this.gui.get("chat_text_in");
+            const chatIn  = this.gui.get("chatInput");
             if(chatTxt instanceof TextComponent)
             {
                 chatTxt.transformation =Matrix3.identity().translate(-(CanvaManager.getWidth/CanvaManager.getHeight),-0.90);
             }
-            chatIn.transformation =Matrix3.identity().translate(-(CanvaManager.getWidth/CanvaManager.getHeight),-0.98).scale(0.4,0.4);
+            chatIn.transformation =Matrix3.identity().translate(-(CanvaManager.getWidth/CanvaManager.getHeight),-0.95).scale(0.4,0.4);
         }
         Main.shader.use();
         this.player.camera.preRender();

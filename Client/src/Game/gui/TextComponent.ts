@@ -19,6 +19,7 @@ export class TextComponent extends GuiComponent
     renderItself(shader: Shader, mat: Matrix3): void {
         Texture.fontAtlas.bind();
         shader.loadMatrix3("transformation",mat);
+        shader.loadFloat("transparency",this.transparency);
         if(this.renderMe)
             gl.drawElements(gl.TRIANGLES,this.vEnd-this.vStart,gl.UNSIGNED_INT,this.vStart*4);
     }
@@ -28,6 +29,16 @@ export class TextComponent extends GuiComponent
         this.renderMe =true;
         if(this.sprite instanceof TextSprite)
             this.sprite.text = text;
+        this.gui.needsRefresh();
+    }
+    appendText(text:string)
+    {
+        this.renderMe =true;
+        if(this.sprite instanceof TextSprite)
+        {
+            this.sprite.text+= text;
+            if(this.sprite.text==""){ this.renderMe = false; return;}
+        }
         this.gui.needsRefresh();
     }
 }

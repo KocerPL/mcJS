@@ -18,7 +18,7 @@ export class InlineTextInput extends GuiComponent
     constructor(id:string,text:string)
     {
         super(id);
-        const txt= this.add(new TextInput(id+"_text_in",text,0.03,null,ALIGN.left));
+        this.add(new TextInput(id+"_text_in",text,0.03,null,ALIGN.left));
         this.sprite = new Sprite(0,-0.1,1,0.1);
         this.visible =true;
         this.transformation = Matrix3.identity();
@@ -30,8 +30,17 @@ export class InlineTextInput extends GuiComponent
     changeText(text:string)
     {
         const t=  this.get(this.id+"_text_in");
-        if(t instanceof TextComponent)
+        if(t instanceof TextInput)
+        {
             t.changeText(text);
+           
+        }
+    }
+    unselect()
+    {
+        const t=  this.get(this.id+"_text_in");
+        if(t instanceof TextInput)
+            t.selected =false;
     }
     renderItself(shader:Shader,mat:Matrix3)
     {
