@@ -88,21 +88,23 @@ export class GameScene extends Scene
     private isInv =false;
     private getNearestSubchunk():SubChunk
     {
-        const plPos = this.player.pos.copy();
+        const plPos = this.toChunkPos(this.player.pos.copy());
         let clDistance = Number.POSITIVE_INFINITY;
         let clSub:SubChunk = undefined;
         for(const sc of this.toUpdate)
         {
             if(!sc.chunk.allNeighbours) 
             {
+             
                 // console.log( "Not enough neighbours",sc.chunk.neighbours);
                 sc.chunk.sendNeighbours(this);
                 if(!sc.chunk.allNeighbours) 
+                {
                     sc.chunk.deleteSubchunksFromQueue(this);
-                continue;
+                    continue;
+                }
             }
-            const dist =Vector.distance(plPos,sc.pos.mult(16));
-           
+            const dist =Vector.distance(plPos,sc.pos);
             if(dist<clDistance)
             {
                 clDistance =dist;
@@ -110,12 +112,14 @@ export class GameScene extends Scene
             }
         }
         return clSub;
+        
     }
     private updateSubchunk()
     {
         //const concatQ:Set<Chunk> = new Set();
         const entry:SubChunk =this.getNearestSubchunk();// this.toUpdate.entries().next().value[0];
         //console.log("running...",entry);
+    
         //    console.log(entry[0].pos);
         if(entry)
         {
@@ -128,14 +132,16 @@ export class GameScene extends Scene
                 //   occasionalSleeper().then(()=>{
                 //     this.updateSubchunk();
                 // });
+                //  console.log("Update",entry);
                 setTimeout( ()=>{ this.updateSubchunk();},0);
             }).catch(()=>{
                 setTimeout( ()=>{ this.updateSubchunk();},0);
             });
         }
         else
+        {
             setTimeout( ()=>{ this.updateSubchunk();},100);
-        //  concatQ.add(entry[0].chunk);
+        }    //  concatQ.add(entry[0].chunk);
        
         // concatQ.forEach((chunk) =>{chunk.updateMesh();});
     
@@ -399,6 +405,17 @@ export class GameScene extends Scene
     {
         this.gui.onClick(x,y);
     }
+    checkAndAddChunk(pPC:Vector,time:number)
+    {
+        if(!this.loadedChunks.has(pPC.x+"-"+pPC.z))
+        {
+            // console.log("LOADING: "+pPC.x+"  "+pPC.z);
+            this.loadedChunks.set(pPC.x+"-"+pPC.z,new Chunk(pPC.x,pPC.z));
+            for(let i=15;i>=0;i--)
+                this.socket.emit("getSubchunk",pPC.x,i,pPC.z);
+        }
+        this.loadedChunks.get(pPC.x+"-"+pPC.z).lastUsed= time;
+    }
     updateChunks()
     {
         const pPC =this.toChunkPos(this.player.pos);
@@ -406,19 +423,8 @@ export class GameScene extends Scene
         let i=1;
         let step=1;
         const time = Date.now();
-        if(!this.loadedChunks.has(pPC.x+"-"+pPC.z))
-        {
-            // console.log("LOADING: "+pPC.x+"  "+pPC.z);
-            this.loadedChunks.set(pPC.x+"-"+pPC.z,new Chunk(pPC.x,pPC.z));
-            for(let i=15;i>=0;i--)
-                this.socket.emit("getSubchunk",pPC.x,i,pPC.z);
-                    
-
-                   
-        }
-             
-        this.loadedChunks.get(pPC.x+"-"+pPC.z).lastUsed= time;
-              
+       
+        this.checkAndAddChunk(pPC,time);
         while(i<this.maxChunks)
         {
             // console.log("LOADUNG: "+pPC.x+"  "+pPC.z);
@@ -426,31 +432,14 @@ export class GameScene extends Scene
             for(let j=0;j<i;j++)
             {
                 pPC.x+=step;
-                if(!this.loadedChunks.has(pPC.x+"-"+pPC.z))
-                {
-                    // console.log("LOADING: "+pPC.x+"  "+pPC.z);
-                    this.loadedChunks.set(pPC.x+"-"+pPC.z,new Chunk(pPC.x,pPC.z));
-                    for(let i=15;i>=0;i--)
-                        this.socket.emit("getSubchunk",pPC.x,i,pPC.z);
-
-
-                   
-                }
-                this.loadedChunks.get(pPC.x+"-"+pPC.z).lastUsed= time;
+                this.checkAndAddChunk(pPC,time);
             
                 //pPC.x+=step;
             }
             for(let j=0;j<i;j++)
             {
                 pPC.z+=step;
-                if(!this.loadedChunks.has(pPC.x+"-"+pPC.z))
-                {
-                    //  console.log("LOADING: "+pPC.x+"  "+pPC.z);
-                    this.loadedChunks.set(pPC.x+"-"+pPC.z,new Chunk(pPC.x,pPC.z));
-                    for(let i=15;i>=0;i--)
-                        this.socket.emit("getSubchunk",pPC.x,i,pPC.z);
-                }
-                this.loadedChunks.get(pPC.x+"-"+pPC.z).lastUsed= time;
+                this.checkAndAddChunk(pPC,time);
              
             }
             step=-step;
@@ -474,7 +463,22 @@ export class GameScene extends Scene
             console.log(txt);
             if(txt instanceof TextInput && txt.selected)
             {
-                this.socket.emit("message",txt.getText());
+                if(txt.getText().startsWith("/"))
+                {
+                    switch(txt.getText())
+                    {
+                    case "/logchunk":
+                        console.log(  this.loadedChunks.get(Math.floor(this.player.pos.x/16)+"-"+Math.floor(this.player.pos.z/16)));
+                        break;
+                    case "/logslength":
+                        const chat = this.gui.get("chat")
+                        console.log(this.toUpdate);
+                        if(chat instanceof TextComponent)
+                            chat.appendText("\n"+this.toUpdate.size)
+                    }
+                }
+                else
+                    this.socket.emit("message",txt.getText());
               
                 txt.changeText("");
             }
@@ -604,7 +608,7 @@ export class GameScene extends Scene
     }
     public toChunkPos(vec:Vector)
     {
-        return new Vector(Math.floor(Math.round(vec.x)/16),0,Math.floor(Math.round(vec.z)/16));
+        return new Vector(Math.floor(Math.round(vec.x)/16),Math.floor(Math.round(vec.y)/16),Math.floor(Math.round(vec.z)/16));
     }
     
 }

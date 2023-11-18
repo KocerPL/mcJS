@@ -29,12 +29,10 @@ export class Chunk {
     subchunks: Array<SubChunk> = new Array(16);
     heightmap: Array<Array<number>> = new Array(16);
     neighbours:{POS_X?:Chunk,POS_Z?:Chunk,NEG_X?:Chunk,NEG_Z?:Chunk}={};
-    readySubchunks=false;
     allNeighbours=false;
     generated = true;
     generatingIndex =0;
-    sended =true;
-    lazy =true;
+    allWasUpdated = false;
     pos:Vector;
     mesh:Mesh;
     vao:VAO;
@@ -102,8 +100,8 @@ export class Chunk {
     }
     deleteSubchunksFromQueue(gs:GameScene)
     {
-        for(let subchunk of this.subchunks)
-        gs.toUpdate.delete(subchunk);
+        for(const subchunk of this.subchunks)
+            gs.toUpdate.delete(subchunk);
     }
     deleteNeighbours(gs:GameScene)
     {
@@ -281,6 +279,7 @@ export class Chunk {
     {
         // console.log("UPDATING SUBSS");
         //console.log(gs);
+        this.allWasUpdated = true;
         for(let i=15;i>=0;i--)
         {
             //  console.log(i);

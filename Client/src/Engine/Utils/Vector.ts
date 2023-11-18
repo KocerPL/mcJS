@@ -48,6 +48,6 @@ export class Vector
     }
     static distance(vecA:Vector,vecB:Vector):number
     {
-        return Math.sqrt(((vecA.x+vecB.x)^2)+((vecA.y+vecB.y)^2)+((vecA.z+vecB.z)^2));
+        return Math.sqrt(Math.pow(vecA.x-vecB.x,2)+Math.pow(vecA.y-vecB.y,2)+Math.pow(vecA.z-vecB.z,2));
     }
 }
