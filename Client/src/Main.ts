@@ -3,7 +3,6 @@ import { AtlasShader } from "./Engine/Shader/AtlasShader.js";
 import { DefaultShader } from "./Engine/Shader/DefaultShader.js";
 import { Shader2d } from "./Engine/Shader/Shader2d.js";
 import { Scene } from "./Engine/Scene.js";
-import { GameScene } from "./Game/scenes/GameScene.js";
 import { MenuScene } from "./Game/scenes/MenuScene.js";
 const gl = CanvaManager.gl;
 declare const io;

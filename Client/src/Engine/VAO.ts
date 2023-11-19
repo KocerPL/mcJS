@@ -1,5 +1,5 @@
 import { CanvaManager } from "./CanvaManager.js";
-let gl = CanvaManager.gl;
+const gl = CanvaManager.gl;
 export class VAO
 {
     private ID:WebGLVertexArrayObject;

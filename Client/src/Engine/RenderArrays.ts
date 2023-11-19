@@ -20,7 +20,7 @@ export class RenderArrays
     {
         this.vertices = this.vertices.concat(rArrays.vertices);
         this.textureCoords = this.textureCoords.concat(rArrays.textureCoords);
-        for(let indice of rArrays.indices)
+        for(const indice of rArrays.indices)
         {
             this.indices.push(indice+offset);
         }

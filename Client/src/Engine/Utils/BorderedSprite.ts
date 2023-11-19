@@ -51,10 +51,7 @@ export class BorderedSprite extends Sprite
         this.sprites.push(new Sprite(x,y,x+border,y+border),new Sprite(x+border,y,dx-border,y+border),new Sprite(dx-border,y,dx,y+border));
 
     }
-    getRenderArrays(coords:{ x:number;
-        y:number,
-        dx:number,
-        dy:number}| null):RenderArrays
+    getRenderArrays():RenderArrays
     {   
         const rArrays = new RenderArrays();
         let i=0;

@@ -1,11 +1,11 @@
 import { Array3D } from "../Engine/Utils/Array3D.js";
-import { Vector } from "../Engine/Utils/Vector.js";
+import { Vector4 } from "../Engine/Utils/Vector4.js";
 import { Block,blockType,Side } from "./Block.js";
 import { Chunk } from "./Chunk.js";
-import { World } from "./World.js";
 import { Mesh } from "./Mesh.js";
 import { Texture } from "../Engine/Texture.js";
 import { GameScene } from "./scenes/GameScene.js";
+import { Vector3 } from "../Engine/Utils/Vector3.js";
 export class SubChunk
 {
     public mesh:Mesh= new Mesh();//Mesh that contains all data needed for rendering  
@@ -15,11 +15,11 @@ export class SubChunk
     lightUpdate = false; //Is subchunk updating light
     // empty:boolean = true;    //Is subchunk empty
     fPass=true;
-    lightList:Array<Vector> =[];
+    lightList:Array<Vector4> =[];
     chunk:Chunk; //parent Chunk of this subchunk
-    pos:Vector;//subchunk position in world
+    pos:Vector3;//subchunk position in world
 
-    constructor(pos:Vector,chunk:Chunk)
+    constructor(pos:Vector4,chunk:Chunk)
     {
         //Setting up variables
         this.pos = pos;
@@ -35,7 +35,7 @@ export class SubChunk
                 for(let k=0;k<16;k++)
                 {
                     if(this.blocks[i][j][k] &&Block.info[this.blocks[i][j][k].id].glowing)
-                        this.lightList.push(new Vector(i,j,k));
+                        this.lightList.push(new Vector4(i,j,k));
                 }
     }
     async update(gs:GameScene):Promise<void>
@@ -54,7 +54,7 @@ export class SubChunk
         //});
     
     }
-    getBlock(pos:Vector):Block // gets block at position relative to subchunk position
+    getBlock(pos:Vector4):Block // gets block at position relative to subchunk position
     {
         if(pos.x>-1 && pos.x<16 && pos.y>-1 && pos.y<16 && pos.z >-1 && pos.z<16)
         {
@@ -62,12 +62,12 @@ export class SubChunk
         }
         try 
         {
-            if(pos.y<0) return this.chunk.subchunks[this.pos.y-1].getBlock(new Vector(pos.x,pos.y+16,pos.z));
-            if(pos.y>15) return this.chunk.subchunks[this.pos.y+1].getBlock(new Vector(pos.x,pos.y-16,pos.z));
-            if(pos.x<0) return this.chunk.neighbours["NEG_X"].subchunks[this.pos.y].getBlock(new Vector(pos.x+16,pos.y,pos.z));
-            if(pos.x>15) return this.chunk.neighbours["POS_X"].subchunks[this.pos.y].getBlock(new Vector(pos.x-16,pos.y,pos.z));
-            if(pos.z<0) return this.chunk.neighbours["NEG_Z"].subchunks[this.pos.y].getBlock(new Vector(pos.x,pos.y,pos.z+16));
-            if(pos.z>15) return this.chunk.neighbours["POS_Z"].subchunks[this.pos.y].getBlock(new Vector(pos.x,pos.y,pos.z-16));
+            if(pos.y<0) return this.chunk.subchunks[this.pos.y-1].getBlock(new Vector4(pos.x,pos.y+16,pos.z));
+            if(pos.y>15) return this.chunk.subchunks[this.pos.y+1].getBlock(new Vector4(pos.x,pos.y-16,pos.z));
+            if(pos.x<0) return this.chunk.neighbours["NEG_X"].subchunks[this.pos.y].getBlock(new Vector4(pos.x+16,pos.y,pos.z));
+            if(pos.x>15) return this.chunk.neighbours["POS_X"].subchunks[this.pos.y].getBlock(new Vector4(pos.x-16,pos.y,pos.z));
+            if(pos.z<0) return this.chunk.neighbours["NEG_Z"].subchunks[this.pos.y].getBlock(new Vector4(pos.x,pos.y,pos.z+16));
+            if(pos.z>15) return this.chunk.neighbours["POS_Z"].subchunks[this.pos.y].getBlock(new Vector4(pos.x,pos.y,pos.z-16));
         }
         catch(error)
         {
@@ -185,7 +185,7 @@ export class SubChunk
         }
         return undefined;
     }
-    getBlockSub(pos:Vector):{block:Block,sub:SubChunk,pos:Vector} // gets block at position relative to subchunk position
+    getBlockSub(pos:Vector4):{block:Block,sub:SubChunk,pos:Vector4} // gets block at position relative to subchunk position
     {
         if(pos.x>-1 && pos.x<16 && pos.y>-1 && pos.y<16 && pos.z >-1 && pos.z<16)
         {
@@ -193,7 +193,7 @@ export class SubChunk
         }
         else
         {
-            const transPos = new Vector(0,0,0);
+            const transPos = new Vector4(0,0,0);
             const func = (par) =>{
                 if(pos[par]<0)
                 {

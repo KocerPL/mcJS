@@ -1,6 +1,6 @@
 import { CanvaManager } from "../Engine/CanvaManager.js";
 import { EBO } from "../Engine/EBO.js";
-import { Vector } from "../Engine/Utils/Vector.js";
+import { Vector4 } from "../Engine/Utils/Vector4.js";
 import { VAO } from "../Engine/VAO.js";
 import { VBO } from "../Engine/VBO.js";
 import {  Main } from "../Main.js";
@@ -8,11 +8,10 @@ import { Block} from "./Block.js";
 import { SubChunk} from "./SubChunk.js";
 import { Matrix4 } from "../Engine/Utils/Matrix4.js";
 import { Mesh } from "./Mesh.js";
-import { World } from "./World.js";
-import { randRange } from "../Engine/Utils/Math.js";
 import { Lighter } from "../Lighter.js";
 import { SkyLighter } from "../SkyLighter.js";
 import { GameScene } from "./scenes/GameScene.js";
+import { Vector3 } from "../Engine/Utils/Vector3.js";
 const gl = CanvaManager.gl;
 export type DIR = "POS_X" | "POS_Z" | "NEG_X"  | "NEG_Z";
 export function flipDir(dir:DIR)
@@ -33,7 +32,7 @@ export class Chunk {
     generated = true;
     generatingIndex =0;
     allWasUpdated = false;
-    pos:Vector;
+    pos:Vector4;
     mesh:Mesh;
     vao:VAO;
     vbo:VBO;
@@ -69,15 +68,7 @@ export class Chunk {
                 this.heightmap[i][j]=255;
             }
         }
-        this.pos = new Vector(x,0,z);
-    }
-    postGenerate()
-    {
-
-        const x = randRange(0,15)+(this.pos.x*16);
-        const z= randRange(0,15)+(this.pos.z*16);
-        //  if(World.getHeight(x,z)<150)
-        //   World.generateTree(new Vector(x,World.getHeight(x,z),z));
+        this.pos = new Vector4(x,0,z);
     }
     updateNeighbour(neigbDir:DIR,chunk:Chunk,gs:GameScene)
     {
@@ -111,7 +102,7 @@ export class Chunk {
         neighbour = gs.getChunkAt(this.pos.x+1,this.pos.z);
         neighbour && neighbour.deleteNeighbour("NEG_X");
         neighbour = gs.getChunkAt(this.pos.x,this.pos.z-1);
-        neighbour && neighbour.deleteNeighbour("POS_Z")
+        neighbour && neighbour.deleteNeighbour("POS_Z");
         neighbour = gs.getChunkAt(this.pos.x,this.pos.z+1);
         neighbour && neighbour.deleteNeighbour("NEG_Z");
     }
@@ -154,7 +145,7 @@ export class Chunk {
             for(let z=0;z<=15;z++)
                 for(let y=255;y>0;y--) 
                 {
-                    const block =this.getBlock(new Vector(x,y,z));
+                    const block =this.getBlock(new Vector4(x,y,z));
                     if(block.id>0)
                     {
                         this.heightmap[x][z] = y;
@@ -178,7 +169,7 @@ export class Chunk {
                 {
                     for(let i=this.heightmap[x][z]+1 ;i<=lastHeightMap[x][z];i++)
                     {
-                        this.getBlock(new Vector(x,i,z)).skyLight=15;
+                        this.getBlock(new Vector4(x,i,z)).skyLight=15;
                         queue.push([(this.pos.x*16)+x , i ,(this.pos.z*16)+z ]);
                     }
                 }
@@ -225,7 +216,7 @@ export class Chunk {
     renderWater() {
         //TODO: Water rendering
     }
-    getBlock(pos:Vector):Block {
+    getBlock(pos:Vector3):Block {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 15 || pos.y > 256 || pos.z > 15) {
             throw new Error("Incorrect cordinates: x:"+pos.x+" y:"+pos.y+" z:"+pos.z );
         }
@@ -240,7 +231,7 @@ export class Chunk {
         }
         throw new Error("Undefined subchunk! ");
     }
-    getBlockSub(pos:Vector):{block:Block,sub:SubChunk} {
+    getBlockSub(pos:Vector3):{block:Block,sub:SubChunk} {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 15 || pos.y > 256 || pos.z > 15) {
             throw new Error("Incorrect cordinates: x:"+pos.x+" y:"+pos.y+" z:"+pos.z );
         }
@@ -255,7 +246,7 @@ export class Chunk {
         }
         throw new Error("Undefined subchunk! ");
     }
-    setLight(pos:Vector,lightLevel:number)
+    setLight(pos:Vector4,lightLevel:number)
     {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {
             throw new Error("Incorrect cordinates");
@@ -319,7 +310,7 @@ export class Chunk {
             for(let z=0;z<=15;z++)
                 for(let y=255;y>0;y--) 
                 {
-                    const block =this.getBlock(new Vector(x,y,z));
+                    const block =this.getBlock(new Vector4(x,y,z));
                     if(block.id>0)
                     {
                         this.heightmap[x][z] = y;
@@ -333,7 +324,7 @@ export class Chunk {
                 {
                     for(let i=this.heightmap[x][z]+1;i<=lastHeightMap[x][z];i++)
                     {
-                        this.getBlock(new Vector(x,i,z)).skyLight=15;
+                        this.getBlock(new Vector4(x,i,z)).skyLight=15;
                         queue.push([(this.pos.x*16)+x , i ,(this.pos.z*16)+z ]);
                     }
                 }
@@ -348,7 +339,7 @@ export class Chunk {
                 return false;
         return true;
     }
-    setBlock(pos:Vector,blockID:number,gs:GameScene)
+    setBlock(pos:Vector4,blockID:number,gs:GameScene)
     {
         if (pos.x < 0 || pos.y < 0 || pos.z < 0 || pos.x > 16 || pos.y > 256 || pos.z > 16) {
             throw new Error("Incorrect cordinates");

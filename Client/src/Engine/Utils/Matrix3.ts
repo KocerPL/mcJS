@@ -5,15 +5,15 @@ export class Matrix3
     private _data: number[] = new Array(9);
     public static identity()
     {
-        let mat = new Matrix3();
+        const mat = new Matrix3();
         mat._data = [1,0,0,
-                     0,1,0,
-                     0,0,1];
+            0,1,0,
+            0,0,1];
         return mat;
     }
     multiplyMat(mat:Matrix3):Matrix3
     {
-        let outMat = new Matrix3();
+        const outMat = new Matrix3();
         outMat._data[0] = this.dot(this._data[0],this._data[1],this._data[2],mat._data[0],mat._data[3],mat._data[6]); 
         outMat._data[1] = this.dot(this._data[0],this._data[1],this._data[2],mat._data[1],mat._data[4],mat._data[7]); 
         outMat._data[2] = this.dot(this._data[0],this._data[1],this._data[2],mat._data[2],mat._data[5],mat._data[8]);
@@ -29,23 +29,23 @@ export class Matrix3
     }
     multiplyVec(vec:Vector3):Vector3
     {
-        let outVec:Vector3;
+
         let col1 = new Vector3(this._data[0],this._data[3],this._data[6]);
         let col2 = new Vector3(this._data[1],this._data[4],this._data[7]);
         let col3 = new Vector3(this._data[2],this._data[5],this._data[8]);
         col1 = col1.multiply(vec.x);
         col2 = col2.multiply(vec.y);
         col3 = col3.multiply(vec.z);
-        outVec = col1.add(col2).add(col3);
+        const outVec:Vector3 = col1.add(col2).add(col3);
         return outVec;
     }
     public translate(x,y)
     {
         
-            const transl = Matrix3.identity();
-            transl._data[2] = x;
-            transl._data[5]=y;
-            return this.multiplyMat(transl);
+        const transl = Matrix3.identity();
+        transl._data[2] = x;
+        transl._data[5]=y;
+        return this.multiplyMat(transl);
     }
     public scale(x,y)
     {
@@ -62,10 +62,10 @@ export class Matrix3
     public toFloat32Array(): Float32Array {
         return new Float32Array( this._data );
     }
-   public inverse():Matrix3
+    public inverse():Matrix3
     {
-      let a =  1/this.det();
-    let mat = new Matrix3();
+        const a =  1/this.det();
+        const mat = new Matrix3();
         mat._data[0] = det2(this._data[4],this._data[5],this._data[7],this._data[8])*a;
         mat._data[1] = det2(this._data[2],this._data[1],this._data[8],this._data[7])*a;
         mat._data[2] = det2(this._data[1],this._data[2],this._data[4],this._data[5])*a;
@@ -87,7 +87,7 @@ export class Matrix3
     }
     rotate(rad:number):Matrix3
     {
-        let rot = new Matrix3();
+        const rot = new Matrix3();
         rot._data[0] = Math.cos(rad);
         rot._data[1] = - Math.sin(rad);
         rot._data[2] =0;

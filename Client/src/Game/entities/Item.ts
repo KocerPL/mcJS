@@ -1,7 +1,7 @@
 import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { Texture } from "../../Engine/Texture.js";
 import { Matrix4 } from "../../Engine/Utils/Matrix4.js";
-import { Vector } from "../../Engine/Utils/Vector.js";
+import { Vector4 } from "../../Engine/Utils/Vector4.js";
 import { Main } from "../../Main.js";
 import { Block, Side, blockType } from "../Block.js";
 import { Entity } from "../Entity.js";
@@ -17,16 +17,16 @@ export class Item extends Entity
     rotation =0;
     count=1;
     gs:GameScene;
-    acc:Vector= new Vector(0,0,0);
-    constructor(pos:Vector,type:number,gs:GameScene,uuid:number)
+    acc:Vector4= new Vector4(0,0,0);
+    constructor(pos:Vector4,type:number,gs:GameScene,uuid:number)
     {
         super(pos,Main.atlasShader,uuid);
         this.gs =gs;
         this.type = type;
         this.prepareModel();
     }
-    update(i:number): void {
-        const block =World.getBlock(new Vector(this.pos.x,this.pos.y ,this.pos.z),this.gs);
+    update(): void {
+        const block =World.getBlock(new Vector4(this.pos.x,this.pos.y ,this.pos.z),this.gs);
         let ll =  block ? block.skyLight: 0;
         this.rs.skyLight = [ll,ll,ll,ll, ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll, ll,ll,ll,ll];
         ll =  block ? block.lightFBlock: 0;
@@ -91,7 +91,7 @@ export class Item extends Entity
         this.rs.skyLight = [14,14,14,14, 14,14,14,14 ,14,14,14,14 ,14,14,14,14 ,14,14,14,14, 14,14,14,14];
            
     }
-    isTouching(vec:Vector,offset?:number)
+    isTouching(vec:Vector4,offset?:number)
     {
         offset??=0;
         if(vec.x > this.pos.x-0.3-offset && vec.z > this.pos.z-0.3-offset && vec.y > this.pos.y-1 
@@ -104,7 +104,7 @@ export class Item extends Entity
         // console.log("rendered")
         //   if(this.acc.x>0.02) this.acc.x-=0.01;else  if(this.acc.x<-0.02) this.acc.x+=0.01;else this.acc.x =0;
         // if(this.acc.z>0.02) this.acc.z-=0.01; else if(this.acc.z<-0.02) this.acc.z+=0.01; else this.acc.z=0;
-        //this.pos = Vector.add(this.pos,this.acc);
+        //this.pos = Vector4.add(this.pos,this.acc);
         if(this.rotation<360)
             this.rotation++;
         else

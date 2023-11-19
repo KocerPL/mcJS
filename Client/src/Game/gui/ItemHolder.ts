@@ -1,4 +1,3 @@
-import { BoundingBox } from "../../Engine/BoundingBox.js";
 import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { Shader } from "../../Engine/Shader/Shader.js";
 import { Texture } from "../../Engine/Texture.js";
@@ -41,7 +40,7 @@ export class ItemHolder extends GuiComponent
         if( Block.info[blockID].type==blockType.NOTFULL)
             this.sprite.dy = 0;
         else 
-        this.sprite.dy = this.size; 
+            this.sprite.dy = this.size; 
         this.tcoords=    Texture.testAtkas.coords[Block.info[blockID].textureIndex[Side.front]];
         this.gui.needsRefresh();
     }

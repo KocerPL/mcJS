@@ -1,14 +1,11 @@
 import { Texture } from "../../Engine/Texture.js";
-import { Sprite } from "../../Engine/Utils/Sprite.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { GuiComponent } from "./GuiComponent.js";
 import { BorderedSprite } from "../../Engine/Utils/BorderedSprite.js";
-import { BoundingBox, isIn } from "../../Engine/BoundingBox.js";
 import { TextComponent } from "./TextComponent.js";
 import { ALIGN, TextSprite } from "../../Engine/Utils/TextSprite.js";
 import { Shader } from "../../Engine/Shader/Shader.js";
 import { CanvaManager } from "../../Engine/CanvaManager.js";
-import { Vector3 } from "../../Engine/Utils/Vector3.js";
 import { TextInput } from "./TextInput.js";
 const gl = CanvaManager.gl;
 export class BorderedTextInput extends GuiComponent

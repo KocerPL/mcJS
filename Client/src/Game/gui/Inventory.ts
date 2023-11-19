@@ -1,15 +1,9 @@
 import { Texture } from "../../Engine/Texture.js";
-import { Sprite } from "../../Engine/Utils/Sprite.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { GuiComponent } from "./GuiComponent.js";
 import { ItemSlot } from "./ItemSlot.js";
-import { SelectedSlot } from "./SelectedSlot.js";
 import { Shader } from "../../Engine/Shader/Shader.js";
 import { BorderedSprite } from "../../Engine/Utils/BorderedSprite.js";
-import { TextComponent } from "./TextComponent.js";
-import { ALIGN } from "../../Engine/Utils/TextSprite.js";
-import { ItemHolder } from "./ItemHolder.js";
-import { Block } from "../Block.js";
 export class Inventory extends GuiComponent
 {
     // slot = new SelectedSlot(0,0,"selected");

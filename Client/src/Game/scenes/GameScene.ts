@@ -3,7 +3,7 @@ import { Scene } from "../../Engine/Scene.js";
 import { Task } from "../../Engine/Task.js";
 import { Texture } from "../../Engine/Texture.js";
 import { Matrix4 } from "../../Engine/Utils/Matrix4.js";
-import { Vector } from "../../Engine/Utils/Vector.js";
+import { Vector4 } from "../../Engine/Utils/Vector4.js";
 import { Main } from "../../Main.js";
 import { Block } from "../Block.js";
 import { Chunk } from "../Chunk.js";
@@ -25,22 +25,23 @@ import { Button } from "../gui/Button.js";
 import { MenuScene } from "./MenuScene.js";
 import { Item } from "../entities/Item.js";
 import { Vector3 } from "../../Engine/Utils/Vector3.js";
-import { BorderedTextInput } from "../gui/BorderedTextInput.js";
 import { TextInput } from "../gui/TextInput.js";
 import { InlineTextInput } from "../gui/InlineTextInput.js";
+import { GuiComponent } from "../gui/GuiComponent.js";
 declare let io;
 const gl = CanvaManager.gl;
 export class GameScene extends Scene
 {
     onKey(key:string) {
-        console.log(key);
+        //  console.log(key);
         if(key=="`")
         {
             const txt = this.gui.get("chatInput_text_in");
             if(txt instanceof TextInput)
             {
-             
+            
                 this.keyLock = !this.keyLock;
+                txt.setVisible = this.keyLock;
                 txt.selected = this.keyLock;   
                 const chat = this.gui.get("chat");
                 if(this.keyLock)
@@ -104,7 +105,7 @@ export class GameScene extends Scene
                     continue;
                 }
             }
-            const dist =Vector.distance(plPos,sc.pos);
+            const dist =Vector4.distance(plPos,sc.pos);
             if(dist<clDistance)
             {
                 clDistance =dist;
@@ -156,7 +157,7 @@ export class GameScene extends Scene
             this.loadedChunks.set(chunk.pos.x+"-"+chunk.pos.z,chunk);
         }
         //    console.log(ev.data);
-        chunk.subchunks[ev.data.subY] = new SubChunk(new Vector(ev.data.subX,ev.data.subY,ev.data.subZ),chunk);
+        chunk.subchunks[ev.data.subY] = new SubChunk(new Vector4(ev.data.subX,ev.data.subY,ev.data.subZ),chunk);
         for(let x=0;x<16;x++)    for(let y=0;y<16;y++)    for(let z=0;z<16;z++)
         {
             chunk.subchunks[ev.data.subY].blocks[x][y][z]=new Block(ev.data.blocks[x+(y*16)+(z*256)]);
@@ -170,7 +171,7 @@ export class GameScene extends Scene
     }
     start() {
         Block.createInfoArray();
-        
+       
         this.gui = new GUI(Main.shader2d);
         this.gui.add(new DarkScreen("DarkScreen"));
         this.cross = new Cross("Cross");
@@ -180,7 +181,7 @@ export class GameScene extends Scene
         this.gui.add(new Inventory("Inventory"));
         this.gui.add(new TextComponent("debug","FPS:",0.01,null,ALIGN.left,true)).transformation =Matrix3.identity().translate(-1,0.98);
         const chat=  this.gui.add(new TextComponent("chat","",0.01,null,ALIGN.left,false));
-        const chatIn =this.gui.add(new InlineTextInput("chatInput","test"));
+        const chatIn =this.gui.add(new InlineTextInput("chatInput",""));
         chat.transformation =Matrix3.identity().translate(-1,0);
         if(chatIn instanceof InlineTextInput)
             chatIn.unselect();
@@ -241,8 +242,6 @@ export class GameScene extends Scene
                     {
                         if(plSlot.id>0)
                         {
-                            const blID = plSlot.id;
-                            const count = plSlot.count;
                             this.socket.emit("moveItem",{slot1:i-1,isInv1:false, slot2:this.fromSlot,isInv2:this.isInv});
                             //this.player.updateItem(mi.blockID,i-1,mi.count);
                             //mi.change(blID,count); 
@@ -277,8 +276,6 @@ export class GameScene extends Scene
                     {
                         if(plSlot.id>0)
                         {
-                            const blID = plSlot.id;
-                            const count = plSlot.count;
                             this.socket.emit("moveItem",{slot1:i-1,isInv1:true, slot2:this.fromSlot,isInv2:this.isInv});
                             // this.player.updateInvItem(mi.blockID,i-1,mi.count);
                             // mi.change(blID,count);
@@ -295,7 +292,7 @@ export class GameScene extends Scene
                 console.log("Clicked "+i+" slot");
             };
         }
-        this.player = new Player(new Vector(-2,144,-7),this);
+        this.player = new Player(new Vector4(-2,144,-7),this);
         this.gui.get("Inventory").setVisible = this.player.openInventory;
         this.socket.emit("login",{nick:Main.shared.nick});
         this.socket.on("subchunk",this.handleSubchunk.bind(this));
@@ -328,22 +325,22 @@ export class GameScene extends Scene
                 chat.appendText("\n"+text);
             
         });
-        this.socket.on("updateEntity",(obj:{uuid:number,pos:Vector})=>
+        this.socket.on("updateEntity",(obj:{uuid:number,pos:Vector4})=>
         {
             for(const ent of this.entities)
                 if(ent.UUID == obj.uuid)
                 {
-                    ent.addNextTransitions(new Vector(obj.pos.x,obj.pos.y,obj.pos.z),3);
+                    ent.addNextTransitions(new Vector4(obj.pos.x,obj.pos.y,obj.pos.z),3);
                 }
         });
         this.socket.on("spawnPlayer",(pos,id)=>{
             // console.log("summoningPLAYER");
-            this.entities.push(new PlayerEntity(new Vector(pos.x,pos.y,pos.z),this,id));
+            this.entities.push(new PlayerEntity(new Vector4(pos.x,pos.y,pos.z),this,id));
         });
         this.socket.on("moveEntity",(id,pos:Vector3,rots:PlayerRotations)=>{
             const ent=  this.getEntity(id);
            
-            // ent.pos =new Vector(pos.x,pos.y,pos.z);
+            // ent.pos =new Vector4(pos.x,pos.y,pos.z);
             if(ent instanceof PlayerEntity)
             { const plRots = new PlayerRotations();
                 for(const name in plRots)
@@ -352,14 +349,14 @@ export class GameScene extends Scene
                     plRots[name].y =  rots[name].y;
                     plRots[name].z =  rots[name].z;
                 }
-                ent.setNextTransitions(new Vector(pos.x,pos.y,pos.z),plRots,3);
+                ent.setNextTransitions(new Vector4(pos.x,pos.y,pos.z),plRots,3);
             }
         });
         
         this.socket.on("login",(posStr:string,id)=>{
             this.player.id = id;
             const pos =JSON.parse(posStr);
-            this.player.pos = new Vector(pos.x,pos.y,pos.z);
+            this.player.pos = new Vector4(pos.x,pos.y,pos.z);
             this.logged=true;
         });
         this.socket.io.on("reconnect",()=>{
@@ -378,13 +375,13 @@ export class GameScene extends Scene
                 }
             }
             if(data.type == "item")
-                this.entities.push(new Item(Vector.fromData(data.pos),data.id,this,data.uuid));
+                this.entities.push(new Item(Vector4.fromData(data.pos),data.id,this,data.uuid));
         });
         this.socket.on("placeBlock",(data)=>{
             if(data.id!=0)
-                World.placeBlock(new Vector(data.pos.x,data.pos.y,data.pos.z),data.id,this);
+                World.placeBlock(new Vector4(data.pos.x,data.pos.y,data.pos.z),data.id,this);
             else
-                World.breakBlock(new Vector(data.pos.x,data.pos.y,data.pos.z),this);
+                World.breakBlock(new Vector4(data.pos.x,data.pos.y,data.pos.z),this);
         });
         this.socket.on("killEntity",(uuid)=>{
             console.log("KILL: "+uuid);
@@ -398,14 +395,15 @@ export class GameScene extends Scene
             }
             console.log("Entity not found!!");
         });
-       
+        this.onKey("`");
+        this.onKey("`");
         this.updateSubchunk();
     }
-    onClick(x:number,y:number)
+    onClick()
     {
-        this.gui.onClick(x,y);
+        this.gui.onClick();
     }
-    checkAndAddChunk(pPC:Vector,time:number)
+    checkAndAddChunk(pPC:Vector4,time:number)
     {
         if(!this.loadedChunks.has(pPC.x+"-"+pPC.z))
         {
@@ -461,6 +459,7 @@ export class GameScene extends Scene
         {
             const txt = this.gui.get("chatInput_text_in");
             console.log(txt);
+            let gComp:GuiComponent =undefined;
             if(txt instanceof TextInput && txt.selected)
             {
                 if(txt.getText().startsWith("/"))
@@ -471,10 +470,10 @@ export class GameScene extends Scene
                         console.log(  this.loadedChunks.get(Math.floor(this.player.pos.x/16)+"-"+Math.floor(this.player.pos.z/16)));
                         break;
                     case "/logslength":
-                        const chat = this.gui.get("chat")
+                        gComp= this.gui.get("chat");
                         console.log(this.toUpdate);
-                        if(chat instanceof TextComponent)
-                            chat.appendText("\n"+this.toUpdate.size)
+                        if(gComp instanceof TextComponent)
+                            gComp.appendText("\n"+this.toUpdate.size);
                     }
                 }
                 else
@@ -501,7 +500,6 @@ export class GameScene extends Scene
             if(mi instanceof ItemHolder)
                 if(mi.blockID != 0)
                 {
-                    this.player.dropItem(mi.blockID,mi.count);
                     mi.change(0,0);  
                 }
             if(!CanvaManager.rPointer) CanvaManager.unlockPointer();
@@ -606,22 +604,9 @@ export class GameScene extends Scene
             }
         }
     }
-    public toChunkPos(vec:Vector)
+    public toChunkPos(vec:Vector4)
     {
-        return new Vector(Math.floor(Math.round(vec.x)/16),Math.floor(Math.round(vec.y)/16),Math.floor(Math.round(vec.z)/16));
+        return new Vector4(Math.floor(Math.round(vec.x)/16),Math.floor(Math.round(vec.y)/16),Math.floor(Math.round(vec.z)/16));
     }
     
 }
-const occasionalSleeper = (function() {
-    //
-    let lastSleepingTime = performance.now();
-
-    return function() {
-        if (performance.now() - lastSleepingTime > 100) {
-            lastSleepingTime = performance.now();
-            return new Promise(resolve => setTimeout(resolve, 0));
-        } else {
-            return Promise.resolve();
-        }
-    };
-}());

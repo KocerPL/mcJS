@@ -1,12 +1,12 @@
 import { CanvaManager } from "./CanvaManager.js";
 import { Matrix4 } from "./Utils/Matrix4.js";
-import { Vector } from "./Utils/Vector.js";
+import { Vector4 } from "./Utils/Vector4.js";
 import { Vector3 } from "./Utils/Vector3.js";
 
 export class Camera
 {
     private projection:Matrix4=Matrix4.projection(70,1,100,CanvaManager.getHeight/CanvaManager.getWidth);
-    private pos:Vector = new Vector(0,10,-20);
+    private pos:Vector4 = new Vector4(0,10,-20);
     private view:Matrix4=Matrix4.viewFPS(this.pos,0,0);
     private yaw = 0;
     private pitch =0;
@@ -45,7 +45,7 @@ export class Camera
     {
         this.pitch = pitch;
     }
-    public setPosition(pos:Vector)
+    public setPosition(pos:Vector4)
     {
         this.pos = pos;
     }

@@ -1,11 +1,9 @@
 import { CanvaManager } from "../../Engine/CanvaManager.js";
-import { Texture2 } from "../../Engine/Loader.js";
 import { RenderSet } from "../../Engine/RenderSet.js";
 import { Shader2d } from "../../Engine/Shader/Shader2d.js";
 import { Texture } from "../../Engine/Texture.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { GuiComponent } from "./GuiComponent.js";
-const gl =CanvaManager.gl;
 
 export class GUI
 {
@@ -66,7 +64,7 @@ export class GUI
         this.renderSet.bufferArrays();
         // console.log(this.renderSet.vertices);
     }
-    onClick(x:number,y:number)
+    onClick()
     {
         //  console.log("propagating onclick");
         for(const comp of this.components)

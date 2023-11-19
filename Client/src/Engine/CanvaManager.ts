@@ -1,5 +1,5 @@
 import { Main } from "../Main.js";
-import { Vector } from "./Utils/Vector.js";
+import { Vector4 } from "./Utils/Vector4.js";
 
 export class CanvaManager
 {
@@ -11,8 +11,8 @@ export class CanvaManager
     public static debug:HTMLSpanElement = document.createElement("span"); 
     private static proportion:number  = 1024/1920;
     private static keys:Array<boolean> = new Array(100);
-    public static mouseMovement = new Vector(0,0,0);
-    public static mouse = {left:false,right:false,pos: new Vector(0,0,0)};
+    public static mouseMovement = new Vector4(0,0,0);
+    public static mouse = {left:false,right:false,pos: new Vector4(0,0,0)};
     public static scrollAmount =0;
     public static setupCanva(location:Node,proportion?:number) : HTMLCanvasElement
     {

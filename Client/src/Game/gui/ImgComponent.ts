@@ -4,7 +4,7 @@ import { Texture } from "../../Engine/Texture.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { Sprite } from "../../Engine/Utils/Sprite.js";
 import { GuiComponent } from "./GuiComponent.js";
-let gl = CanvaManager.gl;
+const gl = CanvaManager.gl;
 export class ImgComponent extends GuiComponent
 {
     constructor(id:string)
@@ -20,6 +20,6 @@ export class ImgComponent extends GuiComponent
         Texture.screenAtlas.bind();
         shader.loadMatrix3("transformation",mat);
         if(this.renderMe)
-        gl.drawElements(gl.TRIANGLES,this.vEnd-this.vStart,gl.UNSIGNED_INT,this.vStart*4);
+            gl.drawElements(gl.TRIANGLES,this.vEnd-this.vStart,gl.UNSIGNED_INT,this.vStart*4);
     }
 }

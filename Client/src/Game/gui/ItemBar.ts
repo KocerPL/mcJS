@@ -1,5 +1,4 @@
 import { Texture } from "../../Engine/Texture.js";
-import { Sprite } from "../../Engine/Utils/Sprite.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { GuiComponent } from "./GuiComponent.js";
 import { ItemSlot } from "./ItemSlot.js";

@@ -2,7 +2,6 @@ import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { Scene } from "../../Engine/Scene.js";
 import { randRange } from "../../Engine/Utils/Math.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
-import { Matrix4 } from "../../Engine/Utils/Matrix4.js";
 import { ALIGN } from "../../Engine/Utils/TextSprite.js";
 import { Main } from "../../Main.js";
 import { BorderedTextInput } from "../gui/BorderedTextInput.js";
@@ -42,10 +41,10 @@ export class MenuScene extends Scene
     update() {
         //throw new Error("Method not implemented.");
     }
-    onClick(x:number,y:number)
+    onClick()
     {
         console.log("works");
-        this.gui.onClick(x,y);
+        this.gui.onClick();
         //  Main.changeScene(new GameScene());
     }
     onKey(key:string) {

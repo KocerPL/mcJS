@@ -1,6 +1,6 @@
 import { CanvaManager } from "./CanvaManager.js";
 
-let gl = CanvaManager.gl;
+const gl = CanvaManager.gl;
 export class EBO
 {
     private ID:WebGLBuffer;
@@ -12,7 +12,7 @@ export class EBO
     }
     public bufferData(data):void
     {
-      this.bind();
+        this.bind();
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(data),gl.STATIC_DRAW);
     }
     public bind():void
@@ -26,7 +26,7 @@ export class EBO
     }
     public static unbind():void
     {
-       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
 
     }
 }

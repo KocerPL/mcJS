@@ -1,4 +1,4 @@
-import { Vector } from "./Vector";
+import { Vector4 } from "./Vector4";
 
 export class Matrix4
 {
@@ -195,7 +195,7 @@ export class Matrix4
         //console.log(mat);
         return Matrix4.invert(mat);
     }
-    static viewFPS(eye:Vector,yaw:number,pitch:number)
+    static viewFPS(eye:Vector4,yaw:number,pitch:number)
     {
     //view2
         let view2 = new Matrix4();

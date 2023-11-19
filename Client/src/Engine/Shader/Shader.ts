@@ -2,7 +2,7 @@ import { CanvaManager } from "../CanvaManager.js";
 import { Loader } from "../Loader.js";
 import { Matrix3 } from "../Utils/Matrix3.js";
 import { Matrix4 } from "../Utils/Matrix4.js";
-import { Vector } from "../Utils/Vector.js";
+import { Vector4 } from "../Utils/Vector4.js";
 const gl = CanvaManager.gl;
 export enum dimensions 
 {
@@ -56,11 +56,11 @@ export abstract class Shader
     {
         gl.uniform1f(this.getLocation(name),float);
     }
-    loadVec3(name:string,vec:Vector)
+    loadVec3(name:string,vec:Vector4)
     {
         gl.uniform3f(this.getLocation(name),vec.x,vec.y,vec.z);
     }
-    loadVec4(name:string,vec:Vector)
+    loadVec4(name:string,vec:Vector4)
     {
         gl.uniform4f(this.getLocation(name),vec.x,vec.y,vec.z,vec.w);
     }

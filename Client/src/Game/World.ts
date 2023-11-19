@@ -1,75 +1,25 @@
-import { Vector } from "../Engine/Utils/Vector.js";
+import { Vector3 } from "../Engine/Utils/Vector3.js";
+import { Vector4 } from "../Engine/Utils/Vector4.js";
 import { Lighter } from "../Lighter.js";
-import { Main } from "../Main.js";
-import {    PerlinN } from "../PerlinNoise.js";
 import { SkyLighter } from "../SkyLighter.js";
-import { Block, directions } from "./Block.js";
+import { Block } from "./Block.js";
 import { Chunk } from "./Chunk.js";
 import { SubChunk } from "./SubChunk.js";
 import { GameScene } from "./scenes/GameScene.js";
-const perlin = new PerlinN();
 export class World
 {
     private Chunks:Array<Array<Chunk>> = [];
     public static waterLevel = 0;
     public static height=50;
-    public static erosion=new PerlinN();
-    public static init()
+    public static setBlockNoLight(blockPos:Vector4,type:number,gs:GameScene)
     {
-        console.log(perlin);
-    }
-    /*  public static generateTree(vec:Vector)
-    {
-        console.log("shedule Generating tree");
-        let i=vec.y+5;
-       
-        
-        for(let x=vec.x-2;x<=vec.x+2;x++)
-            for(let z=vec.z-2;z<=vec.z+2;z++)
-            {
-                this.setBlockNoLight(new Vector(x,i,z),9); 
-            }
-        this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
-        i++;
-        for(let x=vec.x-2;x<=vec.x+2;x++)
-            for(let z=vec.z-2;z<=vec.z+2;z++)
-            {
-            
-                this.setBlockNoLight(new Vector(x,i,z),9); 
-            }
-        this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
-        this.setBlockNoLight(new Vector(vec.x+2,i,vec.z+2),0); 
-        this.setBlockNoLight(new Vector(vec.x+2,i,vec.z-2),0); 
-        this.setBlockNoLight(new Vector(vec.x-2,i,vec.z+2),0);
-        this.setBlockNoLight(new Vector(vec.x-2,i,vec.z-2),0);
-        i++;
-        this.setBlockNoLight(new Vector(vec.x+1,i,vec.z),9); 
-        this.setBlockNoLight(new Vector(vec.x-1,i,vec.z),9); 
-        this.setBlockNoLight(new Vector(vec.x,i,vec.z+1),9);
-        this.setBlockNoLight(new Vector(vec.x,i,vec.z-1),9);
-        this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
-        i++;
-        this.setBlockNoLight(new Vector(vec.x+1,i,vec.z),9); 
-        this.setBlockNoLight(new Vector(vec.x-1,i,vec.z),9); 
-        this.setBlockNoLight(new Vector(vec.x,i,vec.z+1),9);
-        this.setBlockNoLight(new Vector(vec.x,i,vec.z-1),9);
-        this.setBlockNoLight(new Vector(vec.x,i,vec.z),9);
-        for( i=vec.y+1;i<vec.y+5;i++)
-        {
-            //console.log("Generating tree")
-            this.setBlockNoLight(new Vector(vec.x,i,vec.z),6);
-
-        }
-    }*/
-    public static setBlockNoLight(blockPos:Vector,type:number,gs:GameScene)
-    {
-        const inChunkPos:Vector = new Vector(Math.round(Math.round(blockPos.x)%16),Math.round(blockPos.y),Math.round(Math.round(blockPos.z)%16));
+        const inChunkPos:Vector4 = new Vector4(Math.round(Math.round(blockPos.x)%16),Math.round(blockPos.y),Math.round(Math.round(blockPos.z)%16));
         if(inChunkPos.x<0)
             inChunkPos.x = 16-Math.abs(inChunkPos.x);
         if(inChunkPos.z<0)
             inChunkPos.z = 16-Math.abs(inChunkPos.z);
 
-        const chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
+        const chunkPos =new Vector4(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
         try
         {
             const chunk = gs.getChunkAt(chunkPos.x,chunkPos.z);
@@ -82,10 +32,10 @@ export class World
             return;
         }
     }
-    public static  getHeightMap(blockPos:Vector,gs:GameScene):number
+    public static  getHeightMap(blockPos:Vector4,gs:GameScene):number
     {
-        const chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
-        const inChunkPos = new Vector(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);
+        const chunkPos =new Vector4(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
+        const inChunkPos = new Vector4(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);
         if(inChunkPos.x<0)
             inChunkPos.x = 16-Math.abs(inChunkPos.x);
         if(inChunkPos.z<0)
@@ -99,9 +49,9 @@ export class World
             return undefined;
         }
     }
-    public static getSubchunk(blockPos:Vector,gs:GameScene)
+    public static getSubchunk(blockPos:Vector4,gs:GameScene)
     {
-        const chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
+        const chunkPos =new Vector4(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
 
         try
         {
@@ -112,7 +62,7 @@ export class World
             console.log(error);
         }
     }
-    public static placeBlock(pos:Vector,id:number,gs:GameScene)
+    public static placeBlock(pos:Vector4,id:number,gs:GameScene)
     {
         const llight =  World.getBlock(pos,gs).lightFBlock;
         const slight =  World.getBlock(pos,gs).skyLight;
@@ -120,7 +70,7 @@ export class World
         Lighter.removeLight(pos.x,pos.y,pos.z,llight,gs);
         SkyLighter.removeLight(pos.x,pos.y,pos.z,slight,gs);
     }
-    public static breakBlock(pos:Vector,gs:GameScene)
+    public static breakBlock(pos:Vector4,gs:GameScene)
     {
         let isGlowing=false;
         if(Block.info[World.getBlock(pos,gs).id].glowing)
@@ -132,9 +82,9 @@ export class World
             Lighter.processOneBlockLight(pos.x,pos.y,pos.z,gs);
         SkyLighter.processOneBlockLight(pos.x,pos.y,pos.z,gs);
     }
-    public static getBlock(blockPos:Vector,gs:GameScene):Block
+    public static getBlock(blockPos:Vector3,gs:GameScene):Block
     {
-        let inChunkPos = new Vector(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);
+        let inChunkPos = new Vector3(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);
         if(inChunkPos.x<0)
             inChunkPos.x = 16-Math.abs(inChunkPos.x);
         if(inChunkPos.z<0)
@@ -147,7 +97,7 @@ export class World
         }
  
 
-        const chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
+        const chunkPos =new Vector4(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
         try
         {
           
@@ -158,9 +108,9 @@ export class World
         }
     }
     
-    static  getBlockAndSub(blockPos:Vector,gs:GameScene):{block:Block,sub:SubChunk}
+    static  getBlockAndSub(blockPos:Vector3,gs:GameScene):{block:Block,sub:SubChunk}
     {
-        let inChunkPos = new Vector(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);
+        let inChunkPos = new Vector3(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);
         if(inChunkPos.x<0)
             inChunkPos.x = 16-Math.abs(inChunkPos.x);
         if(inChunkPos.z<0)
@@ -172,7 +122,7 @@ export class World
       
         }
 
-        const chunkPos =new Vector(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
+        const chunkPos =new Vector4(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
         try
         {
           
@@ -183,33 +133,5 @@ export class World
             // console.log(Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos));
             console.error(error);
         }
-    }
-    public static getHeight(x,z)
-    {
-        try
-        {
-            //  if(x<0||z<0)
-            //  return this.height;
-            //return 1;
-            let erosion =50;
-            const erN =this.getErosion(x,z);
-            if(erN>0.3)
-                erosion=50+((erN-0.3)*100);
-            return Math.round((perlin.perlin2D(x/256,z/256)+1)*(erosion))+this.height;
-        }
-        catch(error)
-        { /* empty */ }
-        return 0;
-    }
-    public static getErosion(x,z)
-    {
-        try
-        {
-            //
-            return this.erosion.get(x/256,z/256)+0.2;
-        }
-        catch(error)
-        { /* empty */ }
-        return 0;
     }
 }

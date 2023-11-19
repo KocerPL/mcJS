@@ -7,9 +7,7 @@ import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { Vector3 } from "../../Engine/Utils/Vector3.js";
 import { rot2d } from "../Models.js";
 import { GUI } from "./GUI.js";
-import { Button } from "./Button.js";
 import { BoundingBox, isIn } from "../../Engine/BoundingBox.js";
-import { ItemHolder } from "./ItemHolder.js";
 
 const gl = CanvaManager.gl;
 export abstract class GuiComponent

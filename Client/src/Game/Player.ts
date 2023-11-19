@@ -4,7 +4,7 @@ import { RenderSet } from "../Engine/RenderSet.js";
 import { Texture } from "../Engine/Texture.js";
 import { clamp, randRange } from "../Engine/Utils/Math.js";
 import { Matrix4 } from "../Engine/Utils/Matrix4.js";
-import { Vector } from "../Engine/Utils/Vector.js";
+import { Vector4 } from "../Engine/Utils/Vector4.js";
 import { Main } from "../Main.js";
 import { Block } from "./Block.js";
 import { Item } from "./entities/Item.js";
@@ -32,13 +32,13 @@ export class Player
     id:number;
     entity:PlayerEntity;
     camera:Camera = new Camera();
-    pos:Vector;
+    pos:Vector4;
     itemsBar:Array<invItem>=new Array(9);
     inventory:Array<invItem>=new Array(27);
     locked=false;
     targetedBlock=null;
     startTime=0;
-    tbPos = new Vector(0,0,0);
+    tbPos = new Vector4(0,0,0);
     blockOverlay:RenderSet;
     blockBreakingTime=0;
     selectedItem = 0;
@@ -91,7 +91,7 @@ export class Player
         yAcc:0,
 
     };
-    constructor(pos:Vector,gs:GameScene)
+    constructor(pos:Vector4,gs:GameScene)
     {
         this.gs = gs;
         this.blockOverlay = new RenderSet(Main.atlasShader);
@@ -99,7 +99,7 @@ export class Player
         this.entity = new PlayerEntity(this.pos,gs);
         this.camera.offset.z = -0.15;
         this.camera.offset.y = -0.25;
-        this.camera.setPosition(new Vector(pos.x,pos.y+1,pos.z));
+        this.camera.setPosition(new Vector4(pos.x,pos.y+1,pos.z));
         for(let i=0;i<9;i++)
             this.itemsBar[i]= new invItem(0);
         for(let i=0;i<27;i++)
@@ -172,7 +172,7 @@ export class Player
             this.blockOverlay.count=0;
         this.updatePos();
     }
-    dropItem(id:number,count:number)
+    dropItem()
     {
         return;
     }
@@ -196,33 +196,33 @@ export class Player
             this.camera.offset.y = -0.25;
         }
     }
-    isInBlock(pos:Vector):boolean
+    isInBlock(pos:Vector4):boolean
     {
-        if(World.getBlock(new Vector(pos.x+0.33,pos.y-1,pos.z+0.33),this.gs).id>0)
+        if(World.getBlock(new Vector4(pos.x+0.33,pos.y-1,pos.z+0.33),this.gs).id>0)
             return true;
-        if(World.getBlock(new Vector(pos.x-0.33,pos.y-1,pos.z+0.33),this.gs).id>0)
+        if(World.getBlock(new Vector4(pos.x-0.33,pos.y-1,pos.z+0.33),this.gs).id>0)
             return true;
-        if(World.getBlock(new Vector(pos.x-0.33,pos.y-1,pos.z-0.33),this.gs).id>0)
+        if(World.getBlock(new Vector4(pos.x-0.33,pos.y-1,pos.z-0.33),this.gs).id>0)
             return true;
-        if(World.getBlock(new Vector(pos.x+0.33,pos.y-1,pos.z-0.33),this.gs).id>0)
-            return true;
-
-        if(World.getBlock(new Vector(pos.x+0.33,pos.y-0.1,pos.z+0.33),this.gs).id>0)
-            return true;
-        if(World.getBlock(new Vector(pos.x-0.33,pos.y-0.1,pos.z+0.33),this.gs).id>0)
-            return true;
-        if(World.getBlock(new Vector(pos.x-0.33,pos.y-0.1,pos.z-0.33),this.gs).id>0)
-            return true;
-        if(World.getBlock(new Vector(pos.x+0.33,pos.y-0.1,pos.z-0.33),this.gs).id>0)
+        if(World.getBlock(new Vector4(pos.x+0.33,pos.y-1,pos.z-0.33),this.gs).id>0)
             return true;
 
-        if(World.getBlock(new Vector(pos.x+0.33,pos.y+0.75,pos.z+0.33),this.gs).id >0)
+        if(World.getBlock(new Vector4(pos.x+0.33,pos.y-0.1,pos.z+0.33),this.gs).id>0)
             return true;
-        if(World.getBlock(new Vector(pos.x-0.33,pos.y+0.75,pos.z+0.33),this.gs).id>0)
+        if(World.getBlock(new Vector4(pos.x-0.33,pos.y-0.1,pos.z+0.33),this.gs).id>0)
             return true;
-        if(World.getBlock(new Vector(pos.x-0.33,pos.y+0.75,pos.z-0.33),this.gs).id>0)
+        if(World.getBlock(new Vector4(pos.x-0.33,pos.y-0.1,pos.z-0.33),this.gs).id>0)
             return true;
-        if(World.getBlock(new Vector(pos.x+0.33,pos.y+0.75,pos.z-0.33),this.gs).id>0)
+        if(World.getBlock(new Vector4(pos.x+0.33,pos.y-0.1,pos.z-0.33),this.gs).id>0)
+            return true;
+
+        if(World.getBlock(new Vector4(pos.x+0.33,pos.y+0.75,pos.z+0.33),this.gs).id >0)
+            return true;
+        if(World.getBlock(new Vector4(pos.x-0.33,pos.y+0.75,pos.z+0.33),this.gs).id>0)
+            return true;
+        if(World.getBlock(new Vector4(pos.x-0.33,pos.y+0.75,pos.z-0.33),this.gs).id>0)
+            return true;
+        if(World.getBlock(new Vector4(pos.x+0.33,pos.y+0.75,pos.z-0.33),this.gs).id>0)
             return true;
         return false;
     }
@@ -234,10 +234,10 @@ export class Player
             return -1;
         return 0;
     }
-    isBlockInWay(pos:Vector):boolean
+    isBlockInWay(pos:Vector4):boolean
     {
-        const delta =  Vector.add(pos,this.pos.mult(-1));
-        if(this.isInBlock(Vector.add(new Vector(delta.x,delta.y,delta.z),this.pos)))
+        const delta =  Vector4.add(pos,this.pos.mult(-1));
+        if(this.isInBlock(Vector4.add(new Vector4(delta.x,delta.y,delta.z),this.pos)))
             return true;
         if(Math.abs(delta.x)>=Math.abs(delta.y) && Math.abs(delta.x)>=Math.abs(delta.z))
         {
@@ -245,7 +245,7 @@ export class Player
                 for(let x =0;Math.abs(x)<Math.abs(delta.x);x+=(this.norm(delta.x)*0.66))
                 {
                     const percent = x/delta.x;
-                    if(this.isInBlock(Vector.add(new Vector(x,delta.y*percent,delta.z*percent),this.pos)))
+                    if(this.isInBlock(Vector4.add(new Vector4(x,delta.y*percent,delta.z*percent),this.pos)))
                         return true;
                 }
         }
@@ -255,7 +255,7 @@ export class Player
                 for(let y =0;Math.abs(y)<Math.abs(delta.y);y+=(this.norm(delta.y)*0.66))
                 {
                     const percent = y/delta.y;
-                    if(this.isInBlock(Vector.add(new Vector(delta.x*percent,y,delta.z*percent),this.pos)))
+                    if(this.isInBlock(Vector4.add(new Vector4(delta.x*percent,y,delta.z*percent),this.pos)))
                         return true;
                 }
         }
@@ -265,7 +265,7 @@ export class Player
                 for(let z =0;Math.abs(z)<Math.abs(delta.z);z+=(this.norm(delta.z)*0.66))
                 {
                     const percent = z/delta.z;
-                    if(this.isInBlock(Vector.add(new Vector(delta.x*percent,delta.y*percent,z),this.pos)))
+                    if(this.isInBlock(Vector4.add(new Vector4(delta.x*percent,delta.y*percent,z),this.pos)))
                         return true;
                 }
         }
@@ -276,7 +276,7 @@ export class Player
 
         this.entity.rotations.body.y = -this.camera.getYaw();
         this.entity.rotations.head.x = -this.camera.getPitch();
-        this.camera.setPosition(new Vector(this.pos.x,this.pos.y+0.45,this.pos.z));
+        this.camera.setPosition(new Vector4(this.pos.x,this.pos.y+0.45,this.pos.z));
         this.entity.pos = this.pos;
         const nowTime = Date.now();
         if(this.lastTime<nowTime-100)
@@ -285,14 +285,12 @@ export class Player
             this.lastTime = nowTime;
         }
         //if(this.locked) return;
-        let hop =false;
         const tempPos = this.pos.copy();
         if(this.jump.yAcc>0)
         {
             this.jump.yAcc-=0.015;
             tempPos.y+=this.jump.yAcc;
             this.jump.time--;
-            hop=true;
             this.yAcc=0;
         }
         let speed=1;
@@ -340,7 +338,7 @@ export class Player
             
                 }
             }   
-            if(World.getBlock(new Vector(tempPos.x,tempPos.y-1,tempPos.z),this.gs).id<=0 && !this.gs.fly)
+            if(World.getBlock(new Vector4(tempPos.x,tempPos.y-1,tempPos.z),this.gs).id<=0 && !this.gs.fly)
             {
                 this.yAcc+=0.01;
                 tempPos.y-=this.yAcc;
@@ -349,35 +347,35 @@ export class Player
                 tempPos.y-=0.3;
             if(!this.isBlockInWay(tempPos)) 
                 this.pos = tempPos;
-            else  if(!this.isBlockInWay(new Vector(tempPos.x,this.pos.y,tempPos.z)))
+            else  if(!this.isBlockInWay(new Vector4(tempPos.x,this.pos.y,tempPos.z)))
             {
-                this.pos = new Vector(tempPos.x,this.pos.y,tempPos.z);
+                this.pos = new Vector4(tempPos.x,this.pos.y,tempPos.z);
                 this.yAcc=0;
             }
-            else  if(!this.isBlockInWay(new Vector(tempPos.x,tempPos.y,this.pos.z)))
+            else  if(!this.isBlockInWay(new Vector4(tempPos.x,tempPos.y,this.pos.z)))
             {
-                this.pos = new Vector(tempPos.x,tempPos.y,this.pos.z);
+                this.pos = new Vector4(tempPos.x,tempPos.y,this.pos.z);
              
             }
-            else  if(!this.isBlockInWay(new Vector(this.pos.x,tempPos.y,tempPos.z)))
+            else  if(!this.isBlockInWay(new Vector4(this.pos.x,tempPos.y,tempPos.z)))
             {
-                this.pos = new Vector(this.pos.x,tempPos.y,tempPos.z);
+                this.pos = new Vector4(this.pos.x,tempPos.y,tempPos.z);
             }
-            else  if(!this.isBlockInWay(new Vector(this.pos.x,this.pos.y,tempPos.z)))
+            else  if(!this.isBlockInWay(new Vector4(this.pos.x,this.pos.y,tempPos.z)))
             {
                 this.yAcc=0;
-                this.pos = new Vector(this.pos.x,this.pos.y,tempPos.z);
+                this.pos = new Vector4(this.pos.x,this.pos.y,tempPos.z);
                 this.yAcc=0;
             }
-            else  if(!this.isBlockInWay(new Vector(this.pos.x,tempPos.y,this.pos.z)))
+            else  if(!this.isBlockInWay(new Vector4(this.pos.x,tempPos.y,this.pos.z)))
             {
-                this.pos = new Vector(this.pos.x,tempPos.y,this.pos.z);
+                this.pos = new Vector4(this.pos.x,tempPos.y,this.pos.z);
              
             }
-            else  if(!this.isBlockInWay(new Vector(tempPos.x,this.pos.y,this.pos.z)))
+            else  if(!this.isBlockInWay(new Vector4(tempPos.x,this.pos.y,this.pos.z)))
             {
                 this.yAcc=0;
-                this.pos = new Vector(tempPos.x,this.pos.y,this.pos.z);
+                this.pos = new Vector4(tempPos.x,this.pos.y,this.pos.z);
             }
                
             if(CanvaManager.getKey(" "))
@@ -385,17 +383,17 @@ export class Player
                 //  hop=true;
                 if(this.gs.fly)
                     this.jump.yAcc = 0.2;
-                else if(World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y+1.5),Math.round(this.pos.z)),this.gs ).id<1
-        && World.getBlock( new Vector(Math.round(this.pos.x+0.3),Math.round(this.pos.y+1.5),Math.round(this.pos.z)),this.gs).id<1
-            && World.getBlock( new Vector(Math.round(this.pos.x-0.3),Math.round(this.pos.y+1.5),Math.round(this.pos.z)),this.gs).id<1
-            && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y+1.5),Math.round(this.pos.z+0.3)),this.gs).id<1
-            && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y+1.5),Math.round(this.pos.z-0.3)),this.gs).id<1)
+                else if(World.getBlock( new Vector4(Math.round(this.pos.x),Math.round(this.pos.y+1.5),Math.round(this.pos.z)),this.gs ).id<1
+        && World.getBlock( new Vector4(Math.round(this.pos.x+0.3),Math.round(this.pos.y+1.5),Math.round(this.pos.z)),this.gs).id<1
+            && World.getBlock( new Vector4(Math.round(this.pos.x-0.3),Math.round(this.pos.y+1.5),Math.round(this.pos.z)),this.gs).id<1
+            && World.getBlock( new Vector4(Math.round(this.pos.x),Math.round(this.pos.y+1.5),Math.round(this.pos.z+0.3)),this.gs).id<1
+            && World.getBlock( new Vector4(Math.round(this.pos.x),Math.round(this.pos.y+1.5),Math.round(this.pos.z-0.3)),this.gs).id<1)
                 {
-                    if(this.jump.yAcc<=0&& (World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z)),this.gs).id>0 ||
-            World.getBlock( new Vector(Math.round(this.pos.x+0.3),Math.round(this.pos.y-1.5),Math.round(this.pos.z)),this.gs).id>0
-            || World.getBlock( new Vector(Math.round(this.pos.x-0.3),Math.round(this.pos.y-1.5),Math.round(this.pos.z)),this.gs).id>0
-            || World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z+0.3)),this.gs).id>0
-            || World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z-0.3)),this.gs).id>0))
+                    if(this.jump.yAcc<=0&& (World.getBlock( new Vector4(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z)),this.gs).id>0 ||
+            World.getBlock( new Vector4(Math.round(this.pos.x+0.3),Math.round(this.pos.y-1.5),Math.round(this.pos.z)),this.gs).id>0
+            || World.getBlock( new Vector4(Math.round(this.pos.x-0.3),Math.round(this.pos.y-1.5),Math.round(this.pos.z)),this.gs).id>0
+            || World.getBlock( new Vector4(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z+0.3)),this.gs).id>0
+            || World.getBlock( new Vector4(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z-0.3)),this.gs).id>0))
                         this.jump.yAcc = 0.2;
 
 
@@ -403,7 +401,7 @@ export class Player
                 }
             }
            
-            /*  else if(CanvaManager.getKey(16) && World.getBlock( new Vector(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z)) ).id<1)
+            /*  else if(CanvaManager.getKey(16) && World.getBlock( new Vector4(Math.round(this.pos.x),Math.round(this.pos.y-1.5),Math.round(this.pos.z)) ).id<1)
         this.pos.y-=0.1;
         */    
            
@@ -464,7 +462,7 @@ export class Player
             while(World.getBlock(blockPos,this.gs).id<1 && i<5)
             {
                 i+=dist;
-                blockPos = new Vector(blockPos.x+(Math.sin(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)*dist),blockPos.y+(Math.sin(this.camera.getPitch()*Math.PI/180)*dist),blockPos.z+(Math.cos(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)*dist) );
+                blockPos = new Vector4(blockPos.x+(Math.sin(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)*dist),blockPos.y+(Math.sin(this.camera.getPitch()*Math.PI/180)*dist),blockPos.z+(Math.cos(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)*dist) );
             }
             const block=World.getBlock(blockPos,this.gs);
             if( block.id>0)
@@ -483,7 +481,7 @@ export class Player
                     this.targetedBlock = block;
                 }
                 if((Date.now()/1000)-Block.info[this.targetedBlock.id].breakTime>=this.startTime || this.gs.fastBreaking)
-                { const middle = Vector.add(blockPos.round(),new Vector(randRange(-0.2,0.2),randRange(-0.2,0.2),randRange(-0.2,0.2)));
+                { //const middle = Vector4.add(blockPos.round(),new Vector4(randRange(-0.2,0.2),randRange(-0.2,0.2),randRange(-0.2,0.2)));
                     //this.gs.entities.push(new Item(middle,World.getBlock(blockPos,this.gs).id,this.gs));
                     this.gs.socket.emit("placeBlock",{id:0,pos:{x:blockPos.x,y:blockPos.y,z:blockPos.z},slot:this.selectedItem});
                     World.breakBlock(blockPos,this.gs);
@@ -500,20 +498,20 @@ export class Player
     place()
     {
 
-        let  blockPos =new Vector(this.pos.x,this.pos.y+0.7,this.pos.z);
+        let  blockPos =new Vector4(this.pos.x,this.pos.y+0.7,this.pos.z);
         let i=0;
         const dist = 0.1;
         try{
-            let lastPos =new Vector(0,0,0);
+            let lastPos =new Vector4(0,0,0);
             while( World.getBlock(blockPos,this.gs).id<1 && i<5)
             {
                 //    console.log(Main.chunks[chunkPos.x][chunkPos.z].getBlock(inChunkPos));
                 //  console.log(blockPos);
                 lastPos=blockPos.copy();
                 i+=dist;
-                blockPos = new Vector(blockPos.x+(Math.sin(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)*dist),blockPos.y+(Math.sin(this.camera.getPitch()*Math.PI/180)*dist),blockPos.z+(Math.cos(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)*dist) );
+                blockPos = new Vector4(blockPos.x+(Math.sin(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)*dist),blockPos.y+(Math.sin(this.camera.getPitch()*Math.PI/180)*dist),blockPos.z+(Math.cos(this.camera.getYaw()*Math.PI/180)*Math.cos(this.camera.getPitch()*Math.PI/180)*dist) );
             }
-            if(  World.getBlock(lastPos,this.gs).id<1 && i<5 &&  !lastPos.round().equals(new Vector(this.pos.x,this.pos.y-0.5,this.pos.z).round()) &&  !lastPos.round().equals(this.pos.round()) && this.itemsBar[this.selectedItem].id!=0 )
+            if(  World.getBlock(lastPos,this.gs).id<1 && i<5 &&  !lastPos.round().equals(new Vector4(this.pos.x,this.pos.y-0.5,this.pos.z).round()) &&  !lastPos.round().equals(this.pos.round()) && this.itemsBar[this.selectedItem].id!=0 )
             {
                 World.placeBlock(lastPos,this.itemsBar[this.selectedItem].id,this.gs);
                 if(this.isInBlock(this.pos))
@@ -534,7 +532,7 @@ export class Player
         }
         
     }
-    isTouching(vec:Vector,offset?:number)
+    isTouching(vec:Vector4,offset?:number)
     {
         offset??=0;
         if(vec.x > this.pos.x-0.3-offset && vec.z > this.pos.z-0.3-offset && vec.y > this.pos.y-1 

@@ -1,14 +1,12 @@
 import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { Texture } from "../../Engine/Texture.js";
 import { Matrix4 } from "../../Engine/Utils/Matrix4.js";
-import { Vector } from "../../Engine/Utils/Vector.js";
+import { Vector4 } from "../../Engine/Utils/Vector4.js";
 import { Main } from "../../Main.js";
 import { Entity } from "../Entity.js";
 import { rot2d } from "../Models.js";
-import { Loader } from "../../Engine/Loader.js";
 import { GameScene } from "../scenes/GameScene.js";
 import { Item } from "./Item.js";
-import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
 import { Vector3 } from "../../Engine/Utils/Vector3.js";
 import { World } from "../World.js";
 import { Block } from "../Block.js";
@@ -24,17 +22,17 @@ export class PlayerRotations
 }
 export class PlayerEntity extends Entity
 {
-    nextTransitions:Array<{pos:Vector,rots:PlayerRotations}>=[];
+    nextTransitions:Array<{pos:Vector4,rots:PlayerRotations}>=[];
     itemEnt:Item;
     rotations:PlayerRotations = new PlayerRotations();
     // rsHammer = Loader.loadObj("./res/models/hammer.obj");
     gs:GameScene;
-    constructor(pos:Vector,gs:GameScene,id?)
+    constructor(pos:Vector4,gs:GameScene,id?)
     {
         super(pos,Main.atlasShader,id);
         this.gs = gs;
         
-        this.itemEnt =  new Item(new Vector(0,0,0),1,this.gs,0);
+        this.itemEnt =  new Item(new Vector4(0,0,0),1,this.gs,0);
         this.rs.resetArrays();
         this.rs.vertices =[ //tył
             -0.5,-0.5,-0.5,
@@ -323,7 +321,7 @@ export class PlayerEntity extends Entity
         Main.atlasShader.use();
         let block = World.getBlock(this.pos,this.gs);
         if(!block) block = new Block(0);
-        Main.atlasShader.loadUniforms(this.gs.player.camera.getProjection(),transformation,this.gs.player.camera.getView(),Math.max(block.lightFBlock,Math.min(block.skyLight,this.gs.sunLight)));
+        Main.atlasShader.loadUniforms(this.gs.player.camera.getProjection(),transformation,this.gs.player.camera.getView(),this.gs.sunLight);
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,0);
         //Body
         Main.atlasShader.loadTransformation( Matrix4.identity().translate(this.pos.x,this.pos.y+0.05,this.pos.z).scale(bScale ,bScale ,bScale ).rotateX(this.rotations.body.x).rotateY(this.rotations.body.y).rotateZ(this.rotations.body.z));
@@ -376,7 +374,7 @@ export class PlayerEntity extends Entity
                 console.log("changing: "+id);
             }
             
-            //  this.itemEnt.pos   = new Vector(this.pos.x,this.pos.y+0.45,this.pos.z);
+            //  this.itemEnt.pos   = new Vector4(this.pos.x,this.pos.y+0.45,this.pos.z);
             this.itemEnt.render(mat);
         }      
         
@@ -385,9 +383,9 @@ export class PlayerEntity extends Entity
         //Main.atlasShader.loadUniforms(this.gs.player.camera.getProjection(),mat,this.gs.player.camera.getView(),15);
         //gl.drawElements(gl.TRIANGLES,this.rsHammer.count,gl.UNSIGNED_INT,0);
     }
-    setNextTransitions(nextPos:Vector,nextRots:PlayerRotations,count:number)
+    setNextTransitions(nextPos:Vector4,nextRots:PlayerRotations,count:number)
     {
-        const deltaPos = Vector.add(nextPos,this.nextTransitions.length>0?this.nextTransitions.at(-1).pos.mult(-1):this.pos.mult(-1));
+        const deltaPos = Vector4.add(nextPos,this.nextTransitions.length>0?this.nextTransitions.at(-1).pos.mult(-1):this.pos.mult(-1));
         const deltaRots = new PlayerRotations();
         for(const name in this.rotations)
         {
@@ -401,7 +399,7 @@ export class PlayerEntity extends Entity
         }
         for(let i=1;i<count;i++)
         {
-            this.nextTransitions.push({pos:Vector.add(this.pos,OneStepPos),rots:OneStepRots});
+            this.nextTransitions.push({pos:Vector4.add(this.pos,OneStepPos),rots:OneStepRots});
         }
         this.nextTransitions.push({pos:nextPos,rots:OneStepRots});
      

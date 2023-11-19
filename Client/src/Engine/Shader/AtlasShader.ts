@@ -1,6 +1,5 @@
-import { CanvaManager } from "../CanvaManager.js";
+
 import { Matrix4 } from "../Utils/Matrix4.js";
-import { Vector } from "../Utils/Vector.js";
 import { Shader } from "./Shader.js";
 export class AtlasShader extends Shader
 {

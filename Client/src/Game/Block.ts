@@ -1,5 +1,5 @@
 import { Texture } from "../Engine/Texture.js";
-import { Vector } from "../Engine/Utils/Vector.js";
+import { Vector4 } from "../Engine/Utils/Vector4.js";
 export enum blockType
 {
     FULL,
@@ -203,12 +203,12 @@ export const directions = Object.freeze(
 );
 export const dirAssoc = Object.freeze(
     {
-        1:new Vector(1,0,0),
-        2: new Vector(-1,0,0),
-        3: new Vector(0,0,1),
-        4: new Vector(0,0,-1),
-        5: new Vector(0,1,0),
-        6: new Vector(0,-1,0)
+        1:new Vector4(1,0,0),
+        2: new Vector4(-1,0,0),
+        3: new Vector4(0,0,1),
+        4: new Vector4(0,0,-1),
+        5: new Vector4(0,1,0),
+        6: new Vector4(0,-1,0)
     }
 );
 const slab =[

@@ -1,7 +1,7 @@
 import { rot2d } from "../Game/Models.js";
 import { CanvaManager } from "./CanvaManager.js";
 import { RenderSet } from "./RenderSet.js";
-import { Vector } from "./Utils/Vector.js";
+import { Vector4 } from "./Utils/Vector4.js";
 import {Main} from "../Main.js";
 const gl = CanvaManager.gl;
 export class Loader
@@ -65,7 +65,7 @@ export class Loader
             gl.bindTexture(gl.TEXTURE_2D_ARRAY,texture);  
             //  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA,gl.UNSIGNED_BYTE,img);
             gl.texImage3D(gl.TEXTURE_2D_ARRAY,0,gl.RGBA8,size,size,count,0,gl.RGBA,gl.UNSIGNED_BYTE,img);
-            const pos= new Vector(0,0,0);
+            const pos= new Vector4(0,0,0);
             for(let i=0;i<count;i++)
             {
                 const buff = ctx.getImageData(pos.x,pos.y,size,size).data;
@@ -114,7 +114,7 @@ export class Loader
             ctx.drawImage(img,0,0,img.width,img.height);
             gl.bindTexture(gl.TEXTURE_2D_ARRAY,texture);  
             gl.texImage3D(gl.TEXTURE_2D_ARRAY,0,gl.RGBA8,json[0].size[0],json[0].size[1],json.length,0,gl.RGBA,gl.UNSIGNED_BYTE,img);
-            const pos= new Vector(0,0,0);
+            const pos= new Vector4(0,0,0);
             for(let i=0;i<json.length;i++)
             {
                 const sizeX = json[i].size[0];
@@ -190,7 +190,7 @@ export class Loader
 
         return textureHolder;
     }
-    public static  imageAtlasByNewJSON(path:string,json:any):TextureV3
+    public static  imageAtlasByNewJSON(path:string,json):TextureV3
     {
         const img =  new Image();
         img.src = path;

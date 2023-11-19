@@ -1,9 +1,9 @@
 import { Matrix4 } from "../Utils/Matrix4.js";
-import { Vector } from "../Utils/Vector.js";
+import { Vector4 } from "../Utils/Vector4.js";
 import { Shader } from "./Shader.js";
 export class DefaultShader extends Shader
 {
-    viewCenter:Vector = new Vector(0,0,0);
+    viewCenter:Vector4 = new Vector4(0,0,0);
     fogDistance=90;
     constructor()
     {
@@ -17,7 +17,7 @@ export class DefaultShader extends Shader
         this.loadFloat("fogDistance",this.fogDistance);
         this.loadVec3("center",this.viewCenter);
     }
-    setFog(center:Vector,distance:number)
+    setFog(center:Vector4,distance:number)
     {
         this.viewCenter =center;
         this.fogDistance =distance;

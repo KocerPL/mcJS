@@ -2,7 +2,6 @@ import { GuiComponent } from "./GuiComponent.js";
 import { Texture } from "../../Engine/Texture.js";
 import { Sprite } from "../../Engine/Utils/Sprite.js";
 import { Matrix3 } from "../../Engine/Utils/Matrix3.js";
-import { Vector3 } from "../../Engine/Utils/Vector3.js";
 export class SelectedSlot extends GuiComponent
 {
     constructor(x:number,y:number,id:string)
