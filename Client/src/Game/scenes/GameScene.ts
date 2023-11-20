@@ -5,7 +5,7 @@ import { Texture } from "../../Engine/Texture.js";
 import { Matrix4 } from "../../Engine/Utils/Matrix4.js";
 import { Vector4 } from "../../Engine/Utils/Vector4.js";
 import { Main } from "../../Main.js";
-import { Block } from "../Block.js";
+import { Block, RotatableBlock, Side } from "../Block.js";
 import { Chunk } from "../Chunk.js";
 import { Entity } from "../Entity.js";
 import { Player } from "../Player.js";
@@ -148,8 +148,11 @@ export class GameScene extends Scene
         chunk.subchunks[ev.data.subY] = new SubChunk(new Vector4(ev.data.subX,ev.data.subY,ev.data.subZ),chunk);
         for(let x=0;x<16;x++)    for(let y=0;y<16;y++)    for(let z=0;z<16;z++)
         {
-            chunk.subchunks[ev.data.subY].blocks[x][y][z]=new Block(ev.data.blocks[x+(y*16)+(z*256)]);
-            chunk.subchunks[ev.data.subY].blocks[x][y][z].skyLight=0;
+            const bl = new Block(ev.data.blocks[x+(y*16)+(z*256)]);
+            bl.skyLight = 0;
+            // bl.sideTop = Side.left;
+            chunk.subchunks[ev.data.subY].blocks[x][y][z]=bl;
+            // chunk.subchunks[ev.data.subY].blocks[x][y][z]
         }
         for(let i=0;i<16;i++)
             if(!chunk.subchunks[i])

@@ -1,6 +1,6 @@
 import { Array3D } from "../Engine/Utils/Array3D.js";
 import { Vector4 } from "../Engine/Utils/Vector4.js";
-import { Block,blockType,Side } from "./Block.js";
+import { Block,blockType,RotatableBlock,Side } from "./Block.js";
 import { Chunk } from "./Chunk.js";
 import { Mesh } from "./Mesh.js";
 import { Texture } from "../Engine/Texture.js";
@@ -248,7 +248,7 @@ export class SubChunk
     }
     
     //DONE: update vertices only tree sides
-    updateSide(x:number,y:number,z:number,dx:number,dy:number,dz:number,vStart:number,side:Side,block:Block,index:number,vBuffer:Array<Array<number>>)
+    updateSide(x:number,y:number,z:number,dx:number,dy:number,dz:number,side:Side,block:Block,index:number,vBuffer:Array<Array<number>>)
     {
         const testedBlock = this.getBlockWV(dx+x,dy+y,dz+z);
         if(testedBlock==undefined) return;
@@ -373,32 +373,33 @@ export class SubChunk
       
         let index=0;
         let block:Block;
-        const temp:Array<Array<number>> = [];
+        const temp:Array<Array<number>> = new Array(6);
         for(let x=0;x<16;x++) for(let y=0;y<16;y++) for(let z=0;z<16;z++) 
         {
             
             block = this.blocks[x][y][z];
+            
             for(let j=0;j<SubChunk.cubeVert.length;j++)
             {
-                const tempArr = [];
+                const  tempArr = new Array(12);
                 for(let i=0;i<SubChunk.cubeVert[j].length;i+=3)
                 {
-                    tempArr.push(SubChunk.cubeVert[j][i]+x);
-                    tempArr.push(SubChunk.cubeVert[j][i+1]+y+(this.pos.y*16));
-                    tempArr.push(SubChunk.cubeVert[j][i+2]+z);
+                    tempArr[i] =SubChunk.cubeVert[j][i]+x;
+                    tempArr[i+1] =SubChunk.cubeVert[j][i+1]+y+(this.pos.y*16);
+                    tempArr[i+2] = SubChunk.cubeVert[j][i+2]+z;
                 }
-                temp.push(tempArr);
+                temp[j] =tempArr;
             }
-            index= this.updateSide(x,y,z,1,0,0,36,Side.left,block,index,temp);
-            index= this.updateSide(x,y,z,0,1,0,60,Side.top,block,index,temp);
-            index = this.updateSide(x,y,z,0,0,1,12,Side.front,block,index,temp);
-            temp.length=0;
+            index= this.updateSide(x,y,z,0,1,0,Side.top,block,index,temp);
+            index= this.updateSide(x,y,z,1,0,0,Side.left,block,index,temp);
+            
+            index = this.updateSide(x,y,z,0,0,1,Side.front,block,index,temp);
+            //temp.length=0;
             await occasionalSleeper();
         }
         return index;
         
     }
-
     static flip(side:Side):Side
     {
         switch(side)

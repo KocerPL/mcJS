@@ -6,6 +6,7 @@ export enum blockType
     NOTFULL,
     EMPTY
 }
+
 export class Block
 {
    
@@ -184,6 +185,10 @@ export class Block
           }];
     }
     static info:Array<{name,textureIndex?:number[],breakTime?,glowing?,type:blockType,customMesh?:number[][]}> = [];
+}
+export class RotatableBlock extends Block
+{
+    sideTop:Side = Side.top;
 }
 export enum Side
 {
