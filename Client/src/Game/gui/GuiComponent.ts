@@ -16,9 +16,9 @@ export abstract class GuiComponent
     protected components:GuiComponent[]=[];
     renderMe=true;
     boundingBox:BoundingBox =undefined;
-    onclick = ():void=>{};
-    onkey = (key:string):void=>{};
-    onmissclick = ():void=>{};
+    onclick = ():void=>{return;};
+    onkey = (key:string):void=>{return;};
+    onmissclick = ():void=>{return;};
     protected visible:boolean;
     public transparency=1;
     gui:GUI;

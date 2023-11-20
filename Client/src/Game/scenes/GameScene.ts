@@ -28,6 +28,7 @@ import { Vector3 } from "../../Engine/Utils/Vector3.js";
 import { TextInput } from "../gui/TextInput.js";
 import { InlineTextInput } from "../gui/InlineTextInput.js";
 import { GuiComponent } from "../gui/GuiComponent.js";
+import { clamp, roundTo } from "../../Engine/Utils/Math.js";
 declare let io;
 const gl = CanvaManager.gl;
 export class GameScene extends Scene
@@ -36,21 +37,7 @@ export class GameScene extends Scene
         //  console.log(key);
         if(key=="`")
         {
-            const txt = this.gui.get("chatInput_text_in");
-            if(txt instanceof TextInput)
-            {
-            
-                this.keyLock = !this.keyLock;
-                txt.setVisible = this.keyLock;
-                txt.selected = this.keyLock;   
-                const chat = this.gui.get("chat");
-                if(this.keyLock)
-                {
-                    chat.transparency=1;
-                }
-                else
-                    chat.transparency=0.3;
-            }
+            this.switchChat();
         }
         else
             this.gui.onKey(key);
@@ -83,6 +70,7 @@ export class GameScene extends Scene
     public toUpdate:Set<SubChunk> = new Set();
     public  integratedServer:Worker;
     public logged =false;
+    private lastChatClosed =0;
     private counter =0;
     private fromSlot =0;
     public keyLock =false;
@@ -179,12 +167,24 @@ export class GameScene extends Scene
         this.gui.add(this.cross);
         this.gui.add(new ItemBar("ItemBar"));
         this.gui.add(new Inventory("Inventory"));
+      
         this.gui.add(new TextComponent("debug","FPS:",0.01,null,ALIGN.left,true)).transformation =Matrix3.identity().translate(-1,0.98);
+        const db =this.gui.get("debug");
+        if(db instanceof TextComponent)
+            db.background=new Vector4(0.0,0.0,0.0,0.4);
         const chat=  this.gui.add(new TextComponent("chat","",0.01,null,ALIGN.left,false));
         const chatIn =this.gui.add(new InlineTextInput("chatInput",""));
         chat.transformation =Matrix3.identity().translate(-1,0);
+        if(chat instanceof TextComponent)
+        {
+            chat.background = new Vector4(0.0,0.0,0.0,0.3);
+            chat.lineBreakLimit =10;
+        }
         if(chatIn instanceof InlineTextInput)
+        {
+            chatIn.background = new Vector4(0.0,0.0,0.0,0.3);
             chatIn.unselect();
+        }
         const testButton  =new Button("test");
         testButton.transformation = Matrix3.identity().translate(0.9,0.85).scale(0.2,0.2);
         testButton.setVisible = false;
@@ -322,7 +322,11 @@ export class GameScene extends Scene
                 }
             }
             if(chat instanceof TextComponent)
+            {
                 chat.appendText("\n"+text);
+                chat.transparency=1;
+            }
+            this.lastChatClosed = Date.now();
             
         });
         this.socket.on("updateEntity",(obj:{uuid:number,pos:Vector4})=>
@@ -464,7 +468,8 @@ export class GameScene extends Scene
             {
                 if(txt.getText().startsWith("/"))
                 {
-                    switch(txt.getText())
+                    const cmd = txt.getText().split(" ");
+                    switch(cmd[0])
                     {
                     case "/logchunk":
                         console.log(  this.loadedChunks.get(Math.floor(this.player.pos.x/16)+"-"+Math.floor(this.player.pos.z/16)));
@@ -474,11 +479,26 @@ export class GameScene extends Scene
                         console.log(this.toUpdate);
                         if(gComp instanceof TextComponent)
                             gComp.appendText("\n"+this.toUpdate.size);
+                        break;
+                    case "/tp":
+                        gComp= this.gui.get("chat");
+                        console.log(this.toUpdate);
+                        if(gComp instanceof TextComponent)
+                        { 
+                            if(cmd.length>3)
+                            {
+                                this.player.pos = new Vector4(Number.parseFloat(cmd[1]),Number.parseFloat(cmd[2]),Number.parseFloat(cmd[3]));
+                                gComp.appendText("\nTelleported to: x:"+roundTo(this.player.pos.x,2)+" y:"+roundTo(this.player.pos.y,2)+" z:"+roundTo(this.player.pos.z,2));
+                            }
+                            else
+                                gComp.appendText("\nNot enough arguments, expected: /tp <x> <y> <z>");
+                        }
+
                     }
                 }
                 else
                     this.socket.emit("message",txt.getText());
-              
+                this.switchChat(false);
                 txt.changeText("");
             }
         }
@@ -547,16 +567,23 @@ export class GameScene extends Scene
             const txt = this.gui.get("debug");
             if(txt instanceof TextComponent)
             {
-                txt.changeText("FPS:"+ Main.Measure.fps+"Position: X:"+this.player.pos.x+" Y:"+this.player.pos.y+ " Z:"+this.player.pos.z);
+                txt.changeText("FPS:"+ Main.Measure.fps+"\nPosition: X:"+roundTo(this.player.pos.x,2)+" Y:"+roundTo(this.player.pos.y,2)+ " Z:"+roundTo(this.player.pos.z,2));
                 txt.transformation =Matrix3.identity().translate(-(CanvaManager.getWidth/CanvaManager.getHeight),0.98);
             }
             const chatTxt =  this.gui.get("chat");
+
             const chatIn  = this.gui.get("chatInput");
             if(chatTxt instanceof TextComponent)
             {
-                chatTxt.transformation =Matrix3.identity().translate(-(CanvaManager.getWidth/CanvaManager.getHeight),-0.90);
+                chatTxt.transformation =Matrix3.identity().translate(-(CanvaManager.getWidth/CanvaManager.getHeight),-0.93);
+                if(!this.keyLock)
+                {
+                    if(this.lastChatClosed+5000<Date.now())
+                        chatTxt.transparency= clamp(chatTxt.transparency-0.05,0,1);
+                }
             }
-            chatIn.transformation =Matrix3.identity().translate(-(CanvaManager.getWidth/CanvaManager.getHeight),-0.95).scale(0.4,0.4);
+            chatIn.transformation =Matrix3.identity().translate(-(CanvaManager.getWidth/CanvaManager.getHeight),-0.97).scale(0.4,0.4);
+
         }
         Main.shader.use();
         this.player.camera.preRender();
@@ -607,6 +634,21 @@ export class GameScene extends Scene
     public toChunkPos(vec:Vector4)
     {
         return new Vector4(Math.floor(Math.round(vec.x)/16),Math.floor(Math.round(vec.y)/16),Math.floor(Math.round(vec.z)/16));
+    }
+    switchChat(val?:boolean)
+    {
+        const txt = this.gui.get("chatInput_text_in");
+        if(txt instanceof TextInput)
+        {
+            
+            this.keyLock =val?? !this.keyLock;
+            if(!this.keyLock) this.lastChatClosed = Date.now();
+            txt.setVisible = this.keyLock;
+            txt.selected = this.keyLock;
+            const chat = this.gui.get("chat");   
+            if(this.keyLock)
+                chat.transparency=1;
+        }
     }
     
 }

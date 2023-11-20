@@ -6,6 +6,7 @@ import { ALIGN } from "../../Engine/Utils/TextSprite.js";
 import { Shader } from "../../Engine/Shader/Shader.js";
 import { CanvaManager } from "../../Engine/CanvaManager.js";
 import { TextInput } from "./TextInput.js";
+import { Vector4 } from "../../Engine/Utils/Vector4.js";
 const gl = CanvaManager.gl;
 export class InlineTextInput extends GuiComponent
 {
@@ -38,10 +39,19 @@ export class InlineTextInput extends GuiComponent
         if(t instanceof TextInput)
             t.selected =false;
     }
+    set background(bg:Vector4)
+    {
+        const t = this.get(this.id+"_text_in");
+        if(t instanceof TextInput)
+        {
+            console.log("set");
+            t.background = bg;
+           
+        }
+    }
     renderItself(shader:Shader,mat:Matrix3)
     {
         Texture.GUI.bind(); 
-         
         //const v = this.transformation.inverse().multiplyVec(new Vector3(CanvaManager.mouse.pos.x,CanvaManager.mouse.pos.y,1));
         /*if(isIn(v.x,v.y,this.boundingBox))
             shader.loadMatrix3("transformation",mat.scale(1.2,1.2));
@@ -49,5 +59,6 @@ export class InlineTextInput extends GuiComponent
         shader.loadMatrix3("transformation",mat);
         if(this.renderMe)
             gl.drawElements(gl.TRIANGLES,this.vEnd-this.vStart,gl.UNSIGNED_INT,this.vStart*4);
+          
     }
 }
