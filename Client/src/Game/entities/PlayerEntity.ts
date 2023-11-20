@@ -219,7 +219,8 @@ export class PlayerEntity extends Entity
             -0.25,-0.7,0.25,
         ];
         this.rs.skyLight  = [14,14,14,14 ,14,14,14,14 ,14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, /*Body */ 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14,14,14,14,14, 14,14,14,14,   14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14,14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14, 14,14,14,14,];
-        this.rs.blockLight = this.rs.skyLight;
+        for(let i=0;i<this.rs.skyLight.length;i++)
+            this.rs.blockLight.push(1);
         let tc = [];
         const pushFunc = (ind)=>{
             if(Texture.skinAtlas.coords[ind].rotation == undefined)
@@ -321,7 +322,7 @@ export class PlayerEntity extends Entity
         Main.atlasShader.use();
         let block = World.getBlock(this.pos,this.gs);
         if(!block) block = new Block(0);
-        Main.atlasShader.loadUniforms(this.gs.player.camera.getProjection(),transformation,this.gs.player.camera.getView(),this.gs.sunLight);
+        Main.atlasShader.loadUniforms(this.gs.player.camera.getProjection(),transformation,this.gs.player.camera.getView(),Math.max(block.lightFBlock,Math.min(this.gs.sunLight,block.skyLight)));
         gl.drawElements(gl.TRIANGLES,36,gl.UNSIGNED_INT,0);
         //Body
         Main.atlasShader.loadTransformation( Matrix4.identity().translate(this.pos.x,this.pos.y+0.05,this.pos.z).scale(bScale ,bScale ,bScale ).rotateX(this.rotations.body.x).rotateY(this.rotations.body.y).rotateZ(this.rotations.body.z));
@@ -343,7 +344,7 @@ export class PlayerEntity extends Entity
         //  this.renderHandItem();
         Main.shader.use();
     }
-    renderHandItem(id:number)
+    renderHandItem(id:number,l?:number)
     {
     /*    Texture.skinAtlas.bind();
         this.rs.vao.bind();
@@ -375,7 +376,7 @@ export class PlayerEntity extends Entity
             }
             
             //  this.itemEnt.pos   = new Vector4(this.pos.x,this.pos.y+0.45,this.pos.z);
-            this.itemEnt.render(mat);
+            this.itemEnt.render(mat,l);
         }      
         
         //  this.rsHammer.vao.bind();

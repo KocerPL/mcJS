@@ -514,8 +514,10 @@ export class Player
             if(  World.getBlock(lastPos,this.gs).id<1 && i<5 &&  !lastPos.round().equals(new Vector4(this.pos.x,this.pos.y-0.5,this.pos.z).round()) &&  !lastPos.round().equals(this.pos.round()) && this.itemsBar[this.selectedItem].id!=0 )
             {
                 World.placeBlock(lastPos,this.itemsBar[this.selectedItem].id,this.gs);
+                this.entity.rotations.rightHand.x = randRange(-70,-45);
                 if(this.isInBlock(this.pos))
                 {
+                 
                     World.placeBlock(lastPos,0,this.gs);
                     return;
                 }
@@ -598,8 +600,9 @@ export class Player
     render()
     {   
         this.entity.render();
-        
-        this.entity.renderHandItem(this.itemsBar[this.selectedItem].id);
+        let block = World.getBlock(this.pos,this.gs);
+        if(!block) block = new Block(0);
+        this.entity.renderHandItem(this.itemsBar[this.selectedItem].id,Math.max(block.lightFBlock,Math.min(this.gs.sunLight,block.skyLight)));
         if(this.blockBreakingTime>1)
         {      const   transformation = Matrix4.identity();
             if( (Date.now()-this.lastHit)>=300)

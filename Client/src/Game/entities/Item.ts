@@ -38,7 +38,7 @@ export class Item extends Entity
     {
         let ll =   14;
         this.rs.skyLight = [ll,ll,ll,ll, ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll, ll,ll,ll,ll];
-        ll =   14;
+        ll =   1;
         this.rs.blockLight = [ll,ll,ll,ll, ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll ,ll,ll,ll,ll, ll,ll,ll,ll];
         this.rs.bufferArrays();
     }
@@ -100,7 +100,7 @@ export class Item extends Entity
         return false;
         
     }
-    render(transformation?:Matrix4): void {
+    render(transformation?:Matrix4,l?:number): void {
         // console.log("rendered")
         //   if(this.acc.x>0.02) this.acc.x-=0.01;else  if(this.acc.x<-0.02) this.acc.x+=0.01;else this.acc.x =0;
         // if(this.acc.z>0.02) this.acc.z-=0.01; else if(this.acc.z<-0.02) this.acc.z+=0.01; else this.acc.z=0;
@@ -119,7 +119,8 @@ export class Item extends Entity
         Texture.testAtkas.bind();
         this.rs.vao.bind();
         // Main.shader.use();
-        Main.shader.loadUniforms(this.gs.player.camera.getProjection(),transformation??this.transformation,this.gs.player.camera.getView(),this.gs.sunLight);
+       
+        Main.shader.loadUniforms(this.gs.player.camera.getProjection(),transformation??this.transformation,this.gs.player.camera.getView(),l??this.gs.sunLight);
         //     Main.shader.use();
         
       
@@ -129,7 +130,7 @@ export class Item extends Entity
             //      gl.bindTexture(gl.TEXTURE_2D_ARRAY,Texture.blocksGridTest);
             this.rs.vao.bind();
             this.transformation=this.transformation.translate(0.3,-0.3,0.3);
-            Main.shader.loadUniforms(this.gs.player.camera.getProjection(),transformation??this.transformation,this.gs.player.camera.getView(),this.gs.sunLight);
+            Main.shader.loadUniforms(this.gs.player.camera.getProjection(),transformation??this.transformation,this.gs.player.camera.getView(),l??this.gs.sunLight);
             gl.drawElements(gl.TRIANGLES,this.rs.count,gl.UNSIGNED_INT,0);
         }
     }

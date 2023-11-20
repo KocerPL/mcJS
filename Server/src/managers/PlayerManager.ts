@@ -6,6 +6,7 @@ import * as fs from "fs";
 import { Item } from "../Entities/Item";
 import { World } from "../World/World";
 import { Vector } from "../Utils/Vector";
+import e = require("express");
 export class PlayerInfo
 {
     inventory:Array<{id:number,count:number}>=new Array(27);
@@ -105,6 +106,30 @@ export class Player
         it.acc.x=Math.sin(yRot*Math.PI/180)*0.7;
         it.acc.z=Math.cos(yRot*Math.PI/180)*0.7;
     }
+    mvItemsSSlot(slot1: {
+        id: number;
+        count: number;
+    },slot2: {
+        id: number;
+        count: number;
+    })
+    {
+        
+        if(slot1.id!=slot2.id || (slot1.count +slot2.count)>64)
+        {
+        let item = slot1;
+        slot1 = slot2;
+        slot2 = item;
+        }
+        else
+        {
+           slot1.count = slot1.count +slot2.count;
+           slot2.count =0;
+            slot2.id=0;
+          
+        }
+        return {slot1,slot2};
+    }
     moveItem(data:{slot1:number,isInv1:boolean, slot2:number,isInv2:boolean})
     {
 
@@ -114,35 +139,34 @@ export class Player
               
             if(data.isInv1 && data.isInv2)
             {
-
+                let ret =  this.mvItemsSSlot(this.inventory[data.slot1],this.inventory[data.slot2]);
             //    console.log("Moved item!!");
-            let item = this.inventory[data.slot1];
-            this.inventory[data.slot1] = this.inventory[data.slot2];
-            this.inventory[data.slot2] = item;
+            this.inventory[data.slot1] = ret.slot1;
+            this.inventory[data.slot2] = ret.slot2;
             this.socket.emit("updateItem",{id: this.inventory[data.slot2].id,count: this.inventory[data.slot2].count,slot:data.slot2,inventory:true});
             this.socket.emit("updateItem",{id: this.inventory[data.slot1].id,count: this.inventory[data.slot1].count,slot:data.slot1,inventory:true});   
             } 
             else if(data.isInv1 && !data.isInv2)
             {
-                let item =    this.inventory[data.slot1];
-              this.inventory[data.slot1] = this.itemsBar[data.slot2];
-                this.itemsBar[data.slot2] = item;
-                this.socket.emit("updateItem",{id: this.itemsBar[data.slot2].id,count: this.itemsBar[data.slot2].count,slot:data.slot2,inventory:false});
+              let ret =  this.mvItemsSSlot(this.inventory[data.slot1],this.itemsBar[data.slot2]);
+              this.inventory[data.slot1] = ret.slot1;
+              this.itemsBar[data.slot2] = ret.slot2;  
+              this.socket.emit("updateItem",{id: this.itemsBar[data.slot2].id,count: this.itemsBar[data.slot2].count,slot:data.slot2,inventory:false});
                 this.socket.emit("updateItem",{id: this.inventory[data.slot1].id,count: this.inventory[data.slot1].count,slot:data.slot1,inventory:true});
             }
             else if(!data.isInv1 && data.isInv2)
             {
-                let item = this.inventory[data.slot2];
-                this.inventory[data.slot2] = this.itemsBar[data.slot1];
-              this.itemsBar[data.slot1] = item;
+                let ret =this.mvItemsSSlot(this.itemsBar[data.slot1],this.inventory[data.slot2]);
+                this.itemsBar[data.slot1] = ret.slot1;
+                this.inventory[data.slot2] = ret.slot2;  
                 this.socket.emit("updateItem",{id: this.itemsBar[data.slot1].id,count: this.itemsBar[data.slot1].count,slot:data.slot1,inventory:false});
                 this.socket.emit("updateItem",{id: this.inventory[data.slot2].id,count: this.inventory[data.slot2].count,slot:data.slot2,inventory:true});
             }
             else if(!data.isInv1 && !data.isInv2)
             {
-                let item = this.itemsBar[data.slot2];
-                this.itemsBar[data.slot2] = this.itemsBar[data.slot1];
-                this.itemsBar[data.slot1] = item;
+               let ret= this.mvItemsSSlot(this.itemsBar[data.slot1],this.itemsBar[data.slot2]);
+                this.itemsBar[data.slot1] = ret.slot1;
+                this.itemsBar[data.slot2] = ret.slot2;
                 this.socket.emit("updateItem",{id: this.itemsBar[data.slot1].id,count: this.itemsBar[data.slot1].count,slot:data.slot1,inventory:false});
                 this.socket.emit("updateItem",{id: this.itemsBar[data.slot2].id,count: this.itemsBar[data.slot2].count,slot:data.slot2,inventory:false});
             }
@@ -249,11 +273,47 @@ export class PlayerManager
                     for(let i=0;i<player.itemsBar.length;i++)
                     {
                        const slot = player.itemsBar[i];
-                        if(!slot.id  || slot.id ==0 || (slot.id== ent.id && slot.count<64))
+                       if((slot.id== ent.id && slot.count<64))
                         {
                         slot.id = ent.id;
                         Main.entityManager.remove(ent);
                            player.socket.emit("updateItem",{id: slot.id,count: ++slot.count,slot:i,inventory:false});
+                           this.savePlayerInfo();
+                           break;
+                        }
+                    }
+                    for(let i=0;i<player.itemsBar.length;i++)
+                    {
+                        const slot = player.itemsBar[i];
+                        if(!slot.id  || slot.id ==0)
+                        {
+                            slot.id = ent.id;
+                        Main.entityManager.remove(ent);
+                           player.socket.emit("updateItem",{id: slot.id,count: ++slot.count,slot:i,inventory:false});
+                           this.savePlayerInfo();
+                           break;
+                        }
+                    }
+                    for(let i=0;i<player.inventory.length;i++)
+                    {
+                       const slot = player.inventory[i];
+                       if((slot.id== ent.id && slot.count<64))
+                        {
+                        slot.id = ent.id;
+                        Main.entityManager.remove(ent);
+                           player.socket.emit("updateItem",{id: slot.id,count: ++slot.count,slot:i,inventory:true});
+                           this.savePlayerInfo();
+                           break;
+                        }
+                    }
+                    for(let i=0;i<player.inventory.length;i++)
+                    {
+                        const slot = player.inventory[i];
+                        if(!slot.id  || slot.id ==0)
+                        {
+                            slot.id = ent.id;
+                        Main.entityManager.remove(ent);
+                           player.socket.emit("updateItem",{id: slot.id,count: ++slot.count,slot:i,inventory:true});
                            this.savePlayerInfo();
                            break;
                         }
