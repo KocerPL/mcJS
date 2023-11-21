@@ -415,6 +415,14 @@ export class Player
         if(this.locked || this.openInventory) return;
         if(CanvaManager.getKey("W")||CanvaManager.getKey("A")||CanvaManager.getKey("S")||CanvaManager.getKey("D"))
         {
+            if(!this.gs.walkSound.seeking.valueOf())
+            {
+                if(CanvaManager.getKey("CAPSLOCK"))
+                    this.gs.walkSound.playbackRate=2;
+                else
+                    this.gs.walkSound.playbackRate =1;
+                this.gs.walkSound.play();
+            }
             this.entity.rotations.leftLeg.x += this.legChange*speed;
             this.entity.rotations.rightLeg.x -= this.legChange*speed;
     
@@ -423,6 +431,8 @@ export class Player
         }
         else 
         {
+            this.gs.walkSound.pause();
+            this.gs.walkSound.currentTime =0;
             this.entity.rotations.leftLeg.x -= this.entity.rotations.leftLeg.x*0.1;
             this.entity.rotations.rightLeg.x -= this.entity.rotations.rightLeg.x*0.1;
             this.entity.rotations.leftHand.x -= this.entity.rotations.leftHand.x*0.1;
@@ -522,7 +532,7 @@ export class Player
                     return;
                 }
                 this.gs.socket.emit("placeBlock",{id:this.itemsBar[this.selectedItem].id,pos:{x:lastPos.x,y:lastPos.y,z:lastPos.z},slot:this.selectedItem});  
-                
+                this.gs.mineSound.play();
                 //this.updateItem(this.itemsBar[this.selectedItem].id,this.selectedItem,this.itemsBar[this.selectedItem].count-1);
                 CanvaManager.mouse.right=false;
               
@@ -605,8 +615,12 @@ export class Player
         this.entity.renderHandItem(this.itemsBar[this.selectedItem].id,Math.max(block.lightFBlock,Math.min(this.gs.sunLight,block.skyLight)));
         if(this.blockBreakingTime>1)
         {      const   transformation = Matrix4.identity();
+            //if(!this.gs.mineSound.seeking.valueOf())
+            this.gs.mineSound.play();
+            this.gs.mineSound.playbackRate=10;
             if( (Date.now()-this.lastHit)>=300)
             {
+                
                 this.lastHit = Date.now();
                 this.entity.rotations.rightHand.x = randRange(-70,-45);
             }

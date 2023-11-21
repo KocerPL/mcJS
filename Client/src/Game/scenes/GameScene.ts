@@ -63,6 +63,9 @@ export class GameScene extends Scene
     //private static lastFastTick=0;
     public cross:Cross;
     public player:Player ;
+    public audio =new Audio("./res/music/kocecraftvol1.ogg");
+    public walkSound = new Audio("./res/sounds/walk.ogg");
+    public mineSound = new Audio("./res/sounds/mine.ogg");
     public range = {start:0, end:1};
     //public static chunks:Array<Array<Chunk>>=new Array(8);
     public chunkQueue:Set<Chunk> = new Set(); 
@@ -170,7 +173,8 @@ export class GameScene extends Scene
         this.gui.add(this.cross);
         this.gui.add(new ItemBar("ItemBar"));
         this.gui.add(new Inventory("Inventory"));
-      
+        this.audio.play();
+        this.audio.volume = 0.3;
         this.gui.add(new TextComponent("debug","FPS:",0.01,null,ALIGN.left,true)).transformation =Matrix3.identity().translate(-1,0.98);
         const db =this.gui.get("debug");
         if(db instanceof TextComponent)
