@@ -72,10 +72,9 @@ export abstract class GuiComponent
             this.vStart = vStart+ rArrays.indices.length;
             for(let i =0;i<set.vertices.length;i+=2)
             {
-                const result:Vector3 = this.transformation.multiplyVec(new Vector3(set.vertices[i],set.vertices[i+1],1)); 
                 rArrays.vertices.push(set.vertices[i],set.vertices[i+1]);
             }
-            let highest = 0;
+            let highest = -1;
             for(let i=0;i<set.indices.length;i++)
             {
                 if(set.indices[i]+index>highest) highest = set.indices[i]+index;

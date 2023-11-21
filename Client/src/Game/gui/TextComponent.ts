@@ -27,11 +27,10 @@ export class TextComponent extends GuiComponent
         if(this.renderMe)
             gl.drawElements(gl.TRIANGLES,this.vEnd-this.vStart,gl.UNSIGNED_INT,this.vStart*4);
         shader.loadVec4("bgColor",new Vector4(0,0,0,0));
+        shader.loadFloat("transparency",1);
     }
     changeText(text:string)
     {
-        if(text==""){ this.renderMe = false; return;}
-        this.renderMe =true;
         if(this.sprite instanceof TextSprite)
         {
             this.sprite.text = text;
@@ -54,7 +53,6 @@ export class TextComponent extends GuiComponent
     }
     appendText(text:string)
     {
-        this.renderMe =true;
         if(this.sprite instanceof TextSprite)
         {
             this.sprite.text+= text;
@@ -71,7 +69,6 @@ export class TextComponent extends GuiComponent
                     
                 }
             }
-            if(this.sprite.text==""){ this.renderMe = false; return;}
         }
 
        
