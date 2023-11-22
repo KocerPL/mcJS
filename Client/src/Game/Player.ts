@@ -294,6 +294,7 @@ export class Player
             this.yAcc=0;
         }
         let speed=1;
+        let blockUnderneath =false;
         try
         {
             if(!this.locked && !this.openInventory && !this.gs.keyLock)
@@ -338,8 +339,10 @@ export class Player
             
                 }
             }   
+          
             if(World.getBlock(new Vector4(tempPos.x,tempPos.y-1,tempPos.z),this.gs).id<=0 && !this.gs.fly)
             {
+                
                 this.yAcc+=0.01;
                 tempPos.y-=this.yAcc;
             }   
@@ -350,6 +353,7 @@ export class Player
             else  if(!this.isBlockInWay(new Vector4(tempPos.x,this.pos.y,tempPos.z)))
             {
                 this.pos = new Vector4(tempPos.x,this.pos.y,tempPos.z);
+                blockUnderneath=true;
                 this.yAcc=0;
             }
             else  if(!this.isBlockInWay(new Vector4(tempPos.x,tempPos.y,this.pos.z)))
@@ -415,7 +419,7 @@ export class Player
         if(this.locked || this.openInventory) return;
         if(CanvaManager.getKey("W")||CanvaManager.getKey("A")||CanvaManager.getKey("S")||CanvaManager.getKey("D"))
         {
-            if(!this.gs.walkSound.seeking.valueOf())
+            if(blockUnderneath && !this.gs.walkSound.seeking.valueOf())
             {
                 if(CanvaManager.getKey("CAPSLOCK"))
                     this.gs.walkSound.playbackRate=2;

@@ -187,7 +187,7 @@ export class Chunk {
         }
         for(const ls of this.subchunks[yPos].lightList)
         {
-            Lighter.light(ls.x+(this.pos.x*16),ls.y+(yPos*16),ls.z+(this.pos.z*16),15,gs);
+            await  Lighter.light(ls.x+(this.pos.x*16),ls.y+(yPos*16),ls.z+(this.pos.z*16),15,gs);
         // await occasionalSleeper();
         }
         this.subchunks[yPos].fPass=false;

@@ -3,19 +3,13 @@ import { Block, blockType } from "./Game/Block.js";
 import { World } from "./Game/World.js";
 import { GameScene } from "./Game/scenes/GameScene.js";
 
-class LightNode
+class LightNode extends Vector3
 {
-    x:number;
-    y:number;
-    z:number;
     light:number;
     constructor(x:number,y:number,z:number,light:number)
     {
-        this.x=x;this.y=y;this.z=z;this.light =light;
-    }
-    toVector():Vector3
-    {
-        return new Vector3(this.x,this.y,this.z);
+        super(x,y,z);
+        this.light =light;
     }
 }
 function hasNode(x:number,y:number,z:number,list:Array<LightNode>)
@@ -29,21 +23,20 @@ function hasNode(x:number,y:number,z:number,list:Array<LightNode>)
 }
 export class Lighter
 {
-    static light(x:number,y:number,z:number,light:number,gs:GameScene)
+    static async light(x:number,y:number,z:number,light:number,gs:GameScene)
     {
         const list:Array<LightNode> = [];
         let firstNode=true;
         list.push(new LightNode(x,y,z,light));
         for(let i=0; list.length>i;i++)
         {
-        
             const curLightNode = list[i];
             if(curLightNode.light<=0) continue;
             x=curLightNode.x;
             z=curLightNode.z;
             y=curLightNode.y;
             light=curLightNode.light;
-            const d = World.getBlockAndSub(new Vector3(x,y,z),gs);
+            const d = World.getBlockAndSub(curLightNode,gs);
             gs.toUpdate.add(d.sub);
             if(!firstNode &&   Block.info[d.block.id].type==blockType.FULL) continue;
             firstNode=false;
@@ -90,7 +83,7 @@ export class Lighter
       
         }
     }
-    static removeLight(x:number,y:number,z:number,light:number,gs:GameScene)
+    static async removeLight(x:number,y:number,z:number,light:number,gs:GameScene)
     {
 
         const list:Array<LightNode> = [];
@@ -98,14 +91,13 @@ export class Lighter
         list.push(new LightNode(x,y,z,light+2));
         for(let i=0; list.length>i;i++)
         {
-        
             const curLightNode = list[i];
             if(curLightNode.light<=0) continue;
             x=curLightNode.x;
             z=curLightNode.z;
             y=curLightNode.y;
             light=curLightNode.light;
-            const d = World.getBlockAndSub(new Vector3(x,y,z),gs);
+            const d = World.getBlockAndSub(curLightNode,gs);
             gs.toUpdate.add(d.sub);
             if(!firstNode &&    d.block.id>0) continue;
             firstNode=false;
@@ -155,11 +147,11 @@ export class Lighter
         }
         for(let i=list.length-1; i>=0;i--)
         {
-            if(World.getBlock(list[i].toVector(),gs).id<=0)
-                this.processOneBlockLight(list[i].x,list[i].y,list[i].z,gs);
+            if(World.getBlock(list[i],gs).id<=0)
+                await this.processOneBlockLight(list[i].x,list[i].y,list[i].z,gs);
         }
     }
-    static processOneBlockLight(x,y,z,gs:GameScene)
+    static async processOneBlockLight(x,y,z,gs:GameScene)
     {
        
         let light =0;
@@ -188,7 +180,20 @@ export class Lighter
         test = World.getBlock(new Vector3(x,y,z+1),gs);
         if(test.lightFBlock>light+1)
             light= test.lightFBlock-1;
-        this.light(x,y,z,light,gs);
+        await this.light(x,y,z,light,gs);
 
     }
 }
+const occasionalSleeper = (function() {
+    //
+    let lastSleepingTime = performance.now();
+
+    return function() {
+        if (performance.now() - lastSleepingTime > 100) {
+            lastSleepingTime = performance.now();
+            return new Promise(resolve => setTimeout(resolve, 0));
+        } else {
+            return Promise.resolve();
+        }
+    };
+}());

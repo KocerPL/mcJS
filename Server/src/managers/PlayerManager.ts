@@ -86,6 +86,7 @@ export class Player
         let it:Item;
         if(isInv)
         {
+            if(this.inventory[slot].count<=0) return;
             this.inventory[slot].count--;
             it = new Item(this.pos,this.inventory[slot].id);
             Main.entityManager.add(it);
@@ -95,6 +96,7 @@ export class Player
         }
         else
         {
+            if(this.itemsBar[slot].count<=0) return;
             this.itemsBar[slot].count--;
             it = new Item(this.pos,this.itemsBar[slot].id);
             Main.entityManager.add(it);
@@ -279,19 +281,20 @@ export class PlayerManager
                         Main.entityManager.remove(ent);
                            player.socket.emit("updateItem",{id: slot.id,count: ++slot.count,slot:i,inventory:false});
                            this.savePlayerInfo();
-                           break;
+                           return;
                         }
                     }
                     for(let i=0;i<player.itemsBar.length;i++)
                     {
                         const slot = player.itemsBar[i];
-                        if(!slot.id  || slot.id ==0)
+                        if( slot.id ==0)
                         {
                             slot.id = ent.id;
-                        Main.entityManager.remove(ent);
+                            slot.count=0;
+                            Main.entityManager.remove(ent);
                            player.socket.emit("updateItem",{id: slot.id,count: ++slot.count,slot:i,inventory:false});
                            this.savePlayerInfo();
-                           break;
+                           return;
                         }
                     }
                     for(let i=0;i<player.inventory.length;i++)
@@ -303,7 +306,7 @@ export class PlayerManager
                         Main.entityManager.remove(ent);
                            player.socket.emit("updateItem",{id: slot.id,count: ++slot.count,slot:i,inventory:true});
                            this.savePlayerInfo();
-                           break;
+                           return;
                         }
                     }
                     for(let i=0;i<player.inventory.length;i++)
@@ -315,7 +318,7 @@ export class PlayerManager
                         Main.entityManager.remove(ent);
                            player.socket.emit("updateItem",{id: slot.id,count: ++slot.count,slot:i,inventory:true});
                            this.savePlayerInfo();
-                           break;
+                           return;
                         }
                     }
                     }

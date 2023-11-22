@@ -37,6 +37,14 @@ export class Vector3
         outVec.z = this.z*scalar;
         return outVec;
     }
+    round()
+    {
+        return new Vector3(Math.round(this.x),Math.round(this.y),Math.round(this.z));
+    }
+    modulo(div:number)
+    {
+        return new Vector3(this.x%div,this.y%div,this.z%div);
+    }
     copy()
     {
         return new Vector3(this.x,this.y,this.z);

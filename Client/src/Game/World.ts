@@ -84,7 +84,10 @@ export class World
     }
     public static getBlock(blockPos:Vector3,gs:GameScene):Block
     {
-        let inChunkPos = new Vector3(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);
+        const rounded= blockPos.round();// new Vector3(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);
+        let inChunkPos = rounded.copy();
+        inChunkPos.x = inChunkPos.x%16;
+        inChunkPos.z = inChunkPos.z%16;
         if(inChunkPos.x<0)
             inChunkPos.x = 16-Math.abs(inChunkPos.x);
         if(inChunkPos.z<0)
@@ -97,11 +100,11 @@ export class World
         }
  
 
-        const chunkPos =new Vector4(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
+        const chunkPosX =Math.floor(rounded.x/16);
+        const chunkPosZ=Math.floor(rounded.z/16);
         try
         {
-          
-            return gs.getChunkAt(chunkPos.x,chunkPos.z).getBlock(inChunkPos);
+            return gs.getChunkAt(chunkPosX,chunkPosZ).getBlock(inChunkPos);
         }catch(error)
         {
             return undefined;
@@ -110,7 +113,10 @@ export class World
     
     static  getBlockAndSub(blockPos:Vector3,gs:GameScene):{block:Block,sub:SubChunk}
     {
-        let inChunkPos = new Vector3(Math.round(blockPos.x)%16,Math.round(blockPos.y),Math.round(blockPos.z)%16);
+        const rounded= blockPos.round();
+        let inChunkPos = rounded.copy();
+        inChunkPos.x = inChunkPos.x%16;
+        inChunkPos.z = inChunkPos.z%16;
         if(inChunkPos.x<0)
             inChunkPos.x = 16-Math.abs(inChunkPos.x);
         if(inChunkPos.z<0)
@@ -121,12 +127,12 @@ export class World
             inChunkPos=  inChunkPos.abs();
       
         }
-
-        const chunkPos =new Vector4(Math.floor(Math.round(blockPos.x)/16),Math.round(blockPos.y),Math.floor(Math.round(blockPos.z)/16));
+        const chunkPosX =Math.floor(rounded.x/16);
+        const chunkPosZ=Math.floor(rounded.z/16);
         try
         {
           
-            return gs.getChunkAt(chunkPos.x,chunkPos.z).getBlockSub(inChunkPos);
+            return gs.getChunkAt(chunkPosX,chunkPosZ).getBlockSub(inChunkPos);
         }catch(error)
         {
             console.log(inChunkPos);
