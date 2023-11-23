@@ -3,7 +3,7 @@ import { Block, blockType } from "./Game/Block.js";
 import { World } from "./Game/World.js";
 import { GameScene } from "./Game/scenes/GameScene.js";
 
-class LightNode extends Vector3
+export class LightNode extends Vector3
 {
     light:number;
     constructor(x:number,y:number,z:number,light:number)
@@ -23,6 +23,15 @@ function hasNode(x:number,y:number,z:number,list:Array<LightNode>)
 }
 export class Lighter
 {
+    static nodes:Array<LightNode> = [];
+    static async processNode(gs:GameScene)
+    {
+        const node =this.nodes.shift();
+        if(node)
+            await this.light(node.x,node.y,node.z,node.light,gs);
+        await gs.occasionalSleeper();
+        this.processNode(gs);
+    }
     static async light(x:number,y:number,z:number,light:number,gs:GameScene)
     {
         const list:Array<LightNode> = [];
@@ -30,6 +39,7 @@ export class Lighter
         list.push(new LightNode(x,y,z,light));
         for(let i=0; list.length>i;i++)
         {
+            await gs.occasionalSleeper();
             const curLightNode = list[i];
             if(curLightNode.light<=0) continue;
             x=curLightNode.x;
@@ -88,9 +98,11 @@ export class Lighter
 
         const list:Array<LightNode> = [];
         let firstNode=true;
+     
         list.push(new LightNode(x,y,z,light+2));
         for(let i=0; list.length>i;i++)
         {
+            await gs.occasionalSleeper();
             const curLightNode = list[i];
             if(curLightNode.light<=0) continue;
             x=curLightNode.x;
@@ -184,16 +196,3 @@ export class Lighter
 
     }
 }
-const occasionalSleeper = (function() {
-    //
-    let lastSleepingTime = performance.now();
-
-    return function() {
-        if (performance.now() - lastSleepingTime > 100) {
-            lastSleepingTime = performance.now();
-            return new Promise(resolve => setTimeout(resolve, 0));
-        } else {
-            return Promise.resolve();
-        }
-    };
-}());

@@ -8,7 +8,7 @@ import { Block} from "./Block.js";
 import { SubChunk} from "./SubChunk.js";
 import { Matrix4 } from "../Engine/Utils/Matrix4.js";
 import { Mesh } from "./Mesh.js";
-import { Lighter } from "../Lighter.js";
+import { LightNode, Lighter } from "../Lighter.js";
 import { SkyLighter } from "../SkyLighter.js";
 import { GameScene } from "./scenes/GameScene.js";
 import { Vector3 } from "../Engine/Utils/Vector3.js";
@@ -160,7 +160,7 @@ export class Chunk {
                 {
                     for(let i=lastHeightMap[x][z]+1 ;i<=this.heightmap[x][z];i++)
                     {
-                        SkyLighter.removeLight((this.pos.x*16)+x , i ,(this.pos.z*16)+z ,15,gs);
+                        SkyLighter.rmNodes.push(new LightNode((this.pos.x*16)+x , i ,(this.pos.z*16)+z ,15));
                         //  await occasionalSleeper();
                    
                     }
@@ -176,18 +176,18 @@ export class Chunk {
             }
         for(const k of this.lightQueue)
         {
-            SkyLighter.light(k[0],k[1],k[2],15,gs);
+            SkyLighter.nodes.push(new LightNode(k[0],k[1],k[2],15));
             //     await occasionalSleeper();
         }
         this.lightQueue.length =0;
         for(const k of queue)
         {
-            SkyLighter.light(k[0],k[1],k[2],15,gs);
-            await occasionalSleeper();
+            SkyLighter.nodes.push(new LightNode(k[0],k[1],k[2],15));
+            // await   gs.occasionalSleeper();
         }
         for(const ls of this.subchunks[yPos].lightList)
         {
-            await  Lighter.light(ls.x+(this.pos.x*16),ls.y+(yPos*16),ls.z+(this.pos.z*16),15,gs);
+            Lighter.nodes.push(new LightNode(ls.x+(this.pos.x*16),ls.y+(yPos*16),ls.z+(this.pos.z*16),15));
         // await occasionalSleeper();
         }
         this.subchunks[yPos].fPass=false;
@@ -275,6 +275,7 @@ export class Chunk {
         {
             //  console.log(i);
             //console.log(this.subchunks[i]);
+            this.subchunks[i].lightUpdate =true;
             gs.toUpdate.add(this.subchunks[i]);
         }
         //console.log("now not lazy hehehehe")
@@ -351,6 +352,7 @@ export class Chunk {
             if(! (this.subchunks[yPos].blocks[pos.x][y][pos.z] instanceof Block))
                 this.subchunks[yPos].blocks[pos.x][y][pos.z] =new Block(0);
             this.subchunks[yPos].blocks[pos.x][y][pos.z].id=blockID;
+            this.subchunks[yPos].lightUpdate =true;
             gs.toUpdate.add(this.subchunks[yPos]);
             try
             {
@@ -394,17 +396,3 @@ export class Chunk {
   
 
 }
-const occasionalSleeper = (function() {
-    //
-    let lastSleepingTime = performance.now();
-
-    return function() {
-        return new Promise(resolve => setTimeout(resolve, 0));
-        if (performance.now() - lastSleepingTime > 0.5) {
-            lastSleepingTime = performance.now();
-      
-        } else {
-            return Promise.resolve();
-        }
-    };
-}());

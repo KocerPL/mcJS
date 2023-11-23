@@ -29,6 +29,8 @@ import { TextInput } from "../gui/TextInput.js";
 import { InlineTextInput } from "../gui/InlineTextInput.js";
 import { GuiComponent } from "../gui/GuiComponent.js";
 import { clamp, roundTo } from "../../Engine/Utils/Math.js";
+import { Lighter } from "../../Lighter.js";
+import { SkyLighter } from "../../SkyLighter.js";
 declare let io;
 const gl = CanvaManager.gl;
 export class GameScene extends Scene
@@ -97,7 +99,14 @@ export class GameScene extends Scene
                 }
             }
             const dist =Vector4.distance(plPos,sc.pos);
-            if(dist<clDistance)
+            if(sc.mesh.count<=0)
+            {
+                return sc;
+                clDistance =dist;
+                clSub = sc;
+                continue;
+            }
+            if( dist<clDistance)
             {
                 clDistance =dist;
                 clSub = sc;
@@ -106,7 +115,7 @@ export class GameScene extends Scene
         return clSub;
         
     }
-    private updateSubchunk()
+    private async updateSubchunk()
     {
         //const concatQ:Set<Chunk> = new Set();
         const entry:SubChunk =this.getNearestSubchunk();// this.toUpdate.entries().next().value[0];
@@ -117,7 +126,7 @@ export class GameScene extends Scene
         {
    
            
-            entry.update(this).then(()=>{
+            entry.update(this).then(async()=>{
                 // console.log("updating...");
                 entry.chunk.updateMesh();
                 this.toUpdate.delete(entry);
@@ -125,7 +134,8 @@ export class GameScene extends Scene
                 //     this.updateSubchunk();
                 // });
                 //  console.log("Update",entry);
-                setTimeout( ()=>{ this.updateSubchunk();},0);
+                await this.occasionalSleeper();
+                this.updateSubchunk();
             }).catch(()=>{
                 setTimeout( ()=>{ this.updateSubchunk();},0);
             });
@@ -409,6 +419,8 @@ export class GameScene extends Scene
         this.onKey("`");
         this.onKey("`");
         this.updateSubchunk();
+        Lighter.processNode(this);
+        SkyLighter.processNode(this);
     }
     onClick()
     {
@@ -657,5 +669,17 @@ export class GameScene extends Scene
                 chat.transparency=1;
         }
     }
+    public occasionalSleeper = (function() {
+        //
+        let lastSleepingTime = performance.now();
+        return function() {
+            if (performance.now() - lastSleepingTime > 20) {
+                lastSleepingTime = performance.now();
+                return new Promise(resolve => setTimeout(resolve, 0));
+            } else {
+                return Promise.resolve();
+            }
+        };
+    }());
     
 }

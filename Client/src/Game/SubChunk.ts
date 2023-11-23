@@ -43,10 +43,11 @@ export class SubChunk
         // this.chunk.updateLight();
        
         this.scanLight();
-        await  this.chunk.preUpdate(this.pos.y,gs);
+        if(this.lightUpdate)
+            await this.chunk.preUpdate(this.pos.y,gs);
         //this.mesh.reset();
         this.tmpMesh = new Mesh();
-        await    this.updateVerticesOptimized();//.then(()=>{
+        await    this.updateVerticesOptimized(gs);//.then(()=>{
         this.mesh = this.tmpMesh;
         this.mesh.count = this.mesh.indices.length;
         this.lightUpdate =false;
@@ -367,7 +368,7 @@ export class SubChunk
         }
         return index;
     }
-    async  updateVerticesOptimized():Promise<number>
+    async  updateVerticesOptimized(gs:GameScene):Promise<number>
     {
        
       
@@ -395,7 +396,7 @@ export class SubChunk
             
             index = this.updateSide(x,y,z,0,0,1,Side.front,block,index,temp);
             //temp.length=0;
-            await occasionalSleeper();
+            // await gs.occasionalSleeper();
         }
         return index;
         
@@ -590,17 +591,3 @@ export class SubChunk
     ];
 
 }
-const occasionalSleeper = (function() {
-    //
-    let lastSleepingTime = performance.now();
-
-    return function() {
-        return Promise.resolve();
-        if (performance.now() - lastSleepingTime > 100) {
-            lastSleepingTime = performance.now();
-            return new Promise(resolve => setTimeout(resolve, 0));
-        } else {
-            return Promise.resolve();
-        }
-    };
-}());
